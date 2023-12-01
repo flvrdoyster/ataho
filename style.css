@@ -1,0 +1,14 @@
+#bg {
+    height: 640px;
+    width: 1200px;
+    background-image: url("bg_2x.png");
+    background-repeat: no-repeat;
+    background-position: right;
+    }
+
+
+#ataho {
+    position: relative;
+    top: 300px;
+    left: 400px;
+}
