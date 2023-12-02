@@ -1,5 +1,10 @@
+:root {
+    --x: 10px;
+    --y: 100px;
+}
+
 .btn {
-    font-size: 1.2em;
+    font-size: 2em;
 }
 
 #bg {
@@ -7,12 +12,11 @@
     width: 960px;
     background-image: url("bg_2x.png");
     background-repeat: no-repeat;
-    background-position: right;
+    background-position: 80% center;
 }
 
-
-#ataho {
+#character {
     position: relative;
-    top: 300px;
-    left: 400px;
+    left: var(--x);
+    top: var(--y);
 }

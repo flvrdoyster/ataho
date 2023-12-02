@@ -1,8 +1,9 @@
-// swim.js
-
 function toggleImg1() {
-    document.getElementById("ataho").src = "ataho_swim.gif";
+    document.getElementById("gif").src = "ataho_swim.gif";
 }
 function toggleImg2() {
-    document.getElementById("ataho").src = "ataho_idle.gif";
+    document.getElementById("gif").src = "ataho_idle.gif";
+}
+function moveForward() {
+    document.getElementById("character").style.left = "20px" ;
 }
