@@ -22,9 +22,8 @@ img5.src = 'swim3.png';
 var img6 = new Image();
 img6.src = 'swim4.png';
 
-var timer = 0;
-
-var crawl = 0;
+var timer_idle = 0;
+var timer_swim = 0;
 
 var ataho = {
     x: 10,
@@ -32,24 +31,32 @@ var ataho = {
     width: 120,
     height: 160,
     draw(){
-        // ctx.fillStyle = 'green';
-        // ctx.fillRect(this.x, this.y, this.width, this.height)
         if (goLeft == true){
-            if (crawl%4 == 0){
+            if (timer_swim%8 < 2){
                 ctx.drawImage(img3, this.x, this.y);
             }
-            if (crawl%4 == 1){
-                ctx.drawImage(img4, this.x, this.y);
-            }
-            if (crawl%4 == 2){
-                ctx.drawImage(img5, this.x, this.y);
-            }
-            if (crawl%4 == 3){
-                ctx.drawImage(img6, this.x, this.y);
-            }
+            else {
+                if (timer_swim%8 < 4){
+                    ctx.drawImage(img4, this.x, this.y);
+                }
+                else {
+                    if (timer_swim%8 < 6){
+                        ctx.drawImage(img5, this.x, this.y);
+                    }
+                    else {
+                        ctx.drawImage(img6, this.x, this.y);
+                    }
+                }
+
+            }   
         }
         else {
-            ctx.drawImage(img1, this.x, this.y);
+            if (timer_idle%20 < 10){
+                ctx.drawImage(img1, this.x, this.y);
+            }
+            else {
+                ctx.drawImage(img2, this.x, this.y);
+            }
         }
     }
 }
@@ -59,7 +66,6 @@ var goLeft = false;
 document.addEventListener('keydown', function(a){
     if (a.code === 'Space'){
         goLeft = true;
-
     }
 })
 
@@ -79,10 +85,14 @@ function byFrame(){
     requestAnimationFrame(byFrame);
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    
+
+    if (goLeft == false){
+        timer_idle+= 1
+    }    
+
     if (goLeft == true){
         ataho.x += 2;
-        crawl+= 1
+        timer_swim+= 1
     }
     ataho.draw();
  }
