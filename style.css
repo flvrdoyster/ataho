@@ -3,15 +3,9 @@
 }
 
 #bg {
-    height: 640px;
     width: 960px;
+    height: 640px;
     background-image: url("bg_2x.png");
     background-repeat: no-repeat;
     background-position: 80% center;
-}
-
-#character {
-    position: relative;
-    left: 10px;
-    top: 100px;
 }

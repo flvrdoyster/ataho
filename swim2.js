@@ -1,8 +1,8 @@
 var canvas = document.getElementById('canvas');
 var ctx = canvas.getContext('2d');
 
-canvas.width = window.innerWidth - 100;
-canvas.height = window.innerHeight - 100;
+canvas.width = 960;
+canvas.height = 640;
 
 var img1 = new Image();
 img1.src = 'idle1.png';
