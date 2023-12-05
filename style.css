@@ -1,8 +1,3 @@
-:root {
-    --x: 10px;
-    --y: 100px;
-}
-
 .btn {
     font-size: 2em;
 }
@@ -17,6 +12,6 @@
 
 #character {
     position: relative;
-    left: var(--x);
-    top: var(--y);
+    left: 10px;
+    top: 100px;
 }
