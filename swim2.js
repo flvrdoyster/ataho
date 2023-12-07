@@ -152,7 +152,7 @@ document.addEventListener('keyup', function(h){
 document.addEventListener('keydown', function(i){
     if (i.code === 'Enter'){
         ataho.x = 10;
-        ataho.y = 250
+        ataho.y = 250;
     }
 })
 
@@ -177,12 +177,10 @@ function byFrame(){
 
     if (goUp == true){
         ataho.y -= 2;
-        timer_swim+= 1
     }
 
     if (goDown == true){
         ataho.y += 2;
-        timer_swim+= 1
     }
 
     ataho.draw();
@@ -190,17 +188,38 @@ function byFrame(){
 
 byFrame();
 
-function left() {
+function buttonLeft() {
     goLeft = true;
+    goRight = false;
 }
 
-function right() {
+function buttonRight() {
     goRight = true;
+    goLeft = false;
 }
 
-function stop() {
+function buttonUp() {
+    goUp = true;
+    goDown = false;
+}
+
+function buttonDown() {
+    goUp = false;
+    goDown = true;
+}
+
+function buttonStop() {
     goRight = false;
     goLeft = false;
     goUp = false;
     goDown = false;
+}
+
+function buttonReset() {
+    goRight = false;
+    goLeft = false;
+    goUp = false;
+    goDown = false;
+    ataho.x = 10;
+    ataho.y = 250;
 }
