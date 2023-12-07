@@ -39,7 +39,7 @@ var timer_swim = 0;
 
 var ataho = {
     x: 10,
-    y: 200,  
+    y: 250,  
     width: 120,
     height: 160,
     draw(){
@@ -89,13 +89,17 @@ var ataho = {
                     ctx.drawImage(idle_r2, this.x, this.y);
                 }
             }
-        }
+        }    
     }
 }
 
 var goRight = false;
 
 var goLeft = false;
+
+var goUp = false;
+
+var goDown = false;
 
 document.addEventListener('keydown', function(a){
     if (a.code === 'KeyD'){
@@ -122,8 +126,33 @@ document.addEventListener('keyup', function(d){
 })
 
 document.addEventListener('keydown', function(e){
-    if (e.code === 'Enter'){
+    if (e.code === 'KeyW'){
+        goUp = true;
+    }
+})
+
+document.addEventListener('keyup', function(f){
+    if (f.code === 'KeyW'){
+        goUp = false;
+    }
+})
+
+document.addEventListener('keydown', function(g){
+    if (g.code === 'KeyS'){
+        goDown = true;
+    }
+})
+
+document.addEventListener('keyup', function(h){
+    if (h.code === 'KeyS'){
+        goDown = false;
+    }
+})
+
+document.addEventListener('keydown', function(i){
+    if (i.code === 'Enter'){
         ataho.x = 10;
+        ataho.y = 250
     }
 })
 
@@ -146,6 +175,16 @@ function byFrame(){
         }
     }
 
+    if (goUp == true){
+        ataho.y -= 2;
+        timer_swim+= 1
+    }
+
+    if (goDown == true){
+        ataho.y += 2;
+        timer_swim+= 1
+    }
+
     ataho.draw();
  }
 
@@ -162,4 +201,6 @@ function right() {
 function stop() {
     goRight = false;
     goLeft = false;
+    goUp = false;
+    goDown = false;
 }
