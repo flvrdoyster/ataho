@@ -51,6 +51,8 @@ drown3.src = 'drown_3.png';
 var drown4 = new Image();
 drown4.src = 'drown_4.png';
 
+var whirlpool1 = new Image();
+whirlpool1.src = 'whirlpool_2x.png';
 
 // 아타호 오브젝트
 
@@ -137,11 +139,10 @@ var ataho = {
 var whirlpool = {
     x: 800,
     y: 250,  
-    width: 100,
-    height: 100,
+    width: 120,
+    height: 200,
     draw(){
-        ctx.fillStyle = 'red';
-        ctx.fillRect(this.x, this.y, this.width, this.height);
+        ctx.drawImage(whirlpool1, this.x, this.y);
     }
 }
 
