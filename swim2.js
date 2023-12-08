@@ -1,8 +1,13 @@
+// 캔버스 정의
+
 var canvas = document.getElementById('canvas');
 var ctx = canvas.getContext('2d');
 
 canvas.width = 960;
 canvas.height = 640;
+
+
+// 이미지 불러오기
 
 var idle_r1 = new Image();
 idle_r1.src = 'idle_r1.png';
@@ -34,64 +39,123 @@ swim_l3.src = 'swim_l3.png';
 var swim_l4 = new Image();
 swim_l4.src = 'swim_l4.png';
 
-var timer_idle = 0;
-var timer_swim = 0;
+var drown1 = new Image();
+drown1.src = 'drown_1.png';
+
+var drown2 = new Image();
+drown2.src = 'drown_2.png';
+
+var drown3 = new Image();
+drown3.src = 'drown_3.png';
+
+var drown4 = new Image();
+drown4.src = 'drown_4.png';
+
+
+// 아타호 오브젝트
 
 var ataho = {
     x: 10,
     y: 250,  
     width: 120,
-    height: 160,
+    height: 80,
     draw(){
-        if (goLeft == true){
-            if (timer_swim%8 < 2){
-                ctx.drawImage(swim_l1, this.x, this.y);
-            }
-            else {
-                if (timer_swim%8 < 4){
-                    ctx.drawImage(swim_l2, this.x, this.y);
-                }
-                else {
-                    if (timer_swim%8 < 6){
-                        ctx.drawImage(swim_l3, this.x, this.y);
-                    }
-                    else {
-                        ctx.drawImage(swim_l4, this.x, this.y);
-                    }
-                }
-            }   
-        }
-        else {
-            if (goRight == true){
+        if (drown == false){
+            if (goLeft == true){
                 if (timer_swim%8 < 2){
-                    ctx.drawImage(swim_r1, this.x, this.y);
+                    ctx.drawImage(swim_l1, this.x, this.y);
                 }
                 else {
                     if (timer_swim%8 < 4){
-                        ctx.drawImage(swim_r2, this.x, this.y);
+                        ctx.drawImage(swim_l2, this.x, this.y);
                     }
                     else {
                         if (timer_swim%8 < 6){
-                            ctx.drawImage(swim_r3, this.x, this.y);
+                            ctx.drawImage(swim_l3, this.x, this.y);
                         }
                         else {
-                            ctx.drawImage(swim_r4, this.x, this.y);
+                            ctx.drawImage(swim_l4, this.x, this.y);
                         }
                     }
-    
                 }   
             }
             else {
-                if (timer_idle%20 < 10){
-                    ctx.drawImage(idle_r1, this.x, this.y);
+                if (goRight == true){
+                    if (timer_swim%8 < 2){
+                        ctx.drawImage(swim_r1, this.x, this.y);
+                    }
+                    else {
+                        if (timer_swim%8 < 4){
+                            ctx.drawImage(swim_r2, this.x, this.y);
+                        }
+                        else {
+                            if (timer_swim%8 < 6){
+                                ctx.drawImage(swim_r3, this.x, this.y);
+                            }
+                            else {
+                                ctx.drawImage(swim_r4, this.x, this.y);
+                            }
+                        }
+        
+                    }   
                 }
                 else {
-                    ctx.drawImage(idle_r2, this.x, this.y);
+                    if (timer_idle%24 < 12){
+                        ctx.drawImage(idle_r1, this.x, this.y);
+                    }
+                    else {
+                        ctx.drawImage(idle_r2, this.x, this.y);
+                    }
                 }
+            }    
+        }
+        else {
+            if (timer_idle%24 < 6){
+                ctx.drawImage(drown1, this.x, this.y);
             }
-        }    
+            else {
+                if (timer_idle%24 < 12){
+                    ctx.drawImage(drown2, this.x, this.y);
+                }
+                else {
+                    if (timer_idle%24 < 18){
+                        ctx.drawImage(drown3, this.x, this.y);
+                    }
+                    else {
+                        ctx.drawImage(drown4, this.x, this.y);
+                    }
+                }
+
+            }   
+        }
     }
 }
+
+
+// 소용돌이 오브젝트
+
+var whirlpool = {
+    x: 800,
+    y: 250,  
+    width: 100,
+    height: 100,
+    draw(){
+        ctx.fillStyle = 'red';
+        ctx.fillRect(this.x, this.y, this.width, this.height);
+    }
+}
+
+
+// 타이머
+
+var timer_idle = 0;
+
+var timer_swim = 0;
+
+
+// 움직임 상태 값
+
+var drown = false;
 
 var goRight = false;
 
@@ -101,63 +165,14 @@ var goUp = false;
 
 var goDown = false;
 
-document.addEventListener('keydown', function(a){
-    if (a.code === 'KeyD'){
-        goRight = true;
-    }
-})
+var animation1;
 
-document.addEventListener('keyup', function(b){
-    if (b.code === 'KeyD'){
-        goRight = false;
-    }
-})
+var animation2;
 
-document.addEventListener('keydown', function(c){
-    if (c.code === 'KeyA'){
-        goLeft = true;
-    }
-})
-
-document.addEventListener('keyup', function(d){
-    if (d.code === 'KeyA'){
-        goLeft = false;
-    }
-})
-
-document.addEventListener('keydown', function(e){
-    if (e.code === 'KeyW'){
-        goUp = true;
-    }
-})
-
-document.addEventListener('keyup', function(f){
-    if (f.code === 'KeyW'){
-        goUp = false;
-    }
-})
-
-document.addEventListener('keydown', function(g){
-    if (g.code === 'KeyS'){
-        goDown = true;
-    }
-})
-
-document.addEventListener('keyup', function(h){
-    if (h.code === 'KeyS'){
-        goDown = false;
-    }
-})
-
-document.addEventListener('keydown', function(i){
-    if (i.code === 'Enter'){
-        ataho.x = 10;
-        ataho.y = 250;
-    }
-})
+// 프레임 그려주기
 
 function byFrame(){
-    requestAnimationFrame(byFrame);
+    animation1 = requestAnimationFrame(byFrame);
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -183,10 +198,103 @@ function byFrame(){
         ataho.y += 2;
     }
 
+    if (drown == true){
+        goRight = false;
+        goLeft = false;
+        goUp = false;
+        goDown = false;
+    }
+
+    whirlpool.draw();
+
     ataho.draw();
+
+    collision(ataho, whirlpool);
+
  }
 
 byFrame();
+
+
+// 충돌 체크
+
+function collision(ataho, whirlpool){
+    var xCheck = whirlpool.x - (ataho.x + ataho.width);
+    var yCheck = whirlpool.y - (ataho.y + ataho.height);
+    if (xCheck < 0 && yCheck < 0){
+        drown = true;
+    }
+}
+
+
+// 키보드 이벤트
+
+document.addEventListener('keydown', function(a){
+    if (drown == false) {
+        if (a.code === 'KeyD'){
+            goRight = true;
+        }
+    }
+})
+
+document.addEventListener('keyup', function(b){
+    if (b.code === 'KeyD'){
+        goRight = false;
+    }
+})
+
+document.addEventListener('keydown', function(c){
+    if (drown == false) {
+        if (c.code === 'KeyA'){
+                goLeft = true;
+        }
+    }
+})
+
+document.addEventListener('keyup', function(d){
+    if (d.code === 'KeyA'){
+        goLeft = false;
+    }
+})
+
+document.addEventListener('keydown', function(e){
+    if (drown == false) {
+        if (e.code === 'KeyW'){
+            goUp = true;
+        }
+    }
+})
+
+document.addEventListener('keyup', function(f){
+    if (f.code === 'KeyW'){
+        goUp = false;
+    }
+})
+
+document.addEventListener('keydown', function(g){
+    if (drown == false) {
+        if (g.code === 'KeyS'){
+            goDown = true;
+        }
+    }
+})
+
+document.addEventListener('keyup', function(h){
+    if (h.code === 'KeyS'){
+        goDown = false;
+    }
+    
+})
+
+document.addEventListener('keydown', function(i){
+    if (i.code === 'Enter'){
+        ataho.x = 10;
+        ataho.y = 250;
+    }
+})
+
+
+// 버튼 이벤트
 
 function buttonLeft() {
     goLeft = true;
@@ -220,6 +328,7 @@ function buttonReset() {
     goLeft = false;
     goUp = false;
     goDown = false;
+    drown = false;
     ataho.x = 10;
     ataho.y = 250;
 }
