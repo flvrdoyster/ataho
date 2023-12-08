@@ -60,6 +60,7 @@ var ataho = {
     width: 120,
     height: 80,
     draw(){
+
         if (drown == false){
             if (goLeft == true){
                 if (timer_swim%8 < 2){
@@ -96,7 +97,6 @@ var ataho = {
                                 ctx.drawImage(swim_r4, this.x, this.y);
                             }
                         }
-        
                     }   
                 }
                 else {
@@ -169,6 +169,7 @@ var animation1;
 
 var animation2;
 
+
 // 프레임 그려주기
 
 function byFrame(){
@@ -210,7 +211,6 @@ function byFrame(){
     ataho.draw();
 
     collision(ataho, whirlpool);
-
  }
 
 byFrame();
@@ -219,10 +219,15 @@ byFrame();
 // 충돌 체크
 
 function collision(ataho, whirlpool){
-    var xCheck = whirlpool.x - (ataho.x + ataho.width);
-    var yCheck = whirlpool.y - (ataho.y + ataho.height);
-    if (xCheck < 0 && yCheck < 0){
-        drown = true;
+    var xCheck = whirlpool.x - (ataho.x+ataho.width);
+    var yCheck1 = whirlpool.y - (ataho.y+ataho.height);
+    if (xCheck < 0 && yCheck1 < 0){
+        if (whirlpool.y < ataho.y-ataho.height){
+            drown = false;
+        }
+        else {
+            drown = true;
+        }
     }
 }
 
@@ -283,7 +288,6 @@ document.addEventListener('keyup', function(h){
     if (h.code === 'KeyS'){
         goDown = false;
     }
-    
 })
 
 document.addEventListener('keydown', function(i){
