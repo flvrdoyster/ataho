@@ -1,5 +1,14 @@
+
+@font-face {
+    font-family: "KoddiUD-Ongodic";
+    src: url("https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2105_2@1.0/KoddiUDOnGothic-Regular.woff") format("woff");
+    font-weight: normal;
+    font-display: swap;
+}
+
 .btn {
-    font-size: 2em;
+    font-size: 1.2em;
+    font-family: "KoddiUD-Ongodic"
 }
 
 #bg {
