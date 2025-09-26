@@ -95,6 +95,9 @@
     };
     let drownStartTime = null;
 
+    // ✨ 마지막 수평 방향을 기억하기 위한 변수
+    let lastHorizontalDirection = 'right';
+
     // 게임 루프 (`byFrame`): 매 프레임마다 호출됩니다.
     function byFrame() {
         requestAnimationFrame(byFrame);
@@ -109,11 +112,11 @@
                 resetCharacter();
             }
         } else {
-            // ✨ 이동 속도 보정
+            // 이동 속도 보정
             const isDiagonal = (inputState.up || inputState.down) && (inputState.left || inputState.right);
             const speed = isDiagonal ? movementSpeed * 0.707 : movementSpeed;
             
-            // ✨ 캐릭터의 다음 위치를 미리 계산합니다.
+            // 캐릭터의 다음 위치를 미리 계산합니다.
             let nextX = ataho.x;
             let nextY = ataho.y;
 
@@ -123,27 +126,35 @@
             if (inputState.down) {
                 nextY += speed;
             }
+
+            // ✨ 좌우 움직임이 있을 때
             if (inputState.right) {
                 nextX += speed;
                 ataho.state = 'swim_right';
                 timer.swim++;
+                lastHorizontalDirection = 'right'; // 마지막 수평 방향 업데이트
             } else if (inputState.left) {
                 nextX -= speed;
                 ataho.state = 'swim_left';
                 timer.swim++;
-            } else {
-                if (!inputState.up && !inputState.down) {
-                    ataho.state = 'idle_right';
-                    timer.idle++;
-                }
+                lastHorizontalDirection = 'left'; // 마지막 수평 방향 업데이트
+            } 
+            // ✨ 좌우 움직임은 없지만 상하 움직임이 있을 때
+            else if (inputState.up || inputState.down) {
+                // 마지막 수평 방향으로 수영 애니메이션 유지
+                ataho.state = 'swim_' + lastHorizontalDirection;
+                timer.swim++;
+            }
+            // ✨ 모든 움직임이 없을 때
+            else {
+                ataho.state = 'idle_right';
+                timer.idle++;
             }
 
-            // ✨ 경계 충돌을 확인하고, 벗어나지 않는 경우에만 위치를 업데이트합니다.
-            // 좌우 경계
+            // 경계 충돌을 확인하고, 벗어나지 않는 경우에만 위치를 업데이트합니다.
             if (nextX >= 0 && nextX + ataho.width <= canvas.width) {
                 ataho.x = nextX;
             }
-            // 상하 경계
             if (nextY >= 0 && nextY + ataho.height <= canvas.height) {
                 ataho.y = nextY;
             }
@@ -241,6 +252,13 @@
         inputState.left = touchX < characterCenterX;
         inputState.down = touchY > characterCenterY;
         inputState.up = touchY < characterCenterY;
+        
+        // 터치 입력으로 마지막 수평 방향 업데이트
+        if (inputState.right) {
+            lastHorizontalDirection = 'right';
+        } else if (inputState.left) {
+            lastHorizontalDirection = 'left';
+        }
     });
 
     canvas.addEventListener('touchend', (e) => {
@@ -254,6 +272,8 @@
         isDrowned = false;
         drownStartTime = null;
         Object.keys(inputState).forEach(key => inputState[key] = false);
+        // 마지막 수평 방향 초기화
+        lastHorizontalDirection = 'right';
     }
 
     // 모든 이미지 로드가 완료되면 게임을 시작합니다.
