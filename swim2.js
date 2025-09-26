@@ -109,23 +109,26 @@
                 resetCharacter();
             }
         } else {
-            // 이동 속도 보정
+            // ✨ 이동 속도 보정
             const isDiagonal = (inputState.up || inputState.down) && (inputState.left || inputState.right);
             const speed = isDiagonal ? movementSpeed * 0.707 : movementSpeed;
             
-            // 상하 움직임과 좌우 움직임을 독립적으로 처리
+            // ✨ 캐릭터의 다음 위치를 미리 계산합니다.
+            let nextX = ataho.x;
+            let nextY = ataho.y;
+
             if (inputState.up) {
-                ataho.y -= speed;
+                nextY -= speed;
             }
             if (inputState.down) {
-                ataho.y += speed;
+                nextY += speed;
             }
             if (inputState.right) {
-                ataho.x += speed;
+                nextX += speed;
                 ataho.state = 'swim_right';
                 timer.swim++;
             } else if (inputState.left) {
-                ataho.x -= speed;
+                nextX -= speed;
                 ataho.state = 'swim_left';
                 timer.swim++;
             } else {
@@ -133,6 +136,16 @@
                     ataho.state = 'idle_right';
                     timer.idle++;
                 }
+            }
+
+            // ✨ 경계 충돌을 확인하고, 벗어나지 않는 경우에만 위치를 업데이트합니다.
+            // 좌우 경계
+            if (nextX >= 0 && nextX + ataho.width <= canvas.width) {
+                ataho.x = nextX;
+            }
+            // 상하 경계
+            if (nextY >= 0 && nextY + ataho.height <= canvas.height) {
+                ataho.y = nextY;
             }
         }
 
@@ -211,7 +224,7 @@
         }
     });
 
-    // ✨ 터치 이벤트 리스너: 터치된 위치에 따라 모든 방향을 독립적으로 설정합니다.
+    // 터치 이벤트 리스너
     canvas.addEventListener('touchstart', (e) => {
         e.preventDefault(); 
         if (isDrowned) return;
@@ -222,10 +235,8 @@
         const characterCenterX = ataho.x + ataho.width / 2;
         const characterCenterY = ataho.y + ataho.height / 2;
         
-        // 키보드 입력 상태 초기화
         Object.keys(inputState).forEach(key => inputState[key] = false);
 
-        // 터치 위치가 캐릭터의 중심보다 크면 해당 방향을 활성화합니다.
         inputState.right = touchX > characterCenterX;
         inputState.left = touchX < characterCenterX;
         inputState.down = touchY > characterCenterY;
