@@ -1,144 +1,237 @@
-// 캔버스 설정
+//===========================================
+// 게임 설정 및 초기화
+//===========================================
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
 
 canvas.width = 800;
 canvas.height = 600;
 
-// 게임 속도를 조절하는 변수
 const gameSpeed = 2;
+let backgroundY = 0;
+let isGameOver = false;
 
 // 이미지 로드
 const spriteSheet = new Image();
-spriteSheet.src = 'cara_at3.cns.bmp';
-
-// 평균대 배경 이미지 (파일을 준비해주세요)
+spriteSheet.src = 'balance.png';
 const background = new Image();
 background.src = 'balance_beam.png';
 
-// 스프라이트 시트 내의 각 프레임 좌표 정의
+//===========================================
+// 스프라이트 및 게임 데이터
+//===========================================
 const frames = {
-    // 걷는 동작 (앞으로 걷는 모습)
-    walk: {
-        x: [0, 60, 120, 180, 240], // 5개의 프레임 x 좌표
-        y: 0,
-        width: 60,
-        height: 80
-    },
-    // 좌우로 몸을 기울이는 동작
-    lean_right: {
-        x: 300,
-        y: 0,
-        width: 60,
-        height: 80
-    },
-    lean_left: {
-        x: 360,
-        y: 0,
-        width: 60,
-        height: 80
-    },
-    // IDLE 동작 (기본 상태)
-    idle: {
-        x: 0,
-        y: 0,
-        width: 60,
-        height: 80
-    }
+    walk: { x: [0, 80, 160], y: 0, width: 80, height: 96 },
+    jump: { x: [240, 480, 480, 320], y: [0, 192, 288, 0], width: 80, height: 96 },
+    fall: { left: { x: 400, y: 0, width: 80, height: 96 }, right: { x: 480, y: 0, width: 80, height: 96 } },
+    fallen: { x: 480, y: 96, width: 80, height: 96 },
+    lean_slight_left: { x: [0, 80, 160], y: 96, width: 80, height: 96 },
+    lean_slight_right: { x: [240, 320, 400], y: 96, width: 80, height: 96 },
+    lean_medium_left: { x: [0, 80, 160], y: 192, width: 80, height: 96 },
+    lean_medium_right: { x: [240, 320, 400], y: 192, width: 80, height: 96 },
+    lean_large_left: { x: [0, 80, 160], y: 288, width: 80, height: 96 },
+    lean_large_right: { x: [240, 320, 400], y: 288, width: 80, height: 96 },
+    idle: { x: 0, y: 0, width: 80, height: 96 }
 };
 
-// 캐릭터 객체 (위치 고정)
 const cara = {
-    x: canvas.width / 2 - frames.walk.width / 2, // 캔버스 중앙에 고정
+    x: canvas.width / 2 - frames.walk.width / 2,
     y: canvas.height / 2 - frames.walk.height / 2,
     width: frames.walk.width,
     height: frames.walk.height,
 };
 
-// 게임 상태 및 입력 변수
+const walkAnimationSequence = [0, 1, 0, 2];
+const leanAnimationSequence = [0, 1, 2];
+
+// 게임 상태 변수
 const inputState = {};
-let backgroundY = 0;
-let frameIndex = 0;
+let characterState = 'idle';
+let balanceLevel = 0;
+const BALANCE_CHANGE_RATE = 1;
+const BALANCE_RECOVERY_RATE = 0.5;
+const MAX_BALANCE_LEVEL = 100;
+let fallDirection = null;
+let fallTimer = 0;
+const FALL_ANIMATION_DURATION = 30;
 let animationTimer = 0;
 
-// 이미지 로드가 모두 완료되면 게임 시작
+const fallenOffsetX = 40;
+const fallenOffsetY = 20;
+
+//===========================================
+// 메인 게임 루프
+//===========================================
 Promise.all([
-    new Promise(resolve => spriteSheet.onload = resolve),
-    new Promise(resolve => background.onload = resolve)
+    new Promise((resolve, reject) => {
+        spriteSheet.onload = () => { console.log('Sprite Sheet loaded.'); resolve(); };
+        spriteSheet.onerror = () => { console.error('Error loading sprite sheet.'); reject(); };
+    }),
+    new Promise((resolve, reject) => {
+        background.onload = () => { console.log('Background loaded.'); resolve(); };
+        background.onerror = () => { console.error('Error loading background.'); reject(); };
+    })
 ]).then(() => {
+    console.log('모든 이미지 로드 완료. 게임 시작!');
     gameLoop();
+}).catch(error => {
+    console.error('이미지 로드 중 오류 발생:', error);
 });
 
-// 게임 루프
 function gameLoop() {
     requestAnimationFrame(gameLoop);
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    // ✨ 입력 상태에 따라 배경 위치와 애니메이션 업데이트
-    const isWalkingForward = inputState.down; // 'S' 또는 'ArrowDown'
-    const isWalkingBackward = inputState.up; // 'W' 또는 'ArrowUp'
-    
-    // 배경 이동 로직
-    if (isWalkingForward) {
-        backgroundY -= gameSpeed;
-    } else if (isWalkingBackward) {
-        backgroundY += gameSpeed;
-    }
+    let previousState = characterState;
 
-    // 배경이 화면 밖으로 나가면 다시 맨 아래로 이동
-    if (backgroundY <= -canvas.height) {
-        backgroundY = 0;
-    }
-    // 배경이 맨 위로 올라오면 다시 맨 아래로 이동 (뒤로 갈 때)
-    if (backgroundY >= canvas.height) {
-        backgroundY = 0;
-    }
-
-    // ✨ 애니메이션 로직
-    if (isWalkingForward || isWalkingBackward) {
-        animationTimer++;
-        if (animationTimer % 6 === 0) {
-            frameIndex = (frameIndex + 1) % frames.walk.x.length;
+    if (!isGameOver) {
+        if (inputState.left) {
+            balanceLevel -= BALANCE_CHANGE_RATE;
+        } else if (inputState.right) {
+            balanceLevel += BALANCE_CHANGE_RATE;
+        } else {
+            if (balanceLevel > 0) {
+                balanceLevel -= BALANCE_RECOVERY_RATE;
+            } else if (balanceLevel < 0) {
+                balanceLevel += BALANCE_RECOVERY_RATE;
+            }
+            if (Math.abs(balanceLevel) < BALANCE_RECOVERY_RATE) {
+                balanceLevel = 0;
+            }
         }
-    } else {
-        frameIndex = 0; // 걷지 않을 때는 첫 번째 프레임으로
+        
+        if (balanceLevel >= MAX_BALANCE_LEVEL) {
+            characterState = 'falling';
+            fallDirection = 'right';
+        } else if (balanceLevel <= -MAX_BALANCE_LEVEL) {
+            characterState = 'falling';
+            fallDirection = 'left';
+        }
+
+        if (characterState !== 'falling' && characterState !== 'fallen') {
+            if (inputState.left) {
+                if (balanceLevel <= -60) {
+                    characterState = 'leaning_large_left';
+                } else if (balanceLevel <= -30) {
+                    characterState = 'leaning_medium_left';
+                } else {
+                    characterState = 'leaning_slight_left';
+                }
+            } else if (inputState.right) {
+                if (balanceLevel >= 60) {
+                    characterState = 'leaning_large_right';
+                } else if (balanceLevel >= 30) {
+                    characterState = 'leaning_medium_right';
+                } else {
+                    characterState = 'leaning_slight_right';
+                }
+            } else if (inputState.down) {
+                characterState = 'walking';
+            } else if (inputState.up) {
+                characterState = 'walking_backward';
+            } else {
+                characterState = 'idle';
+            }
+        }
+    
+        if (characterState === 'walking') {
+            backgroundY -= gameSpeed;
+        } else if (characterState === 'walking_backward') {
+            backgroundY += gameSpeed;
+        }
+    
+        if (backgroundY <= -canvas.height) {
+            backgroundY = 0;
+        }
+        if (backgroundY >= canvas.height) {
+            backgroundY = 0;
+        }
+    }
+    
+    if (characterState === 'falling') {
+        fallTimer++;
+        if (fallTimer >= FALL_ANIMATION_DURATION) {
+            characterState = 'fallen';
+            isGameOver = true;
+        }
     }
 
-    // 배경 그리기 (캐릭터가 걷는 것처럼 보이게)
+    if (characterState !== previousState) {
+        animationTimer = 0;
+    } else {
+        animationTimer++;
+    }
+    
     ctx.drawImage(background, 0, backgroundY, canvas.width, canvas.height);
     ctx.drawImage(background, 0, backgroundY + canvas.height, canvas.width, canvas.height);
     
-    // 캐릭터 스프라이트 선택 및 그리기
-    let currentFrameX = frames.walk.x[frameIndex];
-    let currentFrameY = frames.walk.y;
+    let currentFrame = frames.idle;
+    let finalX = cara.x;
+    let finalY = cara.y;
 
-    if (inputState.left) {
-        currentFrameX = frames.lean_left.x;
-        currentFrameY = frames.lean_left.y;
-    } else if (inputState.right) {
-        currentFrameX = frames.lean_right.x;
-        currentFrameY = frames.lean_right.y;
-    } else if (!isWalkingForward && !isWalkingBackward) {
-        currentFrameX = frames.idle.x;
-        currentFrameY = frames.idle.y;
+    if (characterState === 'walking') {
+        currentFrame = frames.walk;
+    } else if (characterState === 'walking_backward') {
+        currentFrame = frames.walk;
+    } else if (characterState === 'leaning_slight_left') {
+        currentFrame = frames.lean_slight_left;
+    } else if (characterState === 'leaning_medium_left') {
+        currentFrame = frames.lean_medium_left;
+    } else if (characterState === 'leaning_large_left') {
+        currentFrame = frames.lean_large_left;
+    } else if (characterState === 'leaning_slight_right') {
+        currentFrame = frames.lean_slight_right;
+    } else if (characterState === 'leaning_medium_right') {
+        currentFrame = frames.lean_medium_right;
+    } else if (characterState === 'leaning_large_right') {
+        currentFrame = frames.lean_large_right;
+    } else if (characterState === 'falling') {
+        currentFrame = fallDirection === 'left' ? frames.fall.left : frames.fall.right;
+    } else if (characterState === 'fallen') {
+        currentFrame = frames.fallen;
+        
+        if (fallDirection === 'left') {
+            finalX = cara.x - fallenOffsetX;
+        } else {
+            finalX = cara.x + fallenOffsetX;
+        }
+        finalY = cara.y + fallenOffsetY;
+    }
+
+    let frameIndex = 0;
+    if (currentFrame.x && currentFrame.x.length > 1) {
+        const sequence = characterState.includes('walking') ? walkAnimationSequence : leanAnimationSequence;
+        const sequenceIndex = Math.floor(animationTimer / 6) % sequence.length;
+        frameIndex = sequence[sequenceIndex];
     }
     
+    const sourceX = Array.isArray(currentFrame.x) ? currentFrame.x[frameIndex] : currentFrame.x;
+    const sourceY = Array.isArray(currentFrame.y) ? currentFrame.y[frameIndex] : currentFrame.y;
+
     ctx.drawImage(
         spriteSheet, 
-        currentFrameX, 
-        currentFrameY, 
-        frames.walk.width, 
-        frames.walk.height, 
-        cara.x, 
-        cara.y, 
-        cara.width, 
+        sourceX,
+        sourceY, 
+        currentFrame.width,
+        currentFrame.height,
+        finalX,
+        finalY,
+        cara.width,
         cara.height
     );
+
+    if (isGameOver) {
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = '#fff';
+        ctx.textAlign = 'center';
+        ctx.font = '48px Arial';
+        ctx.fillText('Game Over', canvas.width / 2, canvas.height / 2);
+    }
 }
 
-// ✨ 키보드 이벤트 리스너: 위/아래 화살표 키와 WASD를 모두 처리
 document.addEventListener('keydown', (e) => {
-    if (e.repeat) return;
+    if (e.repeat || isGameOver) return;
     switch (e.code) {
         case 'KeyS':
         case 'ArrowDown':
@@ -160,6 +253,7 @@ document.addEventListener('keydown', (e) => {
 });
 
 document.addEventListener('keyup', (e) => {
+    if (isGameOver) return;
     switch (e.code) {
         case 'KeyS':
         case 'ArrowDown':
