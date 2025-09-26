@@ -7,7 +7,7 @@
     canvas.width = 960;
     canvas.height = 640;
 
-    // ✨ 캐릭터의 움직임 속도를 한 번에 조절하는 변수입니다. 원하는 값으로 변경해 보세요.
+    // 캐릭터의 움직임 속도를 한 번에 조절하는 변수입니다. 원하는 값으로 변경해 보세요.
     const movementSpeed = 2; 
 
     // 이미지 경로를 배열로 관리하여 코드를 간결하게 만듭니다.
@@ -87,7 +87,6 @@
 
     // 게임 상태와 타이머 변수
     let isDrowned = false;
-    // ✨ 키보드와 터치 입력 상태를 모두 관리하는 객체
     const inputState = {}; 
     const timer = {
         idle: 0,
@@ -110,24 +109,31 @@
                 resetCharacter();
             }
         } else {
-            // ✨ inputState 객체를 확인하여 캐릭터를 움직입니다.
+            // ✨ 이동 속도 보정
+            const isDiagonal = (inputState.up || inputState.down) && (inputState.left || inputState.right);
+            const speed = isDiagonal ? movementSpeed * 0.707 : movementSpeed;
+            
+            // ✨ 상하 움직임과 좌우 움직임을 독립적으로 처리
             if (inputState.up) {
-                ataho.y -= movementSpeed;
+                ataho.y -= speed;
             }
             if (inputState.down) {
-                ataho.y += movementSpeed;
+                ataho.y += speed;
             }
             if (inputState.right) {
-                ataho.x += movementSpeed;
+                ataho.x += speed;
                 ataho.state = 'swim_right';
                 timer.swim++;
             } else if (inputState.left) {
-                ataho.x -= movementSpeed;
+                ataho.x -= speed;
                 ataho.state = 'swim_left';
                 timer.swim++;
             } else {
-                ataho.state = 'idle_right';
-                timer.idle++;
+                // 상하 움직임은 있지만 좌우 움직임이 없을 경우 idle 상태로
+                if (!inputState.up && !inputState.down) {
+                    ataho.state = 'idle_right';
+                    timer.idle++;
+                }
             }
         }
 
@@ -157,12 +163,11 @@
         }
     }
     
-    // ✨ 키보드 이벤트 리스너 추가 (이전 코드에서 복구)
+    // 키보드 이벤트 리스너
     document.addEventListener('keydown', (e) => {
         if (e.repeat) return;
         if (isDrowned) return;
 
-        // 눌린 키에 따라 inputState를 업데이트
         switch (e.code) {
             case 'KeyW':
             case 'ArrowUp':
@@ -207,7 +212,7 @@
         }
     });
 
-    // ✨ 터치 이벤트 리스너 추가
+    // 터치 이벤트 리스너
     canvas.addEventListener('touchstart', (e) => {
         e.preventDefault(); 
         if (isDrowned) return;
@@ -221,7 +226,6 @@
         const dx = touchX - characterCenterX;
         const dy = touchY - characterCenterY;
         
-        // 키보드 상태를 초기화
         Object.keys(inputState).forEach(key => inputState[key] = false);
 
         if (Math.abs(dx) > Math.abs(dy)) {
@@ -234,7 +238,6 @@
     });
 
     canvas.addEventListener('touchend', (e) => {
-        // 손을 떼면 모든 방향 상태를 초기화하여 움직임을 멈춥니다.
         Object.keys(inputState).forEach(key => inputState[key] = false);
     });
     
@@ -244,7 +247,6 @@
         ataho.y = 250;
         isDrowned = false;
         drownStartTime = null;
-        // ✨ 입력 상태를 모두 초기화합니다.
         Object.keys(inputState).forEach(key => inputState[key] = false);
     }
 
