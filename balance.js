@@ -34,11 +34,13 @@ const frames = {
     idle: { x: 0, y: 0, width: 80, height: 96 }
 };
 
+// [변경] cara 객체의 너비/높이를 2배로 설정하고, 위치를 새 크기에 맞춰 중앙 정렬합니다.
 const cara = {
-    x: canvas.width / 2 - frames.walk.width / 2,
-    y: canvas.height / 2 - frames.walk.height / 2,
-    width: frames.walk.width,
-    height: frames.walk.height,
+    // 캔버스 중앙에서 (캐릭터 폭 * 2)의 절반만큼 빼서 중앙 정렬
+    x: canvas.width / 2 - (frames.walk.width * 2) / 2,
+    y: canvas.height / 2 - (frames.walk.height * 2) / 2,
+    width: frames.walk.width * 2,  // 🌟 2배 크기 적용
+    height: frames.walk.height * 2, // 🌟 2배 크기 적용
 };
 
 const walkAnimationSequence = [0, 1, 0, 2];
