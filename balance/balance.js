@@ -213,6 +213,10 @@
             } else if (this.balanceLevel <= -BALANCE_THRESHOLD.MAX) {
                 this.actionState = 'falling';
                 this.fallDirection = 'left';
+            } else if (distanceTraveled < -20) {
+                // 2.1 시작점 뒤로 이동 시 낙하
+                this.actionState = 'falling';
+                this.fallDirection = this.balanceLevel >= 0 ? 'right' : 'left';
             }
 
             // 3. Lean State 결정 (Visual)
@@ -425,7 +429,7 @@
             if (backgroundY <= -canvas.height) {
                 backgroundY += canvas.height;
             }
-            if (backgroundY >= canvas.height) {
+            if (backgroundY > 0) {
                 backgroundY -= canvas.height;
             }
         }
