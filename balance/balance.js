@@ -29,6 +29,7 @@
     // 🌟 [Jump Constants]
     const JUMP_CHARGE_TIME = 20;
     const JUMP_POWER_LEVELS = [3, 5, 8];
+    const LANDING_PENALTIES = [10, 30, 50];
     const JUMP_INITIAL_VELOCITY_Y = 12;
     const GRAVITY = 0.6;
 
@@ -154,6 +155,12 @@
                     this.visualY = 0;
                     this.actionState = 'idle';
                     this.jumpVelocityY = 0;
+
+                    // 🌟 [Landing Instability]
+                    const penalty = LANDING_PENALTIES[this.jumpLevel];
+                    const direction = Math.random() < 0.5 ? -1 : 1;
+                    this.balanceLevel += penalty * direction;
+                    this.balanceVelocity += (penalty * direction) * 0.1; // Add some momentum
                 }
                 return;
             }
