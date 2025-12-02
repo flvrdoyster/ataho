@@ -1,0 +1,9 @@
+@import url('https://fonts.cdnfonts.com/css/raster-forge');
+
+#bg {
+    width: 960px;
+    height: 640px;
+    background-image: url("bg_2x.png");
+    background-repeat: no-repeat;
+    background-position: 80% center;
+}
