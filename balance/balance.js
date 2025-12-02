@@ -19,12 +19,12 @@
     };
 
     // 🌟 [Physics Constants]
-    const SWAY_INTENSITY_IDLE = 0.1;
-    const SWAY_INTENSITY_WALK = 0.3;
-    const PLAYER_CONTROL_FORCE = 0.5;
-    const FRICTION = 0.92;
+    const SWAY_INTENSITY_IDLE = 0.07;
+    const SWAY_INTENSITY_WALK = 0.2;
+    const PLAYER_CONTROL_FORCE = 0.4;
+    const FRICTION = 0.90;
     const MAX_VELOCITY = 2.5;
-    const INERTIA_CONSTANT = 0.005; // ✨ 관성 상수 (기울어질수록 더 빠르게 기울어짐)
+    const INERTIA_CONSTANT = 0.003; // ✨ 관성 상수 (기울어질수록 더 빠르게 기울어짐)
 
     // 🌟 [Jump Constants]
     const JUMP_CHARGE_TIME = 20;
@@ -39,8 +39,11 @@
 
     // 이미지 경로 정의
     const imagePaths = {
-        spriteSheet: 'balance.png',
-        background: 'balance_beam.png'
+        spriteSheet: 'balance_char.png',
+        background: 'balance_bg.png',
+        beamStart: 'beam_start.png',
+        beamMid: 'beam_mid.png',
+        beamEnd: 'beam_end.png'
     };
 
     const images = {};
@@ -331,6 +334,23 @@
             let sourceX = Array.isArray(currentFrameSet.x) ? currentFrameSet.x[frameIndex] : currentFrameSet.x;
             let sourceY = Array.isArray(currentFrameSet.y) ? currentFrameSet.y[frameIndex] : currentFrameSet.y;
 
+            // ✨ 점프/충전 중일 때 기울기 적용 (Visual Only)
+            let rotationAngle = 0;
+            if (this.actionState === 'jumping' || this.actionState.includes('jump_charging')) {
+                // 최대 기울기(100)일 때 약 30도(0.5라디안) 정도 기울어지게 설정
+                rotationAngle = (this.balanceLevel / BALANCE_THRESHOLD.MAX) * 0.5;
+            }
+
+            if (rotationAngle !== 0) {
+                ctx.save();
+                // 회전 중심축: 캐릭터의 발 밑 중앙
+                const pivotX = finalX + this.width / 2;
+                const pivotY = finalY + this.height;
+                ctx.translate(pivotX, pivotY);
+                ctx.rotate(rotationAngle);
+                ctx.translate(-pivotX, -pivotY);
+            }
+
             // 이미지 그리기
             ctx.drawImage(
                 images.spriteSheet,
@@ -343,14 +363,53 @@
                 this.width,
                 this.height
             );
+
+            if (rotationAngle !== 0) {
+                ctx.restore();
+            }
         }
+    };
+
+    //===========================================
+    // 게임 재시작 및 종료 로직
+    //===========================================
+    function resetGame() {
+        isGameOver = false;
+        ataho.balanceLevel = 0;
+        ataho.balanceVelocity = 0;
+        ataho.actionState = 'idle';
+        ataho.leanState = 'balanced';
+        ataho.fallTimer = 0;
+        ataho.x = canvas.width / 2 - (frames.walking.width * SCALE_FACTOR) / 2;
+        ataho.y = canvas.height / 2 - (frames.walking.height * SCALE_FACTOR) / 2;
+        ataho.visualY = 0;
+        ataho.jumpVelocityY = 0;
+        ataho.jumpLevel = 0;
+        distanceTraveled = 0;
+        backgroundY = 0;
+
+        // 입력 상태 초기화
+        Object.keys(inputState).forEach(key => inputState[key] = false);
+
+        byFrame(); // 게임 루프 재시작
+    }
+
+
+
+    // 버튼 영역 정의
+    const buttons = {
+        continue: { x: 0, y: 0, width: 200, height: 60, text: 'Continue?' },
+        exit: { x: 0, y: 0, width: 200, height: 60, text: 'Exit' }
     };
 
     //===========================================
     // 메인 게임 루프
     //===========================================
     function byFrame() {
-        requestAnimationFrame(byFrame);
+        if (!isGameOver) {
+            requestAnimationFrame(byFrame);
+        }
+
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
         if (!isGameOver) {
@@ -362,9 +421,6 @@
             if (backgroundY >= canvas.height) {
                 backgroundY -= canvas.height;
             }
-        } else {
-            // 게임 오버 상태에서도 애니메이션 타이머는 계속 돌려야 할 수도 있음 (필요시)
-            // 현재는 멈춤
         }
 
         // 배경 그리기
@@ -373,23 +429,137 @@
             ctx.drawImage(images.background, 0, backgroundY + canvas.height, canvas.width, canvas.height);
         }
 
+        // 평균대 그리기
+        if (images.beamStart && images.beamMid) {
+            // 캐릭터의 초기 Y 위치 (화면 중앙)
+            const charInitialY = canvas.height / 2 + 50; // 캐릭터 발 위치 대략 조정
+
+            // 평균대 시작점의 Y 좌표 (스크롤 적용)
+            // distanceTraveled가 증가하면(전진하면) 평균대는 위로 올라가야 함 (-distanceTraveled)
+            // 하지만 여기서는 distanceTraveled가 전진 시 증가하므로, 화면상 좌표는 감소해야 함.
+            // 초기 위치는 캐릭터 발 밑.
+            let beamCurrentY = charInitialY + distanceTraveled;
+            // 잠깐, distanceTraveled는 "이동한 거리"임.
+            // 캐릭터가 가만히 있고 배경이 움직이는 방식.
+            // 배경은 backgroundY -= speed 로 움직임.
+            // 평균대도 비슷하게 움직여야 함.
+
+            // 평균대 시작 위치 고정값 (캐릭터 시작 위치 기준)
+            const beamStartX = canvas.width / 2 - images.beamStart.width / 2;
+            // 초기 Y는 캐릭터 발 바로 아래
+            const startY = canvas.height / 2 + 40; // 캐릭터 높이 고려
+
+            // 스크롤 적용:
+            // 캐릭터가 전진(distanceTraveled 증가) -> 평균대는 위로 이동(Y 감소)
+            // distanceTraveled는 픽셀 단위가 아닐 수 있으므로 확인 필요.
+            // update()에서 distanceTraveled += currentJumpSpeed (픽셀 단위 추정)
+
+            let currentDrawY = startY - distanceTraveled;
+
+            // 1. Beam Start 그리기
+            // 화면 밖으로 완전히 벗어나지 않았으면 그림
+            if (currentDrawY > -images.beamStart.height) {
+                ctx.drawImage(images.beamStart, beamStartX, currentDrawY);
+            }
+
+            // 2. Beam Mid 반복 그리기
+            // Start 바로 다음부터 시작
+            let midDrawY = currentDrawY + images.beamStart.height;
+
+            // 화면 위쪽으로 벗어난 부분은 건너뛰기 (최적화)
+            if (midDrawY < -images.beamMid.height) {
+                // 화면 위로 벗어난 만큼 건너뜀
+                const skipCount = Math.floor((-midDrawY) / images.beamMid.height);
+                midDrawY += skipCount * images.beamMid.height;
+            }
+
+            // 화면 아래 끝까지 반복
+            while (midDrawY < canvas.height) {
+                ctx.drawImage(images.beamMid, beamStartX, midDrawY);
+                midDrawY += images.beamMid.height;
+            }
+        }
+
         ataho.draw();
 
+        // HUD: 점수 표시 (왼쪽 상단)
+        ctx.font = '24px "Raster Forge", sans-serif';
+        ctx.fillStyle = 'white';
+        ctx.textAlign = 'left';
+        ctx.textBaseline = 'top';
+        ctx.fillText(`Score: ${(distanceTraveled / 100).toFixed(2)}`, 20, 20);
+
         if (isGameOver) {
-            ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.7)'; // 배경을 좀 더 어둡게
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
             ctx.font = '48px "Raster Forge", sans-serif';
             ctx.fillStyle = 'white';
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
-            ctx.fillText('GAME OVER', canvas.width / 2, canvas.height / 2);
+            ctx.fillText('GAME OVER', canvas.width / 2, canvas.height / 2 - 80);
+
+            // 점수 표시
+            ctx.font = '36px "Raster Forge", sans-serif';
+            ctx.fillStyle = '#FFD700'; // 골드 색상
+            ctx.fillText(`Score: ${(distanceTraveled / 100).toFixed(2)}`, canvas.width / 2, canvas.height / 2 - 20);
+
+            // 버튼 위치 설정 (화면 중앙 기준)
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
+
+            buttons.continue.x = centerX - buttons.continue.width / 2;
+            buttons.continue.y = centerY + 20;
+
+            buttons.exit.x = centerX - buttons.exit.width / 2;
+            buttons.exit.y = centerY + 100;
+
+            // 버튼 그리기 함수
+            function drawButton(btn) {
+                // 버튼 배경 (옵션: 마우스 오버 효과 등을 위해 영역 확인용으로 투명도 조절 가능)
+                // ctx.fillStyle = 'rgba(255, 255, 255, 0.2)';
+                // ctx.fillRect(btn.x, btn.y, btn.width, btn.height);
+
+                // 버튼 테두리
+                ctx.strokeStyle = 'white';
+                ctx.lineWidth = 2;
+                ctx.strokeRect(btn.x, btn.y, btn.width, btn.height);
+
+                // 버튼 텍스트
+                ctx.font = '24px "Raster Forge", sans-serif';
+                ctx.fillStyle = 'white';
+                ctx.fillText(btn.text, btn.x + btn.width / 2, btn.y + btn.height / 2);
+            }
+
+            drawButton(buttons.continue);
+            drawButton(buttons.exit);
         }
     }
 
     //===========================================
     // 입력 처리
     //===========================================
+    // 클릭 이벤트 처리 (게임 오버 버튼용)
+    canvas.addEventListener('click', (e) => {
+        if (!isGameOver) return;
+
+        const rect = canvas.getBoundingClientRect();
+        const clickX = e.clientX - rect.left;
+        const clickY = e.clientY - rect.top;
+
+        // Continue 버튼 클릭 확인
+        if (clickX >= buttons.continue.x && clickX <= buttons.continue.x + buttons.continue.width &&
+            clickY >= buttons.continue.y && clickY <= buttons.continue.y + buttons.continue.height) {
+            resetGame();
+        }
+
+        // Exit 버튼 클릭 확인
+        if (clickX >= buttons.exit.x && clickX <= buttons.exit.x + buttons.exit.width &&
+            clickY >= buttons.exit.y && clickY <= buttons.exit.y + buttons.exit.height) {
+            window.location.href = '../index.html';
+        }
+    });
+
     document.addEventListener('keydown', (e) => {
         if (e.repeat || isGameOver) return;
         switch (e.code) {
@@ -443,7 +613,28 @@
     // 터치 이벤트 리스너
     canvas.addEventListener('touchstart', (e) => {
         e.preventDefault();
-        if (isGameOver) return;
+
+        // 게임 오버 상태일 때 터치로 버튼 클릭 처리
+        if (isGameOver) {
+            const rect = canvas.getBoundingClientRect();
+            const touchX = e.touches[0].clientX - rect.left;
+            const touchY = e.touches[0].clientY - rect.top;
+
+            // Continue 버튼
+            if (touchX >= buttons.continue.x && touchX <= buttons.continue.x + buttons.continue.width &&
+                touchY >= buttons.continue.y && touchY <= buttons.continue.y + buttons.continue.height) {
+                resetGame();
+                return;
+            }
+
+            // Exit 버튼
+            if (touchX >= buttons.exit.x && touchX <= buttons.exit.x + buttons.exit.width &&
+                touchY >= buttons.exit.y && touchY <= buttons.exit.y + buttons.exit.height) {
+                window.location.href = '../index.html';
+                return;
+            }
+            return;
+        }
 
         const touchX = e.touches[0].clientX;
         const touchY = e.touches[0].clientY;
