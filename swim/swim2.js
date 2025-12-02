@@ -352,7 +352,7 @@
 
     // 폰트 로딩 함수
     function loadFonts() {
-        // FontFace 객체 생성 (style.css의 @font-face와 일치해야 함)
+        // FontFace 객체 생성
         const font = new FontFace('Raster Forge', 'url(https://fonts.cdnfonts.com/s/123917/RasterForgeRegular-XGDg9.woff)');
         return font.load().then(loadedFont => {
             document.fonts.add(loadedFont);

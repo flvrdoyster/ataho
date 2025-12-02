@@ -226,16 +226,6 @@
                     leanLevel = 'medium'; // 30 이상이면 medium
                 }
 
-                // 수정: large는 정말 위험할 때만 나오게 하거나, 기존대로 하거나.
-                // 기존 frames 정의에 따르면 slight, medium, large가 있음.
-                // slight: 30~60
-                // medium: 60~100 (원래 로직)
-                // large: ??? 원래 로직에 large가 있었나?
-                // 원래 로직:
-                // if (absBalance >= BALANCE_THRESHOLD.MEDIUM) leanLevel = 'large';
-                // else if (absBalance >= BALANCE_THRESHOLD.SLIGHT) leanLevel = 'medium';
-                // else leanLevel = 'slight'; (이건 else에 걸려서 slight가 됨)
-
                 // 다시 정리:
                 if (absBalance >= BALANCE_THRESHOLD.MEDIUM) {
                     leanLevel = 'large';
