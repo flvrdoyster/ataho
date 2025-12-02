@@ -447,7 +447,7 @@
             // 평균대 시작 위치 고정값 (캐릭터 시작 위치 기준)
             const beamStartX = canvas.width / 2 - images.beamStart.width / 2;
             // 초기 Y는 캐릭터 발 바로 아래
-            const startY = canvas.height / 2 + 40; // 캐릭터 높이 고려
+            const startY = canvas.height / 2 ; // 캐릭터 높이 고려
 
             // 스크롤 적용:
             // 캐릭터가 전진(distanceTraveled 증가) -> 평균대는 위로 이동(Y 감소)
