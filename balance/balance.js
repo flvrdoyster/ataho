@@ -6,8 +6,8 @@
     const canvas = document.getElementById('gameCanvas');
     const ctx = canvas.getContext('2d');
 
-    canvas.width = 800;
-    canvas.height = 600;
+    canvas.width = 960;
+    canvas.height = 640;
 
     // 🌟 [최적화 1]: 핵심 상수 정의
     const SCALE_FACTOR = 1.5;
@@ -19,13 +19,21 @@
     };
 
     // 🌟 [Physics Constants]
-    const SWAY_INTENSITY_IDLE = 0.1; // Reduced from 0.5
+    const SWAY_INTENSITY_IDLE = 0.1;
     const SWAY_INTENSITY_WALK = 0.3;
-    const PLAYER_CONTROL_FORCE = 0.5; // Reduced from 1.5
-    const FRICTION = 0.92; // More damping (was 0.95)
-    const MAX_VELOCITY = 2.5; // Reduced from 5
+    const PLAYER_CONTROL_FORCE = 0.5;
+    const FRICTION = 0.92;
+    const MAX_VELOCITY = 2.5;
+    const INERTIA_CONSTANT = 0.005; // ✨ 관성 상수 (기울어질수록 더 빠르게 기울어짐)
+
+    // 🌟 [Jump Constants]
+    const JUMP_CHARGE_TIME = 20;
+    const JUMP_POWER_LEVELS = [4, 7, 11];
+    const JUMP_INITIAL_VELOCITY_Y = 12;
+    const GRAVITY = 0.6;
 
     const gameSpeed = 2;
+    let distanceTraveled = 0;
     let backgroundY = 0;
     let isGameOver = false;
 
@@ -77,11 +85,9 @@
         leaning_right_large: { x: [240, 320, 400], y: 288, width: 80, height: 96 }
     };
 
-    // 🌟 [최적화 3]: 상태별 프레임 매핑 테이블
-    const stateToFrameMap = {
-        'idle': frames.walking,
-        'walking': frames.walking,
-        'walking_backward': frames.walking,
+    // 🌟 [최적화 3]: 상태별 프레임 매핑 테이블 (기울기 상태 기준)
+    const leanStateToFrameMap = {
+        'balanced': frames.walking,
         'leaning_left_slight': frames.leaning_left_slight,
         'leaning_left_medium': frames.leaning_left_medium,
         'leaning_left_large': frames.leaning_left_large,
@@ -101,14 +107,69 @@
         y: canvas.height / 2 - (frames.walking.height * SCALE_FACTOR) / 2,
         width: frames.walking.width * SCALE_FACTOR,
         height: frames.walking.height * SCALE_FACTOR,
-        state: 'idle',
+
+        // ✨ 상태 분리
+        actionState: 'idle', // idle, walking, walking_backward, jumping, jump_charging, falling, fallen
+        leanState: 'balanced', // balanced, leaning_left_slight, ...
+
         balanceLevel: 0,
         balanceVelocity: 0,
         fallDirection: null,
         fallTimer: 0,
         animationTimer: 0,
 
+        // ✨ 점프 관련 변수
+        jumpChargeTimer: 0,
+        jumpLevel: 0,
+        jumpVelocityY: 0,
+        visualY: 0,
+
         update() {
+            // 0. 점프 및 충전 로직
+            if (this.actionState === 'jumping') {
+                // 점프 중 물리 처리
+                this.visualY -= this.jumpVelocityY;
+                this.jumpVelocityY -= GRAVITY;
+
+                // 전진 (점프 파워에 따라)
+                const currentJumpSpeed = JUMP_POWER_LEVELS[this.jumpLevel];
+                distanceTraveled += currentJumpSpeed;
+                backgroundY -= currentJumpSpeed;
+
+                // 착지 체크
+                if (this.visualY >= 0) {
+                    this.visualY = 0;
+                    this.actionState = 'idle';
+                    this.jumpVelocityY = 0;
+                }
+                return; // 점프 중에는 다른 상태 업데이트 건너뜀
+            }
+
+            if (inputState.space) {
+                if (!this.actionState.includes('jump_charging')) {
+                    // 충전 시작
+                    this.actionState = 'jump_charging';
+                    this.jumpChargeTimer = 0;
+                    this.jumpLevel = 0;
+                } else {
+                    // 충전 중
+                    this.jumpChargeTimer++;
+                    if (this.jumpChargeTimer > JUMP_CHARGE_TIME * 2) {
+                        this.jumpLevel = 2;
+                    } else if (this.jumpChargeTimer > JUMP_CHARGE_TIME) {
+                        this.jumpLevel = 1;
+                    } else {
+                        this.jumpLevel = 0;
+                    }
+                }
+                return; // 충전 중에는 이동 불가
+            } else if (this.actionState.includes('jump_charging')) {
+                // 스페이스바 뗌 -> 점프 시작
+                this.actionState = 'jumping';
+                this.jumpVelocityY = JUMP_INITIAL_VELOCITY_Y;
+                return;
+            }
+
             // 1. 균형 레벨 업데이트 (Physics-based)
             let inputForce = 0;
             if (inputState.left) {
@@ -118,11 +179,14 @@
             }
 
             // Random Sway
-            const currentSwayIntensity = (this.state.includes('walking')) ? SWAY_INTENSITY_WALK : SWAY_INTENSITY_IDLE;
+            const currentSwayIntensity = (this.actionState.includes('walking')) ? SWAY_INTENSITY_WALK : SWAY_INTENSITY_IDLE;
             const swayForce = (Math.random() - 0.5) * currentSwayIntensity;
 
+            // ✨ Inertia (관성): 기울어진 방향으로 가속도 추가
+            const inertiaForce = this.balanceLevel * INERTIA_CONSTANT;
+
             // Update Velocity
-            this.balanceVelocity += inputForce + swayForce;
+            this.balanceVelocity += inputForce + swayForce + inertiaForce;
             this.balanceVelocity *= FRICTION;
 
             // Cap Velocity
@@ -132,97 +196,158 @@
             // Update Position
             this.balanceLevel += this.balanceVelocity;
 
-            // Center Recovery (Optional: slight pull to center if no input? - maybe not for "hard" mode)
-            // For now, let friction handle the "stopping", but gravity/sway keeps it moving.
-
             // 2. 균형 초과 및 낙하 상태 체크
             if (this.balanceLevel >= BALANCE_THRESHOLD.MAX) {
-                this.state = 'falling';
+                this.actionState = 'falling';
                 this.fallDirection = 'right';
             } else if (this.balanceLevel <= -BALANCE_THRESHOLD.MAX) {
-                this.state = 'falling';
+                this.actionState = 'falling';
                 this.fallDirection = 'left';
             }
 
-            // Character State 결정 로직
-            if (this.state !== 'falling' && this.state !== 'fallen') {
+            // 3. Lean State 결정 (Visual)
+            const absBalance = Math.abs(this.balanceLevel);
+            const direction = this.balanceLevel < 0 ? 'left' : 'right';
+
+            if (absBalance < BALANCE_THRESHOLD.SLIGHT) {
+                this.leanState = 'balanced';
+            } else {
+                let leanLevel = 'slight';
+                if (absBalance >= BALANCE_THRESHOLD.MEDIUM) {
+                    leanLevel = 'medium';
+                }
+                if (absBalance >= BALANCE_THRESHOLD.MAX * 0.8) { // MAX에 가까워지면 large (조정 가능)
+                    leanLevel = 'large';
+                }
+                // 기존 로직 유지
+                if (absBalance >= BALANCE_THRESHOLD.MEDIUM) {
+                    leanLevel = 'large'; // 기존 로직상 60 이상이면 large였음.
+                } else if (absBalance >= BALANCE_THRESHOLD.SLIGHT) {
+                    leanLevel = 'medium'; // 30 이상이면 medium
+                }
+
+                // 수정: large는 정말 위험할 때만 나오게 하거나, 기존대로 하거나.
+                // 기존 frames 정의에 따르면 slight, medium, large가 있음.
+                // slight: 30~60
+                // medium: 60~100 (원래 로직)
+                // large: ??? 원래 로직에 large가 있었나?
+                // 원래 로직:
+                // if (absBalance >= BALANCE_THRESHOLD.MEDIUM) leanLevel = 'large';
+                // else if (absBalance >= BALANCE_THRESHOLD.SLIGHT) leanLevel = 'medium';
+                // else leanLevel = 'slight'; (이건 else에 걸려서 slight가 됨)
+
+                // 다시 정리:
+                if (absBalance >= BALANCE_THRESHOLD.MEDIUM) {
+                    leanLevel = 'large';
+                } else if (absBalance >= BALANCE_THRESHOLD.SLIGHT) {
+                    leanLevel = 'medium';
+                } else {
+                    leanLevel = 'slight';
+                }
+
+                this.leanState = `leaning_${direction}_${leanLevel}`;
+            }
+
+
+            // 4. Action State 결정 (Input)
+            if (this.actionState !== 'falling' && this.actionState !== 'fallen') {
                 if (inputState.down || inputState.up) {
                     // 걷기 상태
-                    this.state = inputState.down ? 'walking' : 'walking_backward';
-                } else if (inputState.left || inputState.right) {
-                    // 기울이기 상태
-                    const direction = inputState.left ? 'left' : 'right';
-                    const absBalance = Math.abs(this.balanceLevel);
-                    let leanLevel = 'slight';
+                    this.actionState = inputState.down ? 'walking' : 'walking_backward';
 
-                    if (absBalance >= BALANCE_THRESHOLD.MEDIUM) {
-                        leanLevel = 'large';
-                    } else if (absBalance >= BALANCE_THRESHOLD.SLIGHT) {
-                        leanLevel = 'medium';
+                    // ✨ 걷기 시 거리 업데이트
+                    if (this.actionState === 'walking') {
+                        distanceTraveled += gameSpeed;
+                        backgroundY -= gameSpeed;
+                    } else if (this.actionState === 'walking_backward') {
+                        distanceTraveled -= gameSpeed;
+                        backgroundY += gameSpeed;
                     }
-
-                    this.state = `leaning_${direction}_${leanLevel}`;
                 } else {
-                    // 대기 상태
-                    this.state = 'idle';
+                    // 대기 상태 (하지만 균형은 계속 잡아야 함)
+                    this.actionState = 'idle';
                 }
             }
 
             // 낙하 애니메이션 타이머
-            if (this.state === 'falling') {
+            if (this.actionState === 'falling') {
                 this.fallTimer++;
-                if (this.fallTimer >= 30) { // FALL_ANIMATION_DURATION
-                    this.state = 'fallen';
+                if (this.fallTimer >= 30) {
+                    this.actionState = 'fallen';
                     isGameOver = true;
                 }
             }
 
-            if (this.state.includes('walking')) {
+            if (this.actionState.includes('walking')) {
                 this.animationTimer++;
             }
         },
 
         draw() {
-            let currentFrame = frames.idle;
+            let currentFrameSet = frames.walking; // Default
             let finalX = this.x;
             let finalY = this.y;
             let frameIndex = 0;
 
-            if (stateToFrameMap[this.state]) {
-                currentFrame = stateToFrameMap[this.state];
-            } else if (this.state === 'falling') {
-                currentFrame = this.fallDirection === 'left' ? frames.falling.left : frames.falling.right;
-            } else if (this.state === 'fallen') {
-                currentFrame = frames.fallen;
+            // 1. Determine Frame Set based on State
+            if (this.actionState === 'falling') {
+                currentFrameSet = this.fallDirection === 'left' ? frames.falling.left : frames.falling.right;
+            } else if (this.actionState === 'fallen') {
+                currentFrameSet = frames.fallen;
                 const fallenOffsetX = 40;
                 const fallenOffsetY = 20;
+                if (this.fallDirection === 'left') finalX -= fallenOffsetX;
+                else finalX += fallenOffsetX;
+                finalY += fallenOffsetY;
+            } else if (this.actionState.includes('jump_charging')) {
+                // 점프 충전 중
+                const chargeFrameKey = `jump_charging_${this.jumpLevel}`;
+                // stateToFrameMap 대신 직접 frames.jumping 사용
+                // 기존 stateToFrameMap에 있던 로직을 가져옴
+                const jumpFrames = [
+                    { x: frames.jumping.x[0], y: frames.jumping.y[0] },
+                    { x: frames.jumping.x[1], y: frames.jumping.y[1] },
+                    { x: frames.jumping.x[2], y: frames.jumping.y[2] }
+                ];
+                const currentJumpFrame = jumpFrames[this.jumpLevel];
+                currentFrameSet = { x: currentJumpFrame.x, y: currentJumpFrame.y, width: 80, height: 96 };
 
-                if (this.fallDirection === 'left') {
-                    finalX = this.x - fallenOffsetX;
-                } else {
-                    finalX = this.x + fallenOffsetX;
+            } else if (this.actionState === 'jumping') {
+                currentFrameSet = { x: frames.jumping.x[3], y: frames.jumping.y[3], width: 80, height: 96 };
+            } else {
+                // Idle or Walking -> Use Lean State
+                if (leanStateToFrameMap[this.leanState]) {
+                    currentFrameSet = leanStateToFrameMap[this.leanState];
                 }
-                finalY = this.y + fallenOffsetY;
             }
 
-            // 애니메이션 프레임 인덱스 계산
-            if (currentFrame.x && Array.isArray(currentFrame.x) && currentFrame.x.length > 1) {
-                const sequence = walkAnimationSequence;
-                const sequenceIndex = Math.floor(this.animationTimer / ANIMATION_FPS_DIVISOR) % sequence.length;
-                frameIndex = sequence[sequenceIndex];
+            // ✨ 점프 높이 적용
+            finalY += this.visualY;
+
+            // 2. Determine Frame Index (Animation)
+            // 걷는 중이거나, 뒤로 걷는 중일 때만 애니메이션 재생
+            if (this.actionState.includes('walking')) {
+                if (currentFrameSet.x && Array.isArray(currentFrameSet.x) && currentFrameSet.x.length > 1) {
+                    const sequence = walkAnimationSequence;
+                    const sequenceIndex = Math.floor(this.animationTimer / ANIMATION_FPS_DIVISOR) % sequence.length;
+                    frameIndex = sequence[sequenceIndex];
+                }
+            } else {
+                // Idle 상태면 첫 번째 프레임 (멈춰있는 상태)
+                frameIndex = 0;
             }
 
             // 현재 프레임의 원본 좌표 계산
-            let sourceX = Array.isArray(currentFrame.x) ? currentFrame.x[frameIndex] : currentFrame.x;
-            let sourceY = Array.isArray(currentFrame.y) ? currentFrame.y[frameIndex] : currentFrame.y;
+            let sourceX = Array.isArray(currentFrameSet.x) ? currentFrameSet.x[frameIndex] : currentFrameSet.x;
+            let sourceY = Array.isArray(currentFrameSet.y) ? currentFrameSet.y[frameIndex] : currentFrameSet.y;
 
             // 이미지 그리기
             ctx.drawImage(
                 images.spriteSheet,
                 sourceX,
                 sourceY,
-                currentFrame.width,
-                currentFrame.height,
+                currentFrameSet.width,
+                currentFrameSet.height,
                 finalX,
                 finalY,
                 this.width,
@@ -241,18 +366,11 @@
         if (!isGameOver) {
             ataho.update();
 
-            // 배경 스크롤 로직
-            if (ataho.state === 'walking') {
-                backgroundY -= gameSpeed;
-            } else if (ataho.state === 'walking_backward') {
-                backgroundY += gameSpeed;
-            }
-
             if (backgroundY <= -canvas.height) {
-                backgroundY = 0;
+                backgroundY += canvas.height;
             }
             if (backgroundY >= canvas.height) {
-                backgroundY = 0;
+                backgroundY -= canvas.height;
             }
         } else {
             // 게임 오버 상태에서도 애니메이션 타이머는 계속 돌려야 할 수도 있음 (필요시)
@@ -301,6 +419,9 @@
             case 'ArrowRight':
                 inputState.right = true;
                 break;
+            case 'Space':
+                inputState.space = true;
+                break;
         }
     });
 
@@ -322,6 +443,9 @@
             case 'KeyD':
             case 'ArrowRight':
                 inputState.right = false;
+                break;
+            case 'Space':
+                inputState.space = false;
                 break;
         }
     });
