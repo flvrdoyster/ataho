@@ -350,8 +350,17 @@
         setRandomWhirlpoolPosition();
     }
 
-    // 모든 이미지 로드가 완료되면 게임을 시작합니다.
-    loadImages().then(() => {
+    // 폰트 로딩 함수
+    function loadFonts() {
+        // FontFace 객체 생성 (style.css의 @font-face와 일치해야 함)
+        const font = new FontFace('Raster Forge', 'url(https://fonts.cdnfonts.com/s/123917/RasterForgeRegular-XGDg9.woff)');
+        return font.load().then(loadedFont => {
+            document.fonts.add(loadedFont);
+        });
+    }
+
+    // 모든 이미지와 폰트 로드가 완료되면 게임을 시작합니다.
+    Promise.all([loadImages(), loadFonts()]).then(() => {
         setRandomWhirlpoolPosition(); // 초기 위치 설정
         byFrame();
     });
