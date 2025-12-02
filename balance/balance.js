@@ -28,7 +28,7 @@
 
     // 🌟 [Jump Constants]
     const JUMP_CHARGE_TIME = 20;
-    const JUMP_POWER_LEVELS = [4, 7, 11];
+    const JUMP_POWER_LEVELS = [3, 5, 8];
     const JUMP_INITIAL_VELOCITY_Y = 12;
     const GRAVITY = 0.6;
 
@@ -45,7 +45,7 @@
     const BUTTON_WIDTH = 200;
     const BUTTON_HEIGHT = 60;
 
-    const gameSpeed = 2;
+    const gameSpeed = 3;
     let distanceTraveled = 0;
     let backgroundY = 0;
     let isGameOver = false;
@@ -353,7 +353,7 @@
 
     function isClickInsideButton(clickX, clickY, button) {
         return clickX >= button.x && clickX <= button.x + button.width &&
-               clickY >= button.y && clickY <= button.y + button.height;
+            clickY >= button.y && clickY <= button.y + button.height;
     }
 
     // 🌟 [유틸 함수]: 값 범위 제한
