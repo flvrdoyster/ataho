@@ -175,7 +175,14 @@
 
             // 1. 균형 레벨 업데이트 (Physics-based)
             let inputForce = 0;
-            if (inputState.left) {
+
+            // Touch Input (Analog)
+            if (typeof inputState.touchForce === 'number' && inputState.touchForce !== 0) {
+                // 터치 거리에 비례한 힘 적용 (최대 힘은 PLAYER_CONTROL_FORCE * 1.5 정도까지 허용하여 조작감 향상)
+                inputForce = inputState.touchForce * PLAYER_CONTROL_FORCE * 1.5;
+            }
+            // Keyboard Input (Digital)
+            else if (inputState.left) {
                 inputForce = -PLAYER_CONTROL_FORCE;
             } else if (inputState.right) {
                 inputForce = PLAYER_CONTROL_FORCE;
@@ -447,7 +454,7 @@
             // 평균대 시작 위치 고정값 (캐릭터 시작 위치 기준)
             const beamStartX = canvas.width / 2 - images.beamStart.width / 2;
             // 초기 Y는 캐릭터 발 바로 아래
-            const startY = canvas.height / 2 ; // 캐릭터 높이 고려
+            const startY = canvas.height / 2; // 캐릭터 높이 고려
 
             // 스크롤 적용:
             // 캐릭터가 전진(distanceTraveled 증가) -> 평균대는 위로 이동(Y 감소)
@@ -611,11 +618,11 @@
     });
 
     // 터치 이벤트 리스너
-    canvas.addEventListener('touchstart', (e) => {
+    const handleTouch = (e) => {
         e.preventDefault();
 
         // 게임 오버 상태일 때 터치로 버튼 클릭 처리
-        if (isGameOver) {
+        if (isGameOver && e.type === 'touchstart') {
             const rect = canvas.getBoundingClientRect();
             const touchX = e.touches[0].clientX - rect.left;
             const touchY = e.touches[0].clientY - rect.top;
@@ -636,37 +643,56 @@
             return;
         }
 
+        if (isGameOver) return;
+
         const touchX = e.touches[0].clientX;
         const touchY = e.touches[0].clientY;
 
-        // 화면 중앙 기준 좌우 판별
+        // 화면 중앙 기준 좌표 계산
         const centerX = window.innerWidth / 2;
         const centerY = window.innerHeight / 2;
 
-        // 초기화
-        Object.keys(inputState).forEach(key => inputState[key] = false);
+        // 1. 좌우 기울기 (Analog Control)
+        // 화면 중앙에서 터치 지점까지의 거리 비율 (-1.0 ~ 1.0)
+        // 화면 너비의 절반을 최대 거리로 잡음
+        const maxDistX = window.innerWidth / 2;
+        let distRatio = (touchX - centerX) / maxDistX;
 
-        // 간단한 터치 컨트롤: 화면 왼쪽/오른쪽 터치로 균형 잡기
-        // 상하 이동은 화면 위/아래 터치로 구현
+        // 클램핑 (-1.0 ~ 1.0)
+        if (distRatio > 1) distRatio = 1;
+        if (distRatio < -1) distRatio = -1;
 
-        // X축 컨트롤
-        if (touchX < centerX - 50) {
-            inputState.left = true;
-        } else if (touchX > centerX + 50) {
-            inputState.right = true;
-        }
+        // 데드존 (중앙 부근 터치는 무시하거나 아주 약하게)
+        if (Math.abs(distRatio) < 0.05) distRatio = 0;
 
-        // Y축 컨트롤 (옵션: 걷기)
-        if (touchY < centerY - 50) {
+        inputState.touchForce = distRatio;
+
+
+        // 2. 상하 이동 (Digital Control)
+        // 화면 상단 25% -> 위로 걷기
+        // 화면 하단 25% -> 아래로 걷기
+        // 그 외(중앙 50%) -> 걷기 멈춤
+        const screenHeight = window.innerHeight;
+
+        inputState.up = false;
+        inputState.down = false;
+
+        if (touchY < screenHeight * 0.25) {
             inputState.up = true;
-        } else if (touchY > centerY + 50) {
+        } else if (touchY > screenHeight * 0.75) {
             inputState.down = true;
         }
-    });
+    };
+
+    canvas.addEventListener('touchstart', handleTouch, { passive: false });
+    canvas.addEventListener('touchmove', handleTouch, { passive: false });
 
     canvas.addEventListener('touchend', (e) => {
         e.preventDefault();
-        Object.keys(inputState).forEach(key => inputState[key] = false);
+        inputState.touchForce = 0;
+        inputState.up = false;
+        inputState.down = false;
+        // 키보드 입력 상태는 건드리지 않음 (멀티 터치/키보드 혼용 고려)
     });
 
     //===========================================
