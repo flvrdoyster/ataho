@@ -54,7 +54,7 @@
             GAME: 3
         },
         DEBUG: {
-            SHOW_HITBOX: true
+            SHOW_HITBOX: false
         }
     };
 
