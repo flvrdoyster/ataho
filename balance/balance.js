@@ -9,61 +9,97 @@
     canvas.width = 960;
     canvas.height = 640;
 
-    // 🌟 [최적화 1]: 핵심 상수 정의
-    const SCALE_FACTOR = 1.5;
-    const ANIMATION_FPS_DIVISOR = 10;
-    const BALANCE_THRESHOLD = {
-        SLIGHT: 30,
-        MEDIUM: 60,
-        MAX: 100
+    //===========================================
+    // GAME CONFIGURATION
+    //===========================================
+
+    // PHYSICS & DIFFICULTY
+    const CONFIG = {
+        PHYSICS: {
+            SWAY_INTENSITY_IDLE: 0.08,
+            SWAY_INTENSITY_WALK: 0.2,
+            PLAYER_CONTROL_FORCE: 1.0,
+            FRICTION: 0.90,
+            MAX_VELOCITY: 3.5,
+            INERTIA_CONSTANT: 0.0005,
+            GRAVITY: 0.6,
+            EDGE_THRESHOLD: 80,
+            EDGE_RESISTANCE: 0.02,
+            FATIGUE_RATE: 0.01
+        },
+        JUMP: {
+            CHARGE_TIME: 20,
+            DISTANCES: [28, 54, 72], // Tight fit
+            VELOCITIES: [2, 3, 4],   // Low, quick jumps
+            LANDING_PENALTIES: [10, 30, 50]
+        },
+        OBSTACLES: {
+            START_DELAY: 800,
+            MIN_GAP: 80,
+            PATTERNS: [
+                { type: 'SINGLE', groups: [{ count: 1, gap: 0 }] },
+                { type: 'DOUBLE_TIGHT', groups: [{ count: 2, gap: 0 }] },
+                { type: 'DOUBLE_LOOSE', groups: [{ count: 2, gap: 20 }] },
+                { type: 'TRIPLE', groups: [{ count: 3, gap: 0 }] },
+                { type: 'COMBO_2_2', groups: [{ count: 2, gap: 0 }, { count: 2, gap: 0 }], groupGap: 120 },
+                { type: 'COMBO_1_2', groups: [{ count: 1, gap: 0 }, { count: 2, gap: 0 }], groupGap: 100 },
+                { type: 'COMBO_3_1', groups: [{ count: 3, gap: 0 }, { count: 1, gap: 0 }], groupGap: 140 }
+            ]
+        },
+        HITBOXES: {
+            CHAR: { x: 0, y: 98, w: 120, h: 10 },
+            OBS: { x: 26, y: 0, w: 18, h: 18 }
+        },
+        SPEED: {
+            GAME: 3
+        },
+        DEBUG: {
+            SHOW_HITBOX: true
+        }
     };
 
-    // 🌟 [Physics Constants]
-    const SWAY_INTENSITY_IDLE = 0.07;
-    const SWAY_INTENSITY_WALK = 0.2;
-    const PLAYER_CONTROL_FORCE = 0.4;
-    const FRICTION = 0.90;
-    const MAX_VELOCITY = 2.5;
-    const INERTIA_CONSTANT = 0.003;
+    // CORE CONSTANTS
+    const SCALE_FACTOR = 1.5;
+    const ANIMATION_FPS_DIVISOR = 10;
+    const BALANCE_THRESHOLD = { SLIGHT: 30, MEDIUM: 60, MAX: 100 };
 
-    // 🌟 [Jump Constants]
-    const JUMP_CHARGE_TIME = 20;
-    const JUMP_POWER_LEVELS = [3, 5, 8];
-    const LANDING_PENALTIES = [10, 30, 50];
-    const JUMP_INITIAL_VELOCITY_Y = 12;
-    const GRAVITY = 0.6;
-
-    // 🌟 [Sprite Constants]
+    // SPRITE CONSTANTS
     const SPRITE_WIDTH = 80;
     const SPRITE_HEIGHT = 96;
     const FALLEN_OFFSET_X = 40;
     const FALLEN_OFFSET_Y = 20;
 
-    // 🌟 [Layout Constants]
+    // LAYOUT CONSTANTS
     const TOUCH_DEADZONE = 0.05;
     const TOUCH_UPPER_ZONE = 0.25;
     const TOUCH_LOWER_ZONE = 0.75;
     const BUTTON_WIDTH = 200;
     const BUTTON_HEIGHT = 60;
 
-    const gameSpeed = 3;
+    //===========================================
+    // GAME STATE
+    //===========================================
     let distanceTraveled = 0;
     let backgroundY = 0;
     let isGameOver = false;
-    let currentRAFId = null; // 🌟 [메모리 누수 방지 1]: RAF ID 저장
+    let currentRAFId = null;
 
-    // 이미지 경로 정의
+    let obstacles = [];
+    let nextObstacleY = CONFIG.OBSTACLES.START_DELAY;
+
+    // Image Paths
     const imagePaths = {
         spriteSheet: 'balance_char.png',
         background: 'balance_bg.png',
         beamStart: 'beam_start.png',
         beamMid: 'beam_mid.png',
-        beamEnd: 'beam_end.png'
+        beamEnd: 'beam_end.png',
+        beamSpike: 'beam_spike.png'
     };
 
     const images = {};
 
-    // 이미지 로드 함수
+    // Image Loading
     function loadImages() {
         const promises = Object.keys(imagePaths).map(key => {
             return new Promise((resolve, reject) => {
@@ -79,7 +115,7 @@
         return Promise.all(promises);
     }
 
-    // 폰트 로드 함수
+    // Font Loading
     function loadFonts() {
         const font = new FontFace('Raster Forge', 'url(https://fonts.cdnfonts.com/s/123917/RasterForgeRegular-XGDg9.woff)');
         return font.load().then(loadedFont => {
@@ -88,7 +124,7 @@
     }
 
     //===========================================
-    // 스프라이트 및 게임 데이터
+    // SPRITES & GAME DATA
     //===========================================
     const frames = {
         walking: { x: [0, 80, 160], y: 0, width: 80, height: 96 },
@@ -114,10 +150,13 @@
     };
 
     const jumpChargeFrames = [
-        { x: frames.jumping.x[0], y: frames.jumping.y[0] },
-        { x: frames.jumping.x[1], y: frames.jumping.y[1] },
-        { x: frames.jumping.x[2], y: frames.jumping.y[2] }
+        { x: frames.jumping.x[0], y: frames.jumping.y[0], width: SPRITE_WIDTH, height: SPRITE_HEIGHT },
+        { x: frames.jumping.x[1], y: frames.jumping.y[1], width: SPRITE_WIDTH, height: SPRITE_HEIGHT },
+        { x: frames.jumping.x[2], y: frames.jumping.y[2], width: SPRITE_WIDTH, height: SPRITE_HEIGHT }
     ];
+
+    // Pre-allocate jumping frame object to avoid GC
+    const jumpingFrame = { x: frames.jumping.x[3], y: frames.jumping.y[3], width: SPRITE_WIDTH, height: SPRITE_HEIGHT };
 
     const walkAnimationSequence = [0, 1, 2, 1];
     const inputState = {};
@@ -135,6 +174,7 @@
         balanceVelocity: 0,
         fallDirection: null,
         fallTimer: 0,
+        balanceTimer: 0,
         animationTimer: 0,
 
         jumpChargeTimer: 0,
@@ -145,9 +185,13 @@
         update() {
             if (this.actionState === 'jumping') {
                 this.visualY -= this.jumpVelocityY;
-                this.jumpVelocityY -= GRAVITY;
+                this.jumpVelocityY -= CONFIG.PHYSICS.GRAVITY;
 
-                const currentJumpSpeed = JUMP_POWER_LEVELS[this.jumpLevel];
+                // Calculate required speed to hit target distance
+                // Air Time = (2 * InitialVelocity) / Gravity
+                const airTime = (2 * CONFIG.JUMP.VELOCITIES[this.jumpLevel]) / CONFIG.PHYSICS.GRAVITY;
+                const currentJumpSpeed = CONFIG.JUMP.DISTANCES[this.jumpLevel] / airTime;
+
                 distanceTraveled += currentJumpSpeed;
                 backgroundY -= currentJumpSpeed;
 
@@ -156,11 +200,47 @@
                     this.actionState = 'idle';
                     this.jumpVelocityY = 0;
 
-                    // 🌟 [Landing Instability]
-                    const penalty = LANDING_PENALTIES[this.jumpLevel];
+                    // Landing Instability
+                    const penalty = CONFIG.JUMP.LANDING_PENALTIES[this.jumpLevel];
                     const direction = Math.random() < 0.5 ? -1 : 1;
                     this.balanceLevel += penalty * direction;
                     this.balanceVelocity += (penalty * direction) * 0.1; // Add some momentum
+
+                    // Obstacle Landing Collision
+                    // Check if feet (ataho.y + ataho.height) are inside any obstacle in SCREEN SPACE
+                    // Player Feet Y is constant: ataho.y + ataho.height
+                    // Obstacle Screen Y: startY - distanceTraveled + obs.y
+
+                    const playerFeetY = this.y + this.height;
+                    const startY = canvas.height / 2;
+
+                    const landedOnObstacle = obstacles.some(obs => {
+                        // Ignore obstacles behind us
+                        if (distanceTraveled > obs.y + obs.height) return false;
+
+                        const obsScreenY = startY - distanceTraveled + obs.y;
+
+                        // Tight Hitbox Collision - Landing
+                        const playerHitboxTop = this.y + CONFIG.HITBOXES.CHAR.y;
+                        const playerHitboxBottom = this.y + CONFIG.HITBOXES.CHAR.y + CONFIG.HITBOXES.CHAR.h;
+
+                        const obsHitboxTop = obsScreenY + CONFIG.HITBOXES.OBS.y;
+                        const obsHitboxBottom = obsScreenY + CONFIG.HITBOXES.OBS.y + CONFIG.HITBOXES.OBS.h;
+
+                        // We land if our feet (hitbox vertical range) overlaps the obstacle's vertical range
+                        // AABB Overlap: (Range1.Start < Range2.End) && (Range1.End > Range2.Start)
+                        return playerHitboxTop < obsHitboxBottom && playerHitboxBottom > obsHitboxTop;
+                    });
+
+                    if (landedOnObstacle) {
+                        this.actionState = 'falling';
+                        // Fall towards the tilt, or random if perfectly balanced
+                        if (this.balanceLevel !== 0) {
+                            this.fallDirection = this.balanceLevel > 0 ? 'right' : 'left';
+                        } else {
+                            this.fallDirection = Math.random() < 0.5 ? 'right' : 'left';
+                        }
+                    }
                 }
                 return;
             }
@@ -172,9 +252,9 @@
                     this.jumpLevel = 0;
                 } else {
                     this.jumpChargeTimer++;
-                    if (this.jumpChargeTimer > JUMP_CHARGE_TIME * 2) {
+                    if (this.jumpChargeTimer > CONFIG.JUMP.CHARGE_TIME * 2) {
                         this.jumpLevel = 2;
-                    } else if (this.jumpChargeTimer > JUMP_CHARGE_TIME) {
+                    } else if (this.jumpChargeTimer > CONFIG.JUMP.CHARGE_TIME) {
                         this.jumpLevel = 1;
                     } else {
                         this.jumpLevel = 0;
@@ -183,31 +263,47 @@
                 return;
             } else if (this.actionState.includes('jump_charging')) {
                 this.actionState = 'jumping';
-                this.jumpVelocityY = JUMP_INITIAL_VELOCITY_Y;
+                this.jumpVelocityY = CONFIG.JUMP.VELOCITIES[this.jumpLevel];
                 return;
             }
 
             let inputForce = 0;
 
             if (typeof inputState.touchForce === 'number' && inputState.touchForce !== 0) {
-                inputForce = inputState.touchForce * PLAYER_CONTROL_FORCE * 1.5;
+                inputForce = inputState.touchForce * CONFIG.PHYSICS.PLAYER_CONTROL_FORCE * 1.5;
             }
             else if (inputState.left) {
-                inputForce = -PLAYER_CONTROL_FORCE;
+                inputForce = -CONFIG.PHYSICS.PLAYER_CONTROL_FORCE;
             } else if (inputState.right) {
-                inputForce = PLAYER_CONTROL_FORCE;
+                inputForce = CONFIG.PHYSICS.PLAYER_CONTROL_FORCE;
             }
 
-            const currentSwayIntensity = (this.actionState.includes('walking')) ? SWAY_INTENSITY_WALK : SWAY_INTENSITY_IDLE;
-            const swayForce = (Math.random() - 0.5) * currentSwayIntensity;
+            const currentSwayIntensity = (this.actionState.includes('walking')) ? CONFIG.PHYSICS.SWAY_INTENSITY_WALK : CONFIG.PHYSICS.SWAY_INTENSITY_IDLE;
 
-            const inertiaForce = this.balanceLevel * INERTIA_CONSTANT;
+            // Balance Fatigue: Increase sway if staying balanced for too long
+            if (Math.abs(this.balanceLevel) < BALANCE_THRESHOLD.SLIGHT) {
+                this.balanceTimer++;
+            } else {
+                this.balanceTimer = 0;
+            }
 
-            this.balanceVelocity += inputForce + swayForce + inertiaForce;
-            this.balanceVelocity *= FRICTION;
+            const instabilityMultiplier = 1 + (this.balanceTimer * CONFIG.PHYSICS.FATIGUE_RATE);
+            const swayForce = (Math.random() - 0.5) * currentSwayIntensity * instabilityMultiplier;
 
-            if (this.balanceVelocity > MAX_VELOCITY) this.balanceVelocity = MAX_VELOCITY;
-            if (this.balanceVelocity < -MAX_VELOCITY) this.balanceVelocity = -MAX_VELOCITY;
+            const inertiaForce = this.balanceLevel * CONFIG.PHYSICS.INERTIA_CONSTANT;
+
+            // Edge Resistance (Reverse Acceleration)
+            let edgeForce = 0;
+            if (Math.abs(this.balanceLevel) > CONFIG.PHYSICS.EDGE_THRESHOLD) {
+                const sign = this.balanceLevel > 0 ? 1 : -1;
+                edgeForce = -sign * CONFIG.PHYSICS.EDGE_RESISTANCE;
+            }
+
+            this.balanceVelocity += inputForce + swayForce + inertiaForce + edgeForce;
+            this.balanceVelocity *= CONFIG.PHYSICS.FRICTION;
+
+            if (this.balanceVelocity > CONFIG.PHYSICS.MAX_VELOCITY) this.balanceVelocity = CONFIG.PHYSICS.MAX_VELOCITY;
+            if (this.balanceVelocity < -CONFIG.PHYSICS.MAX_VELOCITY) this.balanceVelocity = -CONFIG.PHYSICS.MAX_VELOCITY;
 
             this.balanceLevel += this.balanceVelocity;
 
@@ -238,18 +334,42 @@
             }
 
             if (this.actionState !== 'falling' && this.actionState !== 'fallen') {
-                if (inputState.down || inputState.up) {
-                    this.actionState = inputState.down ? 'walking' : 'walking_backward';
-
-                    if (this.actionState === 'walking') {
-                        distanceTraveled += gameSpeed;
-                        backgroundY -= gameSpeed;
-                    } else if (this.actionState === 'walking_backward') {
-                        distanceTraveled -= gameSpeed;
-                        backgroundY += gameSpeed;
-                    }
+                // Control Fix: Down = Forward
+                if (inputState.down) {
+                    this.actionState = 'walking';
                 } else {
                     this.actionState = 'idle';
+                }
+
+                if (this.actionState === 'walking') {
+                    const nextDist = distanceTraveled + CONFIG.SPEED.GAME;
+
+                    // Obstacle Walking Collision
+                    const startY = canvas.height / 2;
+
+                    const blocked = obstacles.some(obs => {
+                        // Ignore obstacles behind us
+                        if (distanceTraveled > obs.y + obs.height) return false;
+
+                        const obsScreenY = startY - nextDist + obs.y;
+
+                        // Tight Hitbox Collision - Walking
+                        const playerTop = this.y + CONFIG.HITBOXES.CHAR.y;
+                        const playerBottom = this.y + CONFIG.HITBOXES.CHAR.y + CONFIG.HITBOXES.CHAR.h;
+
+                        const obsTop = obsScreenY + CONFIG.HITBOXES.OBS.y;
+                        const obsBottom = obsScreenY + CONFIG.HITBOXES.OBS.y + CONFIG.HITBOXES.OBS.h;
+
+                        // Standard AABB overlap check
+                        const isOverlapping = (playerTop < obsBottom && playerBottom > obsTop);
+                        return isOverlapping;
+                    });
+
+                    if (!blocked) {
+                        distanceTraveled += CONFIG.SPEED.GAME;
+                        backgroundY -= CONFIG.SPEED.GAME;
+                    }
+                    // If blocked, we don't move, but animation continues (feet shuffling)
                 }
             }
 
@@ -280,11 +400,10 @@
                 else finalX += FALLEN_OFFSET_X;
                 finalY += FALLEN_OFFSET_Y;
             } else if (this.actionState.includes('jump_charging')) {
-                const currentJumpFrame = jumpChargeFrames[this.jumpLevel];
-                currentFrameSet = { x: currentJumpFrame.x, y: currentJumpFrame.y, width: SPRITE_WIDTH, height: SPRITE_HEIGHT };
+                currentFrameSet = jumpChargeFrames[this.jumpLevel];
 
             } else if (this.actionState === 'jumping') {
-                currentFrameSet = { x: frames.jumping.x[3], y: frames.jumping.y[3], width: SPRITE_WIDTH, height: SPRITE_HEIGHT };
+                currentFrameSet = jumpingFrame;
             } else {
                 if (leanStateToFrameMap[this.leanState]) {
                     currentFrameSet = leanStateToFrameMap[this.leanState];
@@ -335,6 +454,18 @@
             if (rotationAngle !== 0) {
                 ctx.restore();
             }
+
+            // Debug Hitbox
+            if (CONFIG.DEBUG.SHOW_HITBOX) {
+                ctx.strokeStyle = 'red';
+                ctx.lineWidth = 2;
+                ctx.strokeRect(
+                    finalX + CONFIG.HITBOXES.CHAR.x,
+                    finalY + CONFIG.HITBOXES.CHAR.y,
+                    CONFIG.HITBOXES.CHAR.w,
+                    CONFIG.HITBOXES.CHAR.h
+                );
+            }
         }
     };
 
@@ -344,7 +475,9 @@
         ataho.balanceVelocity = 0;
         ataho.actionState = 'idle';
         ataho.leanState = 'balanced';
+
         ataho.fallTimer = 0;
+        ataho.balanceTimer = 0;
         ataho.x = canvas.width / 2 - (frames.walking.width * SCALE_FACTOR) / 2;
         ataho.y = canvas.height / 2 - (frames.walking.height * SCALE_FACTOR) / 2;
         ataho.visualY = 0;
@@ -353,9 +486,14 @@
         distanceTraveled = 0;
         backgroundY = 0;
 
-        Object.keys(inputState).forEach(key => inputState[key] = false);
+        obstacles = [];
+        nextObstacleY = CONFIG.OBSTACLES.START_DELAY;
 
-        byFrame();
+        Object.keys(inputState).forEach(key => inputState[key] = false);
+        inputState.touchForce = 0;
+
+        // byFrame() is already running continuously, so we don't need to call it here.
+        // Calling it would create a duplicate loop (double speed).
     }
 
     function isClickInsideButton(clickX, clickY, button) {
@@ -363,12 +501,12 @@
             clickY >= button.y && clickY <= button.y + button.height;
     }
 
-    // 🌟 [유틸 함수]: 값 범위 제한
+    // Utility: Clamp value
     function clamp(value, min, max) {
         return Math.max(min, Math.min(max, value));
     }
 
-    // 🌟 [메모리 누수 방지 2]: 이벤트 핸들러를 변수로 저장 (재사용 가능)
+    // Event Handlers
     const handleKeyDown = (e) => {
         if (e.repeat || isGameOver) return;
         switch (e.code) {
@@ -423,13 +561,39 @@
         if (!isGameOver) return;
 
         const rect = canvas.getBoundingClientRect();
-        const clickX = e.clientX - rect.left;
-        const clickY = e.clientY - rect.top;
+        const scaleX = canvas.width / rect.width;
+        const scaleY = canvas.height / rect.height;
+
+        const clickX = (e.clientX - rect.left) * scaleX;
+        const clickY = (e.clientY - rect.top) * scaleY;
+
+        console.log('Click:', clickX, clickY, 'Btn:', buttons.continue);
 
         if (isClickInsideButton(clickX, clickY, buttons.continue)) {
             resetGame();
         } else if (isClickInsideButton(clickX, clickY, buttons.exit)) {
             window.location.href = '../index.html';
+        }
+    };
+
+    const handleMouseMove = (e) => {
+        if (!isGameOver) {
+            canvas.style.cursor = 'default';
+            return;
+        }
+
+        const rect = canvas.getBoundingClientRect();
+        const scaleX = canvas.width / rect.width;
+        const scaleY = canvas.height / rect.height;
+
+        const mouseX = (e.clientX - rect.left) * scaleX;
+        const mouseY = (e.clientY - rect.top) * scaleY;
+
+        if (isClickInsideButton(mouseX, mouseY, buttons.continue) ||
+            isClickInsideButton(mouseX, mouseY, buttons.exit)) {
+            canvas.style.cursor = 'pointer';
+        } else {
+            canvas.style.cursor = 'default';
         }
     };
 
@@ -445,8 +609,11 @@
 
         if (isGameOver && e.type === 'touchstart') {
             const rect = canvas.getBoundingClientRect();
-            const touchX = e.touches[0].clientX - rect.left;
-            const touchY = e.touches[0].clientY - rect.top;
+            const scaleX = canvas.width / rect.width;
+            const scaleY = canvas.height / rect.height;
+
+            const touchX = (e.touches[0].clientX - rect.left) * scaleX;
+            const touchY = (e.touches[0].clientY - rect.top) * scaleY;
 
             if (isClickInsideButton(touchX, touchY, buttons.continue)) {
                 resetGame();
@@ -489,9 +656,7 @@
     };
 
     function byFrame() {
-        if (!isGameOver) {
-            currentRAFId = requestAnimationFrame(byFrame);
-        }
+        currentRAFId = requestAnimationFrame(byFrame);
 
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -503,6 +668,57 @@
             }
             if (backgroundY > 0) {
                 backgroundY -= canvas.height;
+            }
+
+            // Obstacle Generation
+            if (images.beamSpike) {
+                const generateHorizon = distanceTraveled + canvas.height * 2;
+                while (nextObstacleY < generateHorizon) {
+                    const spikeHeight = images.beamSpike.height;
+
+                    // Pick a random pattern
+                    const pattern = CONFIG.OBSTACLES.PATTERNS[Math.floor(Math.random() * CONFIG.OBSTACLES.PATTERNS.length)];
+
+                    if (pattern.groups) {
+                        pattern.groups.forEach((group, index) => {
+                            for (let i = 0; i < group.count; i++) {
+                                obstacles.push({
+                                    y: nextObstacleY,
+                                    height: spikeHeight
+                                });
+                                nextObstacleY += spikeHeight + group.gap;
+                            }
+                            // Add group gap if not the last group
+                            if (index < pattern.groups.length - 1) {
+                                nextObstacleY += pattern.groupGap;
+                            }
+                        });
+                    } else {
+                        // Fallback for old patterns (just in case)
+                        for (let i = 0; i < pattern.count; i++) {
+                            obstacles.push({
+                                y: nextObstacleY,
+                                height: spikeHeight
+                            });
+                            nextObstacleY += spikeHeight + pattern.gap;
+                        }
+                    }
+
+                    // Add gap before next sequence
+                    nextObstacleY += CONFIG.OBSTACLES.MIN_GAP + (Math.random() * 120);
+                }
+
+                // Cleanup old obstacles
+                if (obstacles.length > 0) {
+                    // Remove if completely off-screen (top)
+                    // Screen Y = startY - distanceTraveled + obs.y
+                    // If Screen Y + height < 0, it's gone.
+                    const startY = canvas.height / 2;
+                    const firstObsScreenY = startY - distanceTraveled + obstacles[0].y;
+                    if (firstObsScreenY + obstacles[0].height < -100) {
+                        obstacles.shift();
+                    }
+                }
             }
         }
 
@@ -532,6 +748,38 @@
                 ctx.drawImage(images.beamMid, beamStartX, midDrawY);
                 midDrawY += images.beamMid.height;
             }
+        }
+
+        // Draw Obstacles
+        if (images.beamSpike) {
+            const beamStartX = canvas.width / 2 - images.beamStart.width / 2; // Assuming spike has same width/center logic
+            // User said "same width as beam". beamStart.width should be used for centering if spike is same width.
+            // But we should use spike's width to be safe.
+            const spikeX = canvas.width / 2 - images.beamSpike.width / 2;
+            const startY = canvas.height / 2;
+
+            obstacles.forEach(obs => {
+                // Calculate screen Y
+                // Beam logic: currentDrawY = startY - distanceTraveled
+                // Obstacle at obs.y is at: startY - distanceTraveled + obs.y
+                const drawY = startY - distanceTraveled + obs.y;
+
+                if (drawY > -images.beamSpike.height && drawY < canvas.height) {
+                    ctx.drawImage(images.beamSpike, spikeX, drawY);
+
+                    // Debug Hitbox
+                    if (CONFIG.DEBUG.SHOW_HITBOX) {
+                        ctx.strokeStyle = 'red';
+                        ctx.lineWidth = 2;
+                        ctx.strokeRect(
+                            spikeX + CONFIG.HITBOXES.OBS.x,
+                            drawY + CONFIG.HITBOXES.OBS.y,
+                            CONFIG.HITBOXES.OBS.w,
+                            CONFIG.HITBOXES.OBS.h
+                        );
+                    }
+                }
+            });
         }
 
         ataho.draw();
@@ -582,10 +830,11 @@
         }
     }
 
-    // 🌟 [메모리 누수 방지 3]: 이벤트 리스너 등록 (중복 방지, 한 번만)
+    // Event Listeners
     document.addEventListener('keydown', handleKeyDown);
     document.addEventListener('keyup', handleKeyUp);
     canvas.addEventListener('click', handleCanvasClick);
+    canvas.addEventListener('mousemove', handleMouseMove);
     canvas.addEventListener('touchstart', handleTouch, { passive: false });
     canvas.addEventListener('touchmove', handleTouch, { passive: false });
     canvas.addEventListener('touchend', handleTouchEnd);
@@ -598,3 +847,4 @@
     });
 
 })();
+
