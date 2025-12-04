@@ -31,7 +31,7 @@
             FATIGUE_RATE: 0.005          // Rate at which sway intensity increases over time if perfectly balanced
         },
         JUMP: {
-            CHARGE_TIME: 40,             // Frames required to charge each jump level (hold space)
+            CHARGE_TIME: 20,             // Frames required to charge each jump level (hold space)
             JUMP_COOLDOWN: 20,           // Frames to wait before jumping again
             DISTANCES: [40, 54, 68],     // Forward distance traveled for each jump level [Level 1, Level 2, Level 3]
             VELOCITIES: [5, 6, 7],       // Vertical jump velocity (height) for each level
@@ -57,7 +57,7 @@
             OBS: { x: 26, y: 0, w: 18, h: 18 }    // Obstacle hitbox relative to sprite [x, y, width, height]
         },
         SPEED: {
-            GAME: 3                      // Global game speed (pixels per frame)
+            GAME: 5                      // Global game speed (pixels per frame)
         },
         DEBUG: {
             SHOW_HITBOX: false            // Toggle to show/hide debug hitboxes (red/blue rectangles)
