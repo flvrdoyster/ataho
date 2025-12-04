@@ -5,8 +5,13 @@
     const canvas = document.getElementById('gameCanvas');
     const ctx = canvas.getContext('2d');
 
-    canvas.width = 960;
-    canvas.height = 640;
+    const LOGICAL_WIDTH = 960;
+    const LOGICAL_HEIGHT = 640;
+
+    canvas.width = LOGICAL_WIDTH * 2;
+    canvas.height = LOGICAL_HEIGHT * 2;
+
+    ctx.scale(2, 2);
 
     //===========================================
     // GAME CONFIGURATION
@@ -192,8 +197,8 @@
     const inputState = {};
 
     const ataho = {
-        x: canvas.width / 2 - (frames.walking.width * SCALE_FACTOR) / 2,
-        y: canvas.height / 2 - (frames.walking.height * SCALE_FACTOR) / 2,
+        x: LOGICAL_WIDTH / 2 - (frames.walking.width * SCALE_FACTOR) / 2,
+        y: LOGICAL_HEIGHT / 2 - (frames.walking.height * SCALE_FACTOR) / 2,
         width: frames.walking.width * SCALE_FACTOR,
         height: frames.walking.height * SCALE_FACTOR,
 
@@ -244,7 +249,7 @@
                     // Obstacle Screen Y: startY - distanceTraveled + obs.y
 
                     const playerFeetY = this.y + this.height;
-                    const startY = canvas.height / 2;
+                    const startY = LOGICAL_HEIGHT / 2;
 
                     const landedOnObstacle = obstacles.some(obs => {
                         // Ignore obstacles behind us
@@ -384,7 +389,7 @@
                     const nextDist = distanceTraveled + CONFIG.SPEED.GAME;
 
                     // Obstacle Walking Collision
-                    const startY = canvas.height / 2;
+                    const startY = LOGICAL_HEIGHT / 2;
 
                     const blocked = obstacles.some(obs => {
                         // Ignore obstacles behind us
@@ -535,8 +540,8 @@
 
         ataho.fallTimer = 0;
         ataho.balanceTimer = 0;
-        ataho.x = canvas.width / 2 - (frames.walking.width * SCALE_FACTOR) / 2;
-        ataho.y = canvas.height / 2 - (frames.walking.height * SCALE_FACTOR) / 2;
+        ataho.x = LOGICAL_WIDTH / 2 - (frames.walking.width * SCALE_FACTOR) / 2;
+        ataho.y = LOGICAL_HEIGHT / 2 - (frames.walking.height * SCALE_FACTOR) / 2;
         ataho.visualY = 0;
         ataho.jumpVelocityY = 0;
         ataho.jumpLevel = 0;
@@ -618,8 +623,8 @@
         if (!isGameOver) return;
 
         const rect = canvas.getBoundingClientRect();
-        const scaleX = canvas.width / rect.width;
-        const scaleY = canvas.height / rect.height;
+        const scaleX = LOGICAL_WIDTH / rect.width;
+        const scaleY = LOGICAL_HEIGHT / rect.height;
 
         const clickX = (e.clientX - rect.left) * scaleX;
         const clickY = (e.clientY - rect.top) * scaleY;
@@ -640,8 +645,8 @@
         }
 
         const rect = canvas.getBoundingClientRect();
-        const scaleX = canvas.width / rect.width;
-        const scaleY = canvas.height / rect.height;
+        const scaleX = LOGICAL_WIDTH / rect.width;
+        const scaleY = LOGICAL_HEIGHT / rect.height;
 
         const mouseX = (e.clientX - rect.left) * scaleX;
         const mouseY = (e.clientY - rect.top) * scaleY;
@@ -666,8 +671,8 @@
 
         if (isGameOver && e.type === 'touchstart') {
             const rect = canvas.getBoundingClientRect();
-            const scaleX = canvas.width / rect.width;
-            const scaleY = canvas.height / rect.height;
+            const scaleX = LOGICAL_WIDTH / rect.width;
+            const scaleY = LOGICAL_HEIGHT / rect.height;
 
             const touchX = (e.touches[0].clientX - rect.left) * scaleX;
             const touchY = (e.touches[0].clientY - rect.top) * scaleY;
@@ -715,21 +720,21 @@
     function byFrame() {
         currentRAFId = requestAnimationFrame(byFrame);
 
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.clearRect(0, 0, LOGICAL_WIDTH, LOGICAL_HEIGHT);
 
         if (!isGameOver) {
             ataho.update();
 
-            if (backgroundY <= -canvas.height) {
-                backgroundY += canvas.height;
+            if (backgroundY <= -LOGICAL_HEIGHT) {
+                backgroundY += LOGICAL_HEIGHT;
             }
             if (backgroundY > 0) {
-                backgroundY -= canvas.height;
+                backgroundY -= LOGICAL_HEIGHT;
             }
 
             // Obstacle Generation
             if (images.beamSpike) {
-                const generateHorizon = distanceTraveled + canvas.height * 2;
+                const generateHorizon = distanceTraveled + LOGICAL_HEIGHT * 2;
                 while (nextObstacleY < generateHorizon) {
                     const spikeHeight = images.beamSpike.height;
 
@@ -770,7 +775,7 @@
                     // Remove if completely off-screen (top)
                     // Screen Y = startY - distanceTraveled + obs.y
                     // If Screen Y + height < 0, it's gone.
-                    const startY = canvas.height / 2;
+                    const startY = LOGICAL_HEIGHT / 2;
                     const firstObsScreenY = startY - distanceTraveled + obstacles[0].y;
                     if (firstObsScreenY + obstacles[0].height < -100) {
                         obstacles.shift();
@@ -781,13 +786,13 @@
 
         if (images.background) {
             const bgY = Math.floor(backgroundY);
-            ctx.drawImage(images.background, 0, bgY, canvas.width, canvas.height);
-            ctx.drawImage(images.background, 0, bgY + canvas.height, canvas.width, canvas.height);
+            ctx.drawImage(images.background, 0, bgY, LOGICAL_WIDTH, LOGICAL_HEIGHT);
+            ctx.drawImage(images.background, 0, bgY + LOGICAL_HEIGHT, LOGICAL_WIDTH, LOGICAL_HEIGHT);
         }
 
         if (images.beamStart && images.beamMid) {
-            const beamStartX = canvas.width / 2 - images.beamStart.width / 2;
-            const startY = canvas.height / 2;
+            const beamStartX = LOGICAL_WIDTH / 2 - images.beamStart.width / 2;
+            const startY = LOGICAL_HEIGHT / 2;
 
             let currentDrawY = startY - distanceTraveled;
 
