@@ -1,17 +1,16 @@
 (function () {
+    if (window.ATAHO_BALANCE_GAME_LOADED) return;
+    window.ATAHO_BALANCE_GAME_LOADED = true;
     //===========================================
     // CANVAS SETUP
     //===========================================
     const canvas = document.getElementById('gameCanvas');
     const ctx = canvas.getContext('2d');
+    canvas.width = 960;
+    canvas.height = 640;
 
-    const LOGICAL_WIDTH = 960;
-    const LOGICAL_HEIGHT = 640;
-
-    canvas.width = LOGICAL_WIDTH * 2;
-    canvas.height = LOGICAL_HEIGHT * 2;
-
-    ctx.scale(2, 2);
+    // Disable smoothing AFTER sizing (sizing resets context)
+    ctx.imageSmoothingEnabled = false;
 
     //===========================================
     // GAME CONFIGURATION
@@ -20,48 +19,48 @@
     // PHYSICS & DIFFICULTY
     const CONFIG = {
         PHYSICS: {
-            SWAY_INTENSITY_IDLE: 0.15,
-            SWAY_INTENSITY_WALK: 0.2,
-            PLAYER_CONTROL_FORCE: 1.0,
-            FRICTION: 0.90,
-            MAX_VELOCITY: 3.5,
-            INERTIA_CONSTANT: 0.001,
-            GRAVITY: 0.6,
-            EDGE_THRESHOLD: 0,
-            EDGE_RESISTANCE: 0.02,
-            FATIGUE_RATE: 0.01
+            SWAY_INTENSITY_IDLE: 0.05,   // Intensity of random sway when standing still (higher = harder)
+            SWAY_INTENSITY_WALK: 0.01,   // Intensity of random sway when walking (lower than idle for stability)
+            PLAYER_CONTROL_FORCE: 0.8,   // Force applied by player input (Left/Right arrows or touch)
+            FRICTION: 0.90,              // Damping factor for balance velocity (lower = slippery, higher = sticky)
+            MAX_VELOCITY: 3.5,           // Maximum speed the character can tilt
+            INERTIA_CONSTANT: 0.0005,    // Force added based on current tilt (makes it harder to recover from large tilts)
+            GRAVITY: 0.6,                // Gravity applied during jumps
+            EDGE_THRESHOLD: 0,           // Tilt threshold where "edge resistance" kicks in (0 = disabled)
+            EDGE_RESISTANCE: 0.02,       // Force pushing back against the tilt at extreme angles (helper)
+            FATIGUE_RATE: 0.005          // Rate at which sway intensity increases over time if perfectly balanced
         },
         JUMP: {
-            CHARGE_TIME: 20,
-            JUMP_COOLDOWN: 20,
-            DISTANCES: [30, 48, 60], // Tight fit
-            VELOCITIES: [4, 4, 4],   // Low, quick jumps
-            LANDING_PENALTIES: [10, 30, 50]
+            CHARGE_TIME: 40,             // Frames required to charge each jump level (hold space)
+            JUMP_COOLDOWN: 20,           // Frames to wait before jumping again
+            DISTANCES: [40, 54, 68],     // Forward distance traveled for each jump level [Level 1, Level 2, Level 3]
+            VELOCITIES: [5, 6, 7],       // Vertical jump velocity (height) for each level
+            LANDING_PENALTIES: [5, 10, 15] // Instability added to balance upon landing for each level
         },
         OBSTACLES: {
-            START_DELAY: 100,
-            MIN_GAP: 18,
-            PATTERNS: [
+            START_DELAY: 100,            // Initial distance before the first obstacle appears
+            MIN_GAP: 30,                 // Minimum gap between obstacle groups
+            PATTERNS: [                  // Array of obstacle generation patterns
                 { type: 'SINGLE', groups: [{ count: 1, gap: 0 }] },
                 { type: 'DOUBLE_TIGHT', groups: [{ count: 2, gap: 0 }] },
-                { type: 'DOUBLE_LOOSE', groups: [{ count: 2, gap: 18 }] },
+                { type: 'DOUBLE_LOOSE', groups: [{ count: 2, gap: 34 }] },
                 { type: 'TRIPLE', groups: [{ count: 3, gap: 0 }] },
-                { type: 'COMBO_2_2', groups: [{ count: 2, gap: 0 }, { count: 2, gap: 0 }], groupGap: 20 },
-                { type: 'COMBO_1_2', groups: [{ count: 1, gap: 0 }, { count: 2, gap: 0 }], groupGap: 20 },
-                { type: 'COMBO_3_1', groups: [{ count: 3, gap: 0 }, { count: 1, gap: 0 }], groupGap: 20 },
-                { type: 'COMBO_3_2', groups: [{ count: 3, gap: 0 }, { count: 2, gap: 0 }], groupGap: 20 },
-                { type: 'COMBO_3_3', groups: [{ count: 3, gap: 0 }, { count: 3, gap: 0 }], groupGap: 20 }
+                { type: 'COMBO_2_2', groups: [{ count: 2, gap: 0 }, { count: 2, gap: 0 }], groupGap: 30 },
+                { type: 'COMBO_1_2', groups: [{ count: 1, gap: 0 }, { count: 2, gap: 0 }], groupGap: 30 },
+                { type: 'COMBO_3_1', groups: [{ count: 3, gap: 0 }, { count: 1, gap: 0 }], groupGap: 30 },
+                { type: 'COMBO_3_2', groups: [{ count: 3, gap: 0 }, { count: 2, gap: 0 }], groupGap: 30 },
+                { type: 'COMBO_3_3', groups: [{ count: 3, gap: 0 }, { count: 3, gap: 0 }], groupGap: 30 }
             ]
         },
         HITBOXES: {
-            CHAR: { x: 0, y: 98, w: 120, h: 10 },
-            OBS: { x: 26, y: 0, w: 18, h: 18 }
+            CHAR: { x: 52, y: 98, w: 18, h: 18 }, // Character hitbox relative to sprite [x, y, width, height]
+            OBS: { x: 26, y: 0, w: 18, h: 18 }    // Obstacle hitbox relative to sprite [x, y, width, height]
         },
         SPEED: {
-            GAME: 5
+            GAME: 3                      // Global game speed (pixels per frame)
         },
         DEBUG: {
-            SHOW_HITBOX: false
+            SHOW_HITBOX: false            // Toggle to show/hide debug hitboxes (red/blue rectangles)
         }
     };
 
@@ -197,8 +196,8 @@
     const inputState = {};
 
     const ataho = {
-        x: LOGICAL_WIDTH / 2 - (frames.walking.width * SCALE_FACTOR) / 2,
-        y: LOGICAL_HEIGHT / 2 - (frames.walking.height * SCALE_FACTOR) / 2,
+        x: canvas.width / 2 - (frames.walking.width * SCALE_FACTOR) / 2,
+        y: canvas.height / 2 - (frames.walking.height * SCALE_FACTOR) / 2,
         width: frames.walking.width * SCALE_FACTOR,
         height: frames.walking.height * SCALE_FACTOR,
 
@@ -249,7 +248,7 @@
                     // Obstacle Screen Y: startY - distanceTraveled + obs.y
 
                     const playerFeetY = this.y + this.height;
-                    const startY = LOGICAL_HEIGHT / 2;
+                    const startY = canvas.height / 2;
 
                     const landedOnObstacle = obstacles.some(obs => {
                         // Ignore obstacles behind us
@@ -261,12 +260,16 @@
                         const playerHitboxTop = this.y + CONFIG.HITBOXES.CHAR.y;
                         const playerHitboxBottom = this.y + CONFIG.HITBOXES.CHAR.y + CONFIG.HITBOXES.CHAR.h;
 
-                        const obsHitboxTop = obsScreenY + CONFIG.HITBOXES.OBS.y;
+                        const obsHitboxTop = obsScreenY + CONFIG.HITBOXES.OBS.y - 5; // Add 5px buffer for landing
                         const obsHitboxBottom = obsScreenY + CONFIG.HITBOXES.OBS.y + CONFIG.HITBOXES.OBS.h;
 
                         // We land if our feet (hitbox vertical range) overlaps the obstacle's vertical range
                         // AABB Overlap: (Range1.Start < Range2.End) && (Range1.End > Range2.Start)
-                        return playerHitboxTop < obsHitboxBottom && playerHitboxBottom > obsHitboxTop;
+                        const isHit = playerHitboxTop < obsHitboxBottom && playerHitboxBottom > obsHitboxTop;
+                        if (isHit) {
+                            obs.causedDeath = true;
+                        }
+                        return isHit;
                     });
 
                     if (landedOnObstacle) {
@@ -389,7 +392,7 @@
                     const nextDist = distanceTraveled + CONFIG.SPEED.GAME;
 
                     // Obstacle Walking Collision
-                    const startY = LOGICAL_HEIGHT / 2;
+                    const startY = canvas.height / 2;
 
                     const blocked = obstacles.some(obs => {
                         // Ignore obstacles behind us
@@ -540,8 +543,8 @@
 
         ataho.fallTimer = 0;
         ataho.balanceTimer = 0;
-        ataho.x = LOGICAL_WIDTH / 2 - (frames.walking.width * SCALE_FACTOR) / 2;
-        ataho.y = LOGICAL_HEIGHT / 2 - (frames.walking.height * SCALE_FACTOR) / 2;
+        ataho.x = canvas.width / 2 - (frames.walking.width * SCALE_FACTOR) / 2;
+        ataho.y = canvas.height / 2 - (frames.walking.height * SCALE_FACTOR) / 2;
         ataho.visualY = 0;
         ataho.jumpVelocityY = 0;
         ataho.jumpLevel = 0;
@@ -623,8 +626,8 @@
         if (!isGameOver) return;
 
         const rect = canvas.getBoundingClientRect();
-        const scaleX = LOGICAL_WIDTH / rect.width;
-        const scaleY = LOGICAL_HEIGHT / rect.height;
+        const scaleX = canvas.width / rect.width;
+        const scaleY = canvas.height / rect.height;
 
         const clickX = (e.clientX - rect.left) * scaleX;
         const clickY = (e.clientY - rect.top) * scaleY;
@@ -645,8 +648,8 @@
         }
 
         const rect = canvas.getBoundingClientRect();
-        const scaleX = LOGICAL_WIDTH / rect.width;
-        const scaleY = LOGICAL_HEIGHT / rect.height;
+        const scaleX = canvas.width / rect.width;
+        const scaleY = canvas.height / rect.height;
 
         const mouseX = (e.clientX - rect.left) * scaleX;
         const mouseY = (e.clientY - rect.top) * scaleY;
@@ -671,8 +674,8 @@
 
         if (isGameOver && e.type === 'touchstart') {
             const rect = canvas.getBoundingClientRect();
-            const scaleX = LOGICAL_WIDTH / rect.width;
-            const scaleY = LOGICAL_HEIGHT / rect.height;
+            const scaleX = canvas.width / rect.width;
+            const scaleY = canvas.height / rect.height;
 
             const touchX = (e.touches[0].clientX - rect.left) * scaleX;
             const touchY = (e.touches[0].clientY - rect.top) * scaleY;
@@ -720,132 +723,148 @@
     function byFrame() {
         currentRAFId = requestAnimationFrame(byFrame);
 
-        ctx.clearRect(0, 0, LOGICAL_WIDTH, LOGICAL_HEIGHT);
+        // Reset transform to identity to prevent accumulation from errors
+        ctx.setTransform(1, 0, 0, 1, 0, 0);
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-        if (!isGameOver) {
-            ataho.update();
+        // Save context for camera zoom
+        ctx.save();
+        try {
+            // Translate to center, scale, translate back
+            ctx.translate(canvas.width / 2, canvas.height / 2);
+            ctx.scale(2, 2);
+            ctx.translate(-canvas.width / 2, -canvas.height / 2);
 
-            if (backgroundY <= -LOGICAL_HEIGHT) {
-                backgroundY += LOGICAL_HEIGHT;
-            }
-            if (backgroundY > 0) {
-                backgroundY -= LOGICAL_HEIGHT;
-            }
+            if (!isGameOver) {
+                ataho.update();
 
-            // Obstacle Generation
-            if (images.beamSpike) {
-                const generateHorizon = distanceTraveled + LOGICAL_HEIGHT * 2;
-                while (nextObstacleY < generateHorizon) {
-                    const spikeHeight = images.beamSpike.height;
+                if (backgroundY <= -canvas.height) {
+                    backgroundY += canvas.height;
+                }
+                if (backgroundY > 0) {
+                    backgroundY -= canvas.height;
+                }
 
-                    // Pick a random pattern
-                    const pattern = CONFIG.OBSTACLES.PATTERNS[Math.floor(Math.random() * CONFIG.OBSTACLES.PATTERNS.length)];
+                // Obstacle Generation
+                if (images.beamSpike) {
+                    const generateHorizon = distanceTraveled + canvas.height * 2;
+                    while (nextObstacleY < generateHorizon) {
+                        const spikeHeight = images.beamSpike.height;
 
-                    if (pattern.groups) {
-                        pattern.groups.forEach((group, index) => {
-                            for (let i = 0; i < group.count; i++) {
+                        // Pick a random pattern
+                        const pattern = CONFIG.OBSTACLES.PATTERNS[Math.floor(Math.random() * CONFIG.OBSTACLES.PATTERNS.length)];
+
+                        if (pattern.groups) {
+                            pattern.groups.forEach((group, index) => {
+                                for (let i = 0; i < group.count; i++) {
+                                    obstacles.push({
+                                        y: nextObstacleY,
+                                        height: spikeHeight
+                                    });
+                                    nextObstacleY += spikeHeight + group.gap;
+                                }
+                                // Add group gap if not the last group
+                                if (index < pattern.groups.length - 1) {
+                                    nextObstacleY += pattern.groupGap;
+                                }
+                            });
+                        } else {
+                            // Fallback for old patterns (just in case)
+                            for (let i = 0; i < pattern.count; i++) {
                                 obstacles.push({
                                     y: nextObstacleY,
                                     height: spikeHeight
                                 });
-                                nextObstacleY += spikeHeight + group.gap;
+                                nextObstacleY += spikeHeight + pattern.gap;
                             }
-                            // Add group gap if not the last group
-                            if (index < pattern.groups.length - 1) {
-                                nextObstacleY += pattern.groupGap;
-                            }
-                        });
-                    } else {
-                        // Fallback for old patterns (just in case)
-                        for (let i = 0; i < pattern.count; i++) {
-                            obstacles.push({
-                                y: nextObstacleY,
-                                height: spikeHeight
-                            });
-                            nextObstacleY += spikeHeight + pattern.gap;
+                        }
+
+                        // Add gap before next sequence
+                        nextObstacleY += CONFIG.OBSTACLES.MIN_GAP + (Math.random() * 120);
+                    }
+
+                    // Cleanup old obstacles
+                    if (obstacles.length > 0) {
+                        // Remove if completely off-screen (top)
+                        // Screen Y = startY - distanceTraveled + obs.y
+                        // If Screen Y + height < 0, it's gone.
+                        const startY = canvas.height / 2;
+                        const firstObsScreenY = startY - distanceTraveled + obstacles[0].y;
+                        if (firstObsScreenY + obstacles[0].height < -100) {
+                            obstacles.shift();
                         }
                     }
+                }
+            }
 
-                    // Add gap before next sequence
-                    nextObstacleY += CONFIG.OBSTACLES.MIN_GAP + (Math.random() * 120);
+            if (images.background) {
+                const bgY = Math.floor(backgroundY);
+                ctx.drawImage(images.background, 0, bgY, canvas.width, canvas.height);
+                ctx.drawImage(images.background, 0, bgY + canvas.height, canvas.width, canvas.height);
+            }
+
+            if (images.beamStart && images.beamMid) {
+                const beamStartX = canvas.width / 2 - images.beamStart.width / 2;
+                const startY = canvas.height / 2;
+
+                let currentDrawY = startY - distanceTraveled;
+
+                if (currentDrawY > -images.beamStart.height) {
+                    ctx.drawImage(images.beamStart, beamStartX, Math.floor(currentDrawY));
                 }
 
-                // Cleanup old obstacles
-                if (obstacles.length > 0) {
-                    // Remove if completely off-screen (top)
-                    // Screen Y = startY - distanceTraveled + obs.y
-                    // If Screen Y + height < 0, it's gone.
-                    const startY = LOGICAL_HEIGHT / 2;
-                    const firstObsScreenY = startY - distanceTraveled + obstacles[0].y;
-                    if (firstObsScreenY + obstacles[0].height < -100) {
-                        obstacles.shift();
+                let midDrawY = currentDrawY + images.beamStart.height;
+
+                if (midDrawY < -images.beamMid.height) {
+                    const skipCount = Math.ceil((-images.beamMid.height - midDrawY) / images.beamMid.height);
+                    midDrawY += skipCount * images.beamMid.height;
+                }
+
+                while (midDrawY < canvas.height) {
+                    ctx.drawImage(images.beamMid, beamStartX, Math.floor(midDrawY));
+                    midDrawY += images.beamMid.height;
+                }
+            }
+
+            // Draw Obstacles
+            if (images.beamSpike) {
+                const beamStartX = canvas.width / 2 - images.beamStart.width / 2; // Assuming spike has same width/center logic
+                // User said "same width as beam". beamStart.width should be used for centering if spike is same width.
+                // But we should use spike's width to be safe.
+                const spikeX = canvas.width / 2 - images.beamSpike.width / 2;
+                const startY = canvas.height / 2;
+
+                obstacles.forEach(obs => {
+                    // Calculate screen Y
+                    // Beam logic: currentDrawY = startY - distanceTraveled
+                    // Obstacle at obs.y is at: startY - distanceTraveled + obs.y
+                    const drawY = startY - distanceTraveled + obs.y;
+
+                    if (drawY > -images.beamSpike.height && drawY < canvas.height) {
+                        ctx.drawImage(images.beamSpike, spikeX, drawY);
+
+                        // Debug Hitbox
+                        if (CONFIG.DEBUG.SHOW_HITBOX) {
+                            ctx.strokeStyle = obs.causedDeath ? 'blue' : 'red';
+                            ctx.lineWidth = 2;
+                            ctx.strokeRect(
+                                spikeX + CONFIG.HITBOXES.OBS.x,
+                                drawY + CONFIG.HITBOXES.OBS.y,
+                                CONFIG.HITBOXES.OBS.w,
+                                CONFIG.HITBOXES.OBS.h
+                            );
+                        }
                     }
-                }
-            }
-        }
-
-        if (images.background) {
-            const bgY = Math.floor(backgroundY);
-            ctx.drawImage(images.background, 0, bgY, LOGICAL_WIDTH, LOGICAL_HEIGHT);
-            ctx.drawImage(images.background, 0, bgY + LOGICAL_HEIGHT, LOGICAL_WIDTH, LOGICAL_HEIGHT);
-        }
-
-        if (images.beamStart && images.beamMid) {
-            const beamStartX = LOGICAL_WIDTH / 2 - images.beamStart.width / 2;
-            const startY = LOGICAL_HEIGHT / 2;
-
-            let currentDrawY = startY - distanceTraveled;
-
-            if (currentDrawY > -images.beamStart.height) {
-                ctx.drawImage(images.beamStart, beamStartX, Math.floor(currentDrawY));
+                });
             }
 
-            let midDrawY = currentDrawY + images.beamStart.height;
-
-            if (midDrawY < -images.beamMid.height) {
-                const skipCount = Math.ceil((-images.beamMid.height - midDrawY) / images.beamMid.height);
-                midDrawY += skipCount * images.beamMid.height;
-            }
-
-            while (midDrawY < canvas.height) {
-                ctx.drawImage(images.beamMid, beamStartX, Math.floor(midDrawY));
-                midDrawY += images.beamMid.height;
-            }
+            ataho.draw();
+        } catch (e) {
+            console.error("Error in render loop:", e);
+        } finally {
+            // Restore context to remove zoom for UI
+            ctx.restore();
         }
-
-        // Draw Obstacles
-        if (images.beamSpike) {
-            const beamStartX = canvas.width / 2 - images.beamStart.width / 2; // Assuming spike has same width/center logic
-            // User said "same width as beam". beamStart.width should be used for centering if spike is same width.
-            // But we should use spike's width to be safe.
-            const spikeX = canvas.width / 2 - images.beamSpike.width / 2;
-            const startY = canvas.height / 2;
-
-            obstacles.forEach(obs => {
-                // Calculate screen Y
-                // Beam logic: currentDrawY = startY - distanceTraveled
-                // Obstacle at obs.y is at: startY - distanceTraveled + obs.y
-                const drawY = startY - distanceTraveled + obs.y;
-
-                if (drawY > -images.beamSpike.height && drawY < canvas.height) {
-                    ctx.drawImage(images.beamSpike, spikeX, drawY);
-
-                    // Debug Hitbox
-                    if (CONFIG.DEBUG.SHOW_HITBOX) {
-                        ctx.strokeStyle = 'red';
-                        ctx.lineWidth = 2;
-                        ctx.strokeRect(
-                            spikeX + CONFIG.HITBOXES.OBS.x,
-                            drawY + CONFIG.HITBOXES.OBS.y,
-                            CONFIG.HITBOXES.OBS.w,
-                            CONFIG.HITBOXES.OBS.h
-                        );
-                    }
-                }
-            });
-        }
-
-        ataho.draw();
 
         ctx.font = '24px "Raster Forge", sans-serif';
         ctx.fillStyle = 'white';
