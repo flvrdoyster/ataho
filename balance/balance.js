@@ -768,8 +768,9 @@
         }
 
         if (images.background) {
-            ctx.drawImage(images.background, 0, backgroundY, canvas.width, canvas.height);
-            ctx.drawImage(images.background, 0, backgroundY + canvas.height, canvas.width, canvas.height);
+            const bgY = Math.floor(backgroundY);
+            ctx.drawImage(images.background, 0, bgY, canvas.width, canvas.height);
+            ctx.drawImage(images.background, 0, bgY + canvas.height, canvas.width, canvas.height);
         }
 
         if (images.beamStart && images.beamMid) {
@@ -779,7 +780,7 @@
             let currentDrawY = startY - distanceTraveled;
 
             if (currentDrawY > -images.beamStart.height) {
-                ctx.drawImage(images.beamStart, beamStartX, currentDrawY);
+                ctx.drawImage(images.beamStart, beamStartX, Math.floor(currentDrawY));
             }
 
             let midDrawY = currentDrawY + images.beamStart.height;
@@ -790,7 +791,7 @@
             }
 
             while (midDrawY < canvas.height) {
-                ctx.drawImage(images.beamMid, beamStartX, midDrawY);
+                ctx.drawImage(images.beamMid, beamStartX, Math.floor(midDrawY));
                 midDrawY += images.beamMid.height;
             }
         }
