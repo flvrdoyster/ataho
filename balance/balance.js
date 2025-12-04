@@ -50,7 +50,7 @@
             OBS: { x: 26, y: 0, w: 18, h: 18 }
         },
         SPEED: {
-            GAME: 3
+            GAME: 5
         },
         DEBUG: {
             SHOW_HITBOX: false
