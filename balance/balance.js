@@ -39,17 +39,17 @@
         },
         OBSTACLES: {
             START_DELAY: 100,            // Initial distance before the first obstacle appears
-            MIN_GAP: 30,                 // Minimum gap between obstacle groups
+            MIN_GAP: 32,                 // Minimum gap between obstacle groups
             PATTERNS: [                  // Array of obstacle generation patterns
                 { type: 'SINGLE', groups: [{ count: 1, gap: 0 }] },
                 { type: 'DOUBLE_TIGHT', groups: [{ count: 2, gap: 0 }] },
-                { type: 'DOUBLE_LOOSE', groups: [{ count: 2, gap: 34 }] },
+                { type: 'DOUBLE_LOOSE', groups: [{ count: 2, gap: 32 }] },
                 { type: 'TRIPLE', groups: [{ count: 3, gap: 0 }] },
-                { type: 'COMBO_2_2', groups: [{ count: 2, gap: 0 }, { count: 2, gap: 0 }], groupGap: 30 },
-                { type: 'COMBO_1_2', groups: [{ count: 1, gap: 0 }, { count: 2, gap: 0 }], groupGap: 30 },
-                { type: 'COMBO_3_1', groups: [{ count: 3, gap: 0 }, { count: 1, gap: 0 }], groupGap: 30 },
-                { type: 'COMBO_3_2', groups: [{ count: 3, gap: 0 }, { count: 2, gap: 0 }], groupGap: 30 },
-                { type: 'COMBO_3_3', groups: [{ count: 3, gap: 0 }, { count: 3, gap: 0 }], groupGap: 30 }
+                { type: 'COMBO_2_2', groups: [{ count: 2, gap: 0 }, { count: 2, gap: 0 }], groupGap: 32 },
+                { type: 'COMBO_1_2', groups: [{ count: 1, gap: 0 }, { count: 2, gap: 0 }], groupGap: 32 },
+                { type: 'COMBO_3_1', groups: [{ count: 3, gap: 0 }, { count: 1, gap: 0 }], groupGap: 32 },
+                { type: 'COMBO_3_2', groups: [{ count: 3, gap: 0 }, { count: 2, gap: 0 }], groupGap: 32 },
+                { type: 'COMBO_3_3', groups: [{ count: 3, gap: 0 }, { count: 3, gap: 0 }], groupGap: 32 }
             ]
         },
         HITBOXES: {
