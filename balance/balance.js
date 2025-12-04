@@ -463,7 +463,7 @@
             let sourceY = Array.isArray(currentFrameSet.y) ? currentFrameSet.y[frameIndex] : currentFrameSet.y;
 
             let rotationAngle = 0;
-            if (this.actionState === 'jumping' || this.actionState.includes('jump_charging')) {
+            if (this.actionState === 'jumping') {
                 rotationAngle = (this.balanceLevel / BALANCE_THRESHOLD.MAX) * 0.5;
             }
 
