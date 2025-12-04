@@ -1,0 +1,17 @@
+@font-face {
+    font-family: 'KoddiudOngodic';
+    src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2105_2@1.0/KoddiUDOnGothic-Regular.woff') format('woff');
+    font-weight: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'KoddiudOngodic';
+    src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2105_2@1.0/KoddiUDOnGothic-Bold.woff') format('woff');
+    font-weight: 700;
+    font-display: swap;
+}
+
+body {
+    font-family: 'KoddiudOngodic', sans-serif;
+}
