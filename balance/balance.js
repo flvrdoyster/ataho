@@ -6,21 +6,11 @@
     //===========================================
     const canvas = document.getElementById('gameCanvas');
     const ctx = canvas.getContext('2d');
+    canvas.width = 960;
+    canvas.height = 640;
 
-    // Responsive Canvas
-    function resizeCanvas() {
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
-        ctx.imageSmoothingEnabled = false;
-
-        // Re-center character if game is running
-        if (typeof ataho !== 'undefined') {
-            ataho.x = canvas.width / 2 - (frames.walking.width * SCALE_FACTOR) / 2;
-            ataho.y = canvas.height / 2 - (frames.walking.height * SCALE_FACTOR) / 2;
-        }
-    }
-    window.addEventListener('resize', resizeCanvas);
-    resizeCanvas();
+    // Disable smoothing AFTER sizing (sizing resets context)
+    ctx.imageSmoothingEnabled = false;
 
     //===========================================
     // GAME CONFIGURATION
@@ -29,8 +19,8 @@
     // PHYSICS & DIFFICULTY
     const CONFIG = {
         PHYSICS: {
-            SWAY_INTENSITY_IDLE: 0.005,   // Intensity of random sway when standing still (higher = harder)
-            SWAY_INTENSITY_WALK: 0.01,   // Intensity of random sway when walking (lower than idle for stability)
+            SWAY_INTENSITY_IDLE: 0.008,   // Intensity of random sway when standing still (higher = harder)
+            SWAY_INTENSITY_WALK: 0.005,   // Intensity of random sway when walking (lower than idle for stability)
             PLAYER_CONTROL_FORCE: 0.8,   // Force applied by player input (Left/Right arrows or touch)
             FRICTION: 0.90,              // Damping factor for balance velocity (lower = slippery, higher = sticky)
             MAX_VELOCITY: 3.5,           // Maximum speed the character can tilt
@@ -326,13 +316,9 @@
 
             let inputForce = 0;
 
-            // Gyroscope / Touch Force
-            if (inputState.tiltForce !== 0) {
-                inputForce = inputState.tiltForce * CONFIG.PHYSICS.PLAYER_CONTROL_FORCE * 1.5;
+            if (typeof inputState.touchForce === 'number' && inputState.touchForce !== 0) {
+                inputForce = inputState.touchForce * CONFIG.PHYSICS.PLAYER_CONTROL_FORCE * 1.5;
             }
-            // Legacy Touch Force (if we want to keep it as fallback, but we are replacing it with Jump)
-            // We'll remove the old touchForce logic for movement as it's now Jump.
-
             else if (inputState.left) {
                 inputForce = -CONFIG.PHYSICS.PLAYER_CONTROL_FORCE;
             } else if (inputState.right) {
@@ -396,10 +382,7 @@
 
             if (this.actionState !== 'falling' && this.actionState !== 'fallen') {
                 // Control Fix: Down = Forward
-                // Mobile: Auto-Walk
-                const isMobile = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
-
-                if (inputState.down || isMobile) {
+                if (inputState.down) {
                     this.actionState = 'walking';
                 } else {
                     this.actionState = 'idle';
@@ -572,7 +555,7 @@
         nextObstacleY = CONFIG.OBSTACLES.START_DELAY;
 
         Object.keys(inputState).forEach(key => inputState[key] = false);
-        inputState.tiltForce = 0;
+        inputState.touchForce = 0;
 
         // byFrame() is already running continuously, so we don't need to call it here.
         // Calling it would create a duplicate loop (double speed).
@@ -681,7 +664,9 @@
 
     const handleTouchEnd = (e) => {
         e.preventDefault();
-        inputState.space = false; // Release Jump
+        inputState.touchForce = 0;
+        inputState.up = false;
+        inputState.down = false;
     };
 
     const handleTouch = (e) => {
@@ -705,60 +690,30 @@
 
         if (isGameOver) return;
 
-        // Touch to Jump (Charge)
-        if (e.type === 'touchstart') {
-            inputState.space = true;
+        const touchX = e.touches[0].clientX;
+        const touchY = e.touches[0].clientY;
+
+        const centerX = window.innerWidth / 2;
+        const centerY = window.innerHeight / 2;
+
+        const maxDistX = window.innerWidth / 2;
+        let distRatio = clamp((touchX - centerX) / maxDistX, -1, 1);
+
+        if (Math.abs(distRatio) < TOUCH_DEADZONE) distRatio = 0;
+
+        inputState.touchForce = distRatio;
+
+        const screenHeight = window.innerHeight;
+
+        inputState.up = false;
+        inputState.down = false;
+
+        if (touchY < screenHeight * TOUCH_UPPER_ZONE) {
+            inputState.up = true;
+        } else if (touchY > screenHeight * TOUCH_LOWER_ZONE) {
+            inputState.down = true;
         }
     };
-
-    const handleOrientation = (e) => {
-        if (isGameOver) return;
-
-        // Gamma is left/right tilt in degrees (-90 to 90)
-        // We clamp it to a reasonable range for control (e.g., -30 to 30)
-        const tilt = e.gamma;
-        if (tilt === null) return;
-
-        const maxTilt = 30;
-        let force = clamp(tilt, -maxTilt, maxTilt) / maxTilt;
-
-        // Add a small deadzone
-        if (Math.abs(force) < 0.05) force = 0;
-
-        inputState.tiltForce = force;
-    };
-
-    // Add Start Button for Mobile Permissions
-    let gameStarted = false;
-    function initGame() {
-        if (gameStarted) return;
-
-        // Request DeviceOrientation permission (iOS 13+)
-        if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
-            DeviceOrientationEvent.requestPermission()
-                .then(response => {
-                    if (response === 'granted') {
-                        window.addEventListener('deviceorientation', handleOrientation);
-                    }
-                })
-                .catch(console.error);
-        } else {
-            window.addEventListener('deviceorientation', handleOrientation);
-        }
-
-        loadAudio().then(() => {
-            if (bgm) {
-                bgm.loop = true;
-                bgm.play().catch(console.error);
-            }
-        }).catch(console.error);
-
-        gameStarted = true;
-        document.getElementById('startOverlay').style.display = 'none';
-
-        // Start Loop
-        requestAnimationFrame(byFrame);
-    }
 
     const buttons = {
         continue: { x: 0, y: 0, width: BUTTON_WIDTH, height: BUTTON_HEIGHT, text: 'Continue?' },
@@ -886,7 +841,14 @@
                     const drawY = startY - distanceTraveled + obs.y;
 
                     if (drawY > -images.beamSpike.height && drawY < canvas.height) {
+                        if (obs.causedDeath) {
+                            ctx.save();
+                            ctx.filter = 'sepia(1) hue-rotate(-50deg) saturate(5) brightness(0.8)'; // Red tint
+                        }
                         ctx.drawImage(images.beamSpike, spikeX, drawY);
+                        if (obs.causedDeath) {
+                            ctx.restore();
+                        }
 
                         // Debug Hitbox
                         if (CONFIG.DEBUG.SHOW_HITBOX) {
@@ -957,44 +919,35 @@
         }
     }
 
-    // Initialize
-    Promise.all([loadImages(), loadFonts()]).then(() => {
-        // Create Start Overlay
-        const overlay = document.createElement('div');
-        overlay.id = 'startOverlay';
-        overlay.style.position = 'fixed';
-        overlay.style.top = '0';
-        overlay.style.left = '0';
-        overlay.style.width = '100%';
-        overlay.style.height = '100%';
-        overlay.style.backgroundColor = 'rgba(0,0,0,0.7)';
-        overlay.style.display = 'flex';
-        overlay.style.justifyContent = 'center';
-        overlay.style.alignItems = 'center';
-        overlay.style.zIndex = '1000';
-        overlay.style.color = 'white';
-        overlay.style.fontSize = '24px';
-        overlay.style.cursor = 'pointer';
-        overlay.innerHTML = '<div>Tap to Start<br><span style="font-size:16px">(Enable Audio & Tilt)</span></div>';
+    // Event Listeners
+    document.addEventListener('keydown', handleKeyDown);
+    document.addEventListener('keyup', handleKeyUp);
+    canvas.addEventListener('click', handleCanvasClick);
+    canvas.addEventListener('mousemove', handleMouseMove);
+    canvas.addEventListener('touchstart', handleTouch, { passive: false });
+    canvas.addEventListener('touchmove', handleTouch, { passive: false });
+    canvas.addEventListener('touchend', handleTouchEnd);
 
-        overlay.addEventListener('click', initGame);
-        overlay.addEventListener('touchstart', initGame);
+    Promise.all([loadImages(), loadFonts(), loadAudio()]).then(() => {
+        console.log('모든 이미지, 폰트, 오디오 로드 완료. 게임 시작!');
 
-        document.body.appendChild(overlay);
+        // Try to play music immediately
+        bgm.play().catch(e => {
+            console.log('Autoplay prevented. Waiting for user interaction.', e);
+            const playOnInteraction = () => {
+                bgm.play();
+                ['keydown', 'touchstart', 'click'].forEach(evt =>
+                    document.removeEventListener(evt, playOnInteraction)
+                );
+            };
+            ['keydown', 'touchstart', 'click'].forEach(evt =>
+                document.addEventListener(evt, playOnInteraction, { once: true })
+            );
+        });
 
-        window.addEventListener('keydown', handleKeyDown);
-        window.addEventListener('keyup', handleKeyUp);
-        window.addEventListener('mousedown', handleCanvasClick);
-        window.addEventListener('mousemove', handleMouseMove);
-
-        // Touch Events
-        canvas.addEventListener('touchstart', handleTouch, { passive: false });
-        canvas.addEventListener('touchend', handleTouchEnd, { passive: false });
-
-        // Initial Reset
-        resetGame();
-
-        // Note: loop is started in initGame
+        byFrame();
+    }).catch(error => {
+        console.error('리소스 로드 중 오류 발생:', error);
     });
 
 })();
