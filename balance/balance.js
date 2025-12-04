@@ -15,34 +15,37 @@
     // PHYSICS & DIFFICULTY
     const CONFIG = {
         PHYSICS: {
-            SWAY_INTENSITY_IDLE: 0.08,
+            SWAY_INTENSITY_IDLE: 0.15,
             SWAY_INTENSITY_WALK: 0.2,
             PLAYER_CONTROL_FORCE: 1.0,
             FRICTION: 0.90,
             MAX_VELOCITY: 3.5,
-            INERTIA_CONSTANT: 0.0005,
+            INERTIA_CONSTANT: 0.001,
             GRAVITY: 0.6,
-            EDGE_THRESHOLD: 80,
+            EDGE_THRESHOLD: 0,
             EDGE_RESISTANCE: 0.02,
             FATIGUE_RATE: 0.01
         },
         JUMP: {
             CHARGE_TIME: 20,
-            DISTANCES: [28, 54, 72], // Tight fit
-            VELOCITIES: [2, 3, 4],   // Low, quick jumps
+            JUMP_COOLDOWN: 20,
+            DISTANCES: [30, 48, 60], // Tight fit
+            VELOCITIES: [4, 4, 4],   // Low, quick jumps
             LANDING_PENALTIES: [10, 30, 50]
         },
         OBSTACLES: {
-            START_DELAY: 800,
-            MIN_GAP: 80,
+            START_DELAY: 100,
+            MIN_GAP: 18,
             PATTERNS: [
                 { type: 'SINGLE', groups: [{ count: 1, gap: 0 }] },
                 { type: 'DOUBLE_TIGHT', groups: [{ count: 2, gap: 0 }] },
-                { type: 'DOUBLE_LOOSE', groups: [{ count: 2, gap: 20 }] },
+                { type: 'DOUBLE_LOOSE', groups: [{ count: 2, gap: 18 }] },
                 { type: 'TRIPLE', groups: [{ count: 3, gap: 0 }] },
-                { type: 'COMBO_2_2', groups: [{ count: 2, gap: 0 }, { count: 2, gap: 0 }], groupGap: 120 },
-                { type: 'COMBO_1_2', groups: [{ count: 1, gap: 0 }, { count: 2, gap: 0 }], groupGap: 100 },
-                { type: 'COMBO_3_1', groups: [{ count: 3, gap: 0 }, { count: 1, gap: 0 }], groupGap: 140 }
+                { type: 'COMBO_2_2', groups: [{ count: 2, gap: 0 }, { count: 2, gap: 0 }], groupGap: 20 },
+                { type: 'COMBO_1_2', groups: [{ count: 1, gap: 0 }, { count: 2, gap: 0 }], groupGap: 20 },
+                { type: 'COMBO_3_1', groups: [{ count: 3, gap: 0 }, { count: 1, gap: 0 }], groupGap: 20 },
+                { type: 'COMBO_3_2', groups: [{ count: 3, gap: 0 }, { count: 2, gap: 0 }], groupGap: 20 },
+                { type: 'COMBO_3_3', groups: [{ count: 3, gap: 0 }, { count: 3, gap: 0 }], groupGap: 20 }
             ]
         },
         HITBOXES: {
@@ -205,6 +208,7 @@
         animationTimer: 0,
 
         jumpChargeTimer: 0,
+        jumpCooldown: 0,
         jumpLevel: 0,
         jumpVelocityY: 0,
         visualY: 0,
@@ -226,6 +230,7 @@
                     this.visualY = 0;
                     this.actionState = 'idle';
                     this.jumpVelocityY = 0;
+                    this.jumpCooldown = CONFIG.JUMP.JUMP_COOLDOWN;
 
                     // Landing Instability
                     const penalty = CONFIG.JUMP.LANDING_PENALTIES[this.jumpLevel];
@@ -272,16 +277,23 @@
                 return;
             }
 
-            if (inputState.space) {
+            if (this.jumpCooldown > 0) {
+                this.jumpCooldown--;
+            }
+
+            if (inputState.space && this.jumpCooldown <= 0 && !this.actionState.includes('fall')) {
                 if (!this.actionState.includes('jump_charging')) {
                     this.actionState = 'jump_charging';
                     this.jumpChargeTimer = 0;
                     this.jumpLevel = 0;
                 } else {
                     this.jumpChargeTimer++;
-                    if (this.jumpChargeTimer > CONFIG.JUMP.CHARGE_TIME * 2) {
+                    const cycleTime = CONFIG.JUMP.CHARGE_TIME * 3;
+                    const effectiveTimer = this.jumpChargeTimer % cycleTime;
+
+                    if (effectiveTimer >= CONFIG.JUMP.CHARGE_TIME * 2) {
                         this.jumpLevel = 2;
-                    } else if (this.jumpChargeTimer > CONFIG.JUMP.CHARGE_TIME) {
+                    } else if (effectiveTimer >= CONFIG.JUMP.CHARGE_TIME) {
                         this.jumpLevel = 1;
                     } else {
                         this.jumpLevel = 0;
