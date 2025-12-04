@@ -1,7 +1,6 @@
-// 전역 변수 오염을 막기 위해 모든 코드를 즉시 실행 함수로 감쌉니다.
 (function () {
     //===========================================
-    // 게임 설정 및 초기화
+    // CANVAS SETUP
     //===========================================
     const canvas = document.getElementById('gameCanvas');
     const ctx = canvas.getContext('2d');
@@ -66,7 +65,8 @@
     // SPRITE CONSTANTS
     const SPRITE_WIDTH = 80;
     const SPRITE_HEIGHT = 96;
-    const FALLEN_OFFSET_X = 40;
+    const FALLEN_OFFSET_X = 70;
+    const FALLING_OFFSET_X = 30;
     const FALLEN_OFFSET_Y = 20;
 
     // LAYOUT CONSTANTS
@@ -86,6 +86,9 @@
 
     let obstacles = [];
     let nextObstacleY = CONFIG.OBSTACLES.START_DELAY;
+
+    let bgm = null;
+    let overBgm = null;
 
     // Image Paths
     const imagePaths = {
@@ -121,6 +124,30 @@
         return font.load().then(loadedFont => {
             document.fonts.add(loadedFont);
         });
+    }
+
+    // Audio Loading
+    function loadAudio() {
+        const bgmPromise = new Promise((resolve, reject) => {
+            bgm = new Audio('duel.mp3');
+            bgm.loop = true;
+            bgm.volume = 0.5;
+            bgm.addEventListener('canplaythrough', () => resolve(), { once: true });
+            bgm.addEventListener('error', (e) => reject(e));
+            bgm.load();
+        });
+
+        const overBgmPromise = new Promise((resolve, reject) => {
+            overBgm = new Audio('over.mp3');
+            overBgm.loop = false; // Game Over music usually plays once or loops, user didn't specify, but usually looping is fine or once. Let's loop for now as requested "background music".
+            overBgm.loop = true;
+            overBgm.volume = 0.5;
+            overBgm.addEventListener('canplaythrough', () => resolve(), { once: true });
+            overBgm.addEventListener('error', (e) => reject(e));
+            overBgm.load();
+        });
+
+        return Promise.all([bgmPromise, overBgmPromise]);
     }
 
     //===========================================
@@ -378,6 +405,14 @@
                 if (this.fallTimer >= 30) {
                     this.actionState = 'fallen';
                     isGameOver = true;
+                    if (bgm) {
+                        bgm.pause();
+                        bgm.currentTime = 0;
+                    }
+                    if (overBgm) {
+                        overBgm.currentTime = 0;
+                        overBgm.play().catch(e => console.log('Over BGM play failed', e));
+                    }
                 }
             }
 
@@ -394,6 +429,8 @@
 
             if (this.actionState === 'falling') {
                 currentFrameSet = this.fallDirection === 'left' ? frames.falling.left : frames.falling.right;
+                if (this.fallDirection === 'left') finalX -= FALLING_OFFSET_X;
+                else finalX += FALLING_OFFSET_X / 2;
             } else if (this.actionState === 'fallen') {
                 currentFrameSet = frames.fallen;
                 if (this.fallDirection === 'left') finalX -= FALLEN_OFFSET_X;
@@ -471,6 +508,14 @@
 
     function resetGame() {
         isGameOver = false;
+        if (overBgm) {
+            overBgm.pause();
+            overBgm.currentTime = 0;
+        }
+        if (bgm) {
+            bgm.currentTime = 0;
+            bgm.play().catch(e => console.log('BGM play failed', e));
+        }
         ataho.balanceLevel = 0;
         ataho.balanceVelocity = 0;
         ataho.actionState = 'idle';
@@ -839,8 +884,23 @@
     canvas.addEventListener('touchmove', handleTouch, { passive: false });
     canvas.addEventListener('touchend', handleTouchEnd);
 
-    Promise.all([loadImages(), loadFonts()]).then(() => {
-        console.log('모든 이미지와 폰트 로드 완료. 게임 시작!');
+    Promise.all([loadImages(), loadFonts(), loadAudio()]).then(() => {
+        console.log('모든 이미지, 폰트, 오디오 로드 완료. 게임 시작!');
+
+        // Try to play music immediately
+        bgm.play().catch(e => {
+            console.log('Autoplay prevented. Waiting for user interaction.', e);
+            const playOnInteraction = () => {
+                bgm.play();
+                ['keydown', 'touchstart', 'click'].forEach(evt =>
+                    document.removeEventListener(evt, playOnInteraction)
+                );
+            };
+            ['keydown', 'touchstart', 'click'].forEach(evt =>
+                document.addEventListener(evt, playOnInteraction, { once: true })
+            );
+        });
+
         byFrame();
     }).catch(error => {
         console.error('리소스 로드 중 오류 발생:', error);
