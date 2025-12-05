@@ -67,7 +67,7 @@
     // CORE CONSTANTS
     const SCALE_FACTOR = 1.0;
     const ANIMATION_FPS_DIVISOR = 10;
-    const BALANCE_THRESHOLD = { SLIGHT: 30, MEDIUM: 60, MAX: 100 };
+    const BALANCE_THRESHOLD = { SLIGHT: 20, MEDIUM: 55, LARGE: 80, MAX: 100 };
 
     // SPRITE CONSTANTS
     const SPRITE_WIDTH = 80;
@@ -376,9 +376,9 @@
                 this.leanState = 'balanced';
             } else {
                 let leanLevel = 'slight';
-                if (absBalance >= BALANCE_THRESHOLD.MEDIUM) {
+                if (absBalance >= BALANCE_THRESHOLD.LARGE) {
                     leanLevel = 'large';
-                } else if (absBalance >= BALANCE_THRESHOLD.SLIGHT) {
+                } else if (absBalance >= BALANCE_THRESHOLD.MEDIUM) {
                     leanLevel = 'medium';
                 }
                 this.leanState = `leaning_${direction}_${leanLevel}`;
