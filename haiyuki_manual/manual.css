@@ -1,5 +1,19 @@
 @charset "utf-8";
 
+@font-face {
+    font-family: 'KoddiUDOnGothic-Regular';
+    src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2105_2@1.0/KoddiUDOnGothic-Regular.woff') format('woff');
+    font-weight: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'KoddiUDOnGothic-Regular';
+    src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2105_2@1.0/KoddiUDOnGothic-Bold.woff') format('woff');
+    font-weight: 700;
+    font-display: swap;
+}
+
 /* Reset & Base */
 body {
     margin: 0;
