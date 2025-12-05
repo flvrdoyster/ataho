@@ -936,6 +936,27 @@
     canvas.addEventListener('touchmove', handleTouch, { passive: false });
     canvas.addEventListener('touchend', handleTouchEnd);
 
+    // Mobile Jump Button Injection
+    if ('ontouchstart' in window || navigator.maxTouchPoints > 0) {
+        const jumpBtn = document.createElement('button');
+        jumpBtn.id = 'mobile-jump-btn';
+        jumpBtn.innerText = 'JUMP';
+        jumpBtn.style.display = 'block'; // Show only on touch devices
+        document.body.appendChild(jumpBtn);
+
+        jumpBtn.addEventListener('touchstart', (e) => {
+            e.preventDefault(); // Prevent default touch behavior (scrolling/zooming)
+            e.stopPropagation(); // Stop propagation to canvas
+            inputState.space = true;
+        }, { passive: false });
+
+        jumpBtn.addEventListener('touchend', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            inputState.space = false;
+        }, { passive: false });
+    }
+
     Promise.all([loadImages(), loadFonts(), loadAudio()]).then(() => {
         // Optimization: Pre-render Red Spike
         if (images.beamSpike) {

@@ -37,6 +37,32 @@ body {
     padding: 10px;
 }
 
+/* Mobile Controls */
+#mobile-jump-btn {
+    display: none;
+    /* Hidden by default, shown via JS on touch devices */
+    position: fixed;
+    bottom: 40px;
+    right: 40px;
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.2);
+    border: 2px solid rgba(255, 255, 255, 0.5);
+    color: white;
+    font-family: 'Raster Forge', sans-serif;
+    font-size: 16px;
+    touch-action: manipulation;
+    user-select: none;
+    -webkit-user-select: none;
+    z-index: 1000;
+}
+
+#mobile-jump-btn:active {
+    background: rgba(255, 255, 255, 0.4);
+    transform: scale(0.95);
+}
+
 #footer {
     font-size: small;
     text-align: right;
