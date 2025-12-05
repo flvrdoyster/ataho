@@ -1,481 +1,640 @@
 <!DOCTYPE html>
 <html lang="ko">
+
 <head>
     <meta charset="UTF-8">
     <link rel="icon" href="https://atah.io/favicon.ico">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <link rel="preload" href="https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2105_2@1.0/KoddiUDOnGothic-Regular.woff" as="font"
+    <link rel="preload"
+        href="https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2105_2@1.0/KoddiUDOnGothic-Regular.woff" as="font"
         type="font/woff" crossorigin>
-    <link rel="stylesheet" href="https://atah.io/style.css">
+    <link rel="stylesheet" href="manual.css">
     <title>환세패유기 해설서</title>
 </head>
 
-<body background="img/background.png">
-<table align="center" border="0" bgcolor="#e8od0c" cellspacing="5" font-size=9pt>
-<tr>
-<td align="center">
-<img src="img/pai_haiyuki.png"><br>
-<h1><b>환세패유기<br>
-해　설　서</b><p></h1>
-<h6>옮김 : 맛굴<br><a href="https://atah.io">https://atah.io</a></h6></td>
-</tr>
-</table>
-<p>
-<br>
-</p>
-<table width="600" align="center" bgcolor="#ffffff" border="0" cellspacing="10">
-<tr>
-<td>
-
-<h2>개요</h2>
-<p>
-환세패유기는 마작풍의 테이블 게임입니다.
-</p>
-
-<p align="center">●스토리●<br><br>
-어느날 갑자기 개최된 마작풍 테이블 게임 대회.<br>
-참가하려고 모인 것은 환세 캐릭터 여섯 명.<br>
-우승해서 유명해 지고 싶거나, 어쩌다 보니 참가해 버리거나,<br>
-목적은 저마다 다르지만 참가한 이상 무슨 일이 있어도 우승을 노린다.<br>
-우승의 영광은 누구의 머리 위에 빛날 것인가?<br>
-그리고 여섯 명을 기다리는 수수께끼의 인물은….
-</p>
-
-<h2>캐릭터 소개</h2>
-
-<table border="0" cellspacing="20">
-<tr>
-<td>
-<img src="img/face_fari.png" width="150" height="163" align="left">
-</td>
-<td>
-<h3>●화린</h3>
-여우마을의 지도자, 스마슈의 희생양<br>
-<i>등장작품 : 환세희담, 환세포물장</i><br><br>
-<b>회복</b>　소비MP 24<br>
-HP를 조금 회복한다. 한 라운드에 몇 번이고 사용할 수 있다.<br><br>
-<b>버린 패 방어</b>　소비MP 18<br>
-5턴 간 상대가 자신이 버린 패로 <a href="#footnote-2">퐁</a>·<a href="#footnote-4">론</a>을 할 수 없게 한다. <br>한 라운드에 몇 번이고 사용할 수 있다.
-</td>
-
-<tr>
-<td>
-<img src="img/face_rin.png" width="150" height="163" align="left">
-</td>
-<td>
-<h3>●린샹</h3>
-성질 고약한 고양이 귀 여권사<br>
-<i>등장작품 : 환세취호전</i><br><br>
-<b>수경</b>　소비MP 22<br>
-상대가 났을 때 자신이 받는 데미지를 25퍼센트 감소시킨다.<br><br>
-<b>도라폭진</b>　소비MP 32<br>
-<a href="#footnote-3">리치</a>로 났을 때 숨김 <a href="#footnote-8">도라</a>를 자신이 가지고 있는 패로 바꾼다.
-</td>
-
-<tr>
-<td>
-<img src="img/face_pet.png" width="150" height="163" align="left">
-</td>
-<td>
-<h3>●페톰</h3>
-뛰어난 마법사(사기꾼)<br>
-<i>등장작품 : 환세희담, 환세풍광전, 환세쾌도전, 환세취호전</i><br><br>
-<b>크리티컬</b>　소비MP 24<br>
-났을 때 상대에게 주는 데미지를 25퍼센트 증가시킨다.<br><br>
-<b>라스트 찬스</b>　소비MP 18<br>
-<a href="#footnote-6">텐파이</a>인 상태에서 <a href="#footnote-5">나가리</a>일 경우 남은 패 룰렛에 도전할 수 있다.<br>
-남은 하나의 패가 나는 패의 룰렛에서 멈추면 난다.
-</td>
-
-<tr>
-<td>
-<img src="img/face_ata.png" width="150" height="163" align="left">
-</td>
-<td>
-<h3>●아타호</h3>
-술 좋아하는 호랑이 아저씨<br>
-<i>등장작품 : 환세희담, 환세취호전</i><br><br>
-<b>맹호일발권</b>　소비MP 100<br>
-<a href="#footnote-3">리치</a>를 걸 수 있을 때 사용하면 다음 <a href="#footnote-1">쯔모</a>로 반드시 난다. 20턴 째엔 사용할 수 없다.<br><br>
-<b>지옥 쌓기</b>　소비MP 18<br>
-3턴 간 상대가 받는 패를 쓸모 없는 패로 바꿔 <a href="#footnote-1">쯔모</a>로 나는 것을 막는다.<p>
-</td>
-
-<tr>
-<td>
-<img src="img/face_smsh.png" width="150" height="163" align="left">
-</td>
-<td>
-<h3>●스마슈</h3>
-환세시리즈의 주인공, 호색한 개 검사<br>
-<i>등장작품 : 환세희담, 환세쾌도전, 환세포물장, 환세쾌진극, 환세취호전</i><br><br>
-<b>패 교환</b>　소비MP 6×교환한 패의 수<br>
-라운드가 시작할 때 필요 없는 패를 골라 ESC키를 누르거나 오른쪽 클릭하면, 다른 패로 교환할 수 있다.<br><br>
-<b>론 패 교환</b>　소비MP 10<br>
-상대가 <a href="#footnote-4">론</a>이 되었을 때 버린 패를 자신이 가진 다른 패로 교환해 <a href="#footnote-4">론</a>을 무효로 한다.<br>
-자신이 <a href="#footnote-3">리치</a>를 걸고 있을 경우에는 사용할 수 없다.
-</td>
-
-<tr>
-<td>
-<img src="img/face_yuri.png" width="150" height="163" align="left">
-</td>
-<td>
-<h3>●유리와카마루</h3>
-시리즈 내내 비중이 적은 남장 여검사<br>
-<i>등장작품 : 환세포물장</i><br><br>
-<b>초 거합베기</b>　소비MP 22<br>
-상대가 <a href="#footnote-4">론</a>이 되었을 때 버린 패를 거합베기로 잘라 <a href="#footnote-4">론</a>을 무효로 한다.<br>
-자신이 <a href="#footnote-3">리치</a>를 걸고 있을 경우에는 사용할 수 없다.<br><br>
-<b>기합 리치</b>　소비MP 24<br>
-<a href="#footnote-3">리치</a>를 걸 수 있을 때 사용하면 5턴 후 <a href="#footnote-1">쯔모</a>로 반드시 난다. 16턴 째 이후에는 사용할 수 없다.
-</td>
-
-<tr>
-<td></td>
-<td>
-<h3>●???</h3>
-우승자를 기다리는 수수께끼의 인물<br><br>
-<b>패 덧칠</b>　소비MP 4×교환한 패의 수<br>
-라운드가 시작할 때 필요 없는 패를 골라 ESC키를 누르거나 오른쪽 클릭하면, 다른 패로 교환할 수 있다.
-</td>
-</table>
-
-<h2>게임 방법</h2>
-
-<p>
-게임은 일대일로 승부합니다. 맨 처음 11개의 패가 주어집니다. 패를 갖거나 버려 가면서 같은 무늬의 패를 몇 종류씩 모아 갑니다.<br>
-역이 완성되어서 나면 승리가 되며 1라운드가 종료됩니다. 올린 역의 점수와 보너스 점수를 더한 만큼을 진 상대에게 데미지로 줄 수 있습니다.<br>
-어느 한 쪽의 HP가 0이 되면 시합이 종료됩니다. 시합은 승자 진출제로 진행되며 자신을 제외한 5인 전원에게 이기면 우승합니다.<br>
-또한 각 캐릭터에게는 각각의 비기가 있으며, MP를 소비해 사용할 수 있습니다.<br>
-상대에게 줄 데미지를 증가시키거나, 자신의 HP를 회복하는 등, 비기를 사용해 게임을 유리하게 진행할 수 있습니다.
-</p>
-
-<h3>●기본 룰</h3>
-
-<p>
-이 대회의 룰은 마작과는 조금 다릅니다.<br><br>
-1) 패는 캐릭터패 6종류, 무기패 3종류, 눈썹개패 4종류의 총 13종류가 있으며, 빨강·노랑·파랑의 3색으로 나뉘어 있습니다. <br>단, 눈썹개패는 보라색도 있습니다. 패의 개수는 9개씩 있으며 <a href="#footnote-8">도라</a>를 표시하는 패는 개수에 포함되지 않습니다.<br>
-2) 1라운드는 20턴으로 종료됩니다.<br>
-3) 역이 2종류 이상 있을 때에는 점수가 높은 쪽의 역으로 적용됩니다.<br>
-4) <a href="#footnote-5">나가리</a>가 되었을 때 어느 쪽이 <a href="#footnote-6">텐파이</a>일 경우 <a href="#footnote-7">노텐</a>의 상대에게 1000의 데미지를 줍니다.
-</p>
-
-<h3>●게임 룰 보충</h3>
-
-<p>
-후리텐(날 수 있는 패를 이미 자신이 버린 경우)이라도 날 수 있습니다.<br>
-<a href="#footnote-3">리치</a>를 걸지 않으면 상대로부터 <a href="#footnote-4">론</a>으로 날 수 없습니다. (즉, <a href="#footnote-2">퐁</a>을 통해 <a href="#footnote-1">쯔모</a>로 나야 됩니다.)<br>
-「비기」의 유무는 타이틀의 옵션에서만 설정할 수 있습니다. 게임 중의 옵션에서는 변경이 불가능합니다.<br>
-1턴 째, 20턴 째에는 <a href="#footnote-2">퐁</a>을 할 수 없습니다.
-</p>
-
-<h3>●메뉴의 표시</h3>
-
-<p>
-게임 중에 마우스 오른쪽 클릭이나 키보드의 [X]를 누르면 아래와 같은 메뉴가 표시됩니다.
-</p>
-
-<table>
-<tr>
-<td width="140">
-<img src="img/menu.png" align="left"></td>
-<td>
-아가리 (あがり) - 납니다.<br>
-퐁 (ポン) - <a href="#footnote-2">퐁</a>을 합니다.<br>
-리치 (リ―チ) - <a href="#footnote-3">리치</a>를 겁니다.<br>
-패 덧칠 - 비기가 표시, 캐릭터에 따라 다르게 표시됩니다.<br>
-- - -<br>
-헬프 (ヘルプ) - 역의 설명을 표시합니다.<br>
-옵션 (オプション) - 옵션을 엽니다.</td>
-</tr>
-</table>
-
-<h2>용어 해설</h2>
-
-<p id="footnote-1"><b>쯔모</b> (ツモ) : 패를 가져오는 것.</p>
-<p id="footnote-2"><b>퐁</b> (ポン) : 상대가 버린 패를 받아 3개 모음으로 만드는 것. 1턴 째와 20턴 째는 퐁을 할 수 없다. 퐁을 해서 나면 역의 득점이 3/4가 된다.</p>
-<p id="footnote-3"><b>리치</b> (リ―チ) : 앞으로 1개로 날 수 있을 때 리치를 선언하는 것. 한번이라도 퐁을 한 이후에는 리치를 걸 수 없다. 리치를 걸면 자동적으로 발생하는 비기 이외에는 조작이 불가능해진다.</p>
-<p id="footnote-4"><b>론</b> (ロン) : 리치를 걸고 있을 때, 상대가 버린 패로 나는 것.</p>
-<p id="footnote-5"><b>나가리</b> (流局) : 어느 쪽도 나지 못하고 라운드가 종료되는 것.</p>
-<p id="footnote-6"><b>텐파이</b> (テンパイ) : 앞으로 1개로 날 수 있는 상태.</p>
-<p id="footnote-7"><b>노텐</b> (ノ―テン) : 나가리가 됐을 때 텐파이가 아닌 상태.</p>
-<p id="footnote-8"><b>도라</b> (ドラ) : 났을 때에 도라와 같은 패를 들고 있으면 보너스를 받을 수 있다. ?로 표시된 「숨김 도라」는, 리치로 난 경우에만 무늬가 표시된다.</p>
-<p id="footnote-9"><b>오야코</b> (親子) : 오야는 먼저 패를 가져가는 쪽, 코는 나중에 가져가는 쪽.</p>
-
-<h2>보너스 득점 일람</h2>
-
-<p>났을 때 들고 있는 패나 난 방법에 따라, 보너스 점수를 받을 수 있습니다.</p>
-
-<p>
-●도라 보너스 400점 × 개수<br>
-들고 있는 패에 <a href="#footnote-8">도라</a>, 숨김 <a href="#footnote-8">도라</a>와 같은 패가 있으면, 그 패의 개수만큼 받는다.</p>
-<p>
-●강바닥 보너스 800점<br>
-20턴 째에 상대가 버린 패로 나면 받는다.</p>
-<p>
-●해저 보너스 800점<br>
-20턴 째의 <a href="#footnote-1">쯔모</a>로 났을 경우에 받는다. 페톰의 「라스트 찬스」로도 받을 수 있다.</p>
-<p>
-●텐호 보너스 800점<br>
-<a href="#footnote-9">오야</a>가 1턴 째에 <a href="#footnote-1">쯔모</a>로 나면 받는다.</p>
-
-<h2>역 일람</h2>
-
-<p>
-환세패유기의 역은 전부해서 30종류가 있습니다. 역의 설명은 게임 중 메뉴에서도 볼 수 있습니다.</p>
-
-<h3>●2개 역</h3>
-
-<p>
-<b>삼연격</b>　2000점<br>
-<img src="img/pai_ata.png"><img src="img/pai_ata.png">
-<img src="img/pai_punch.png"><img src="img/pai_punch.png">
-<img src="img/pai_fari.png"><img src="img/pai_fari.png">
-<img src="img/pai_wand.png"><img src="img/pai_wand.png">
-<img src="img/pai_smsh.png"><img src="img/pai_smsh.png">
-<img src="img/pai_sword.png"><img src="img/pai_sword.png"><br>
-캐릭터패와 무기패를 2개씩, 3색을 모은다.</p>
-
-<p>
-<b>올스타즈</b>　2400점<br>
-<img src="img/pai_ata.png"><img src="img/pai_ata.png">
-<img src="img/pai_rin.png"><img src="img/pai_rin.png">
-<img src="img/pai_fari.png"><img src="img/pai_fari.png">
-<img src="img/pai_pet.png"><img src="img/pai_pet.png">
-<img src="img/pai_smsh.png"><img src="img/pai_smsh.png">
-<img src="img/pai_yuri.png"><img src="img/pai_yuri.png"><br>
-눈썹개 이외의 모든 캐릭터 패를 2개씩 모은다.</p>
-
-
-<h3>●3개 역</h3>
-
-<p>
-<b>삼도립</b>　2400점<br>
-<img src="img/pai_pet.png"><img src="img/pai_pet.png"><img src="img/pai_pet.png">
-<img src="img/pai_smsh.png"><img src="img/pai_smsh.png"><img src="img/pai_smsh.png">
-<img src="img/pai_yuri.png"><img src="img/pai_yuri.png"><img src="img/pai_yuri.png">
-<img src="img/pai_purple.png"><img src="img/pai_purple.png"><img src="img/pai_purple.png"><br>
-뭐든지 좋으니까 각각 3개씩 모두 4벌 모은다.</p>
-
-<p>
-<b>장기*</b>　2800점<br>
-<img src="img/pai_rin.png"><img src="img/pai_rin.png"><img src="img/pai_rin.png">
-<img src="img/pai_punch.png"><img src="img/pai_punch.png"><img src="img/pai_punch.png"><br>
-같은 색의 캐릭터패 한 종류와 무기패를 3개씩 모은다. (아무 거나 3개씩 2벌 더)<br>
-(아타호 : 호격권, 린샹 : 선열각, 페톰 : 폭염의 주문, 화린 : 빙인의 주문, 스마슈 : 쾌진격, 유리와카마루 : 진공거합베기)<br>
-*원문에는 得意技, 국내 발매된 환세취호전에 맞추어 장기로 옮김.</p>
-
-<p>
-<b>색 하나씩</b>　3200점<br>
-<img src="img/pai_rin.png"><img src="img/pai_rin.png"><img src="img/pai_rin.png">
-<img src="img/pai_pet.png"><img src="img/pai_pet.png"><img src="img/pai_pet.png">
-<img src="img/pai_sword.png"><img src="img/pai_sword.png"><img src="img/pai_sword.png">
-<img src="img/pai_purple.png"><img src="img/pai_purple.png"><img src="img/pai_purple.png"><br>
-4색의 패를 각각 3개씩 모은다.</p>
-
-<p>
-<b>콤비네이션</b>　4000점<br>
-<img src="img/pai_pet.png"><img src="img/pai_pet.png"><img src="img/pai_pet.png">
-<img src="img/pai_fari.png"><img src="img/pai_fari.png"><img src="img/pai_fari.png">
-<img src="img/pai_wand.png"><img src="img/pai_wand.png"><img src="img/pai_wand.png"><br>
-같은 색의 캐릭터패 2종류와 무기패를 3개씩 모은다. (아무 거나 3개씩 1벌 더)</p>
-
-<p>
-<b>일색</b>　4800점<br>
-<img src="img/pai_ata.png"><img src="img/pai_ata.png"><img src="img/pai_ata.png">
-<img src="img/pai_punch.png"><img src="img/pai_punch.png"><img src="img/pai_punch.png">
-<img src="img/pai_red.png"><img src="img/pai_red.png"><img src="img/pai_red.png">
-<img src="img/pai_purple.png"><img src="img/pai_purple.png"><img src="img/pai_purple.png"><br>
-같은 색의 패로 3종류를 3개씩, 보라색 눈썹개패를 3개 모은다.<br>
-(빨강으로 모으면 적일색, 노랑으로 모으면 황일색, 파랑으로 모으면 청일색)</p>
-
-<p>
-<b>더블 콤비네이션</b>　4800점<br>
-<img src="img/pai_fari.png"><img src="img/pai_fari.png"><img src="img/pai_fari.png">
-<img src="img/pai_wand.png"><img src="img/pai_wand.png"><img src="img/pai_wand.png">
-<img src="img/pai_smsh.png"><img src="img/pai_smsh.png"><img src="img/pai_smsh.png">
-<img src="img/pai_sword.png"><img src="img/pai_sword.png"><img src="img/pai_sword.png"><br>
-캐릭터패와 무기패를 3개씩, 2색을 모은다.</p>
-
-<p>
-<b>눈썹개</b>　4800점<br>
-<img src="img/pai_red.png"><img src="img/pai_red.png"><img src="img/pai_red.png">
-<img src="img/pai_yellow.png"><img src="img/pai_yellow.png"><img src="img/pai_yellow.png">
-<img src="img/pai_blue.png"><img src="img/pai_blue.png"><img src="img/pai_blue.png"><br>
-빨강·노랑·파랑의 눈썹개패를 3개씩 모은다. (아무 거나 3개씩 1벌 더)</p>
-
-<p>
-<b>초 눈썹개</b>　6400점<br>
-<img src="img/pai_red.png"><img src="img/pai_red.png"><img src="img/pai_red.png">
-<img src="img/pai_yellow.png"><img src="img/pai_yellow.png"><img src="img/pai_yellow.png">
-<img src="img/pai_blue.png"><img src="img/pai_blue.png"><img src="img/pai_blue.png">
-<img src="img/pai_purple.png"><img src="img/pai_purple.png"><img src="img/pai_purple.png"><br>
-눈썹개패를 3장씩, 4색을 모은다.</p>
-
-<p>
-<b>변태개</b>　6400점<br>
-<img src="img/pai_rin.png"><img src="img/pai_rin.png"><img src="img/pai_rin.png">
-<img src="img/pai_fari.png"><img src="img/pai_fari.png"><img src="img/pai_fari.png">
-<img src="img/pai_smsh.png"><img src="img/pai_smsh.png"><img src="img/pai_smsh.png">
-<img src="img/pai_yuri.png"><img src="img/pai_yuri.png"><img src="img/pai_yuri.png"><br>
-스마슈와 여성 캐릭터패 3종류를 3개씩 모은다.</p>
-
-<p>
-<b>스페셜 콤비네이션</b>　8000점<br>
-<img src="img/pai_pet.png"><img src="img/pai_pet.png"><img src="img/pai_pet.png">
-<img src="img/pai_fari.png"><img src="img/pai_fari.png"><img src="img/pai_fari.png">
-<img src="img/pai_wand.png"><img src="img/pai_wand.png"><img src="img/pai_wand.png">
-<img src="img/pai_yellow.png"><img src="img/pai_yellow.png"><img src="img/pai_yellow.png"><br>
-같은 색으로 4종류를 3개씩 모은다.</p>
-
-
-<h3>●4개 역</h3>
-
-<p>
-<b>사천요리</b>　3200점<br>
-<img src="img/pai_rin.png"><img src="img/pai_rin.png"><img src="img/pai_rin.png"><img src="img/pai_rin.png">
-<img src="img/pai_smsh.png"><img src="img/pai_smsh.png"><img src="img/pai_smsh.png"><img src="img/pai_smsh.png">
-<img src="img/pai_blue.png"><img src="img/pai_blue.png"><img src="img/pai_blue.png"><img src="img/pai_blue.png"><br>
-뭐든지 좋으니까 4개씩 모은다.</p>
-
-<p>
-<b>필살기</b>　5600점<br>
-<img src="img/pai_smsh.png"><img src="img/pai_smsh.png"><img src="img/pai_smsh.png"><img src="img/pai_smsh.png">
-<img src="img/pai_sword.png"><img src="img/pai_sword.png"><img src="img/pai_sword.png"><img src="img/pai_sword.png"><br>
-같은 색의 캐릭터패 1종류와 무기패를 4개씩 모은다. (아무 거나 4개씩 1벌 더)<br>
-(아타호 : 맹호난무, 린샹 : 유미쌍조, 페톰 : 대폭염의 주문, 화린 : 뇌격의 주문, 스마슈 : 백인일섬, 유리와카마루 : 선풍거합베기)</p>
-
-<p>
-<b>자유 박애 평등</b>　6400점<br>
-<img src="img/pai_ata.png"><img src="img/pai_ata.png"><img src="img/pai_ata.png"><img src="img/pai_ata.png">
-<img src="img/pai_fari.png"><img src="img/pai_fari.png"><img src="img/pai_fari.png"><img src="img/pai_fari.png">
-<img src="img/pai_blue.png"><img src="img/pai_blue.png"><img src="img/pai_blue.png"><img src="img/pai_blue.png"><br>
-3색의 패를 4장씩 모은다.</p>
-
-<p>
-<b>남탕</b>　7200점<br>
-<img src="img/pai_ata.png"><img src="img/pai_ata.png"><img src="img/pai_ata.png"><img src="img/pai_ata.png">
-<img src="img/pai_pet.png"><img src="img/pai_pet.png"><img src="img/pai_pet.png"><img src="img/pai_pet.png">
-<img src="img/pai_smsh.png"><img src="img/pai_smsh.png"><img src="img/pai_smsh.png"><img src="img/pai_smsh.png"><br>
-남성 캐릭터패 3종류를 4개씩 모은다.</p>
-
-<p>
-<b>여탕</b>　7200점<br>
-<img src="img/pai_rin.png"><img src="img/pai_rin.png"><img src="img/pai_rin.png"><img src="img/pai_rin.png">
-<img src="img/pai_fari.png"><img src="img/pai_fari.png"><img src="img/pai_fari.png"><img src="img/pai_fari.png">
-<img src="img/pai_yuri.png"><img src="img/pai_yuri.png"><img src="img/pai_yuri.png"><img src="img/pai_yuri.png"><br>
-여성 캐릭터패 3종류를 4개씩 모은다.</p>
-
-<p>
-<b>취호전</b>　7200점<br>
-<img src="img/pai_ata.png"><img src="img/pai_ata.png"><img src="img/pai_ata.png"><img src="img/pai_ata.png">
-<img src="img/pai_rin.png"><img src="img/pai_rin.png"><img src="img/pai_rin.png"><img src="img/pai_rin.png">
-<img src="img/pai_smsh.png"><img src="img/pai_smsh.png"><img src="img/pai_smsh.png"><img src="img/pai_smsh.png"><br>
-취호전의 캐릭터 3인(아타호, 린샹, 스마슈)을 4개씩 모은다.</p>
-
-<p>
-<b>포물장</b>　7200점<br>
-<img src="img/pai_fari.png"><img src="img/pai_fari.png"><img src="img/pai_fari.png"><img src="img/pai_fari.png">
-<img src="img/pai_smsh.png"><img src="img/pai_smsh.png"><img src="img/pai_smsh.png"><img src="img/pai_smsh.png">
-<img src="img/pai_yuri.png"><img src="img/pai_yuri.png"><img src="img/pai_yuri.png"><img src="img/pai_yuri.png"><br>
-포물장의 캐릭터 3인(화린, 스마슈, 유리와카마루)을 4개씩 모은다.</p>
-
-<p>
-<b>초 일색</b></b>　8000점<br>
-<img src="img/pai_ata.png"><img src="img/pai_ata.png"><img src="img/pai_ata.png"><img src="img/pai_ata.png">
-<img src="img/pai_punch.png"><img src="img/pai_punch.png"><img src="img/pai_punch.png"><img src="img/pai_punch.png">
-<img src="img/pai_red.png"><img src="img/pai_red.png"><img src="img/pai_red.png"><img src="img/pai_red.png"><br>
-같은 색의 패를 4개씩 모은다.<br>
-(빨강으로 모으면 초 적일색, 노랑으로 모으면 초 황일색, 파랑으로 모으면 초 청일색)</p>
-
-<p>
-<b>진 눈썹개</b></b>　9600점<br>
-<img src="img/pai_red.png"><img src="img/pai_red.png"><img src="img/pai_red.png"><img src="img/pai_red.png">
-<img src="img/pai_yellow.png"><img src="img/pai_yellow.png"><img src="img/pai_yellow.png"><img src="img/pai_yellow.png">
-<img src="img/pai_blue.png"><img src="img/pai_blue.png"><img src="img/pai_blue.png"><img src="img/pai_blue.png"><br>
-빨강·노랑·파랑의 눈썹개패를 4장씩 모은다.</p>
-
-<p>
-<b>크로스 콤비네이션</b>　9600점<br>
-<img src="img/pai_pet.png"><img src="img/pai_pet.png"><img src="img/pai_pet.png"><img src="img/pai_pet.png">
-<img src="img/pai_fari.png"><img src="img/pai_fari.png"><img src="img/pai_fari.png"><img src="img/pai_fari.png">
-<img src="img/pai_wand.png"><img src="img/pai_wand.png"><img src="img/pai_wand.png"><img src="img/pai_wand.png"><br>
-같은 색의 캐릭터패 2종류와 무기패를 4장씩 모은다.</p>
-
-<p>
-<b>마구 때리기*</b></b>　9600점<br>
-<img src="img/pai_punch.png"><img src="img/pai_punch.png"><img src="img/pai_punch.png"><img src="img/pai_punch.png">
-<img src="img/pai_wand.png"><img src="img/pai_wand.png"><img src="img/pai_wand.png"><img src="img/pai_wand.png">
-<img src="img/pai_sword.png"><img src="img/pai_sword.png"><img src="img/pai_sword.png"><img src="img/pai_sword.png"><br>
-무기패를 4개씩 3벌 모은다.<br>
-*국내에 발매된 환세희담에서는 문어공격으로 옮김.</p>
-
-
-<h3>●6개 역</h3>
-
-<p>
-<b>육법전서</b>　5600점<br>
-<img src="img/pai_red.png"><img src="img/pai_red.png"><img src="img/pai_red.png"><img src="img/pai_red.png"><img src="img/pai_red.png"><img src="img/pai_red.png">
-<img src="img/pai_wand.png"><img src="img/pai_wand.png"><img src="img/pai_wand.png"><img src="img/pai_wand.png"><img src="img/pai_wand.png"><img src="img/pai_wand.png"><br>
-2종류의 패를 6개씩 모은다.</p>
-
-<p>
-<b>순 일색</b>　6400점<br>
-<img src="img/pai_smsh.png"><img src="img/pai_smsh.png"><img src="img/pai_smsh.png">
-<img src="img/pai_yuri.png"><img src="img/pai_yuri.png"><img src="img/pai_yuri.png">
-<img src="img/pai_blue.png"><img src="img/pai_blue.png"><img src="img/pai_blue.png"><img src="img/pai_blue.png"><img src="img/pai_blue.png"><img src="img/pai_blue.png"><br>
-같은 색 패만으로 2종류를 3개씩, 다른 1종류는 6개 모은다.<br>
-(빨강으로 모으면 순 적일색, 노랑으로 모으면 순 황일색, 파랑으로 모으면 순 청일색)</p>
-
-<p>
-<b>주호</b>　7200점<br>
-<img src="img/pai_ata.png"><img src="img/pai_ata.png"><img src="img/pai_ata.png"><img src="img/pai_ata.png"><img src="img/pai_ata.png"><img src="img/pai_ata.png">
-<img src="img/pai_pet.png"><img src="img/pai_pet.png"><img src="img/pai_pet.png"><img src="img/pai_pet.png"><img src="img/pai_pet.png"><img src="img/pai_pet.png"><br>
-아타호와 페톰을 6개씩 모은다.</p>
-
-<p>
-<b>오의</b>　9600점<br>
-<img src="img/pai_ata.png"><img src="img/pai_ata.png"><img src="img/pai_ata.png"><img src="img/pai_ata.png"><img src="img/pai_ata.png"><img src="img/pai_ata.png">
-<img src="img/pai_punch.png"><img src="img/pai_punch.png"><img src="img/pai_punch.png"><img src="img/pai_punch.png"><img src="img/pai_punch.png"><img src="img/pai_punch.png"><br>
-같은 색의 캐릭터패와 무기패를 6장씩 모은다.</p>
-
-
-<h3>●8개 역</h3>
-
-<p>
-<b>팔보채</b>　8800점<br>
-<img src="img/pai_smsh.png"><img src="img/pai_smsh.png"><img src="img/pai_smsh.png"><img src="img/pai_smsh.png"><img src="img/pai_smsh.png"><img src="img/pai_smsh.png"><img src="img/pai_smsh.png"><img src="img/pai_smsh.png"><br>
-뭐든지 1종류의 패를 8개 모은다.</p>
-
-<p>
-<b>비오의</b>　12800점<br>
-<img src="img/pai_fari.png"><img src="img/pai_fari.png"><img src="img/pai_fari.png"><img src="img/pai_fari.png"><img src="img/pai_fari.png"><img src="img/pai_fari.png"><img src="img/pai_fari.png"><img src="img/pai_fari.png">
-<img src="img/pai_wand.png"><img src="img/pai_wand.png"><img src="img/pai_wand.png"><img src="img/pai_wand.png"><br>
-같은 색의 캐릭터 패 8개와 무기 패 4개를 모은다.</p>
-
-
-<h3>●9개 역</h3>
-
-<p>
-<b>입에 담을 수도 없는 엄청난 기술</b>　12800점<br>
-<img src="img/pai_pet.png"><img src="img/pai_pet.png"><img src="img/pai_pet.png"><img src="img/pai_pet.png"><img src="img/pai_pet.png"><img src="img/pai_pet.png"><img src="img/pai_pet.png"><img src="img/pai_pet.png"><img src="img/pai_pet.png"><br>
-뭐든지 1종류의 패를 9개 모은다.</p>
-
-<h2>숨겨진 캐릭터</h2>
-
-<p>
-컨티뉴 없이 클리어하면 (라운드를 지는 것에 상관 없이 노 컨티뉴) 엔딩 후 눈썹개가 난입해 온다. 이를 물리치면 캐릭터 선택 시에 「VS」 아래로 커서를 옮기면 눈썹개를 고를 수 있다.
-</p>
-
-</td>
-</tr>
-</table>
-
-<p align="center">
-이 문서는 「컴파일 THE 베스트」 환세패유기에 포함되어 있던 해설서의 내용을 우리말로 옮기고<br> 
-옮긴이가 이미지와 기타 자료를 추가 편집해 만들어 졌습니다.<br>
-원본과 수정 사항은 <a href="http://oysterbay.tistory.com/43">여기</a>에서 보실 수 있습니다.
-</p>
+<body>
+
+    <div class="container">
+        <header class="manual-header">
+            <img src="img/pai_haiyuki.png" alt="환세패유기 로고">
+            <h1>환세패유기<br>해　설　서</h1>
+            <div class="translator-info">
+                옮김 : 맛굴<br>
+                <a href="https://atah.io">https://atah.io</a>
+            </div>
+        </header>
+
+        <main>
+            <section id="intro">
+                <h2>개요</h2>
+                <p>환세패유기는 마작풍의 테이블 게임입니다.</p>
+
+                <div style="text-align: center; margin: 20px 0; font-style: italic;">
+                    <p>●스토리●</p>
+                    <p>
+                        어느날 갑자기 개최된 마작풍 테이블 게임 대회.<br>
+                        참가하려고 모인 것은 환세 캐릭터 여섯 명.<br>
+                        우승해서 유명해 지고 싶거나, 어쩌다 보니 참가해 버리거나,<br>
+                        목적은 저마다 다르지만 참가한 이상 무슨 일이 있어도 우승을 노린다.<br>
+                        우승의 영광은 누구의 머리 위에 빛날 것인가?<br>
+                        그리고 여섯 명을 기다리는 수수께끼의 인물은….
+                    </p>
+                </div>
+            </section>
+
+            <section id="characters">
+                <h2>캐릭터 소개</h2>
+
+                <div class="character-card">
+                    <div class="character-img">
+                        <img src="img/face_fari.png" alt="화린">
+                    </div>
+                    <div class="character-info">
+                        <h3>●화린</h3>
+                        <p>여우마을의 지도자, 스마슈의 희생양<br>
+                            <i>등장작품 : 환세희담, 환세포물장</i>
+                        </p>
+                        <p><b>회복</b>　소비MP 24<br>
+                            HP를 조금 회복한다. 한 라운드에 몇 번이고 사용할 수 있다.</p>
+                        <p><b>버린 패 방어</b>　소비MP 18<br>
+                            5턴 간 상대가 자신이 버린 패로 <a href="#footnote-2">퐁</a>·<a href="#footnote-4">론</a>을 할 수 없게 한다. <br>한
+                            라운드에 몇 번이고 사용할 수 있다.</p>
+                    </div>
+                </div>
+
+                <div class="character-card">
+                    <div class="character-img">
+                        <img src="img/face_rin.png" alt="린샹">
+                    </div>
+                    <div class="character-info">
+                        <h3>●린샹</h3>
+                        <p>성질 고약한 고양이 귀 여권사<br>
+                            <i>등장작품 : 환세취호전</i>
+                        </p>
+                        <p><b>수경</b>　소비MP 22<br>
+                            상대가 났을 때 자신이 받는 데미지를 25퍼센트 감소시킨다.</p>
+                        <p><b>도라폭진</b>　소비MP 32<br>
+                            <a href="#footnote-3">리치</a>로 났을 때 숨김 <a href="#footnote-8">도라</a>를 자신이 가지고 있는 패로 바꾼다.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="character-card">
+                    <div class="character-img">
+                        <img src="img/face_pet.png" alt="페톰">
+                    </div>
+                    <div class="character-info">
+                        <h3>●페톰</h3>
+                        <p>뛰어난 마법사(사기꾼)<br>
+                            <i>등장작품 : 환세희담, 환세풍광전, 환세쾌도전, 환세취호전</i>
+                        </p>
+                        <p><b>크리티컬</b>　소비MP 24<br>
+                            났을 때 상대에게 주는 데미지를 25퍼센트 증가시킨다.</p>
+                        <p><b>라스트 찬스</b>　소비MP 18<br>
+                            <a href="#footnote-6">텐파이</a>인 상태에서 <a href="#footnote-5">나가리</a>일 경우 남은 패 룰렛에 도전할 수 있다.<br>
+                            남은 하나의 패가 나는 패의 룰렛에서 멈추면 난다.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="character-card">
+                    <div class="character-img">
+                        <img src="img/face_ata.png" alt="아타호">
+                    </div>
+                    <div class="character-info">
+                        <h3>●아타호</h3>
+                        <p>술 좋아하는 호랑이 아저씨<br>
+                            <i>등장작품 : 환세희담, 환세취호전</i>
+                        </p>
+                        <p><b>맹호일발권</b>　소비MP 100<br>
+                            <a href="#footnote-3">리치</a>를 걸 수 있을 때 사용하면 다음 <a href="#footnote-1">쯔모</a>로 반드시 난다. 20턴 째엔
+                            사용할 수 없다.
+                        </p>
+                        <p><b>지옥 쌓기</b>　소비MP 18<br>
+                            3턴 간 상대가 받는 패를 쓸모 없는 패로 바꿔 <a href="#footnote-1">쯔모</a>로 나는 것을 막는다.</p>
+                    </div>
+                </div>
+
+                <div class="character-card">
+                    <div class="character-img">
+                        <img src="img/face_smsh.png" alt="스마슈">
+                    </div>
+                    <div class="character-info">
+                        <h3>●스마슈</h3>
+                        <p>환세시리즈의 주인공, 호색한 개 검사<br>
+                            <i>등장작품 : 환세희담, 환세쾌도전, 환세포물장, 환세쾌진극, 환세취호전</i>
+                        </p>
+                        <p><b>패 교환</b>　소비MP 6×교환한 패의 수<br>
+                            라운드가 시작할 때 필요 없는 패를 골라 ESC키를 누르거나 오른쪽 클릭하면, 다른 패로 교환할 수 있다.</p>
+                        <p><b>론 패 교환</b>　소비MP 10<br>
+                            상대가 <a href="#footnote-4">론</a>이 되었을 때 버린 패를 자신이 가진 다른 패로 교환해 <a href="#footnote-4">론</a>을
+                            무효로 한다.<br>
+                            자신이 <a href="#footnote-3">리치</a>를 걸고 있을 경우에는 사용할 수 없다.</p>
+                    </div>
+                </div>
+
+                <div class="character-card">
+                    <div class="character-img">
+                        <img src="img/face_yuri.png" alt="유리와카마루">
+                    </div>
+                    <div class="character-info">
+                        <h3>●유리와카마루</h3>
+                        <p>시리즈 내내 비중이 적은 남장 여검사<br>
+                            <i>등장작품 : 환세포물장</i>
+                        </p>
+                        <p><b>초 거합베기</b>　소비MP 22<br>
+                            상대가 <a href="#footnote-4">론</a>이 되었을 때 버린 패를 거합베기로 잘라 <a href="#footnote-4">론</a>을 무효로
+                            한다.<br>
+                            자신이 <a href="#footnote-3">리치</a>를 걸고 있을 경우에는 사용할 수 없다.</p>
+                        <p><b>기합 리치</b>　소비MP 24<br>
+                            <a href="#footnote-3">리치</a>를 걸 수 있을 때 사용하면 5턴 후 <a href="#footnote-1">쯔모</a>로 반드시 난다. 16턴 째
+                            이후에는 사용할 수 없다.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="character-card">
+                    <div class="character-img">
+                        <!-- Placeholder or empty div for alignment -->
+                    </div>
+                    <div class="character-info">
+                        <h3>●???</h3>
+                        <p>우승자를 기다리는 수수께끼의 인물</p>
+                        <p><b>패 덧칠</b>　소비MP 4×교환한 패의 수<br>
+                            라운드가 시작할 때 필요 없는 패를 골라 ESC키를 누르거나 오른쪽 클릭하면, 다른 패로 교환할 수 있다.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section id="gameplay">
+                <h2>게임 방법</h2>
+                <p>
+                    게임은 일대일로 승부합니다. 맨 처음 11개의 패가 주어집니다. 패를 갖거나 버려 가면서 같은 무늬의 패를 몇 종류씩 모아 갑니다.<br>
+                    역이 완성되어서 나면 승리가 되며 1라운드가 종료됩니다. 올린 역의 점수와 보너스 점수를 더한 만큼을 진 상대에게 데미지로 줄 수 있습니다.<br>
+                    어느 한 쪽의 HP가 0이 되면 시합이 종료됩니다. 시합은 승자 진출제로 진행되며 자신을 제외한 5인 전원에게 이기면 우승합니다.<br>
+                    또한 각 캐릭터에게는 각각의 비기가 있으며, MP를 소비해 사용할 수 있습니다.<br>
+                    상대에게 줄 데미지를 증가시키거나, 자신의 HP를 회복하는 등, 비기를 사용해 게임을 유리하게 진행할 수 있습니다.
+                </p>
+
+                <h3>●기본 룰</h3>
+                <p>
+                    이 대회의 룰은 마작과는 조금 다릅니다.<br><br>
+                    1) 패는 캐릭터패 6종류, 무기패 3종류, 눈썹개패 4종류의 총 13종류가 있으며, 빨강·노랑·파랑의 3색으로 나뉘어 있습니다. <br>단, 눈썹개패는 보라색도 있습니다. 패의
+                    개수는 9개씩 있으며 <a href="#footnote-8">도라</a>를 표시하는 패는 개수에 포함되지 않습니다.<br>
+                    2) 1라운드는 20턴으로 종료됩니다.<br>
+                    3) 역이 2종류 이상 있을 때에는 점수가 높은 쪽의 역으로 적용됩니다.<br>
+                    4) <a href="#footnote-5">나가리</a>가 되었을 때 어느 쪽이 <a href="#footnote-6">텐파이</a>일 경우 <a
+                        href="#footnote-7">노텐</a>의 상대에게 1000의 데미지를 줍니다.
+                </p>
+
+                <h3>●게임 룰 보충</h3>
+                <p>
+                    후리텐(날 수 있는 패를 이미 자신이 버린 경우)이라도 날 수 있습니다.<br>
+                    <a href="#footnote-3">리치</a>를 걸지 않으면 상대로부터 <a href="#footnote-4">론</a>으로 날 수 없습니다. (즉, <a
+                        href="#footnote-2">퐁</a>을 통해 <a href="#footnote-1">쯔모</a>로 나야 됩니다.)<br>
+                    「비기」의 유무는 타이틀의 옵션에서만 설정할 수 있습니다. 게임 중의 옵션에서는 변경이 불가능합니다.<br>
+                    1턴 째, 20턴 째에는 <a href="#footnote-2">퐁</a>을 할 수 없습니다.
+                </p>
+
+                <h3>●메뉴의 표시</h3>
+                <p>게임 중에 마우스 오른쪽 클릭이나 키보드의 [X]를 누르면 아래와 같은 메뉴가 표시됩니다.</p>
+
+                <div class="menu-section">
+                    <img src="img/menu.png" alt="메뉴 이미지">
+                    <div>
+                        아가리 (あがり) - 납니다.<br>
+                        퐁 (ポン) - <a href="#footnote-2">퐁</a>을 합니다.<br>
+                        리치 (リ―チ) - <a href="#footnote-3">리치</a>를 겁니다.<br>
+                        패 덧칠 - 비기가 표시, 캐릭터에 따라 다르게 표시됩니다.<br>
+                        - - -<br>
+                        헬프 (ヘルプ) - 역의 설명을 표시합니다.<br>
+                        옵션 (オプション) - 옵션을 엽니다.
+                    </div>
+                </div>
+            </section>
+
+            <section id="terms">
+                <h2>용어 해설</h2>
+                <p id="footnote-1"><b>쯔모</b> (ツモ) : 패를 가져오는 것.</p>
+                <p id="footnote-2"><b>퐁</b> (ポン) : 상대가 버린 패를 받아 3개 모음으로 만드는 것. 1턴 째와 20턴 째는 퐁을 할 수 없다. 퐁을 해서 나면 역의 득점이
+                    3/4가 된다.</p>
+                <p id="footnote-3"><b>리치</b> (リ―チ) : 앞으로 1개로 날 수 있을 때 리치를 선언하는 것. 한번이라도 퐁을 한 이후에는 리치를 걸 수 없다. 리치를 걸면
+                    자동적으로 발생하는 비기 이외에는 조작이 불가능해진다.</p>
+                <p id="footnote-4"><b>론</b> (ロン) : 리치를 걸고 있을 때, 상대가 버린 패로 나는 것.</p>
+                <p id="footnote-5"><b>나가리</b> (流局) : 어느 쪽도 나지 못하고 라운드가 종료되는 것.</p>
+                <p id="footnote-6"><b>텐파이</b> (テンパイ) : 앞으로 1개로 날 수 있는 상태.</p>
+                <p id="footnote-7"><b>노텐</b> (ノ―テン) : 나가리가 됐을 때 텐파이가 아닌 상태.</p>
+                <p id="footnote-8"><b>도라</b> (ドラ) : 났을 때에 도라와 같은 패를 들고 있으면 보너스를 받을 수 있다. ?로 표시된 「숨김 도라」는, 리치로 난 경우에만 무늬가
+                    표시된다.</p>
+                <p id="footnote-9"><b>오야코</b> (親子) : 오야는 먼저 패를 가져가는 쪽, 코는 나중에 가져가는 쪽.</p>
+            </section>
+
+            <section id="bonus">
+                <h2>보너스 득점 일람</h2>
+                <p>났을 때 들고 있는 패나 난 방법에 따라, 보너스 점수를 받을 수 있습니다.</p>
+                <p>
+                    ●도라 보너스 400점 × 개수<br>
+                    들고 있는 패에 <a href="#footnote-8">도라</a>, 숨김 <a href="#footnote-8">도라</a>와 같은 패가 있으면, 그 패의 개수만큼 받는다.
+                </p>
+                <p>
+                    ●강바닥 보너스 800점<br>
+                    20턴 째에 상대가 버린 패로 나면 받는다.
+                </p>
+                <p>
+                    ●해저 보너스 800점<br>
+                    20턴 째의 <a href="#footnote-1">쯔모</a>로 났을 경우에 받는다. 페톰의 「라스트 찬스」로도 받을 수 있다.
+                </p>
+                <p>
+                    ●텐호 보너스 800점<br>
+                    <a href="#footnote-9">오야</a>가 1턴 째에 <a href="#footnote-1">쯔모</a>로 나면 받는다.
+                </p>
+            </section>
+
+            <section id="hands">
+                <h2>역 일람</h2>
+                <p>환세패유기의 역은 전부해서 30종류가 있습니다. 역의 설명은 게임 중 메뉴에서도 볼 수 있습니다.</p>
+
+                <h3>●2개 역</h3>
+                <div class="yaku-item">
+                    <b>삼연격</b>　2000점
+                    <div class="yaku-tiles">
+                        <img src="img/pai_ata.png"><img src="img/pai_ata.png">
+                        <img src="img/pai_punch.png"><img src="img/pai_punch.png">
+                        <img src="img/pai_fari.png"><img src="img/pai_fari.png">
+                        <img src="img/pai_wand.png"><img src="img/pai_wand.png">
+                        <img src="img/pai_smsh.png"><img src="img/pai_smsh.png">
+                        <img src="img/pai_sword.png"><img src="img/pai_sword.png">
+                    </div>
+                    캐릭터패와 무기패를 2개씩, 3색을 모은다.
+                </div>
+
+                <div class="yaku-item">
+                    <b>올스타즈</b>　2400점
+                    <div class="yaku-tiles">
+                        <img src="img/pai_ata.png"><img src="img/pai_ata.png">
+                        <img src="img/pai_rin.png"><img src="img/pai_rin.png">
+                        <img src="img/pai_fari.png"><img src="img/pai_fari.png">
+                        <img src="img/pai_pet.png"><img src="img/pai_pet.png">
+                        <img src="img/pai_smsh.png"><img src="img/pai_smsh.png">
+                        <img src="img/pai_yuri.png"><img src="img/pai_yuri.png">
+                    </div>
+                    눈썹개 이외의 모든 캐릭터 패를 2개씩 모은다.
+                </div>
+
+                <h3>●3개 역</h3>
+                <div class="yaku-item">
+                    <b>삼도립</b>　2400점
+                    <div class="yaku-tiles">
+                        <img src="img/pai_pet.png"><img src="img/pai_pet.png"><img src="img/pai_pet.png">
+                        <img src="img/pai_smsh.png"><img src="img/pai_smsh.png"><img src="img/pai_smsh.png">
+                        <img src="img/pai_yuri.png"><img src="img/pai_yuri.png"><img src="img/pai_yuri.png">
+                        <img src="img/pai_purple.png"><img src="img/pai_purple.png"><img src="img/pai_purple.png">
+                    </div>
+                    뭐든지 좋으니까 각각 3개씩 모두 4벌 모은다.
+                </div>
+
+                <div class="yaku-item">
+                    <b>장기*</b>　2800점
+                    <div class="yaku-tiles">
+                        <img src="img/pai_rin.png"><img src="img/pai_rin.png"><img src="img/pai_rin.png">
+                        <img src="img/pai_punch.png"><img src="img/pai_punch.png"><img src="img/pai_punch.png">
+                    </div>
+                    같은 색의 캐릭터패 한 종류와 무기패를 3개씩 모은다. (아무 거나 3개씩 2벌 더)<br>
+                    (아타호 : 호격권, 린샹 : 선열각, 페톰 : 폭염의 주문, 화린 : 빙인의 주문, 스마슈 : 쾌진격, 유리와카마루 : 진공거합베기)<br>
+                    *원문에는 得意技, 국내 발매된 환세취호전에 맞추어 장기로 옮김.
+                </div>
+
+                <div class="yaku-item">
+                    <b>색 하나씩</b>　3200점
+                    <div class="yaku-tiles">
+                        <img src="img/pai_rin.png"><img src="img/pai_rin.png"><img src="img/pai_rin.png">
+                        <img src="img/pai_pet.png"><img src="img/pai_pet.png"><img src="img/pai_pet.png">
+                        <img src="img/pai_sword.png"><img src="img/pai_sword.png"><img src="img/pai_sword.png">
+                        <img src="img/pai_purple.png"><img src="img/pai_purple.png"><img src="img/pai_purple.png">
+                    </div>
+                    4색의 패를 각각 3개씩 모은다.
+                </div>
+
+                <div class="yaku-item">
+                    <b>콤비네이션</b>　4000점
+                    <div class="yaku-tiles">
+                        <img src="img/pai_pet.png"><img src="img/pai_pet.png"><img src="img/pai_pet.png">
+                        <img src="img/pai_fari.png"><img src="img/pai_fari.png"><img src="img/pai_fari.png">
+                        <img src="img/pai_wand.png"><img src="img/pai_wand.png"><img src="img/pai_wand.png">
+                    </div>
+                    같은 색의 캐릭터패 2종류와 무기패를 3개씩 모은다. (아무 거나 3개씩 1벌 더)
+                </div>
+
+                <div class="yaku-item">
+                    <b>일색</b>　4800점
+                    <div class="yaku-tiles">
+                        <img src="img/pai_ata.png"><img src="img/pai_ata.png"><img src="img/pai_ata.png">
+                        <img src="img/pai_punch.png"><img src="img/pai_punch.png"><img src="img/pai_punch.png">
+                        <img src="img/pai_red.png"><img src="img/pai_red.png"><img src="img/pai_red.png">
+                        <img src="img/pai_purple.png"><img src="img/pai_purple.png"><img src="img/pai_purple.png">
+                    </div>
+                    같은 색의 패로 3종류를 3개씩, 보라색 눈썹개패를 3개 모은다.<br>
+                    (빨강으로 모으면 적일색, 노랑으로 모으면 황일색, 파랑으로 모으면 청일색)
+                </div>
+
+                <div class="yaku-item">
+                    <b>더블 콤비네이션</b>　4800점
+                    <div class="yaku-tiles">
+                        <img src="img/pai_fari.png"><img src="img/pai_fari.png"><img src="img/pai_fari.png">
+                        <img src="img/pai_wand.png"><img src="img/pai_wand.png"><img src="img/pai_wand.png">
+                        <img src="img/pai_smsh.png"><img src="img/pai_smsh.png"><img src="img/pai_smsh.png">
+                        <img src="img/pai_sword.png"><img src="img/pai_sword.png"><img src="img/pai_sword.png">
+                    </div>
+                    캐릭터패와 무기패를 3개씩, 2색을 모은다.
+                </div>
+
+                <div class="yaku-item">
+                    <b>눈썹개</b>　4800점
+                    <div class="yaku-tiles">
+                        <img src="img/pai_red.png"><img src="img/pai_red.png"><img src="img/pai_red.png">
+                        <img src="img/pai_yellow.png"><img src="img/pai_yellow.png"><img src="img/pai_yellow.png">
+                        <img src="img/pai_blue.png"><img src="img/pai_blue.png"><img src="img/pai_blue.png">
+                    </div>
+                    빨강·노랑·파랑의 눈썹개패를 3개씩 모은다. (아무 거나 3개씩 1벌 더)
+                </div>
+
+                <div class="yaku-item">
+                    <b>초 눈썹개</b>　6400점
+                    <div class="yaku-tiles">
+                        <img src="img/pai_red.png"><img src="img/pai_red.png"><img src="img/pai_red.png">
+                        <img src="img/pai_yellow.png"><img src="img/pai_yellow.png"><img src="img/pai_yellow.png">
+                        <img src="img/pai_blue.png"><img src="img/pai_blue.png"><img src="img/pai_blue.png">
+                        <img src="img/pai_purple.png"><img src="img/pai_purple.png"><img src="img/pai_purple.png">
+                    </div>
+                    눈썹개패를 3장씩, 4색을 모은다.
+                </div>
+
+                <div class="yaku-item">
+                    <b>변태개</b>　6400점
+                    <div class="yaku-tiles">
+                        <img src="img/pai_rin.png"><img src="img/pai_rin.png"><img src="img/pai_rin.png">
+                        <img src="img/pai_fari.png"><img src="img/pai_fari.png"><img src="img/pai_fari.png">
+                        <img src="img/pai_smsh.png"><img src="img/pai_smsh.png"><img src="img/pai_smsh.png">
+                        <img src="img/pai_yuri.png"><img src="img/pai_yuri.png"><img src="img/pai_yuri.png">
+                    </div>
+                    스마슈와 여성 캐릭터패 3종류를 3개씩 모은다.
+                </div>
+
+                <div class="yaku-item">
+                    <b>스페셜 콤비네이션</b>　8000점
+                    <div class="yaku-tiles">
+                        <img src="img/pai_pet.png"><img src="img/pai_pet.png"><img src="img/pai_pet.png">
+                        <img src="img/pai_fari.png"><img src="img/pai_fari.png"><img src="img/pai_fari.png">
+                        <img src="img/pai_wand.png"><img src="img/pai_wand.png"><img src="img/pai_wand.png">
+                        <img src="img/pai_yellow.png"><img src="img/pai_yellow.png"><img src="img/pai_yellow.png">
+                    </div>
+                    같은 색으로 4종류를 3개씩 모은다.
+                </div>
+
+                <h3>●4개 역</h3>
+                <div class="yaku-item">
+                    <b>사천요리</b>　3200점
+                    <div class="yaku-tiles">
+                        <img src="img/pai_rin.png"><img src="img/pai_rin.png"><img src="img/pai_rin.png"><img
+                            src="img/pai_rin.png">
+                        <img src="img/pai_smsh.png"><img src="img/pai_smsh.png"><img src="img/pai_smsh.png"><img
+                            src="img/pai_smsh.png">
+                        <img src="img/pai_blue.png"><img src="img/pai_blue.png"><img src="img/pai_blue.png"><img
+                            src="img/pai_blue.png">
+                    </div>
+                    뭐든지 좋으니까 4개씩 모은다.
+                </div>
+
+                <div class="yaku-item">
+                    <b>필살기</b>　5600점
+                    <div class="yaku-tiles">
+                        <img src="img/pai_smsh.png"><img src="img/pai_smsh.png"><img src="img/pai_smsh.png"><img
+                            src="img/pai_smsh.png">
+                        <img src="img/pai_sword.png"><img src="img/pai_sword.png"><img src="img/pai_sword.png"><img
+                            src="img/pai_sword.png">
+                    </div>
+                    같은 색의 캐릭터패 1종류와 무기패를 4개씩 모은다. (아무 거나 4개씩 1벌 더)<br>
+                    (아타호 : 맹호난무, 린샹 : 유미쌍조, 페톰 : 대폭염의 주문, 화린 : 뇌격의 주문, 스마슈 : 백인일섬, 유리와카마루 : 선풍거합베기)
+                </div>
+
+                <div class="yaku-item">
+                    <b>자유 박애 평등</b>　6400점
+                    <div class="yaku-tiles">
+                        <img src="img/pai_ata.png"><img src="img/pai_ata.png"><img src="img/pai_ata.png"><img
+                            src="img/pai_ata.png">
+                        <img src="img/pai_fari.png"><img src="img/pai_fari.png"><img src="img/pai_fari.png"><img
+                            src="img/pai_fari.png">
+                        <img src="img/pai_blue.png"><img src="img/pai_blue.png"><img src="img/pai_blue.png"><img
+                            src="img/pai_blue.png">
+                    </div>
+                    3색의 패를 4장씩 모은다.
+                </div>
+
+                <div class="yaku-item">
+                    <b>남탕</b>　7200점
+                    <div class="yaku-tiles">
+                        <img src="img/pai_ata.png"><img src="img/pai_ata.png"><img src="img/pai_ata.png"><img
+                            src="img/pai_ata.png">
+                        <img src="img/pai_pet.png"><img src="img/pai_pet.png"><img src="img/pai_pet.png"><img
+                            src="img/pai_pet.png">
+                        <img src="img/pai_smsh.png"><img src="img/pai_smsh.png"><img src="img/pai_smsh.png"><img
+                            src="img/pai_smsh.png">
+                    </div>
+                    남성 캐릭터패 3종류를 4개씩 모은다.
+                </div>
+
+                <div class="yaku-item">
+                    <b>여탕</b>　7200점
+                    <div class="yaku-tiles">
+                        <img src="img/pai_rin.png"><img src="img/pai_rin.png"><img src="img/pai_rin.png"><img
+                            src="img/pai_rin.png">
+                        <img src="img/pai_fari.png"><img src="img/pai_fari.png"><img src="img/pai_fari.png"><img
+                            src="img/pai_fari.png">
+                        <img src="img/pai_yuri.png"><img src="img/pai_yuri.png"><img src="img/pai_yuri.png"><img
+                            src="img/pai_yuri.png">
+                    </div>
+                    여성 캐릭터패 3종류를 4개씩 모은다.
+                </div>
+
+                <div class="yaku-item">
+                    <b>취호전</b>　7200점
+                    <div class="yaku-tiles">
+                        <img src="img/pai_ata.png"><img src="img/pai_ata.png"><img src="img/pai_ata.png"><img
+                            src="img/pai_ata.png">
+                        <img src="img/pai_rin.png"><img src="img/pai_rin.png"><img src="img/pai_rin.png"><img
+                            src="img/pai_rin.png">
+                        <img src="img/pai_smsh.png"><img src="img/pai_smsh.png"><img src="img/pai_smsh.png"><img
+                            src="img/pai_smsh.png">
+                    </div>
+                    취호전의 캐릭터 3인(아타호, 린샹, 스마슈)을 4개씩 모은다.
+                </div>
+
+                <div class="yaku-item">
+                    <b>포물장</b>　7200점
+                    <div class="yaku-tiles">
+                        <img src="img/pai_fari.png"><img src="img/pai_fari.png"><img src="img/pai_fari.png"><img
+                            src="img/pai_fari.png">
+                        <img src="img/pai_smsh.png"><img src="img/pai_smsh.png"><img src="img/pai_smsh.png"><img
+                            src="img/pai_smsh.png">
+                        <img src="img/pai_yuri.png"><img src="img/pai_yuri.png"><img src="img/pai_yuri.png"><img
+                            src="img/pai_yuri.png">
+                    </div>
+                    포물장의 캐릭터 3인(화린, 스마슈, 유리와카마루)을 4개씩 모은다.
+                </div>
+
+                <div class="yaku-item">
+                    <b>초 일색</b>　8000점
+                    <div class="yaku-tiles">
+                        <img src="img/pai_ata.png"><img src="img/pai_ata.png"><img src="img/pai_ata.png"><img
+                            src="img/pai_ata.png">
+                        <img src="img/pai_punch.png"><img src="img/pai_punch.png"><img src="img/pai_punch.png"><img
+                            src="img/pai_punch.png">
+                        <img src="img/pai_red.png"><img src="img/pai_red.png"><img src="img/pai_red.png"><img
+                            src="img/pai_red.png">
+                    </div>
+                    같은 색의 패를 4개씩 모은다.<br>
+                    (빨강으로 모으면 초 적일색, 노랑으로 모으면 초 황일색, 파랑으로 모으면 초 청일색)
+                </div>
+
+                <div class="yaku-item">
+                    <b>진 눈썹개</b>　9600점
+                    <div class="yaku-tiles">
+                        <img src="img/pai_red.png"><img src="img/pai_red.png"><img src="img/pai_red.png"><img
+                            src="img/pai_red.png">
+                        <img src="img/pai_yellow.png"><img src="img/pai_yellow.png"><img src="img/pai_yellow.png"><img
+                            src="img/pai_yellow.png">
+                        <img src="img/pai_blue.png"><img src="img/pai_blue.png"><img src="img/pai_blue.png"><img
+                            src="img/pai_blue.png">
+                    </div>
+                    빨강·노랑·파랑의 눈썹개패를 4장씩 모은다.
+                </div>
+
+                <div class="yaku-item">
+                    <b>크로스 콤비네이션</b>　9600점
+                    <div class="yaku-tiles">
+                        <img src="img/pai_pet.png"><img src="img/pai_pet.png"><img src="img/pai_pet.png"><img
+                            src="img/pai_pet.png">
+                        <img src="img/pai_fari.png"><img src="img/pai_fari.png"><img src="img/pai_fari.png"><img
+                            src="img/pai_fari.png">
+                        <img src="img/pai_wand.png"><img src="img/pai_wand.png"><img src="img/pai_wand.png"><img
+                            src="img/pai_wand.png">
+                    </div>
+                    같은 색의 캐릭터패 2종류와 무기패를 4장씩 모은다.
+                </div>
+
+                <div class="yaku-item">
+                    <b>마구 때리기*</b>　9600점
+                    <div class="yaku-tiles">
+                        <img src="img/pai_punch.png"><img src="img/pai_punch.png"><img src="img/pai_punch.png"><img
+                            src="img/pai_punch.png">
+                        <img src="img/pai_wand.png"><img src="img/pai_wand.png"><img src="img/pai_wand.png"><img
+                            src="img/pai_wand.png">
+                        <img src="img/pai_sword.png"><img src="img/pai_sword.png"><img src="img/pai_sword.png"><img
+                            src="img/pai_sword.png">
+                    </div>
+                    무기패를 4개씩 3벌 모은다.<br>
+                    *국내에 발매된 환세희담에서는 문어공격으로 옮김.
+                </div>
+
+                <h3>●6개 역</h3>
+                <div class="yaku-item">
+                    <b>육법전서</b>　5600점
+                    <div class="yaku-tiles">
+                        <img src="img/pai_red.png"><img src="img/pai_red.png"><img src="img/pai_red.png"><img
+                            src="img/pai_red.png"><img src="img/pai_red.png"><img src="img/pai_red.png">
+                        <img src="img/pai_wand.png"><img src="img/pai_wand.png"><img src="img/pai_wand.png"><img
+                            src="img/pai_wand.png"><img src="img/pai_wand.png"><img src="img/pai_wand.png">
+                    </div>
+                    2종류의 패를 6개씩 모은다.
+                </div>
+
+                <div class="yaku-item">
+                    <b>순 일색</b>　6400점
+                    <div class="yaku-tiles">
+                        <img src="img/pai_smsh.png"><img src="img/pai_smsh.png"><img src="img/pai_smsh.png">
+                        <img src="img/pai_yuri.png"><img src="img/pai_yuri.png"><img src="img/pai_yuri.png">
+                        <img src="img/pai_blue.png"><img src="img/pai_blue.png"><img src="img/pai_blue.png"><img
+                            src="img/pai_blue.png"><img src="img/pai_blue.png"><img src="img/pai_blue.png">
+                    </div>
+                    같은 색 패만으로 2종류를 3개씩, 다른 1종류는 6개 모은다.<br>
+                    (빨강으로 모으면 순 적일색, 노랑으로 모으면 순 황일색, 파랑으로 모으면 순 청일색)
+                </div>
+
+                <div class="yaku-item">
+                    <b>주호</b>　7200점
+                    <div class="yaku-tiles">
+                        <img src="img/pai_ata.png"><img src="img/pai_ata.png"><img src="img/pai_ata.png"><img
+                            src="img/pai_ata.png"><img src="img/pai_ata.png"><img src="img/pai_ata.png">
+                        <img src="img/pai_pet.png"><img src="img/pai_pet.png"><img src="img/pai_pet.png"><img
+                            src="img/pai_pet.png"><img src="img/pai_pet.png"><img src="img/pai_pet.png">
+                    </div>
+                    아타호와 페톰을 6개씩 모은다.
+                </div>
+
+                <div class="yaku-item">
+                    <b>오의</b>　9600점
+                    <div class="yaku-tiles">
+                        <img src="img/pai_ata.png"><img src="img/pai_ata.png"><img src="img/pai_ata.png"><img
+                            src="img/pai_ata.png"><img src="img/pai_ata.png"><img src="img/pai_ata.png">
+                        <img src="img/pai_punch.png"><img src="img/pai_punch.png"><img src="img/pai_punch.png"><img
+                            src="img/pai_punch.png"><img src="img/pai_punch.png"><img src="img/pai_punch.png">
+                    </div>
+                    같은 색의 캐릭터패와 무기패를 6장씩 모은다.
+                </div>
+
+                <h3>●8개 역</h3>
+                <div class="yaku-item">
+                    <b>팔보채</b>　8800점
+                    <div class="yaku-tiles">
+                        <img src="img/pai_smsh.png"><img src="img/pai_smsh.png"><img src="img/pai_smsh.png"><img
+                            src="img/pai_smsh.png"><img src="img/pai_smsh.png"><img src="img/pai_smsh.png"><img
+                            src="img/pai_smsh.png"><img src="img/pai_smsh.png">
+                    </div>
+                    뭐든지 1종류의 패를 8개 모은다.
+                </div>
+
+                <div class="yaku-item">
+                    <b>비오의</b>　12800점
+                    <div class="yaku-tiles">
+                        <img src="img/pai_fari.png"><img src="img/pai_fari.png"><img src="img/pai_fari.png"><img
+                            src="img/pai_fari.png"><img src="img/pai_fari.png"><img src="img/pai_fari.png"><img
+                            src="img/pai_fari.png"><img src="img/pai_fari.png">
+                        <img src="img/pai_wand.png"><img src="img/pai_wand.png"><img src="img/pai_wand.png"><img
+                            src="img/pai_wand.png">
+                    </div>
+                    같은 색의 캐릭터 패 8개와 무기 패 4개를 모은다.
+                </div>
+
+                <h3>●9개 역</h3>
+                <div class="yaku-item">
+                    <b>입에 담을 수도 없는 엄청난 기술</b>　12800점
+                    <div class="yaku-tiles">
+                        <img src="img/pai_pet.png"><img src="img/pai_pet.png"><img src="img/pai_pet.png"><img
+                            src="img/pai_pet.png"><img src="img/pai_pet.png"><img src="img/pai_pet.png"><img
+                            src="img/pai_pet.png"><img src="img/pai_pet.png"><img src="img/pai_pet.png">
+                    </div>
+                    뭐든지 1종류의 패를 9개 모은다.
+                </div>
+            </section>
+
+            <section id="hidden-char">
+                <h2>숨겨진 캐릭터</h2>
+                <p>
+                    컨티뉴 없이 클리어하면 (라운드를 지는 것에 상관 없이 노 컨티뉴) 엔딩 후 눈썹개가 난입해 온다. 이를 물리치면 캐릭터 선택 시에 「VS」 아래로 커서를 옮기면 눈썹개를 고를 수
+                    있다.
+                </p>
+            </section>
+        </main>
+
+        <footer class="manual-footer">
+            <p>
+                이 문서는 「컴파일 THE 베스트」 환세패유기에 포함되어 있던 해설서의 내용을 우리말로 옮기고<br>
+                옮긴이가 이미지와 기타 자료를 추가 편집해 만들어 졌습니다.<br>
+                원본과 수정 사항은 <a href="http://oysterbay.tistory.com/43">여기</a>에서 보실 수 있습니다.
+            </p>
+        </footer>
+    </div>
+
 </body>
+
 </html>

@@ -1,0 +1,197 @@
+@charset "utf-8";
+
+/* Reset & Base */
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'KoddiUDOnGothic-Regular', sans-serif;
+    background-image: url('img/background.png');
+    background-repeat: repeat;
+    color: #333;
+    line-height: 1.6;
+}
+
+img {
+    max-width: 100%;
+    height: auto;
+    vertical-align: middle;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    margin-top: 1.5em;
+    margin-bottom: 0.5em;
+    font-weight: bold;
+}
+
+h1 {
+    font-size: 2em;
+    text-align: center;
+}
+
+h2 {
+    font-size: 1.5em;
+    border-bottom: 2px solid #333;
+    padding-bottom: 10px;
+    margin-top: 40px;
+}
+
+h3 {
+    font-size: 1.2em;
+    margin-top: 30px;
+}
+
+p {
+    margin-bottom: 1em;
+}
+
+a {
+    color: #0066cc;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+/* Layout Container */
+.container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: rgba(255, 255, 255, 0.9);
+    /* Slight transparency for readability */
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Header */
+.manual-header {
+    text-align: center;
+    background-color: #e80d0c;
+    color: white;
+    padding: 20px;
+    border-radius: 10px;
+    margin: 0 auto 30px;
+    /* Center horizontally and add bottom margin */
+    width: fit-content;
+    /* Shrink width to fit content */
+}
+
+.manual-header h1 {
+    margin: 10px 0;
+    color: white;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+.manual-header .translator-info {
+    font-size: 0.9em;
+    margin-top: 10px;
+    opacity: 0.9;
+}
+
+.manual-header .translator-info a {
+    color: #fff;
+    text-decoration: underline;
+}
+
+/* Character Section */
+.character-card {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    margin-bottom: 40px;
+    border-bottom: 1px dashed #ccc;
+    padding-bottom: 20px;
+}
+
+.character-card:last-child {
+    border-bottom: none;
+}
+
+.character-img {
+    flex: 0 0 150px;
+    /* Fixed width for image container */
+    text-align: center;
+}
+
+.character-info {
+    flex: 1;
+    min-width: 250px;
+    /* Ensure text doesn't get too squished */
+}
+
+.character-info h3 {
+    margin-top: 0;
+}
+
+/* Menu Image */
+.menu-section {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    align-items: flex-start;
+    background-color: #f9f9f9;
+    padding: 15px;
+    border-radius: 5px;
+}
+
+/* Yaku (Hands) Section */
+.yaku-item {
+    margin-bottom: 30px;
+    padding: 15px;
+    background-color: #fff;
+    border: 1px solid #eee;
+    border-radius: 5px;
+}
+
+.yaku-tiles {
+    margin: 10px 0;
+    line-height: 0;
+    /* Remove gap between images */
+}
+
+.yaku-tiles img {
+    margin-right: 2px;
+    margin-bottom: 5px;
+    /* Wrap spacing */
+}
+
+/* Footer */
+.manual-footer {
+    text-align: center;
+    margin-top: 50px;
+    padding-top: 20px;
+    border-top: 1px solid #ccc;
+    font-size: 0.9em;
+    color: #666;
+}
+
+/* Mobile Adjustments */
+@media (max-width: 600px) {
+    .character-card {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+
+    .character-info {
+        text-align: left;
+        /* Keep text readable */
+    }
+
+    .character-img {
+        margin-bottom: 10px;
+    }
+
+    h1 {
+        font-size: 1.5em;
+    }
+
+    h2 {
+        font-size: 1.3em;
+    }
+}
