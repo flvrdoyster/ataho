@@ -24,57 +24,57 @@
             PLAYER_CONTROL_FORCE: 0.8,   // Force applied by player input (Left/Right arrows or touch)
             FRICTION: 0.90,              // Damping factor for balance velocity (lower = slippery, higher = sticky)
             MAX_VELOCITY: 3.5,           // Maximum speed the character can tilt
-            INERTIA_CONSTANT: 0.0005,    // Force added based on current tilt (makes it harder to recover from large tilts)
-            GRAVITY: 0.6,                // Gravity applied during jumps
+            INERTIA_CONSTANT: 0.0008,    // Force added based on current tilt (makes it harder to recover from large tilts)
+            GRAVITY: 0.4,                // Gravity applied during jumps
             EDGE_THRESHOLD: 0,           // Tilt threshold where "edge resistance" kicks in (0 = disabled)
             EDGE_RESISTANCE: 0.02,       // Force pushing back against the tilt at extreme angles (helper)
             FATIGUE_RATE: 0.005          // Rate at which sway intensity increases over time if perfectly balanced
         },
         JUMP: {
-            CHARGE_TIME: 20,             // Frames required to charge each jump level (hold space)
+            CHARGE_TIME: 60,             // Frames required to charge each jump level (hold space)
             JUMP_COOLDOWN: 20,           // Frames to wait before jumping again
-            DISTANCES: [40, 54, 68],     // Forward distance traveled for each jump level [Level 1, Level 2, Level 3]
-            VELOCITIES: [5, 6, 7],       // Vertical jump velocity (height) for each level
+            DISTANCES: [28, 46, 58],     // Forward distance traveled for each jump level [Level 1, Level 2, Level 3]
+            VELOCITIES: [2, 3, 4],       // Vertical jump velocity (height) for each level
             LANDING_PENALTIES: [5, 10, 15] // Instability added to balance upon landing for each level
         },
         OBSTACLES: {
-            START_DELAY: 100,            // Initial distance before the first obstacle appears
-            MIN_GAP: 32,                 // Minimum gap between obstacle groups
+            START_DELAY: 66,            // Initial distance before the first obstacle appears
+            MIN_GAP: 22,                 // Minimum gap between obstacle groups
             PATTERNS: [                  // Array of obstacle generation patterns
                 { type: 'SINGLE', groups: [{ count: 1, gap: 0 }] },
                 { type: 'DOUBLE_TIGHT', groups: [{ count: 2, gap: 0 }] },
-                { type: 'DOUBLE_LOOSE', groups: [{ count: 2, gap: 32 }] },
+                { type: 'DOUBLE_LOOSE', groups: [{ count: 2, gap: 22 }] },
                 { type: 'TRIPLE', groups: [{ count: 3, gap: 0 }] },
-                { type: 'COMBO_2_2', groups: [{ count: 2, gap: 0 }, { count: 2, gap: 0 }], groupGap: 32 },
-                { type: 'COMBO_1_2', groups: [{ count: 1, gap: 0 }, { count: 2, gap: 0 }], groupGap: 32 },
-                { type: 'COMBO_3_1', groups: [{ count: 3, gap: 0 }, { count: 1, gap: 0 }], groupGap: 32 },
-                { type: 'COMBO_3_2', groups: [{ count: 3, gap: 0 }, { count: 2, gap: 0 }], groupGap: 32 },
-                { type: 'COMBO_3_3', groups: [{ count: 3, gap: 0 }, { count: 3, gap: 0 }], groupGap: 32 }
+                { type: 'COMBO_2_2', groups: [{ count: 2, gap: 0 }, { count: 2, gap: 0 }], groupGap: 22 },
+                { type: 'COMBO_1_2', groups: [{ count: 1, gap: 0 }, { count: 2, gap: 0 }], groupGap: 22 },
+                { type: 'COMBO_3_1', groups: [{ count: 3, gap: 0 }, { count: 1, gap: 0 }], groupGap: 22 },
+                { type: 'COMBO_3_2', groups: [{ count: 3, gap: 0 }, { count: 2, gap: 0 }], groupGap: 22 },
+                { type: 'COMBO_3_3', groups: [{ count: 3, gap: 0 }, { count: 3, gap: 0 }], groupGap: 22 }
             ]
         },
         HITBOXES: {
-            CHAR: { x: 52, y: 98, w: 18, h: 18 }, // Character hitbox relative to sprite [x, y, width, height]
-            OBS: { x: 26, y: 0, w: 18, h: 18 }    // Obstacle hitbox relative to sprite [x, y, width, height]
+            CHAR: { x: 34, y: 64, w: 12, h: 12 }, // Character hitbox relative to sprite [x, y, width, height]
+            OBS: { x: 26, y: 0, w: 16, h: 16 }    // Obstacle hitbox relative to sprite [x, y, width, height]
         },
         SPEED: {
-            GAME: 5                      // Global game speed (pixels per frame)
+            GAME: 2                      // Global game speed (pixels per frame)
         },
         DEBUG: {
-            SHOW_HITBOX: false            // Toggle to show/hide debug hitboxes (red/blue rectangles)
+            SHOW_HITBOX: true            // Toggle to show/hide debug hitboxes (red/blue rectangles)
         }
     };
 
     // CORE CONSTANTS
-    const SCALE_FACTOR = 1.5;
+    const SCALE_FACTOR = 1.0;
     const ANIMATION_FPS_DIVISOR = 10;
     const BALANCE_THRESHOLD = { SLIGHT: 30, MEDIUM: 60, MAX: 100 };
 
     // SPRITE CONSTANTS
     const SPRITE_WIDTH = 80;
     const SPRITE_HEIGHT = 96;
-    const FALLEN_OFFSET_X = 70;
-    const FALLING_OFFSET_X = 30;
-    const FALLEN_OFFSET_Y = 20;
+    const FALLEN_OFFSET_X = 47;
+    const FALLING_OFFSET_X = 20;
+    const FALLEN_OFFSET_Y = 13;
 
     // LAYOUT CONSTANTS
     const TOUCH_DEADZONE = 0.05;
@@ -236,6 +236,10 @@
                     this.jumpVelocityY = 0;
                     this.jumpCooldown = CONFIG.JUMP.JUMP_COOLDOWN;
 
+                    // Prevent auto-walking upon landing (require fresh input)
+                    inputState.down = false;
+                    inputState.up = false;
+
                     // Landing Instability
                     const penalty = CONFIG.JUMP.LANDING_PENALTIES[this.jumpLevel];
                     const direction = Math.random() < 0.5 ? -1 : 1;
@@ -260,7 +264,7 @@
                         const playerHitboxTop = this.y + CONFIG.HITBOXES.CHAR.y;
                         const playerHitboxBottom = this.y + CONFIG.HITBOXES.CHAR.y + CONFIG.HITBOXES.CHAR.h;
 
-                        const obsHitboxTop = obsScreenY + CONFIG.HITBOXES.OBS.y - 5; // Add 5px buffer for landing
+                        const obsHitboxTop = obsScreenY + CONFIG.HITBOXES.OBS.y;
                         const obsHitboxBottom = obsScreenY + CONFIG.HITBOXES.OBS.y + CONFIG.HITBOXES.OBS.h;
 
                         // We land if our feet (hitbox vertical range) overlaps the obstacle's vertical range
