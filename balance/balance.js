@@ -61,7 +61,7 @@
         },
         DEBUG: {
             SHOW_HITBOX: false,           // Toggle to show/hide debug hitboxes (red/blue rectangles)
-            SHOW_MOBILE_CONTROLS: false    // Force show mobile controls for debugging
+            FORCE_MOBILE_MODE: true      // Force mobile mode (UI, controls, score) for debugging
         }
     };
 
@@ -156,6 +156,11 @@
         });
 
         return Promise.all([bgmPromise, overBgmPromise]);
+    }
+
+    // Helper: Check if mobile device
+    function isMobile() {
+        return CONFIG.DEBUG.FORCE_MOBILE_MODE || 'ontouchstart' in window || navigator.maxTouchPoints > 0;
     }
 
     //===========================================
@@ -883,10 +888,32 @@
         }
 
         ctx.font = '24px "Raster Forge", sans-serif';
-        ctx.fillStyle = 'white';
-        ctx.textAlign = 'left';
         ctx.textBaseline = 'top';
-        ctx.fillText(`Score: ${(distanceTraveled / 100).toFixed(2)}`, 20, 20);
+
+        if (isMobile()) {
+            const scoreText = `Score: ${(distanceTraveled / 100).toFixed(2)}`;
+            const textWidth = ctx.measureText(scoreText).width;
+            const padding = 10;
+            const bgX = (canvas.width / 2) - (textWidth / 2) - padding;
+            const bgY = 10;
+            const bgWidth = textWidth + (padding * 2);
+            const bgHeight = 30; // Approx height for 24px font
+
+            // Draw Background
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
+            ctx.beginPath();
+            ctx.roundRect(bgX, bgY, bgWidth, bgHeight, 5);
+            ctx.fill();
+
+            // Draw Text
+            ctx.fillStyle = 'white';
+            ctx.textAlign = 'center';
+            ctx.fillText(scoreText, canvas.width / 2, bgY + padding / 2); // Adjust Y for padding
+        } else {
+            ctx.fillStyle = 'white';
+            ctx.textAlign = 'left';
+            ctx.fillText(`Score: ${(distanceTraveled / 100).toFixed(2)}`, 20, 20);
+        }
 
         if (isGameOver) {
             ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
@@ -937,8 +964,10 @@
     canvas.addEventListener('touchmove', handleTouch, { passive: false });
     canvas.addEventListener('touchend', handleTouchEnd);
 
+    canvas.addEventListener('touchend', handleTouchEnd);
+
     // Mobile Jump Button Injection
-    if (CONFIG.DEBUG.SHOW_MOBILE_CONTROLS || 'ontouchstart' in window || navigator.maxTouchPoints > 0) {
+    if (isMobile()) {
         const jumpBtn = document.createElement('button');
         jumpBtn.id = 'mobile-jump-btn';
         jumpBtn.innerText = 'JUMP';
