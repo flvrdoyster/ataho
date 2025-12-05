@@ -60,8 +60,7 @@
             GAME: 2                      // Global game speed (pixels per frame)
         },
         DEBUG: {
-            SHOW_HITBOX: false,           // Toggle to show/hide debug hitboxes (red/blue rectangles)
-            FORCE_MOBILE_MODE: true      // Force mobile mode (UI, controls, score) for debugging
+            SHOW_HITBOX: false           // Toggle to show/hide debug hitboxes (red/blue rectangles)
         }
     };
 
@@ -147,7 +146,6 @@
 
         const overBgmPromise = new Promise((resolve, reject) => {
             overBgm = new Audio('over.mp3');
-            overBgm.loop = false; // Game Over music usually plays once or loops, user didn't specify, but usually looping is fine or once. Let's loop for now as requested "background music".
             overBgm.loop = true;
             overBgm.volume = 0.5;
             overBgm.addEventListener('canplaythrough', () => resolve(), { once: true });
@@ -156,11 +154,6 @@
         });
 
         return Promise.all([bgmPromise, overBgmPromise]);
-    }
-
-    // Helper: Check if mobile device
-    function isMobile() {
-        return CONFIG.DEBUG.FORCE_MOBILE_MODE || 'ontouchstart' in window || navigator.maxTouchPoints > 0;
     }
 
     //===========================================
@@ -700,8 +693,8 @@
 
         if (isGameOver) return;
 
-        const touchX = e.touches[0].clientX;
-        const touchY = e.touches[0].clientY;
+        const touchX = e.touches ? e.touches[0].clientX : e.clientX;
+        const touchY = e.touches ? e.touches[0].clientY : e.clientY;
 
         const centerX = window.innerWidth / 2;
         const centerY = window.innerHeight / 2;
@@ -723,6 +716,24 @@
         } else if (touchY > screenHeight * TOUCH_LOWER_ZONE) {
             inputState.down = true;
         }
+    };
+
+    // Mouse Simulation for Touch
+    let isMouseDown = false;
+
+    const handleMouseDown = (e) => {
+        isMouseDown = true;
+        handleTouch(e);
+    };
+
+    const handleMouseUp = (e) => {
+        isMouseDown = false;
+        handleTouchEnd(e);
+    };
+
+    const handleMouseMoveTouch = (e) => {
+        if (!isMouseDown) return;
+        handleTouch(e);
     };
 
     const buttons = {
@@ -890,30 +901,24 @@
         ctx.font = '24px "Raster Forge", sans-serif';
         ctx.textBaseline = 'top';
 
-        if (isMobile()) {
-            const scoreText = `Score: ${(distanceTraveled / 100).toFixed(2)}`;
-            const textWidth = ctx.measureText(scoreText).width;
-            const padding = 10;
-            const bgX = (canvas.width / 2) - (textWidth / 2) - padding;
-            const bgY = 10;
-            const bgWidth = textWidth + (padding * 2);
-            const bgHeight = 30; // Approx height for 24px font
+        const scoreText = `Score: ${(distanceTraveled / 100).toFixed(2)}`;
+        const textWidth = ctx.measureText(scoreText).width;
+        const padding = 10;
+        const bgX = (canvas.width / 2) - (textWidth / 2) - padding;
+        const bgY = 10;
+        const bgWidth = textWidth + (padding * 2);
+        const bgHeight = 30; // Approx height for 24px font
 
-            // Draw Background
-            ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
-            ctx.beginPath();
-            ctx.roundRect(bgX, bgY, bgWidth, bgHeight, 5);
-            ctx.fill();
+        // Draw Background
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
+        ctx.beginPath();
+        ctx.roundRect(bgX, bgY, bgWidth, bgHeight, 5);
+        ctx.fill();
 
-            // Draw Text
-            ctx.fillStyle = 'white';
-            ctx.textAlign = 'center';
-            ctx.fillText(scoreText, canvas.width / 2, bgY + padding / 2); // Adjust Y for padding
-        } else {
-            ctx.fillStyle = 'white';
-            ctx.textAlign = 'left';
-            ctx.fillText(`Score: ${(distanceTraveled / 100).toFixed(2)}`, 20, 20);
-        }
+        // Draw Text
+        ctx.fillStyle = 'white';
+        ctx.textAlign = 'center';
+        ctx.fillText(scoreText, canvas.width / 2, bgY + padding / 2); // Adjust Y for padding
 
         if (isGameOver) {
             ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
@@ -959,41 +964,46 @@
     document.addEventListener('keydown', handleKeyDown);
     document.addEventListener('keyup', handleKeyUp);
     canvas.addEventListener('click', handleCanvasClick);
-    canvas.addEventListener('mousemove', handleMouseMove);
+    canvas.addEventListener('mousemove', handleMouseMove); // For cursor style
+
+    // Mouse Touch Simulation
+    canvas.addEventListener('mousedown', handleMouseDown);
+    canvas.addEventListener('mousemove', handleMouseMoveTouch); // For controls
+    canvas.addEventListener('mouseup', handleMouseUp);
+    canvas.addEventListener('mouseleave', handleMouseUp);
+
     canvas.addEventListener('touchstart', handleTouch, { passive: false });
     canvas.addEventListener('touchmove', handleTouch, { passive: false });
     canvas.addEventListener('touchend', handleTouchEnd);
 
     canvas.addEventListener('touchend', handleTouchEnd);
 
-    // Mobile Jump Button Injection
-    if (isMobile()) {
-        const jumpBtn = document.createElement('button');
-        jumpBtn.id = 'mobile-jump-btn';
-        jumpBtn.innerText = 'JUMP';
-        jumpBtn.style.display = 'block'; // Show only on touch devices
-        document.body.appendChild(jumpBtn);
+    // Jump Button Injection (Always Active)
+    const jumpBtn = document.createElement('button');
+    jumpBtn.id = 'mobile-jump-btn';
+    jumpBtn.innerText = 'JUMP';
+    jumpBtn.style.display = 'block';
+    document.body.appendChild(jumpBtn);
 
-        const handleJumpStart = (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            inputState.space = true;
-        };
+    const handleJumpStart = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        inputState.space = true;
+    };
 
-        const handleJumpEnd = (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            inputState.space = false;
-        };
+    const handleJumpEnd = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        inputState.space = false;
+    };
 
-        jumpBtn.addEventListener('touchstart', handleJumpStart, { passive: false });
-        jumpBtn.addEventListener('touchend', handleJumpEnd, { passive: false });
+    jumpBtn.addEventListener('touchstart', handleJumpStart, { passive: false });
+    jumpBtn.addEventListener('touchend', handleJumpEnd, { passive: false });
 
-        // For desktop testing
-        jumpBtn.addEventListener('mousedown', handleJumpStart);
-        jumpBtn.addEventListener('mouseup', handleJumpEnd);
-        jumpBtn.addEventListener('mouseleave', handleJumpEnd);
-    }
+    // Mouse events for desktop
+    jumpBtn.addEventListener('mousedown', handleJumpStart);
+    jumpBtn.addEventListener('mouseup', handleJumpEnd);
+    jumpBtn.addEventListener('mouseleave', handleJumpEnd);
 
     Promise.all([loadImages(), loadFonts(), loadAudio()]).then(() => {
         // Optimization: Pre-render Red Spike
