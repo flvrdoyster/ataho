@@ -16,6 +16,10 @@ body {
     font-family: 'KoddiudOngodic', sans-serif;
 }
 
+hr {
+    margin: 40px 0;
+}
+
 #header {
     text-align: center;
 }
