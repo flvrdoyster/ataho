@@ -60,7 +60,7 @@
             GAME: 2                      // Global game speed (pixels per frame)
         },
         DEBUG: {
-            SHOW_HITBOX: true            // Toggle to show/hide debug hitboxes (red/blue rectangles)
+            SHOW_HITBOX: false            // Toggle to show/hide debug hitboxes (red/blue rectangles)
         }
     };
 
@@ -819,14 +819,20 @@
 
                 let midDrawY = currentDrawY + images.beamStart.height;
 
-                if (midDrawY < -images.beamMid.height) {
-                    const skipCount = Math.ceil((-images.beamMid.height - midDrawY) / images.beamMid.height);
-                    midDrawY += skipCount * images.beamMid.height;
-                }
-
-                while (midDrawY < canvas.height) {
-                    ctx.drawImage(images.beamMid, beamStartX, Math.floor(midDrawY));
-                    midDrawY += images.beamMid.height;
+                if (images.beamMidPattern) {
+                    ctx.save();
+                    ctx.translate(beamStartX, Math.floor(midDrawY));
+                    ctx.fillStyle = images.beamMidPattern;
+                    const heightNeeded = canvas.height - midDrawY;
+                    if (heightNeeded > 0) {
+                        ctx.fillRect(0, 0, images.beamMid.width, heightNeeded);
+                    }
+                    ctx.restore();
+                } else {
+                    while (midDrawY < canvas.height) {
+                        ctx.drawImage(images.beamMid, beamStartX, Math.floor(midDrawY));
+                        midDrawY += images.beamMid.height;
+                    }
                 }
             }
 
@@ -845,14 +851,12 @@
                     const drawY = startY - distanceTraveled + obs.y;
 
                     if (drawY > -images.beamSpike.height && drawY < canvas.height) {
-                        if (obs.causedDeath) {
-                            ctx.save();
-                            ctx.filter = 'sepia(1) hue-rotate(-50deg) saturate(5) brightness(0.8)'; // Red tint
+                        let spriteToDraw = images.beamSpike;
+                        if (obs.causedDeath && images.beamSpikeRed) {
+                            spriteToDraw = images.beamSpikeRed;
                         }
-                        ctx.drawImage(images.beamSpike, spikeX, drawY);
-                        if (obs.causedDeath) {
-                            ctx.restore();
-                        }
+
+                        ctx.drawImage(spriteToDraw, spikeX, drawY);
 
                         // Debug Hitbox
                         if (CONFIG.DEBUG.SHOW_HITBOX) {
@@ -933,6 +937,22 @@
     canvas.addEventListener('touchend', handleTouchEnd);
 
     Promise.all([loadImages(), loadFonts(), loadAudio()]).then(() => {
+        // Optimization: Pre-render Red Spike
+        if (images.beamSpike) {
+            const offCanvas = document.createElement('canvas');
+            offCanvas.width = images.beamSpike.width;
+            offCanvas.height = images.beamSpike.height;
+            const offCtx = offCanvas.getContext('2d');
+            offCtx.filter = 'sepia(1) hue-rotate(-50deg) saturate(5) brightness(0.8)';
+            offCtx.drawImage(images.beamSpike, 0, 0);
+            images.beamSpikeRed = offCanvas;
+        }
+
+        // Optimization: Create Beam Pattern
+        if (images.beamMid) {
+            images.beamMidPattern = ctx.createPattern(images.beamMid, 'repeat-y');
+        }
+
         console.log('모든 이미지, 폰트, 오디오 로드 완료. 게임 시작!');
 
         // Try to play music immediately
