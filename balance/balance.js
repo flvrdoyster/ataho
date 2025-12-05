@@ -60,7 +60,8 @@
             GAME: 2                      // Global game speed (pixels per frame)
         },
         DEBUG: {
-            SHOW_HITBOX: false            // Toggle to show/hide debug hitboxes (red/blue rectangles)
+            SHOW_HITBOX: false,           // Toggle to show/hide debug hitboxes (red/blue rectangles)
+            SHOW_MOBILE_CONTROLS: false    // Force show mobile controls for debugging
         }
     };
 
@@ -937,24 +938,32 @@
     canvas.addEventListener('touchend', handleTouchEnd);
 
     // Mobile Jump Button Injection
-    if ('ontouchstart' in window || navigator.maxTouchPoints > 0) {
+    if (CONFIG.DEBUG.SHOW_MOBILE_CONTROLS || 'ontouchstart' in window || navigator.maxTouchPoints > 0) {
         const jumpBtn = document.createElement('button');
         jumpBtn.id = 'mobile-jump-btn';
         jumpBtn.innerText = 'JUMP';
         jumpBtn.style.display = 'block'; // Show only on touch devices
         document.body.appendChild(jumpBtn);
 
-        jumpBtn.addEventListener('touchstart', (e) => {
-            e.preventDefault(); // Prevent default touch behavior (scrolling/zooming)
-            e.stopPropagation(); // Stop propagation to canvas
+        const handleJumpStart = (e) => {
+            e.preventDefault();
+            e.stopPropagation();
             inputState.space = true;
-        }, { passive: false });
+        };
 
-        jumpBtn.addEventListener('touchend', (e) => {
+        const handleJumpEnd = (e) => {
             e.preventDefault();
             e.stopPropagation();
             inputState.space = false;
-        }, { passive: false });
+        };
+
+        jumpBtn.addEventListener('touchstart', handleJumpStart, { passive: false });
+        jumpBtn.addEventListener('touchend', handleJumpEnd, { passive: false });
+
+        // For desktop testing
+        jumpBtn.addEventListener('mousedown', handleJumpStart);
+        jumpBtn.addEventListener('mouseup', handleJumpEnd);
+        jumpBtn.addEventListener('mouseleave', handleJumpEnd);
     }
 
     Promise.all([loadImages(), loadFonts(), loadAudio()]).then(() => {
