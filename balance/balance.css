@@ -1,9 +1,10 @@
 body {
     display: flex;
+    /* Use Flexbox layout to easily center content */
     justify-content: center;
-    align-items: center;
-    height: 100vh;
+    /* Center content horizontally (left-right) */
     margin: 0;
+    /* Remove default browser margin */
     background-color: #f0f0f0;
 }
 
@@ -12,18 +13,17 @@ canvas {
     background-color: #fff;
 }
 
-/* Mobile Controls */
 #mobile-jump-btn {
     display: none;
     position: fixed;
-    bottom: 80px;
+    bottom: 40px;
     left: 50%;
     transform: translateX(-50%);
     width: 80px;
     height: 80px;
     border-radius: 50%;
-    background: rgba(255, 255, 255, 0.2);
-    border: 2px solid rgba(255, 255, 255, 0.5);
+    background: rgba(0, 0, 0, 0.2);
+    border: 2px solid rgba(0, 0, 0, 0.5);
     color: white;
     font-family: 'Raster Forge', sans-serif;
     font-size: 16px;
@@ -34,6 +34,6 @@ canvas {
 }
 
 #mobile-jump-btn:active {
-    background: rgba(255, 255, 255, 0.4);
+    background: rgba(0, 0, 0, 0.4);
     transform: translateX(-50%) scale(0.95);
 }
