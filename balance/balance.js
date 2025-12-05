@@ -436,6 +436,8 @@
                         overBgm.currentTime = 0;
                         overBgm.play().catch(e => console.log('Over BGM play failed', e));
                     }
+                    const jumpBtn = document.getElementById('mobile-jump-btn');
+                    if (jumpBtn) jumpBtn.style.display = 'none';
                 }
             }
 
@@ -562,6 +564,9 @@
 
         // byFrame() is already running continuously, so we don't need to call it here.
         // Calling it would create a duplicate loop (double speed).
+
+        const jumpBtn = document.getElementById('mobile-jump-btn');
+        if (jumpBtn) jumpBtn.style.display = 'block';
     }
 
     function isClickInsideButton(clickX, clickY, button) {
