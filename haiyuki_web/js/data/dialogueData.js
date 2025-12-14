@@ -381,11 +381,101 @@ const DialogueData = {
         { speaker: "mayu", text: "캬아~앙!!", speakerState: '', listenerState: '' }
     ],
 
+
     // ----------------------------------------------------------------
-    // 4. Default Fallbacks
+    // 4. Battle Dialogues (In-Game)
     // ----------------------------------------------------------------
-    "default": [
-        { speaker: 'p1', text: "자, 승부다!", speakerState: '', listenerState: '' },
-        { speaker: 'cpu', text: "지지 않아!", speakerState: '', listenerState: '' }
-    ]
+    // Format: "KEY": ["Dialog Option 1", "Option 2", ...],
+    // The game picks one random line from the array.
+    // Keys: PON, PON_REPLY, RIICHI, RIICHI_REPLY, WIN, LOSE, RANDOM, DAMAGED
+    BATTLE: {
+        // Default / Safe Fallback
+        default: {
+            PON: [],
+            PON_REPLY: [],
+            RIICHI: [],
+            RIICHI_REPLY: [],
+            WIN: [],
+            LOSE: [],
+            RANDOM: [],
+            DAMAGED: []
+        },
+        // Ataho
+        ataho: {
+            PON: [],
+            PON_REPLY: [],
+            RIICHI: [],
+            RIICHI_REPLY: [],
+            WIN: [],
+            LOSE: [],
+            RANDOM: [],
+            DAMAGED: []
+        },
+        // Rinxiang
+        rinxiang: {
+            PON: [],
+            PON_REPLY: [],
+            RIICHI: [],
+            RIICHI_REPLY: [],
+            WIN: [],
+            LOSE: [],
+            RANDOM: [],
+            DAMAGED: []
+        },
+        // Smash
+        smash: {
+            PON: [],
+            PON_REPLY: [],
+            RIICHI: [],
+            RIICHI_REPLY: [],
+            WIN: [],
+            LOSE: [],
+            RANDOM: [],
+            DAMAGED: []
+        },
+        // Petum
+        petum: {
+            PON: [],
+            PON_REPLY: [],
+            RIICHI: [],
+            RIICHI_REPLY: [],
+            WIN: [],
+            LOSE: [],
+            RANDOM: [],
+            DAMAGED: []
+        },
+        // Fari
+        fari: {
+            PON: [],
+            PON_REPLY: [],
+            RIICHI: [],
+            RIICHI_REPLY: [],
+            WIN: [],
+            LOSE: [],
+            RANDOM: [],
+            DAMAGED: []
+        },
+        // Yuriwakamaru
+        yuri: {
+            PON: [],
+            PON_REPLY: [],
+            RIICHI: [],
+            RIICHI_REPLY: [],
+            WIN: [],
+            LOSE: [],
+            RANDOM: [],
+            DAMAGED: []
+        },
+        // Mayu
+        mayu: {
+            PON: [],
+            PON_REPLY: [],
+            RIICHI: [],
+            RIICHI_REPLY: [],
+            WIN: [],
+            LOSE: [],
+            RANDOM: [],
+            DAMAGED: []
+        }
+    }
 };
