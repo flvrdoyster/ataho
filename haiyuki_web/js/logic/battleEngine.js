@@ -494,7 +494,7 @@ const BattleEngine = {
                 this.sequencing.currentStep++;
             }
         } else if (step.type === 'FX') {
-            this.playFX(step.asset, step.x, step.y, { scale: step.scale, slideFrom: step.slideFrom });
+            this.playFX(step.asset, step.x, step.y, { scale: step.scale, slideFrom: step.slideFrom, popupType: step.popupType, blocking: step.blocking });
             this.sequencing.currentStep++;
         } else if (step.type === 'FX_PARALLEL') {
             step.items.forEach(item => {
@@ -1126,7 +1126,7 @@ const BattleEngine = {
                     timer: 0,
                     currentStep: 0,
                     steps: [
-                        { type: 'FX', asset: 'fx/riichi', x: BattleConfig.POPUP.x, y: BattleConfig.POPUP.y, anim: 'SLIDE', slideFrom: 'RIGHT', scale: 1.0 },
+                        { type: 'FX', asset: 'fx/riichi', x: BattleConfig.POPUP.x, y: BattleConfig.POPUP.y, anim: 'SLIDE', slideFrom: 'RIGHT', scale: 1.0, popupType: 'RIICHI', blocking: true },
                         { type: 'MUSIC', id: 'audio/bgm_tension', loop: true }, // Music update handled here
                         { type: 'WAIT', duration: 60 },
                         {
@@ -1172,7 +1172,8 @@ const BattleEngine = {
         }
 
         // Dialogue Trigger (Random or Worry)
-        if (!this.dialogueTriggeredThisTurn && this.turnCount < 20) {
+        // Suppress random dialogue if CPU is Riichi (Silent Focus)
+        if (!this.dialogueTriggeredThisTurn && this.turnCount < 20 && !this.cpu.isRiichi) {
             if (this.p1.isRiichi) {
                 if (Math.random() < BattleConfig.DIALOGUE.CHANCE.WORRY_RON) this.triggerDialogue('WORRY_RON', 'cpu');
             } else {
@@ -1587,7 +1588,7 @@ const BattleEngine = {
                 this.p1.isRiichi = true;
                 this.p1.declaringRiichi = true;
                 this.showPopup('RIICHI', { blocking: true, slideFrom: 'LEFT' });
-                this.events.push({ type: 'SOUND', id: 'audio/riichi' });
+                // Sound handled by showPopup -> View (popupType check)
                 this.updateBattleMusic();
                 this.discardTile(riichiDiscardIndex);
                 return;
