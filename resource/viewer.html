@@ -225,9 +225,11 @@
     <script src="manifest.js"></script>
 
     <!-- MIDI Player Support -->
-    <!-- MIDI Player Support -->
-    <script
-        src="https://cdn.jsdelivr.net/combined/npm/tone@14.7.58,npm/@magenta/music@1.23.1/es6/core.js,npm/focus-visible@5,npm/html-midi-player@1.5.0"></script>
+    <!-- MIDI Player Support - Separate Scripts for Reliability -->
+    <script src="https://cdn.jsdelivr.net/npm/tone@14.7.58/build/Tone.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@magenta/music@1.23.1/es6/core.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/html-midi-player@1.5.0/dist/midi-player.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/html-midi-player@1.5.0/dist/midi-visualizer.min.js"></script>
 
     <script>
         const galleryImages = document.getElementById('gallery-images');
@@ -354,11 +356,16 @@
                                 <div>${filename}</div>
                                 <midi-player 
                                     src="${src}" 
-                                    sound-font="https://storage.googleapis.com/magentadata/js/soundfonts/sgm_plus" 
-                                    visualizer="#vis-${cleanFilename}">
+                                    sound-font="https://storage.googleapis.com/magentadata/js/soundfonts/sgm_plus">
                                 </midi-player>
                             </div>
                         `;
+                        // Log errors
+                        const player = card.querySelector('midi-player');
+                        if (player) {
+                            player.addEventListener('error', (e) => console.error('MIDI Player Error:', e));
+                            player.addEventListener('load', () => console.log('MIDI loaded:', src));
+                        }
                         // Prevent lightbox
                         card.addEventListener('click', (e) => e.stopPropagation());
                         galleryAudio.appendChild(card);
