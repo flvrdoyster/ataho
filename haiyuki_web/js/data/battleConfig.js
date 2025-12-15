@@ -5,6 +5,9 @@ const FONTS = {
 };
 
 const BattleConfig = {
+    // ----------------------------------------------------------------
+    // 1. Core Settings
+    // ----------------------------------------------------------------
     GAME_ID: 'HAIYUKI_WEB',
     SCREEN: {
         width: 640,
@@ -26,6 +29,10 @@ const BattleConfig = {
         //             Action: Standard profile chance (Optimal)
         AI_DIFFICULTY: 2
     },
+
+    // ----------------------------------------------------------------
+    // 2. Visuals & Animation
+    // ----------------------------------------------------------------
     UI_BG: { path: 'bg/GAMEBG.png', color: '#225522' },
     BG: { prefix: 'bg/', min: 0, max: 11, x: 320, y: 220, align: 'center' },
     PORTRAIT: {
@@ -34,6 +41,78 @@ const BattleConfig = {
         baseW: 264,
         baseH: 280
     },
+    ANIMATION: {
+        BLINK_SPEED: 4,       // Frames per blink frame
+        TALK_SPEED: 10,        // Frames per mouth frame
+        BLINK_INTERVAL: 200    // Interval between blinks (frames)
+    },
+    FX: {
+        // Generic FX Animation Settings
+        fadeInDuration: 4,  // Frames to fade in
+        fadeOutDuration: 12, // Frames to fade out
+        slideDuration: 10,   // Frames for slide animation
+
+        // ZOOM_IN (Pop) Settings
+        zoomPopDuration: 16,
+        zoomOvershoot: 2.0,
+
+        // BOUNCE_UP Settings
+        bounceDropDuration: 10,
+        bounceUpDuration: 10,
+        bounceStartOffsetX: -200,
+        bounceStartOffsetY: -200,
+        bounceImpactOffsetX: -30,
+        bounceFloorOffsetY: 80
+    },
+
+    // ----------------------------------------------------------------
+    // 3. Table Elements
+    // ----------------------------------------------------------------
+    HAND: {
+        playerY: 410,     // Unified Player Hand Y Position
+        openSetRightAnchor: 620, // Right padding/anchor for open sets
+        cpuY: 10,
+        tileWidth: 40,
+        tileHeight: 53,
+        // Spacing
+        tileGap: 0,       // Standard gap between tiles
+        drawGap: 10,      // Gap for newly drawn tile
+        sectionGap: 10,   // Gap between Hand and Open Sets
+
+        hoverYOffset: -10,
+        hoverColor: '#ffaa00',
+        hoverColors: ['#ffaa00', '#9cc041', '#b4dcff'],
+        hoverBlinkSpeed: 8,
+        hoverWidth: 3
+    },
+    DISCARDS: {
+        P1: { x: 214, y: 280 },
+        CPU: { x: 214, y: 100 },
+        tileWidth: 20,
+        tileHeight: 27,
+        gap: 2,
+        rowMax: 10
+    },
+    DORA: {
+        x: 320, y: 180, // x is now center if align is center
+        gap: 5,
+        align: 'center',
+        tileWidth: 40,
+        tileHeight: 53,
+        tileXOffset: 10, // New: Tile X alignment relative to frame
+        tileYOffset: -6, // New: Tile Y alignment relative to frame
+        frame: { path: 'ui/dora.png', xOffset: 0, yOffset: 40, align: 'center' }
+    },
+    RIICHI_STICK: {
+        path: 'ui/riichi.png',
+        y: 246,
+        offset: 58,            // Distance from Center (Dora)
+        scale: 0.9
+    },
+
+    // ----------------------------------------------------------------
+    // 4. UI / HUD
+    // ----------------------------------------------------------------
     NAME_DISPLAY: {
         font: `bold 28px ${FONTS.bold}`,
         color: '#4848c7', // Text fill color
@@ -50,35 +129,6 @@ const BattleConfig = {
         CPU: { x: 459, y: 347 },
         gap: 8, // Gap between HP and MP bars
     },
-    HAND: {
-        y: 400,
-        playerHandY: 400, // Fixed Y for player hand
-        openSetY: 400,    // Align with player hand Y
-        openSetRightAnchor: 620, // Right padding/anchor for open sets
-        cpuY: 10,
-        tileWidth: 40,
-        tileHeight: 53,
-        gap: 0,
-        hoverYOffset: -10,
-        hoverColor: '#ffaa00',
-        hoverColors: ['#ffaa00', '#9cc041', '#b4dcff'],
-        hoverBlinkSpeed: 8,
-        hoverWidth: 3,
-        groupGap: 10,
-        // Open Set specific settings
-        openSetTileGap: 0, // Gap between tiles within a set (e.g. Pon)
-        openSetGap: 10     // Gap between open sets or between hand and open sets
-    },
-    DORA: {
-        x: 320, y: 180, // x is now center if align is center
-        gap: 5,
-        align: 'center',
-        tileWidth: 40,
-        tileHeight: 53,
-        tileXOffset: 10, // New: Tile X alignment relative to frame
-        tileYOffset: -6, // New: Tile Y alignment relative to frame
-        frame: { path: 'ui/dora.png', xOffset: 0, yOffset: 40, align: 'center' }
-    },
     INFO: {
         // Center-Relative Offsets (Center = 320)
         // Turn = Center - Offset
@@ -93,12 +143,42 @@ const BattleConfig = {
             roundPath: 'ui/round.png'
         }
     },
-    RIICHI_STICK: {
-        path: 'ui/riichi.png',
-        y: 246,
-        offset: 58,            // Distance from Center (Dora)
-        scale: 0.9
+    DIALOGUE: {
+        bubblePath: 'ui/short_bubble.png',
+        font: `18px ${FONTS.regular}`,
+        color: 'white',
+        lineHeight: 20, // Added for multi-line support
+        life: 180, // Duration in frames
+        replyDelay: 360, // Response delay in ms
+        P1: { offsetX: -20, offsetY: -86, textOffsetX: 20, textOffsetY: 0 },
+        CPU: { offsetX: 20, offsetY: 86, textOffsetX: -20, textOffsetY: 0 },
+        CHANCE: {
+            RANDOM: 0.3,      // Chance for random dialogue (0.0 - 1.0)
+            WORRY_RON: 0.6    // Chance for worry dialogue when player is Riichi
+        }
     },
+    POPUP: {
+        // Configuration for Action Callouts (Riichi, Pon, Ron, Tsumo, Nagari)
+        // These use the FX system but are positioned according to these settings.
+        x: 320,
+        y: 200,
+        scale: 1.0,
+        life: 45, // Default Life
+        align: 'center',
+
+        // Sound mapping for Popups
+        TYPES: {
+            'RIICHI': { life: 80, anim: 'SLIDE', scale: 1.0, sound: 'audio/riichi' },
+            'PON': { life: 40, scale: 1.0, anim: 'BOUNCE_UP', sound: 'audio/pon' },
+            'RON': { life: 40, scale: 1.0, anim: 'ZOOM_IN', sound: 'audio/gong' },
+            'TSUMO': { life: 40, scale: 1.0, anim: 'ZOOM_IN', sound: 'audio/gong' },
+            'NAGARI': { life: 80, scale: 1.0, anim: 'ZOOM_IN', sound: 'audio/deal' }
+        }
+    },
+
+    // ----------------------------------------------------------------
+    // 5. Menus & Interaction
+    // ----------------------------------------------------------------
     ACTION: {
         // Menu Layout
         y: 320,
@@ -123,48 +203,48 @@ const BattleConfig = {
         colors: {
         }
     },
-    POPUP: {
-        // Configuration for Action Callouts (Riichi, Pon, Ron, Tsumo, Nagari)
-        // These use the FX system but are positioned according to these settings.
-        x: 320,
-        y: 200,
-        scale: 1.0,
-        life: 45, // Default Life
-        align: 'center',
-
-        // Sound mapping for Popups
-        TYPES: {
-            'RIICHI': { life: 80, anim: 'SLIDE', scale: 1.0, sound: 'audio/riichi' },
-            'PON': { life: 40, scale: 1.0, anim: 'BOUNCE_UP', sound: 'audio/pon' },
-            'RON': { life: 40, scale: 1.0, anim: 'ZOOM_IN', sound: 'audio/gong' },
-            'TSUMO': { life: 40, scale: 1.0, anim: 'ZOOM_IN', sound: 'audio/gong' },
-            'NAGARI': { life: 80, scale: 1.0, anim: 'ZOOM_IN', sound: 'audio/deal' }
-        }
+    DRAW_BUTTON: {
+        x: 500,
+        y: 400,
+        w: 100,
+        h: 36,
+        text: "패 가져오기",
+        font: `bold 16px ${FONTS.bold}`,
+        dimmer: 'rgba(0, 0, 0, 0.5)',
+        cursor: 'rgba(255, 105, 180, 0.5)',
+        textColor: 'white'
     },
-    FX: {
-        // Generic FX Animation Settings
-        fadeInDuration: 3,  // Frames to fade in
-        fadeOutDuration: 3, // Frames to fade out
-        slideDuration: 6,   // Frames for slide animation
-        zoomPulseDuration: 3, // Frames for initial zoom pulse 
-        zoomSettleDuration: 3, // Frames for settling 
-        zoomPeakScale: 1.2   // Peak scale factor
-    },
-    DIALOGUE: {
-        bubblePath: 'ui/short_bubble.png',
-        font: `18px ${FONTS.regular}`,
-        color: 'white',
-        lineHeight: 20, // Added for multi-line support
-        life: 120, // Duration in frames
-        replyDelay: 600, // Response delay in ms
-        P1: { offsetX: -20, offsetY: -86, textOffsetX: 20, textOffsetY: 0 },
-        CPU: { offsetX: 20, offsetY: 86, textOffsetX: -20, textOffsetY: 0 }
+    BATTLE_MENU: {
+        w: 140,
+        h: 150,
+        x: 500, // 640 - 140
+        y: 330, // 480 - 150
+        font: `bold 16px ${FONTS.bold}`,
+        textDefault: 'white',
+        textSelected: '#FFFF00',
+        cursor: 'rgba(255, 105, 180, 0.5)', // HotPink 0.5
+        dimmer: 'rgba(0, 0, 0, 0.5)',
+        padding: 2, // Increased padding for 9-slice look
+        textOffsetX: 8,
+        textOffsetY: 2,
+        fixedLineHeight: 24, // Fixed height per item
+        separatorHeight: 8, // Height for separator items
+        cursorYOffset: -6,
+
+        // Menu Layout Definition
+        layout: [
+            { id: 'AUTO', label: '자동 선택' },
+            { id: 'RESTART', label: '다시 시작' },
+            { type: 'SEPARATOR' },
+            { id: 'SKILLS_PLACEHOLDER' }, // Insert Skills Here
+            { type: 'SEPARATOR' },
+            { id: 'HELP', label: '역 일람' }
+        ]
     },
 
-    // Legacy Sound map
-    SOUNDS: {},
-
-    // Global Audio Configuration
+    // ----------------------------------------------------------------
+    // 6. Audio
+    // ----------------------------------------------------------------
     AUDIO: {
         // Generic Battle Sounds
         DRAW: 'audio/draw',
@@ -172,8 +252,6 @@ const BattleConfig = {
         HIT: 'audio/hit', // Default hit sound
         DAMAGE: 'audio/hit', // Used if specific damage sound needed
     },
-
-    // Background Music Configuration
     BGM: {
         BASIC: 'audio/bgm_basic',
         TENSION: 'audio/bgm_tension',
@@ -184,7 +262,12 @@ const BattleConfig = {
         TITLE: 'audio/bgm_title',
         CHRSEL: 'audio/bgm_chrsel'
     },
+    // Legacy Sound map
+    SOUNDS: {},
 
+    // ----------------------------------------------------------------
+    // 7. Result Screen
+    // ----------------------------------------------------------------
     RESULT: {
         // --- Window Configuration ---
         x: 120, y: 90, w: 400, h: 300,
@@ -263,8 +346,9 @@ const BattleConfig = {
         }
     },
 
-
-
+    // ----------------------------------------------------------------
+    // 8. Data & Texts
+    // ----------------------------------------------------------------
     // Yaku Names for Configuration
     YAKU_NAMES: {
         IP_E_DAM: '입에 담을 수도 없는 엄청난 기술',
@@ -351,51 +435,5 @@ const BattleConfig = {
         cardBackPattern: '#880000',
         unknownBg: '#444',
         unknownStroke: '#888'
-    },
-    DISCARDS: {
-        P1: { x: 214, y: 280 },
-        CPU: { x: 214, y: 100 },
-        tileWidth: 20,
-        tileHeight: 27,
-        gap: 2,
-        rowMax: 10
-    },
-    DRAW_BUTTON: {
-        x: 270,
-        y: 190,
-        w: 100,
-        h: 40,
-        text: "패 가져오기",
-        font: `bold 16px ${FONTS.bold}`,
-        dimmer: 'rgba(0, 0, 0, 0.5)',
-        cursor: 'rgba(255, 105, 180, 0.5)',
-        textColor: 'white'
-    },
-    BATTLE_MENU: {
-        w: 140,
-        h: 150,
-        x: 500, // 640 - 140
-        y: 330, // 480 - 150
-        font: `bold 16px ${FONTS.bold}`,
-        textDefault: 'white',
-        textSelected: '#FFFF00',
-        cursor: 'rgba(255, 105, 180, 0.5)', // HotPink 0.5
-        dimmer: 'rgba(0, 0, 0, 0.5)',
-        padding: 2, // Increased padding for 9-slice look
-        textOffsetX: 8,
-        textOffsetY: 2,
-        fixedLineHeight: 24, // Fixed height per item
-        separatorHeight: 8, // Height for separator items
-        cursorYOffset: -6,
-
-        // Menu Layout Definition
-        layout: [
-            { id: 'AUTO', label: '자동 선택' },
-            { id: 'RESTART', label: '다시 시작' },
-            { type: 'SEPARATOR' },
-            { id: 'SKILLS_PLACEHOLDER' }, // Insert Skills Here
-            { type: 'SEPARATOR' },
-            { id: 'HELP', label: '역 일람' }
-        ]
     }
 };
