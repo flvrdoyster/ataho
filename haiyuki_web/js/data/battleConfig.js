@@ -29,6 +29,10 @@ const BattleConfig = {
         //             Action: Standard profile chance (Optimal)
         AI_DIFFICULTY: 2
     },
+    SPEED: {
+        RIICHI_AUTO_DISCARD: 40, // Frames to wait before auto-discarding in Riichi
+        CPU_THINK_TIME: 80       // Frames to wait for CPU action
+    },
 
     // ----------------------------------------------------------------
     // 2. Visuals & Animation
@@ -50,7 +54,7 @@ const BattleConfig = {
         // Generic FX Animation Settings
         fadeInDuration: 4,  // Frames to fade in
         fadeOutDuration: 12, // Frames to fade out
-        slideDuration: 10,   // Frames for slide animation
+        slideDuration: 20,   // Frames for slide animation
 
         // ZOOM_IN (Pop) Settings
         zoomPopDuration: 16,
@@ -325,7 +329,7 @@ const BattleConfig = {
                 sound: "audio/wrong" // Configurable Sound
             },
             MATCH_WIN: {
-                title: "다음 상대로!",
+                title: "{winner} 승리!",
                 color: "gold",
                 sound: "audio/victory", // Configurable Sound
                 historyFont: `16px ${FONTS.regular}`,

@@ -119,7 +119,8 @@ const BattleEngine = {
 
     dialogueTriggeredThisTurn: false,
 
-    init: function (data) {
+    init: function (data, scene) {
+        this.scene = scene;
         // Prevent Context Menu on Canvas (Right Click)
         const canvas = document.querySelector('canvas');
         if (canvas) {
@@ -828,7 +829,7 @@ const BattleEngine = {
 
         // RIICHI AUTO-PLAY LOGIC (Normal Game)
         // Only if NOT declaring Riichi (User Manual Discard)
-        if (!Game.isAutoTest && this.p1.isRiichi && !this.p1.declaringRiichi && this.currentState === this.STATE_PLAYER_TURN && this.timer > 20) {
+        if (!Game.isAutoTest && this.p1.isRiichi && !this.p1.declaringRiichi && this.currentState === this.STATE_PLAYER_TURN && this.timer > BattleConfig.SPEED.RIICHI_AUTO_DISCARD) {
             this.discardTile(this.p1.hand.length - 1);
             return;
         }
@@ -1171,7 +1172,7 @@ const BattleEngine = {
         }
 
         // Dialogue Trigger (Random or Worry)
-        if (!this.dialogueTriggeredThisTurn) {
+        if (!this.dialogueTriggeredThisTurn && this.turnCount < 20) {
             if (this.p1.isRiichi) {
                 if (Math.random() < BattleConfig.DIALOGUE.CHANCE.WORRY_RON) this.triggerDialogue('WORRY_RON', 'cpu');
             } else {
@@ -1314,7 +1315,8 @@ const BattleEngine = {
         // Require at least 3 tiles in hand to Pon (need 1 tile left to discard)
         if (pairCount >= 2 && !this.cpu.isRiichi && this.cpu.hand.length >= 3) {
             const difficulty = BattleConfig.RULES.AI_DIFFICULTY;
-            if (AILogic.shouldPon(this.cpu.hand, discardedTile, difficulty, this.cpu.aiProfile)) {
+            const context = { isMenzen: this.cpu.isMenzen, turnCount: this.turnCount };
+            if (AILogic.shouldPon(this.cpu.hand, discardedTile, difficulty, this.cpu.aiProfile, context)) {
                 this.executeCpuPon(discardedTile);
                 return true;
             }
@@ -1407,6 +1409,12 @@ const BattleEngine = {
                 this.currentState = this.STATE_CPU_TURN;
                 this.timer = 30; // Short delay before discard
                 this.cpu.needsToDiscard = true; // Fix: Prevent Drawing on next turn
+
+                // Trigger Dialogue (PON)
+                this.triggerDialogue('PON', 'cpu');
+                // Set flag to inhibit Random/Worry dialogue on discard
+                this.dialogueTriggeredThisTurn = true;
+
             }
         }, 450);
     },
@@ -1670,6 +1678,7 @@ const BattleEngine = {
 
                     // Dialogue
                     this.triggerDialogue('PON', 'p1');
+                    this.dialogueTriggeredThisTurn = true;
                     setTimeout(() => {
                         this.triggerDialogue('PON_REPLY', 'cpu');
                     }, BattleConfig.DIALOGUE.replyDelay);
