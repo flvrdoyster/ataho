@@ -225,8 +225,9 @@
     <script src="manifest.js"></script>
 
     <!-- MIDI Player Support -->
-    <script
-        src="https://cdn.jsdelivr.net/combined/npm/tone@14.7.58,npm/@magenta/music@1.23.1/es6/core.js,npm/focus-visible@5,npm/html-midi-player@1.5.0"></script>
+    <!-- MIDI Player Support -->
+    <script src="https://cdn.jsdelivr.net/npm/@magenta/music@1.23.1/es6/core.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/html-midi-player@1.5.0"></script>
 
     <script>
         const galleryImages = document.getElementById('gallery-images');
@@ -343,9 +344,8 @@
                         card.innerHTML = `
                             <div class="info">
                                 <div>${filename}</div>
-                                <midi-player
-                                    src="${src}"
-                                    sound-font="https://storage.googleapis.com/magentadata/js/soundfonts/sgm_plus"
+                                <midi-player 
+                                    src="${src}" 
                                     visualizer="#vis-${cleanFilename}">
                                 </midi-player>
                             </div>
