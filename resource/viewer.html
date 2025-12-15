@@ -268,6 +268,14 @@
 
         // Initialize
         window.addEventListener('DOMContentLoaded', () => {
+            // Fix: AudioContext might be suspended. Resume on first interaction.
+            document.body.addEventListener('click', async () => {
+                if (window.Tone && window.Tone.context.state !== 'running') {
+                    await window.Tone.context.resume();
+                    console.log('AudioContext resumed');
+                }
+            }, { once: true });
+
             if (typeof RESOURCE_MANIFEST === 'undefined' || !Array.isArray(RESOURCE_MANIFEST)) {
                 galleryImages.innerHTML = '<div class="status-msg">Error: <code>manifest.js</code> not found or invalid.<br>Please ensure manifest.js exists in the same directory.</div>';
                 return;
@@ -346,6 +354,7 @@
                                 <div>${filename}</div>
                                 <midi-player 
                                     src="${src}" 
+                                    sound-font="https://storage.googleapis.com/magentadata/js/soundfonts/sgm_plus" 
                                     visualizer="#vis-${cleanFilename}">
                                 </midi-player>
                             </div>
