@@ -48,3 +48,17 @@ hr {
     text-align: right;
     display: block;
 }
+
+a {
+    text-decoration: none;
+    color: #7ba6de;
+}
+
+a:visited {
+    color: #5a85b9;
+}
+
+a:hover {
+    text-decoration: underline;
+    text-decoration-style: dotted;
+}
