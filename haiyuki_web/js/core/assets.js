@@ -7,7 +7,7 @@ const Assets = {
     toLoad: [
         'ui/title.png',
         'ui/pushok.png',   // "PUSH SPACE KEY"
-        'ui/logo_compile_1998.png',  // Small Compile Logo?
+        'ui/logo_compile_1998.png',  // Compile Logo with 1998
 
         // Audio
         { id: 'audio/draw', src: 'assets/audio/draw.mp3', type: 'audio' },
@@ -21,6 +21,10 @@ const Assets = {
         { id: 'audio/bgm_win', src: 'assets/audio/victory.mp3', type: 'audio' },
         { id: 'audio/bgm_lose', src: 'assets/audio/lose.mp3', type: 'audio' },
         { id: 'audio/lose', src: 'assets/audio/lose.mp3', type: 'audio' },
+        { id: 'audio/bgm_inn', src: 'assets/audio/bgm_inn.mp3', type: 'audio' },
+        { id: 'audio/recovery', src: 'assets/audio/recovery.mp3', type: 'audio' },
+        { id: 'audio/barrier', src: 'assets/audio/barrier.mp3', type: 'audio' },
+        { id: 'audio/buff', src: 'assets/audio/buff.mp3', type: 'audio' },
         { id: 'audio/bgm_ending', src: 'assets/audio/bgm_ending.mp3', type: 'audio' },
         { id: 'audio/pon', src: 'assets/audio/pon.mp3', type: 'audio' },
         { id: 'audio/riichi', src: 'assets/audio/riichi.mp3', type: 'audio' },
@@ -142,7 +146,6 @@ const Assets = {
         'ui/riichi.png', // New Riichi stick asset
         'ui/bar_blue.png',
         'ui/bar_yellow.png',
-        // 'ui/cursor_yellow.png', // File missing
         'ui/alphabet.png',
         'ui/pointer.png',
 

@@ -61,7 +61,10 @@ const CharacterSelectScene = {
         this.cpuIndex = 0; // Initialize to 0 to avoid draw crash
         this.timer = 0;
         this.cpuTimer = 0; // Ensure timer is reset
+        this.timer = 0;
+        this.cpuTimer = 0; // Ensure timer is reset
         this.readyTimer = 0;
+        this.lastHoveredIndex = -1; // Track mouse hover state
 
         // BGM
         Assets.playMusic('audio/bgm_chrsel');
@@ -200,10 +203,12 @@ const CharacterSelectScene = {
                 this.playerIndex--;
                 if (this.playerIndex < 0) this.playerIndex = this.characters.length - 1;
                 this.updateP1Portrait();
+                Assets.playSound('audio/tick');
             } else if (Input.isJustPressed(Input.RIGHT)) {
                 this.playerIndex++;
                 if (this.playerIndex >= this.characters.length) this.playerIndex = 0;
                 this.updateP1Portrait();
+                Assets.playSound('audio/tick');
             }
 
             if (Input.isJustPressed(Input.Z) || Input.isJustPressed(Input.ENTER) || Input.isJustPressed(Input.SPACE)) {
@@ -219,12 +224,21 @@ const CharacterSelectScene = {
                 }
             }
             // Mouse Input
+            // Hybrid: Update selection on hover change
+            const hoveredIndex = this.getHoveredCharacterIndex();
+            if (hoveredIndex !== -1 && hoveredIndex !== this.lastHoveredIndex) {
+                this.playerIndex = hoveredIndex;
+                this.updateP1Portrait();
+                this.lastHoveredIndex = hoveredIndex;
+                // Add sound?
+                Assets.playSound('audio/tick');
+            } else if (hoveredIndex === -1) {
+                this.lastHoveredIndex = -1;
+            }
+
             if (Input.isMouseJustPressed()) {
-                const clickedIndex = this.getClickedCharacterIndex();
-                if (clickedIndex !== -1) {
-                    this.playerIndex = clickedIndex;
-                    this.updateP1Portrait();
-                    // Click sets state directly
+                if (hoveredIndex !== -1) {
+                    // Click confirms current selection (which is already sync'd via hover)
                     this.currentState = this.STATE_CPU_SELECT;
                     this.cpuTimer = 0;
                     this.updateCpuPortrait();
@@ -258,7 +272,7 @@ const CharacterSelectScene = {
 
                 // Mouse Input (Debug Manual)
                 if (Input.isMouseJustPressed()) {
-                    const clickedIndex = this.getClickedCharacterIndex();
+                    const clickedIndex = this.getHoveredCharacterIndex();
                     if (clickedIndex !== -1) {
                         this.cpuIndex = clickedIndex;
                         this.updateCpuPortrait();
@@ -271,20 +285,7 @@ const CharacterSelectScene = {
                     }
                 }
 
-                // Mouse Input (Debug Manual)
-                if (Input.isMouseJustPressed()) {
-                    const clickedIndex = this.getClickedCharacterIndex();
-                    if (clickedIndex !== -1) {
-                        this.cpuIndex = clickedIndex;
-                        this.updateCpuPortrait();
-                        // Confirm if clicked again?
-                        if (this.cpuIndex === clickedIndex) {
-                            this.currentState = this.STATE_READY;
-                            this.readyTimer = 0;
-                            console.log(`Ready(Manual): P1(${this.characters[this.playerIndex].name}) vs CPU(${this.characters[this.cpuIndex].name})`);
-                        }
-                    }
-                }
+
 
             } else {
                 // Original Roulette Logic
@@ -453,6 +454,8 @@ const CharacterSelectScene = {
         const totalW = (iconW * this.characters.length) + (gap * (this.characters.length - 1));
         const startX = (640 - totalW) / 2;
 
+        const hoveredIndex = this.getHoveredCharacterIndex();
+
         this.characters.forEach((char, index) => {
             const x = startX + index * (iconW + gap);
             const y = iconY;
@@ -472,6 +475,8 @@ const CharacterSelectScene = {
             }
 
             ctx.restore();
+
+
         });
 
         // 7. Draw Cursors
@@ -497,7 +502,7 @@ const CharacterSelectScene = {
         }
     },
 
-    getClickedCharacterIndex: function () {
+    getHoveredCharacterIndex: function () {
         const firstIcon = Assets.get(this.characters[0].selectIcon);
         if (!firstIcon) return -1;
 
