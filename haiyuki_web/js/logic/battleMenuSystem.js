@@ -27,7 +27,13 @@ const BattleMenuSystem = {
                     p1Data.skills.forEach(skillId => {
                         const skill = SkillData[skillId];
                         if (skill) {
-                            const isDisabled = !BattleConfig.RULES.SKILLS_ENABLED;
+                            // Check Global Rule
+                            const rulesEnabled = BattleConfig.RULES.SKILLS_ENABLED;
+                            // Check Engine Validation
+                            const canUse = this.engine.canUseSkill(skillId, 'P1');
+
+                            const isDisabled = !rulesEnabled || !canUse;
+
                             this.menuItems.push({ id: skillId, label: skill.name, type: 'SKILL', data: skill, disabled: isDisabled });
                         }
                     });
@@ -42,6 +48,7 @@ const BattleMenuSystem = {
         if (this.engine.currentState === this.engine.STATE_BATTLE_MENU) {
             this.engine.currentState = this.lastStateBeforeMenu || this.engine.STATE_PLAYER_TURN;
         } else {
+            this.constructMenu(); // Refresh validation
             this.lastStateBeforeMenu = this.engine.currentState;
             this.engine.currentState = this.engine.STATE_BATTLE_MENU;
             this.selectedMenuIndex = 0;
@@ -111,8 +118,7 @@ const BattleMenuSystem = {
             }
 
             // Delegate Skill Execution to Engine
-            // this.engine.useSkill(selectedId);
-            // Placeholder until Engine implements useSkill
+            this.engine.useSkill(selectedId);
         }
 
         this.toggle();
