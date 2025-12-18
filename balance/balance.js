@@ -91,6 +91,9 @@
     let isGameOver = false;
     let currentRAFId = null;
 
+    let startTime = 0;
+    let elapsedTime = 0; // in milliseconds
+
     let obstacles = [];
     let nextObstacleY = CONFIG.OBSTACLES.START_DELAY;
 
@@ -541,6 +544,9 @@
             bgm.currentTime = 0;
             bgm.play().catch(e => console.log('BGM play failed', e));
         }
+        startTime = Date.now();
+        elapsedTime = 0;
+
         ataho.balanceLevel = 0;
         ataho.balanceVelocity = 0;
         ataho.actionState = 'idle';
@@ -903,27 +909,46 @@
             ctx.restore();
         }
 
+
+        // Calculate Time
+        if (!isGameOver) {
+            elapsedTime = Date.now() - startTime;
+        }
+
+        const totalSeconds = Math.floor(elapsedTime / 1000);
+        const minutes = Math.floor(totalSeconds / 60);
+        const seconds = totalSeconds % 60;
+        const milliseconds = Math.floor((elapsedTime % 1000) / 10); // 2 digits
+
+        const timeText = `Time: ${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+        const distanceText = `Dist: ${(distanceTraveled / 100).toFixed(1)}m`;
+
+
+        // Draw HUD
         ctx.font = '24px "Raster Forge", sans-serif';
         ctx.textBaseline = 'top';
+        ctx.textAlign = 'center';
 
-        const scoreText = `Score: ${(distanceTraveled / 100).toFixed(2)}`;
-        const textWidth = ctx.measureText(scoreText).width;
         const padding = 10;
-        const bgX = (canvas.width / 2) - (textWidth / 2) - padding;
+        // Center align box
+        const boxWidth = 220; // Slightly wider to be safe
+        const boxHeight = 70;
+        const bgX = (canvas.width / 2) - (boxWidth / 2);
         const bgY = 10;
-        const bgWidth = textWidth + (padding * 2);
-        const bgHeight = 30; // Approx height for 24px font
 
         // Draw Background
         ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
         ctx.beginPath();
-        ctx.roundRect(bgX, bgY, bgWidth, bgHeight, 5);
+        ctx.roundRect(bgX, bgY, boxWidth, boxHeight, 5);
         ctx.fill();
 
         // Draw Text
         ctx.fillStyle = 'white';
-        ctx.textAlign = 'center';
-        ctx.fillText(scoreText, canvas.width / 2, bgY + padding / 2); // Adjust Y for padding
+        // Time
+        ctx.fillText(timeText, canvas.width / 2, bgY + padding);
+        // Distance
+        ctx.fillText(distanceText, canvas.width / 2, bgY + padding + 30);
+
 
         if (isGameOver) {
             ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
@@ -933,20 +958,21 @@
             ctx.fillStyle = 'white';
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
-            ctx.fillText('GAME OVER', canvas.width / 2, canvas.height / 2 - 80);
+            ctx.fillText('GAME OVER', canvas.width / 2, canvas.height / 2 - 140);
 
             ctx.font = '36px "Raster Forge", sans-serif';
             ctx.fillStyle = '#FFD700';
-            ctx.fillText(`Score: ${(distanceTraveled / 100).toFixed(2)}`, canvas.width / 2, canvas.height / 2 - 20);
+            ctx.fillText(timeText, canvas.width / 2, canvas.height / 2 - 80);
+            ctx.fillText(distanceText, canvas.width / 2, canvas.height / 2 - 30);
 
             const centerX = canvas.width / 2;
             const centerY = canvas.height / 2;
 
             buttons.continue.x = centerX - buttons.continue.width / 2;
-            buttons.continue.y = centerY + 20;
+            buttons.continue.y = centerY + 30;
 
             buttons.exit.x = centerX - buttons.exit.width / 2;
-            buttons.exit.y = centerY + 100;
+            buttons.exit.y = centerY + 110;
 
             function drawButton(btn) {
                 ctx.strokeStyle = 'white';
@@ -1028,6 +1054,9 @@
         }
 
         console.log('모든 이미지, 폰트, 오디오 로드 완료. 게임 시작!');
+
+        // Initialize Start Time
+        startTime = Date.now();
 
         // Try to play music immediately
         bgm.play().catch(e => {
