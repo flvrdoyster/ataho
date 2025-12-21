@@ -1,0 +1,393 @@
+<html>
+
+<head>
+    <style>
+        body {
+            background: #222;
+            display: flex;
+            flex-direction: row;
+            font-family: sans-serif;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+        }
+
+        .editor-container {
+            flex: 1;
+            overflow: auto;
+            background: #333;
+            position: relative;
+            display: flex;
+            justify-content: flex-start;
+            align-items: flex-start;
+            padding: 20px;
+        }
+
+        .map-grid {
+            position: relative;
+            background: #000;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+        }
+
+        .tile {
+            position: absolute;
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+            image-rendering: pixelated;
+            background-image: url('assets/cave/cave_tile.png');
+            background-repeat: no-repeat;
+            z-index: 1;
+        }
+
+        .reference-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            /* transform: translateY(-50%); REMOVED */
+            z-index: 2;
+            opacity: 0.5;
+            pointer-events: none;
+            opacity: 0.5;
+            pointer-events: none;
+            width: 610px;
+            height: auto;
+            max-width: none;
+            margin-left: -8px;
+            margin-top: 15px;
+        }
+
+        .tile:hover {
+            z-index: 100;
+            outline: 1px solid white;
+        }
+
+        .tile.empty {
+            background: none !important;
+        }
+
+        .sidebar {
+            width: 600px;
+            background: #1a1a1a;
+            color: #eee;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            border-right: 1px solid #444;
+            z-index: 200;
+        }
+
+        .palette {
+            display: grid;
+            grid-template-columns: repeat(16, 32px);
+            background: #000;
+            padding: 5px;
+            /* max-height removed to show all tiles */
+            /* overflow-y removed */
+            border: 1px solid #555;
+        }
+
+        .palette-tile {
+            width: 32px;
+            height: 32px;
+            margin: 0;
+            cursor: pointer;
+            border: 2px solid transparent;
+            box-sizing: border-box;
+            image-rendering: pixelated;
+            background-image: url('assets/cave/cave_tile.png');
+            background-size: 512px auto;
+            /* Scale up for palette visibility (32px view of 16px tile) -> 16px * 2 = 32px, so total width * 2 */
+            background-repeat: no-repeat;
+        }
+
+        .palette-tile.selected {
+            border: 2px solid cyan;
+            z-index: 10;
+        }
+
+        .palette-tile:hover {
+            border-color: #888;
+        }
+
+        .controls {
+            margin-top: 20px;
+        }
+
+        button {
+            padding: 10px;
+            width: 100%;
+            margin-bottom: 10px;
+            background: #444;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #555;
+        }
+
+        textarea {
+            width: 100%;
+            height: 100px;
+            background: #222;
+            color: #aaa;
+            border: 1px solid #444;
+            margin-top: 10px;
+            font-size: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="sidebar">
+        <h2>Map Editor</h2>
+        <div class="palette" id="palette"></div>
+        <div class="controls">
+            <p>Selected Tile: <span id="selected-id">None</span></p>
+            <div style="margin-bottom: 10px; display: flex; gap: 5px;">
+                <button onclick="setEraser()" style="flex: 1; background: #c33;">Eraser</button>
+            </div>
+            <div style="margin-bottom: 10px; display: flex; gap: 5px;">
+                <button onclick="changeZoom(0.1)" style="flex: 1;">Zoom +</button>
+                <button onclick="changeZoom(-0.1)" style="flex: 1;">Zoom -</button>
+                <button onclick="resetZoom()" style="flex: 1;">Reset</button>
+            </div>
+            <p>Zoom: <span id="zoom-level">100%</span></p>
+            <div style="margin-bottom: 10px;">
+                <label for="overlay-width">Overlay Width:</label>
+                <input type="number" id="overlay-width" value="610" onchange="updateOverlayWidth(this.value)"
+                    style="width: 60px;"> px
+            </div>
+            <div style="margin-bottom: 10px;">
+                <label for="overlay-offset-x">Overlay X Offset:</label>
+                <input type="number" id="overlay-offset-x" value="-8" onchange="updateOverlayOffsetX(this.value)"
+                    style="width: 60px;"> px
+            </div>
+            <div style="margin-bottom: 10px;">
+                <label for="overlay-offset-y">Overlay Y Offset:</label>
+                <input type="number" id="overlay-offset-y" value="15" onchange="updateOverlayOffsetY(this.value)"
+                    style="width: 60px;"> px
+            </div>
+            <button onclick="exportData()">Export JSON</button>
+            <textarea id="output" readonly></textarea>
+        </div>
+    </div>
+    <div class="editor-container">
+        <div class="map-grid" id="map"></div>
+    </div>
+
+    <!-- External Data -->
+    <script src="data/map_data.js"></script>
+
+    <script>
+        // Configuration
+        const TILE_SIZE = 16;
+        const PALETTE_SCALE = 2; // Show tiles 2x bigger in palette
+        const ASSET_PATH = 'assets/cave/cave_tile.png';
+        const EMPTY_TILE = { tx: 1, ty: 0 };
+
+        let selectedTx = 0;
+        let selectedTy = 0;
+        let tilesetWidth = 0;
+        let tilesetHeight = 0;
+        let zoomLevel = 1.0;
+
+        // Initialize
+        const img = new Image();
+        img.src = ASSET_PATH;
+        img.onload = function () {
+            tilesetWidth = img.width;
+            tilesetHeight = img.height;
+            initEditor();
+        };
+        img.onerror = function () {
+            alert("Failed to load tileset image: " + ASSET_PATH);
+        }
+
+        function initEditor() {
+            console.log("Initializing Editor...");
+
+            // 1. Build Palette
+            const cols = Math.floor(tilesetWidth / TILE_SIZE);
+            const rows = Math.floor(tilesetHeight / TILE_SIZE);
+            const palette = document.getElementById('palette');
+
+            // Adjust background size for palette scaling
+            // Original width is tilesetWidth. We want 16px tile to be 32px.
+            // So we scale the background by PALETTE_SCALE.
+            const bgWidth = tilesetWidth * PALETTE_SCALE;
+
+            // Update CSS rule dynamically for palette scale or just set inline
+
+            for (let y = 0; y < rows; y++) {
+                for (let x = 0; x < cols; x++) {
+                    let d = document.createElement('div');
+                    d.className = 'palette-tile';
+                    // We need to set background position.
+                    // Since background-size is 200% (roughly), position needs to be scaled too?
+                    // No, background-position is in pixels related to the element box or percentage.
+                    // If we set background-size to specific px, we use specific px for position.
+                    d.style.backgroundSize = `${bgWidth}px auto`;
+                    d.style.backgroundPosition = `-${x * TILE_SIZE * PALETTE_SCALE}px -${y * TILE_SIZE * PALETTE_SCALE}px`;
+
+                    d.onclick = function () { selectTile(this, x, y); };
+                    palette.appendChild(d);
+                }
+            }
+
+            // 2. Load Map Data
+            const mapContainer = document.getElementById('map');
+            mapContainer.innerHTML = '';
+
+            // Add reference overlay
+            const overlay = document.createElement('img');
+            overlay.src = 'assets/cave/cave_ori.png';
+            overlay.className = 'reference-overlay';
+            overlay.onload = function () {
+                const currentW = parseInt(mapContainer.style.width) || 0;
+                const currentH = parseInt(mapContainer.style.height) || 0;
+                // Use rendered width/height (overlay.width/height) instead of naturalWidth/Height
+                updateMapSizeForOverlay();
+            };
+            mapContainer.appendChild(overlay);
+
+            let tilesToRender = [];
+            if (window.MAP_DATA) {
+                console.log("Loading map data from window.MAP_DATA");
+                tilesToRender = window.MAP_DATA;
+            } else {
+                console.warn("No MAP_DATA found, starting empty.");
+            }
+
+            let maxX = 0;
+            let maxY = 0;
+
+            tilesToRender.forEach(tileData => {
+                let div = document.createElement('div');
+                div.className = 'tile';
+                div.id = `cell_${tileData.gx}_${tileData.gy}`;
+                div.style.left = (tileData.gx * TILE_SIZE) + 'px';
+                div.style.top = (tileData.gy * TILE_SIZE) + 'px';
+                div.dataset.tx = tileData.tx;
+                div.dataset.ty = tileData.ty;
+
+                // Set background position for map tile (1x scale)
+                if (tileData.tx === EMPTY_TILE.tx && tileData.ty === EMPTY_TILE.ty) {
+                    div.classList.add('empty');
+                } else {
+                    div.style.backgroundPosition = `-${tileData.tx * TILE_SIZE}px -${tileData.ty * TILE_SIZE}px`;
+                }
+
+                div.onclick = function () { paintTile(this, tileData.gx, tileData.gy); };
+                mapContainer.appendChild(div);
+
+                if (tileData.gx > maxX) maxX = tileData.gx;
+                if (tileData.gy > maxY) maxY = tileData.gy;
+            });
+
+            mapContainer.style.width = ((maxX + 1) * TILE_SIZE) + 'px';
+            mapContainer.style.height = ((maxY + 1) * TILE_SIZE) + 'px';
+        }
+
+        function selectTile(el, tx, ty) {
+            document.querySelectorAll('.palette-tile').forEach(t => t.classList.remove('selected'));
+            el.classList.add('selected');
+            selectedTx = tx;
+            selectedTy = ty;
+            document.getElementById('selected-id').innerText = tx + "," + ty;
+        }
+
+        function setEraser() {
+            document.querySelectorAll('.palette-tile').forEach(t => t.classList.remove('selected'));
+            selectedTx = EMPTY_TILE.tx;
+            selectedTy = EMPTY_TILE.ty;
+            document.getElementById('selected-id').innerText = "Eraser";
+        }
+
+        function changeZoom(delta) {
+            zoomLevel += delta;
+            if (zoomLevel < 0.1) zoomLevel = 0.1;
+            updateZoom();
+        }
+
+        function resetZoom() {
+            zoomLevel = 1.0;
+            updateZoom();
+        }
+
+        function updateZoom() {
+            const mapGrid = document.getElementById('map');
+            // Use transform-origin top-left to zoom naturally from the corner
+            mapGrid.style.transformOrigin = "0 0";
+            mapGrid.style.transform = `scale(${zoomLevel})`;
+            document.getElementById('zoom-level').innerText = Math.round(zoomLevel * 100) + "%";
+        }
+
+        function updateOverlayOffsetX(val) {
+            const overlay = document.querySelector('.reference-overlay');
+            if (overlay) {
+                overlay.style.marginLeft = val + 'px';
+            }
+        }
+
+        function updateOverlayOffsetY(val) {
+            const overlay = document.querySelector('.reference-overlay');
+            if (overlay) {
+                overlay.style.marginTop = val + 'px';
+            }
+        }
+
+        function updateOverlayWidth(val) {
+            const overlay = document.querySelector('.reference-overlay');
+            if (overlay) {
+                overlay.style.width = val + 'px';
+                // Wait for layout update before resizing map
+                setTimeout(updateMapSizeForOverlay, 50);
+            }
+        }
+
+        function updateMapSizeForOverlay() {
+            const overlay = document.querySelector('.reference-overlay');
+            const mapContainer = document.getElementById('map');
+            if (!overlay || !mapContainer) return;
+
+            const currentW = parseInt(mapContainer.style.width) || 0;
+            const currentH = parseInt(mapContainer.style.height) || 0;
+
+            if (overlay.width > currentW) mapContainer.style.width = overlay.width + 'px';
+            if (overlay.height > currentH) mapContainer.style.height = overlay.height + 'px';
+        }
+
+        function paintTile(el, gx, gy) {
+            // Update visual
+            if (selectedTx === EMPTY_TILE.tx && selectedTy === EMPTY_TILE.ty) {
+                el.classList.add('empty');
+                el.style.backgroundPosition = '';
+            } else {
+                el.classList.remove('empty');
+                el.style.backgroundPosition = `-${selectedTx * TILE_SIZE}px -${selectedTy * TILE_SIZE}px`;
+            }
+            // Update data
+            el.dataset.tx = selectedTx;
+            el.dataset.ty = selectedTy;
+        }
+
+        function exportData() {
+            let cells = document.querySelectorAll('.tile');
+            let data = [];
+            cells.forEach(c => {
+                let parts = c.id.split('_');
+                let gx = parseInt(parts[1]);
+                let gy = parseInt(parts[2]);
+                let tx = parseInt(c.dataset.tx);
+                let ty = parseInt(c.dataset.ty);
+                data.push({ gx, gy, tx, ty });
+            });
+            document.getElementById('output').value = JSON.stringify(data);
+        }
+    </script>
+</body>
+
+</html>
