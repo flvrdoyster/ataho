@@ -33,11 +33,40 @@
             position: absolute;
             width: 16px;
             height: 16px;
+            /* pointer-events: none; REMOVED to allow simple clicks, but we handle click on map container usually? 
+               Actually tile has onclick. Keep it. */
             cursor: pointer;
             image-rendering: pixelated;
             background-image: url('assets/cave/cave_tile.png');
             background-repeat: no-repeat;
             z-index: 1;
+        }
+
+        .anim-obj {
+            position: absolute;
+            background-repeat: no-repeat;
+            image-rendering: pixelated;
+            z-index: 10;
+            /* Above tiles */
+            border: 1px solid rgba(255, 255, 0, 0.5);
+            /* Highlight bounds */
+            pointer-events: none;
+            /* Let clicks pass to grid? No, we might want to select/delete. */
+            cursor: pointer;
+        }
+
+        .anim-obj:hover {
+            border: 1px solid yellow;
+        }
+
+        .collision-overlay {
+            position: absolute;
+            background: rgba(255, 0, 0, 0.5);
+            z-index: 15;
+            pointer-events: none;
+            cursor: pointer;
+            width: 16px;
+            height: 16px;
         }
 
         .reference-overlay {
@@ -128,6 +157,11 @@
             background: #555;
         }
 
+        button.active {
+            background: #d32f2f;
+            font-weight: bold;
+        }
+
         textarea {
             width: 100%;
             height: 100px;
@@ -146,6 +180,23 @@
         <div class="palette" id="palette"></div>
         <div class="controls">
             <p>Selected Tile: <span id="selected-id">None</span></p>
+            <p>Hover: <span id="hover-coords">--,--</span></p>
+
+            <div style="margin-bottom: 10px; border-bottom: 1px solid #555; padding-bottom: 10px;">
+                <label><input type="radio" name="mode" value="tile" checked onchange="setMode('tile')"> Tile
+                    Mode</label>
+                <label><input type="radio" name="mode" value="anim" onchange="setMode('anim')"> Animation Mode</label>
+            </div>
+
+            <!-- Animation Palette (Hidden by default) -->
+            <div id="anim-palette" style="display:none; margin-bottom: 15px;">
+                <h3>Animations</h3>
+                <div class="anim-item" onclick="selectAnim('irori')"
+                    style="cursor: pointer; border: 1px solid #444; padding: 5px; margin-bottom: 5px;">
+                    Irori (Hearth)
+                </div>
+            </div>
+
             <div style="margin-bottom: 10px; display: flex; gap: 5px;">
                 <button onclick="setEraser()" style="flex: 1; background: #c33;">Eraser</button>
             </div>
@@ -173,6 +224,9 @@
                 <input type="number" id="overlay-offset-y" value="15" onchange="updateOverlayOffsetY(this.value)"
                     style="width: 60px;"> px
             </div>
+            <div style="margin-bottom: 10px;">
+                <button id="collisionBtn" onclick="toggleCollisionMode()">Collision Mode: OFF</button>
+            </div>
             <button onclick="exportData()">Export JSON</button>
             <textarea id="output" readonly></textarea>
         </div>
@@ -190,6 +244,13 @@
         const PALETTE_SCALE = 2; // Show tiles 2x bigger in palette
         const ASSET_PATH = 'assets/cave/cave_tile.png';
         const EMPTY_TILE = { tx: 1, ty: 0 };
+
+        let currentMode = 'tile'; // 'tile' or 'anim'
+        let selectedAnimType = null;
+
+        let animations = []; // Array of { type, x, y }
+        let isCollisionMode = false;
+        let collisionTiles = new Set(); // Stores "gx,gy" strings
 
         let selectedTx = 0;
         let selectedTy = 0;
@@ -258,8 +319,20 @@
 
             let tilesToRender = [];
             if (window.MAP_DATA) {
-                console.log("Loading map data from window.MAP_DATA");
-                tilesToRender = window.MAP_DATA;
+                // Check if old format (Array) or new format (Object)
+                if (Array.isArray(window.MAP_DATA)) {
+                    console.log("Loading legacy map data (Array)");
+                    tilesToRender = window.MAP_DATA;
+                } else {
+                    console.log("Loading map data (Object)");
+                    tilesToRender = window.MAP_DATA.tiles || [];
+                    animations = window.MAP_DATA.animations || [];
+                    renderAnimations();
+                    if (window.MAP_DATA.collisions) {
+                        window.MAP_DATA.collisions.forEach(c => collisionTiles.add(`${c.x},${c.y}`));
+                    }
+                    renderCollisions();
+                }
             } else {
                 console.warn("No MAP_DATA found, starting empty.");
             }
@@ -283,7 +356,10 @@
                     div.style.backgroundPosition = `-${tileData.tx * TILE_SIZE}px -${tileData.ty * TILE_SIZE}px`;
                 }
 
-                div.onclick = function () { paintTile(this, tileData.gx, tileData.gy); };
+                div.onclick = function () { onGridClick(this, tileData.gx, tileData.gy); };
+                div.onmousemove = function () {
+                    document.getElementById('hover-coords').innerText = tileData.gx + "," + tileData.gy;
+                };
                 mapContainer.appendChild(div);
 
                 if (tileData.gx > maxX) maxX = tileData.gx;
@@ -295,12 +371,188 @@
         }
 
         function selectTile(el, tx, ty) {
+            setMode('tile'); // Auto switch
             document.querySelectorAll('.palette-tile').forEach(t => t.classList.remove('selected'));
             el.classList.add('selected');
             selectedTx = tx;
             selectedTy = ty;
             document.getElementById('selected-id').innerText = tx + "," + ty;
         }
+
+        function setMode(mode) {
+            currentMode = mode;
+            document.getElementById('palette').style.display = (mode === 'tile') ? 'grid' : 'none';
+            document.getElementById('anim-palette').style.display = (mode === 'anim') ? 'block' : 'none';
+
+            // UI Update
+            document.querySelectorAll('input[name="mode"]').forEach(r => {
+                if (r.value === mode) r.checked = true;
+            });
+        }
+
+        function selectAnim(type) {
+            selectedAnimType = type;
+            document.getElementById('selected-id').innerText = "Anim: " + type;
+        }
+
+        function onGridClick(el, gx, gy) {
+            if (isCollisionMode) {
+                toggleCollisionAt(gx, gy);
+            } else if (currentMode === 'tile') {
+                paintTile(el, gx, gy);
+            } else if (currentMode === 'anim') {
+                placeAnimation(gx, gy);
+            }
+        }
+
+        function placeAnimation(gx, gy) {
+            if (!selectedAnimType) {
+                alert("Select an animation first!");
+                return;
+            }
+
+            // Add new animation
+            // Irori config: 5 frames, 64x48.
+            // Helper to get config based on type
+            let config = { type: 'irori', w: 64, h: 48 }; // Corrected to 4 tiles wide
+
+            // Center logic? Or Top-Left?
+            // User clicks a tile. Let's place Top-Left at that tile?
+            // Or center?
+            // Let's assume user clicks the Top-Left tile of the desired position.
+            // gx, gy -> pixels
+
+            let anim = {
+                type: selectedAnimType,
+                x: gx * TILE_SIZE,
+                y: gy * TILE_SIZE,
+                w: 64,
+                h: 48
+            };
+
+            animations.push(anim);
+            renderAnimations();
+        }
+
+        function renderAnimations() {
+            // Clear existing anim divs?
+            document.querySelectorAll('.anim-obj').forEach(e => e.remove());
+
+            const mapContainer = document.getElementById('map');
+
+            animations.forEach((anim, index) => {
+                const div = document.createElement('div');
+                div.className = 'anim-obj';
+                div.style.left = anim.x + 'px';
+                div.style.top = anim.y + 'px';
+                div.style.width = anim.w + 'px';
+                div.style.height = anim.h + 'px';
+                div.dataset.type = anim.type; // Store type for animator
+
+                // Show first frame
+                if (anim.type === 'irori') {
+                    div.style.backgroundImage = "url('assets/cave/cave_tile_irori.png')";
+                    div.style.backgroundPosition = "0 0";
+                }
+
+                // Delete on right click? or click in delete mode?
+                div.onclick = (e) => {
+                    e.stopPropagation(); // Prevent grid click
+                    if (confirm("Delete this animation?")) {
+                        animations.splice(index, 1);
+                        renderAnimations();
+                    }
+                };
+
+                mapContainer.appendChild(div);
+            });
+        }
+
+        function toggleCollisionMode() {
+            isCollisionMode = !isCollisionMode;
+            const btn = document.getElementById('collisionBtn');
+            if (isCollisionMode) {
+                btn.innerText = "Collision Mode: ON";
+                btn.classList.add('active');
+            } else {
+                btn.innerText = "Collision Mode: OFF";
+                btn.classList.remove('active');
+            }
+            renderCollisions();
+        }
+
+        function toggleCollisionAt(gx, gy) {
+            const key = `${gx},${gy}`;
+            if (collisionTiles.has(key)) {
+                collisionTiles.delete(key);
+            } else {
+                collisionTiles.add(key);
+            }
+            renderCollisions();
+        }
+
+        function renderCollisions() {
+            // Clear existing
+            document.querySelectorAll('.collision-overlay').forEach(e => e.remove());
+
+            if (!isCollisionMode && collisionTiles.size === 0) return;
+            // Even if not in mode, we might want to see them? Or only in mode?
+            // Let's show them if in mode OR we can just show them always? 
+            // Usually editor shows walls always or in a view mode. 
+            // For now, show if isCollisionMode is true? 
+            // Or maybe always show semi-transparent if they exist?
+            // Let's show always for now if the user toggled them on? 
+            // Actually, let's just render them. 
+
+            // Wait, the Requirement was "Visual Feedback: Render placed animations on the map editor grid."
+            // For collisions: "When Collision Mode is active, render a semi-transparent red overlay"
+
+            if (!isCollisionMode) return;
+
+            const mapContainer = document.getElementById('map');
+            collisionTiles.forEach(key => {
+                const [gx, gy] = key.split(',').map(Number);
+                const div = document.createElement('div');
+                div.className = 'collision-overlay';
+                div.style.left = (gx * TILE_SIZE) + 'px';
+                div.style.top = (gy * TILE_SIZE) + 'px';
+                div.onclick = (e) => {
+                    e.stopPropagation(); // Pass through to grid? 
+                    // No, invalidates click if we catch it. 
+                    // But we want to toggle.
+                    if (isCollisionMode) toggleCollisionAt(gx, gy);
+                };
+                mapContainer.appendChild(div);
+            });
+        }
+
+        // Editor Animation Loop
+        function startEditorLoop() {
+            const startTime = Date.now();
+
+            function loop() {
+                const now = Date.now();
+
+                document.querySelectorAll('.anim-obj').forEach(div => {
+                    const type = div.dataset.type;
+                    if (type === 'irori') {
+                        // 5 frames, 200ms each (Slower)
+                        const frames = 5;
+                        const speed = 200;
+                        const width = 64;
+
+                        const frameIndex = Math.floor(now / speed) % frames;
+                        div.style.backgroundPosition = `-${frameIndex * width}px 0px`;
+                    }
+                });
+
+                requestAnimationFrame(loop);
+            }
+            requestAnimationFrame(loop);
+        }
+
+        // Start immediately
+        startEditorLoop();
 
         function setEraser() {
             document.querySelectorAll('.palette-tile').forEach(t => t.classList.remove('selected'));
@@ -395,7 +647,17 @@
                 let ty = parseInt(c.dataset.ty);
                 data.push({ gx, gy, tx, ty });
             });
-            document.getElementById('output').value = JSON.stringify(data);
+
+            const exportData = {
+                tiles: data,
+                animations: animations,
+                collisions: Array.from(collisionTiles).map(k => {
+                    const [x, y] = k.split(',').map(Number);
+                    return { x, y };
+                })
+            };
+
+            document.getElementById('output').value = "window.MAP_DATA = " + JSON.stringify(exportData);
         }
     </script>
 </body>

@@ -6,16 +6,14 @@
     <style>
         body {
             background: #333;
-            display: flex;
-            justify-content: center;
-            align-items: center;
             height: 100vh;
             margin: 0;
+            overflow: hidden;
         }
 
         canvas {
+            display: block;
             background: #000;
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
             image-rendering: pixelated;
         }
     </style>
@@ -23,8 +21,8 @@
 
 <body>
     <canvas id="gameCanvas"></canvas>
-    <script src="data/map_data.js"></script>
-    <script src="loader_example.js"></script>
+    <script src="data/map_data.js?v=2"></script>
+    <script src="map_loader.js?v=2"></script>
 </body>
 
 </html>
