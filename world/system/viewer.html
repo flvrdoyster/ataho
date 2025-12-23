@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Map Viewer</title>
+    <style>
+        body {
+            background: #000;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+        }
+
+        canvas {
+            display: block;
+            background: #000;
+            image-rendering: pixelated;
+        }
+    </style>
+</head>
+
+<body>
+    <canvas id="gameCanvas"></canvas>
+    <div id="loading" style="color: white; position: absolute; top: 10px; left: 10px;">Loading...</div>
+    <script>
+        // Parse URL parameter for map name
+        const urlParams = new URLSearchParams(window.location.search);
+        const mapName = urlParams.get('map') || 'cave'; // Default to cave
+
+        // Dynamic Data Loader
+        const dataScript = document.createElement('script');
+        dataScript.src = `../maps/${mapName}/data.js`;
+        dataScript.onload = () => {
+            document.getElementById('loading').style.display = 'none';
+            // Start the game loader after data is ready
+            const loaderScript = document.createElement('script');
+            loaderScript.src = 'loader.js';
+            document.body.appendChild(loaderScript);
+        };
+        dataScript.onerror = () => {
+            document.getElementById('loading').innerText = `Error: Map '${mapName}' not found.`;
+        };
+        document.body.appendChild(dataScript);
+    </script>
+</body>
+
+</html>

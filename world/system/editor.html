@@ -1,6 +1,7 @@
 <html>
 
 <head>
+    <title>Map Editor</title>
     <style>
         body {
             background: #222;
@@ -104,6 +105,7 @@
             flex-direction: column;
             border-right: 1px solid #444;
             z-index: 200;
+            overflow-y: auto;
         }
 
         .palette {
@@ -206,29 +208,80 @@
                 <button onclick="resetZoom()" style="flex: 1;">Reset</button>
             </div>
             <p>Zoom: <span id="zoom-level">100%</span></p>
-            <div style="margin-bottom: 10px; margin-top: 10px;">
-                <button onclick="toggleOverlay()">Toggle Overlay</button>
+            <div style="margin-bottom: 5px; margin-top: 10px;">
+                <label>Overlay Config:</label>
+                <button onclick="toggleOverlay()" style="float:right; font-size: 10px;">Toggle</button>
             </div>
-            <div style="margin-bottom: 10px;">
-                <label for="overlay-width">Overlay Width:</label>
-                <input type="number" id="overlay-width" value="610" onchange="updateOverlayWidth(this.value)"
-                    style="width: 60px;"> px
+            <div style="margin-bottom: 5px;">
+                <input type="text" id="overlay-url" value="map/assets/cave/cave_ori.png"
+                    onchange="updateOverlayConfig()" placeholder="Image Path" style="width:100%;">
             </div>
-            <div style="margin-bottom: 10px;">
-                <label for="overlay-offset-x">Overlay X Offset:</label>
-                <input type="number" id="overlay-offset-x" value="-8" onchange="updateOverlayOffsetX(this.value)"
-                    style="width: 60px;"> px
+            <div style="display: flex; gap: 5px; margin-bottom: 5px;">
+                <label style="flex:1;">Opacity:
+                    <input type="number" id="overlay-opacity" step="0.1" min="0" max="1" value="0.5"
+                        onchange="updateOverlayConfig()" style="width:40px;">
+                </label>
+                <label style="flex:1;">Width:
+                    <input type="number" id="overlay-width" value="610" onchange="updateOverlayConfig()"
+                        style="width:50px;">
+                </label>
             </div>
-            <div style="margin-bottom: 10px;">
-                <label for="overlay-offset-y">Overlay Y Offset:</label>
-                <input type="number" id="overlay-offset-y" value="15" onchange="updateOverlayOffsetY(this.value)"
-                    style="width: 60px;"> px
+            <div style="display: flex; gap: 5px; margin-bottom: 10px;">
+                <label style="flex:1;">X:
+                    <input type="number" id="overlay-offset-x" value="-8" onchange="updateOverlayConfig()"
+                        style="width:50px;">
+                </label>
+                <label style="flex:1;">Y:
+                    <input type="number" id="overlay-offset-y" value="15" onchange="updateOverlayConfig()"
+                        style="width:50px;">
+                </label>
             </div>
             <div style="margin-bottom: 10px;">
                 <button id="collisionBtn" onclick="toggleCollisionMode()">Collision Mode: OFF</button>
             </div>
             <button onclick="exportData()">Export JSON</button>
             <textarea id="output" readonly></textarea>
+
+            <hr style="border-color: #555; margin: 20px 0;">
+            <h3>Map Config</h3>
+            <div style="margin-bottom: 10px;">
+                <label>Width (Tiles): <input type="number" id="map-width" value="40" style="width:50px;"></label>
+            </div>
+            <div style="margin-bottom: 10px;">
+                <label>Height (Tiles): <input type="number" id="map-height" value="30" style="width:50px;"></label>
+            </div>
+
+            <div style="margin-bottom: 10px;">
+                <label>Anchor:
+                    <select id="resize-anchor" style="width: 100px;">
+                        <option value="tl" selected>Top-Left</option>
+                        <option value="tr">Top-Right</option>
+                        <option value="bl">Bottom-Left</option>
+                        <option value="br">Bottom-Right</option>
+                        <option value="c">Center</option>
+                    </select>
+                </label>
+            </div>
+            <button onclick="resizeMap()">Update Size</button>
+
+            <h3>Assets</h3>
+            <div style="margin-bottom: 5px;"><label>Tileset:</label></div>
+            <input type="text" id="asset-tileset" value="map/assets/cave/cave_tile.png"
+                style="width:100%; margin-bottom:10px;">
+
+            <div style="margin-bottom: 5px;"><label>Ceiling:</label></div>
+            <input type="text" id="asset-ceiling" value="map/assets/cave/cave_tile_top.png"
+                style="width:100%; margin-bottom:10px;">
+
+            <div style="margin-bottom: 5px;"><label>Animation:</label></div>
+            <input type="text" id="asset-anim" value="map/assets/cave/cave_tile_irori.png"
+                style="width:100%; margin-bottom:10px;">
+
+            <div style="margin-bottom: 5px;"><label>Character:</label></div>
+            <input type="text" id="asset-char" value="map/assets/char/ataho-1.png"
+                style="width:100%; margin-bottom:10px;">
+
+            <button onclick="updateAssets()">Update Assets</button>
         </div>
     </div>
     <div class="editor-container">
@@ -236,14 +289,64 @@
     </div>
 
     <!-- External Data -->
-    <script src="data/map_data.js"></script>
+    <div id="loading" style="color: white; position: absolute; top: 10px; left: 10px; z-index:9999;">Loading Map...
+    </div>
+    <script>
+        // Parse URL parameter for map name
+        const urlParams = new URLSearchParams(window.location.search);
+        const mapName = urlParams.get('map') || 'cave'; // Default to cave
+
+        // Helper for editor to resolve paths relative to the map folder
+        // Only used for DISPLAYing images in the editor DOM.
+        // The data in JSON remains relative to the data.js file (e.g. "assets/tile.png")
+        function resolveEditorPath(path) {
+            if (!path) return '';
+            if (path.startsWith('http') || path.startsWith('/')) return path;
+            // If path is shared "world/system", it might be referenced as "../../system" in data.js
+            // Editor is in "world/system", so "../../system" -> "../" (parent of system is world) -> world + /system ??
+            // Let's trace:
+            // Editor: world/system/editor.html
+            // Path: ../../system/assets/char.png
+            // Target: world/system/assets/char.png
+            // Direct link: assets/char.png (if in same folder)
+            // But data.js is in world/maps/cave/.
+            // ../../system means "up to map", "up to world", then "system".
+            // So from Editor (world/system):
+            // We want to reach world/system/assets/char.png... that is just "assets/char.png"!
+            // BUT, if the path is relative to MAP (assets/tile.png), we need "../maps/cave/assets/tile.png".
+
+            if (path.startsWith('../../system')) {
+                // ../../system/assets/char.png -> assets/char.png (local to editor)
+                return path.replace('../../system/', '');
+            }
+
+            // Assume map-relative path
+            return `../maps/${mapName}/${path}`;
+        }
+
+        const script = document.createElement('script');
+        script.src = `../maps/${mapName}/data.js`;
+        script.onload = () => {
+            document.getElementById('loading').style.display = 'none';
+            // Trigger init after load
+            if (typeof initEditor === 'function') initEditor();
+        };
+        script.onerror = () => {
+            document.getElementById('loading').innerText = `Error: Map '${mapName}' data not found.`;
+        };
+        document.body.appendChild(script);
+    </script>
 
     <script>
         // Configuration
         const TILE_SIZE = 16;
         const PALETTE_SCALE = 2; // Show tiles 2x bigger in palette
-        const ASSET_PATH = 'assets/cave/cave_tile.png';
+        let ASSET_PATH = 'assets/cave/cave_tile.png';
         const EMPTY_TILE = { tx: 1, ty: 0 };
+
+        let mapWidthTiles = 40;
+        let mapHeightTiles = 30;
+        let mapDataGrid = []; // 2D array [y][x] = {tx, ty}
 
         let currentMode = 'tile'; // 'tile' or 'anim'
         let selectedAnimType = null;
@@ -257,6 +360,15 @@
         let tilesetWidth = 0;
         let tilesetHeight = 0;
         let zoomLevel = 1.0;
+
+        let overlayConfig = {
+            url: 'map/assets/cave/cave_ori.png',
+            x: -8,
+            y: 15,
+            w: 610,
+            opacity: 0.5,
+            visible: true
+        };
 
         // Initialize
         const img = new Image();
@@ -302,30 +414,42 @@
             }
 
             // 2. Load Map Data
-            const mapContainer = document.getElementById('map');
-            mapContainer.innerHTML = '';
-
-            // Add reference overlay
-            const overlay = document.createElement('img');
-            overlay.src = 'assets/cave/cave_ori.png';
-            overlay.className = 'reference-overlay';
-            overlay.onload = function () {
-                const currentW = parseInt(mapContainer.style.width) || 0;
-                const currentH = parseInt(mapContainer.style.height) || 0;
-                // Use rendered width/height (overlay.width/height) instead of naturalWidth/Height
-                updateMapSizeForOverlay();
-            };
-            mapContainer.appendChild(overlay);
-
-            let tilesToRender = [];
             if (window.MAP_DATA) {
-                // Check if old format (Array) or new format (Object)
+                // Load Assets Config
+                if (window.MAP_DATA.assets) {
+                    document.getElementById('asset-tileset').value = window.MAP_DATA.assets.tileset || "assets/cave_tile.png";
+                    document.getElementById('asset-ceiling').value = window.MAP_DATA.assets.ceilingTileset || "assets/cave_tile_top.png";
+                    document.getElementById('asset-anim').value = window.MAP_DATA.assets.animation || "assets/cave_tile_irori.png";
+                    document.getElementById('asset-char').value = window.MAP_DATA.assets.character || "../../system/assets/char/ataho-1.png";
+
+                    // Resolve path for internal editor usage (Images)
+                    ASSET_PATH = resolveEditorPath(window.MAP_DATA.assets.tileset);
+                }
+
+
+                // Load Editor Config (Overlay)
+                if (window.MAP_DATA.editor && window.MAP_DATA.editor.overlay) {
+                    const ov = window.MAP_DATA.editor.overlay;
+                    overlayConfig.url = ov.url || overlayConfig.url;
+                    overlayConfig.x = (ov.x !== undefined) ? ov.x : overlayConfig.x;
+                    overlayConfig.y = (ov.y !== undefined) ? ov.y : overlayConfig.y;
+                    overlayConfig.w = (ov.w !== undefined) ? ov.w : overlayConfig.w;
+                    overlayConfig.opacity = (ov.opacity !== undefined) ? ov.opacity : overlayConfig.opacity;
+                }
+
+                // Update UI Inputs for Overlay
+                document.getElementById('overlay-url').value = overlayConfig.url;
+                document.getElementById('overlay-width').value = overlayConfig.w;
+                document.getElementById('overlay-offset-x').value = overlayConfig.x;
+                document.getElementById('overlay-offset-y').value = overlayConfig.y;
+                document.getElementById('overlay-opacity').value = overlayConfig.opacity;
+
+                // Load Tiles
+                let loadedTiles = [];
                 if (Array.isArray(window.MAP_DATA)) {
-                    console.log("Loading legacy map data (Array)");
-                    tilesToRender = window.MAP_DATA;
+                    loadedTiles = window.MAP_DATA;
                 } else {
-                    console.log("Loading map data (Object)");
-                    tilesToRender = window.MAP_DATA.tiles || [];
+                    loadedTiles = window.MAP_DATA.tiles || [];
                     animations = window.MAP_DATA.animations || [];
                     renderAnimations();
                     if (window.MAP_DATA.collisions) {
@@ -333,41 +457,182 @@
                     }
                     renderCollisions();
                 }
-            } else {
-                console.warn("No MAP_DATA found, starting empty.");
-            }
 
-            let maxX = 0;
-            let maxY = 0;
+                // Determine Size
+                let maxX = 0;
+                let maxY = 0;
+                loadedTiles.forEach(t => {
+                    if (t.gx > maxX) maxX = t.gx;
+                    if (t.gy > maxY) maxY = t.gy;
+                });
+                mapWidthTiles = maxX + 1;
+                mapHeightTiles = maxY + 1;
 
-            tilesToRender.forEach(tileData => {
-                let div = document.createElement('div');
-                div.className = 'tile';
-                div.id = `cell_${tileData.gx}_${tileData.gy}`;
-                div.style.left = (tileData.gx * TILE_SIZE) + 'px';
-                div.style.top = (tileData.gy * TILE_SIZE) + 'px';
-                div.dataset.tx = tileData.tx;
-                div.dataset.ty = tileData.ty;
+                // Populate Data Grid
+                mapDataGrid = new Array(mapHeightTiles).fill(0).map(() => new Array(mapWidthTiles).fill(null));
+                loadedTiles.forEach(t => {
+                    if (t.gx < mapWidthTiles && t.gy < mapHeightTiles) {
+                        mapDataGrid[t.gy][t.gx] = { tx: t.tx, ty: t.ty };
+                    }
+                });
 
-                // Set background position for map tile (1x scale)
-                if (tileData.tx === EMPTY_TILE.tx && tileData.ty === EMPTY_TILE.ty) {
-                    div.classList.add('empty');
-                } else {
-                    div.style.backgroundPosition = `-${tileData.tx * TILE_SIZE}px -${tileData.ty * TILE_SIZE}px`;
+                // Fill gaps
+                for (let y = 0; y < mapHeightTiles; y++) {
+                    for (let x = 0; x < mapWidthTiles; x++) {
+                        if (!mapDataGrid[y][x]) mapDataGrid[y][x] = { ...EMPTY_TILE };
+                    }
                 }
 
-                div.onclick = function () { onGridClick(this, tileData.gx, tileData.gy); };
-                div.onmousemove = function () {
-                    document.getElementById('hover-coords').innerText = tileData.gx + "," + tileData.gy;
-                };
-                mapContainer.appendChild(div);
+            } else {
+                console.warn("No MAP_DATA found, starting empty.");
+                // Init empty
+                mapDataGrid = new Array(mapHeightTiles).fill(0).map(() => new Array(mapWidthTiles).fill(null).map(() => ({ ...EMPTY_TILE })));
+            }
 
-                if (tileData.gx > maxX) maxX = tileData.gx;
-                if (tileData.gy > maxY) maxY = tileData.gy;
-            });
+            // Set Inputs
+            document.getElementById('map-width').value = mapWidthTiles;
+            document.getElementById('map-height').value = mapHeightTiles;
 
-            mapContainer.style.width = ((maxX + 1) * TILE_SIZE) + 'px';
-            mapContainer.style.height = ((maxY + 1) * TILE_SIZE) + 'px';
+            renderMapGrid();
+        }
+
+        function resizeMap() {
+            const newW = parseInt(document.getElementById('map-width').value);
+            const newH = parseInt(document.getElementById('map-height').value);
+            const anchor = document.getElementById('resize-anchor').value;
+
+            if (newW === mapWidthTiles && newH === mapHeightTiles) return;
+
+            if (!confirm("Resizing might crop map data. Continue?")) return;
+
+            // Create new grid
+            const newGrid = new Array(newH).fill(0).map(() => new Array(newW).fill(null));
+
+            let offX = 0;
+            let offY = 0;
+
+            if (anchor === 'tr' || anchor === 'br') offX = newW - mapWidthTiles;
+            if (anchor === 'bl' || anchor === 'br') offY = newH - mapHeightTiles;
+            if (anchor === 'c') {
+                offX = Math.floor((newW - mapWidthTiles) / 2);
+                offY = Math.floor((newH - mapHeightTiles) / 2);
+            }
+
+            for (let y = 0; y < newH; y++) {
+                for (let x = 0; x < newW; x++) {
+                    const srcX = x - offX;
+                    const srcY = y - offY;
+
+                    if (srcX >= 0 && srcX < mapWidthTiles && srcY >= 0 && srcY < mapHeightTiles) {
+                        newGrid[y][x] = mapDataGrid[srcY][srcX];
+                    } else {
+                        newGrid[y][x] = { ...EMPTY_TILE };
+                    }
+                }
+            }
+
+            mapWidthTiles = newW;
+            mapHeightTiles = newH;
+            mapDataGrid = newGrid;
+
+            // Adjust Overlay
+            overlayConfig.x += offX * TILE_SIZE;
+            overlayConfig.y += offY * TILE_SIZE;
+            document.getElementById('overlay-offset-x').value = overlayConfig.x;
+            document.getElementById('overlay-offset-y').value = overlayConfig.y;
+
+            renderMapGrid();
+        }
+
+        function updateAssets() {
+            const newVal = document.getElementById('asset-tileset').value;
+            let tPath = newVal;
+            if (tPath && tPath.startsWith('map/')) tPath = tPath.substring(4);
+            ASSET_PATH = tPath;
+
+            // Reload Image
+            const img = new Image();
+            img.src = ASSET_PATH;
+            img.onload = function () {
+                tilesetWidth = img.width;
+                tilesetHeight = img.height;
+                // Rebuild palette?
+                document.getElementById('palette').innerHTML = '';
+                // ... Reinit palette logic needs extraction ...
+                // For now, just reload page or simple alert.
+                // Ideally separate rebuildPalette function.
+                // Quick fix: Just alert user to reload or impl simple palette refresh.
+                alert("Tileset path updated. Please reload logic or save & refresh for palette update.");
+                // Actually, let's just update the css rule for .tile?
+                // .tile background-image
+                const styleSheet = document.styleSheets[0];
+                // Hard to find rule. 
+                // Just set inline style for all tiles?
+                renderMapGrid();
+            };
+        }
+
+        function renderMapGrid() {
+            const mapContainer = document.getElementById('map');
+            mapContainer.innerHTML = '';
+            mapContainer.style.width = (mapWidthTiles * TILE_SIZE) + 'px';
+            mapContainer.style.height = (mapHeightTiles * TILE_SIZE) + 'px';
+
+            // Re-add reference overlay
+            const overlay = document.createElement('img');
+            overlay.src = overlayConfig.url;
+            overlay.className = 'reference-overlay';
+            // Override styles with config
+            overlay.style.width = overlayConfig.w + 'px';
+            overlay.style.height = 'auto'; // Maintain aspect ratio
+            overlay.style.left = '0px'; // Reset base
+            overlay.style.top = '0px';
+            overlay.style.marginLeft = overlayConfig.x + 'px'; // Using margin for offset as per original CSS logic
+            overlay.style.marginTop = overlayConfig.y + 'px';
+            overlay.style.opacity = overlayConfig.opacity;
+            overlay.style.display = overlayConfig.visible ? 'block' : 'none';
+            overlay.id = 'ref-overlay-img';
+            mapContainer.appendChild(overlay);
+
+            // Ensure container covers overlay if overlay is huge
+            // (Optional, user might prefer scrollbars)
+            if (overlayConfig.w > (mapWidthTiles * TILE_SIZE)) {
+                mapContainer.style.width = overlayConfig.w + 'px';
+            }
+
+            // Render Tiles
+            for (let y = 0; y < mapHeightTiles; y++) {
+                for (let x = 0; x < mapWidthTiles; x++) {
+                    let tileData = mapDataGrid[y][x];
+                    let div = document.createElement('div');
+                    div.className = 'tile';
+                    div.id = `cell_${x}_${y}`;
+                    div.style.left = (x * TILE_SIZE) + 'px';
+                    div.style.top = (y * TILE_SIZE) + 'px';
+
+                    // Use current ASSET_PATH for background
+                    div.style.backgroundImage = `url('${ASSET_PATH}')`;
+
+                    if (tileData.tx === EMPTY_TILE.tx && tileData.ty === EMPTY_TILE.ty) {
+                        div.classList.add('empty');
+                    } else {
+                        div.style.backgroundPosition = `-${tileData.tx * TILE_SIZE}px -${tileData.ty * TILE_SIZE}px`;
+                    }
+
+                    div.dataset.tx = tileData.tx;
+                    div.dataset.ty = tileData.ty;
+
+                    div.onclick = function () { onGridClick(this, x, y); };
+                    div.onmousemove = function () {
+                        document.getElementById('hover-coords').innerText = x + "," + y;
+                    };
+                    mapContainer.appendChild(div);
+                }
+            }
+
+            // Re-render things that float on top (Animations, Collisions)
+            renderAnimations();
+            renderCollisions();
         }
 
         function selectTile(el, tx, ty) {
@@ -580,46 +845,36 @@
             document.getElementById('zoom-level').innerText = Math.round(zoomLevel * 100) + "%";
         }
 
-        function updateOverlayOffsetX(val) {
-            const overlay = document.querySelector('.reference-overlay');
-            if (overlay) {
-                overlay.style.marginLeft = val + 'px';
-            }
-        }
+        function updateOverlayConfig() {
+            overlayConfig.url = document.getElementById('overlay-url').value;
+            overlayConfig.w = parseInt(document.getElementById('overlay-width').value) || 0;
+            overlayConfig.x = parseInt(document.getElementById('overlay-offset-x').value) || 0;
+            overlayConfig.y = parseInt(document.getElementById('overlay-offset-y').value) || 0;
+            overlayConfig.opacity = parseFloat(document.getElementById('overlay-opacity').value) || 0.5;
 
-        function updateOverlayOffsetY(val) {
-            const overlay = document.querySelector('.reference-overlay');
+            const overlay = document.getElementById('ref-overlay-img');
             if (overlay) {
-                overlay.style.marginTop = val + 'px';
+                overlay.src = overlayConfig.url;
+                overlay.style.width = overlayConfig.w + 'px';
+                overlay.style.marginLeft = overlayConfig.x + 'px'; // margin logic
+                overlay.style.marginTop = overlayConfig.y + 'px';
+                overlay.style.opacity = overlayConfig.opacity;
             }
-        }
 
-        function updateOverlayWidth(val) {
-            const overlay = document.querySelector('.reference-overlay');
-            if (overlay) {
-                overlay.style.width = val + 'px';
-                // Wait for layout update before resizing map
-                setTimeout(updateMapSizeForOverlay, 50);
+            // Expand container if needed
+            const mapContainer = document.getElementById('map');
+            const mapW = mapWidthTiles * TILE_SIZE;
+            if (mapContainer && overlayConfig.w > mapW) {
+                mapContainer.style.width = overlayConfig.w + 'px';
             }
         }
 
         function toggleOverlay() {
-            const overlay = document.querySelector('.reference-overlay');
+            overlayConfig.visible = !overlayConfig.visible;
+            const overlay = document.getElementById('ref-overlay-img');
             if (overlay) {
-                overlay.style.display = (overlay.style.display === 'none') ? 'block' : 'none';
+                overlay.style.display = overlayConfig.visible ? 'block' : 'none';
             }
-        }
-
-        function updateMapSizeForOverlay() {
-            const overlay = document.querySelector('.reference-overlay');
-            const mapContainer = document.getElementById('map');
-            if (!overlay || !mapContainer) return;
-
-            const currentW = parseInt(mapContainer.style.width) || 0;
-            const currentH = parseInt(mapContainer.style.height) || 0;
-
-            if (overlay.width > currentW) mapContainer.style.width = overlay.width + 'px';
-            if (overlay.height > currentH) mapContainer.style.height = overlay.height + 'px';
         }
 
         function paintTile(el, gx, gy) {
@@ -632,8 +887,10 @@
                 el.style.backgroundPosition = `-${selectedTx * TILE_SIZE}px -${selectedTy * TILE_SIZE}px`;
             }
             // Update data
+            // Update data
             el.dataset.tx = selectedTx;
             el.dataset.ty = selectedTy;
+            mapDataGrid[gy][gx] = { tx: selectedTx, ty: selectedTy };
         }
 
         function exportData() {
@@ -649,8 +906,17 @@
             });
 
             const exportData = {
+                assets: {
+                    tileset: document.getElementById('asset-tileset').value,
+                    ceilingTileset: document.getElementById('asset-ceiling').value,
+                    animation: document.getElementById('asset-anim').value,
+                    character: document.getElementById('asset-char').value
+                },
                 tiles: data,
                 animations: animations,
+                editor: {
+                    overlay: overlayConfig
+                },
                 collisions: Array.from(collisionTiles).map(k => {
                     const [x, y] = k.split(',').map(Number);
                     return { x, y };
