@@ -12,9 +12,10 @@
 let CONFIG = {
     TILE_SIZE: 16,
     SCALE: 2,
-    MOVEMENT_SPEED: 8,
+    MOVEMENT_SPEED: 4,
     ANIMATION_SPEED: 40,
     MAP_ANIM_DEFAULT_SPEED: 200,
+    COLLISION_PADDING: 8,
     CEILING_RENDER: {
         RANGE_TOP: 16,
         RANGE_BOTTOM: 32,
@@ -70,6 +71,11 @@ const keys = {
     a: false,
     d: false
 };
+
+// Initialize
+let triggers = [];
+let activeTrigger = null;
+let isModalOpen = false;
 
 // Initialize
 async function initGame() {
@@ -138,6 +144,17 @@ async function initGame() {
                 mapCollisions.add(`${col.x},${col.y}`);
             });
         }
+
+        // Triggers
+        if (window.MAP_DATA.triggers) {
+            triggers = window.MAP_DATA.triggers.map(t => ({
+                x: t.x * CONFIG.TILE_SIZE,
+                y: t.y * CONFIG.TILE_SIZE,
+                w: (t.w || 1) * CONFIG.TILE_SIZE,
+                h: (t.h || 1) * CONFIG.TILE_SIZE,
+                targetId: t.targetId
+            }));
+        }
     } else {
         console.warn("No MAP_DATA found in window");
         return;
@@ -150,10 +167,29 @@ async function initGame() {
 
     // Handle Input
     window.addEventListener('keydown', e => {
+        if (isModalOpen) {
+            if (e.key === 'Escape') closeModal();
+            return;
+        }
+
         if (keys.hasOwnProperty(e.key)) keys[e.key] = true;
+        if (e.code === 'Space' && activeTrigger) {
+            openModal(activeTrigger.targetId);
+        }
     });
+
     window.addEventListener('keyup', e => {
         if (keys.hasOwnProperty(e.key)) keys[e.key] = false;
+    });
+
+    // Close modal on click outside
+    document.querySelectorAll('.modal').forEach(modal => {
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) closeModal();
+        });
+
+        const closeBtn = modal.querySelector('.close-modal');
+        if (closeBtn) closeBtn.addEventListener('click', closeModal);
     });
 
     // Handle Resize
@@ -222,6 +258,37 @@ async function initGame() {
     console.log("Game initialized!");
 }
 
+function openModal(modalId) {
+    const modal = document.getElementById(modalId);
+    if (modal) {
+        modal.classList.remove('hidden');
+        isModalOpen = true;
+
+        // Stop player movement
+        keys.ArrowUp = false;
+        keys.ArrowDown = false;
+        keys.ArrowLeft = false;
+        keys.ArrowRight = false;
+        player.isMoving = false; // Assuming currentSpeed is player.isMoving or similar
+
+        // Position Logic - ALWAYS CENTERED (Default CSS)
+        // We ensure any previous manual positioning is cleared
+        const content = modal.querySelector('.modal-content');
+        if (content) {
+            content.style.position = '';
+            content.style.left = '';
+            content.style.top = '';
+            content.style.transform = '';
+            content.style.margin = '';
+        }
+    }
+}
+
+function closeModal() {
+    document.querySelectorAll('.modal').forEach(m => m.classList.add('hidden'));
+    isModalOpen = false;
+}
+
 function resizeCanvas() {
     // Set internal resolution to 1x (viewport / scale)
     canvas.width = Math.ceil(window.innerWidth / CONFIG.SCALE);
@@ -268,15 +335,18 @@ function update() {
         player.stepTimer = 0;
     }
 
+    const pad = CONFIG.COLLISION_PADDING || 0;
+
     // Try Move X
     let nextX = player.x + dx;
-    if (!checkCollision(nextX, player.y, player.width, player.height)) {
+    // Inflate Collision Box by padding
+    if (!checkCollision(nextX - pad, player.y - pad, player.width + pad * 2, player.height + pad * 2)) {
         player.x = nextX;
     }
 
     // Try Move Y
     let nextY = player.y + dy;
-    if (!checkCollision(player.x, nextY, player.width, player.height)) {
+    if (!checkCollision(player.x - pad, nextY - pad, player.width + pad * 2, player.height + pad * 2)) {
         player.y = nextY;
     }
 
@@ -312,6 +382,38 @@ function update() {
         if (camera.y > mapHeight - camera.height) camera.y = mapHeight - camera.height;
     } else {
         camera.y = -(camera.height - mapHeight) / 2; // Center vertically
+    }
+
+    checkTriggers();
+}
+
+function checkTriggers() {
+    if (isModalOpen) return;
+
+    const pCx = player.x + player.width / 2;
+    const pCy = player.y + player.height / 2;
+
+    // Simple point-in-rect for now, or center-in-rect
+    const prevTrigger = activeTrigger;
+    activeTrigger = null;
+
+    for (let t of triggers) {
+        if (pCx >= t.x && pCx <= t.x + t.w &&
+            pCy >= t.y && pCy <= t.y + t.h) {
+            activeTrigger = t;
+            break;
+        }
+    }
+
+    const prompt = document.getElementById('interaction-prompt');
+    if (activeTrigger) {
+        if (prompt && prompt.classList.contains('hidden')) {
+            prompt.classList.remove('hidden');
+        }
+    } else {
+        if (prompt && !prompt.classList.contains('hidden')) {
+            prompt.classList.add('hidden');
+        }
     }
 }
 

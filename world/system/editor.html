@@ -70,22 +70,7 @@
             height: 16px;
         }
 
-        .reference-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            /* transform: translateY(-50%); REMOVED */
-            z-index: 2;
-            opacity: 0.5;
-            pointer-events: none;
-            opacity: 0.5;
-            pointer-events: none;
-            width: 610px;
-            height: auto;
-            max-width: none;
-            margin-left: -8px;
-            margin-top: 15px;
-        }
+
 
         .tile:hover {
             z-index: 100;
@@ -179,6 +164,17 @@
 <body>
     <div class="sidebar">
         <h2>Map Editor</h2>
+
+        <div style="margin-bottom: 10px;">
+            <label>Map:
+                <select id="map-selector" onchange="changeMap()"
+                    style="width: 100px; padding: 5px; background: #333; color: white; border: 1px solid #555;">
+                    <option value="cave">Cave</option>
+                    <option value="bamboo">Bamboo</option>
+                </select>
+            </label>
+        </div>
+
         <div class="palette" id="palette"></div>
         <div class="controls">
             <p>Selected Tile: <span id="selected-id">None</span></p>
@@ -208,34 +204,7 @@
                 <button onclick="resetZoom()" style="flex: 1;">Reset</button>
             </div>
             <p>Zoom: <span id="zoom-level">100%</span></p>
-            <div style="margin-bottom: 5px; margin-top: 10px;">
-                <label>Overlay Config:</label>
-                <button onclick="toggleOverlay()" style="float:right; font-size: 10px;">Toggle</button>
-            </div>
-            <div style="margin-bottom: 5px;">
-                <input type="text" id="overlay-url" value="map/assets/cave/cave_ori.png"
-                    onchange="updateOverlayConfig()" placeholder="Image Path" style="width:100%;">
-            </div>
-            <div style="display: flex; gap: 5px; margin-bottom: 5px;">
-                <label style="flex:1;">Opacity:
-                    <input type="number" id="overlay-opacity" step="0.1" min="0" max="1" value="0.5"
-                        onchange="updateOverlayConfig()" style="width:40px;">
-                </label>
-                <label style="flex:1;">Width:
-                    <input type="number" id="overlay-width" value="610" onchange="updateOverlayConfig()"
-                        style="width:50px;">
-                </label>
-            </div>
-            <div style="display: flex; gap: 5px; margin-bottom: 10px;">
-                <label style="flex:1;">X:
-                    <input type="number" id="overlay-offset-x" value="-8" onchange="updateOverlayConfig()"
-                        style="width:50px;">
-                </label>
-                <label style="flex:1;">Y:
-                    <input type="number" id="overlay-offset-y" value="15" onchange="updateOverlayConfig()"
-                        style="width:50px;">
-                </label>
-            </div>
+
             <div style="margin-bottom: 10px;">
                 <button id="collisionBtn" onclick="toggleCollisionMode()">Collision Mode: OFF</button>
             </div>
@@ -296,6 +265,17 @@
         const urlParams = new URLSearchParams(window.location.search);
         const mapName = urlParams.get('map') || 'cave'; // Default to cave
 
+        // Set selector value
+        const mapSelector = document.getElementById('map-selector');
+        if (mapSelector) {
+            mapSelector.value = mapName;
+        }
+
+        function changeMap() {
+            const selectedMap = document.getElementById('map-selector').value;
+            window.location.search = `?map=${selectedMap}`;
+        }
+
         // Helper for editor to resolve paths relative to the map folder
         // Only used for DISPLAYing images in the editor DOM.
         // The data in JSON remains relative to the data.js file (e.g. "assets/tile.png")
@@ -327,9 +307,20 @@
         const script = document.createElement('script');
         script.src = `../maps/${mapName}/data.js`;
         script.onload = () => {
-            document.getElementById('loading').style.display = 'none';
-            // Trigger init after load
-            if (typeof initEditor === 'function') initEditor();
+            // Load triggers.js if it exists, but don't fail hard if it doesn't?
+            // Actually, for now we assume it exists for this map structure.
+            const triggerScript = document.createElement('script');
+            triggerScript.src = `../maps/${mapName}/triggers.js`;
+            triggerScript.onload = () => {
+                document.getElementById('loading').style.display = 'none';
+                if (typeof initEditor === 'function') initEditor();
+            };
+            triggerScript.onerror = () => {
+                console.warn("No triggers.js found, or failed to load. Continuing...");
+                document.getElementById('loading').style.display = 'none';
+                if (typeof initEditor === 'function') initEditor();
+            };
+            document.body.appendChild(triggerScript);
         };
         script.onerror = () => {
             document.getElementById('loading').innerText = `Error: Map '${mapName}' data not found.`;
@@ -361,14 +352,7 @@
         let tilesetHeight = 0;
         let zoomLevel = 1.0;
 
-        let overlayConfig = {
-            url: 'map/assets/cave/cave_ori.png',
-            x: -8,
-            y: 15,
-            w: 610,
-            opacity: 0.5,
-            visible: true
-        };
+
 
         // Initialize
         const img = new Image();
@@ -427,22 +411,10 @@
                 }
 
 
-                // Load Editor Config (Overlay)
-                if (window.MAP_DATA.editor && window.MAP_DATA.editor.overlay) {
-                    const ov = window.MAP_DATA.editor.overlay;
-                    overlayConfig.url = ov.url || overlayConfig.url;
-                    overlayConfig.x = (ov.x !== undefined) ? ov.x : overlayConfig.x;
-                    overlayConfig.y = (ov.y !== undefined) ? ov.y : overlayConfig.y;
-                    overlayConfig.w = (ov.w !== undefined) ? ov.w : overlayConfig.w;
-                    overlayConfig.opacity = (ov.opacity !== undefined) ? ov.opacity : overlayConfig.opacity;
-                }
+
 
                 // Update UI Inputs for Overlay
-                document.getElementById('overlay-url').value = overlayConfig.url;
-                document.getElementById('overlay-width').value = overlayConfig.w;
-                document.getElementById('overlay-offset-x').value = overlayConfig.x;
-                document.getElementById('overlay-offset-y').value = overlayConfig.y;
-                document.getElementById('overlay-opacity').value = overlayConfig.opacity;
+
 
                 // Load Tiles
                 let loadedTiles = [];
@@ -535,11 +507,7 @@
             mapHeightTiles = newH;
             mapDataGrid = newGrid;
 
-            // Adjust Overlay
-            overlayConfig.x += offX * TILE_SIZE;
-            overlayConfig.y += offY * TILE_SIZE;
-            document.getElementById('overlay-offset-x').value = overlayConfig.x;
-            document.getElementById('overlay-offset-y').value = overlayConfig.y;
+
 
             renderMapGrid();
         }
@@ -578,27 +546,7 @@
             mapContainer.style.width = (mapWidthTiles * TILE_SIZE) + 'px';
             mapContainer.style.height = (mapHeightTiles * TILE_SIZE) + 'px';
 
-            // Re-add reference overlay
-            const overlay = document.createElement('img');
-            overlay.src = overlayConfig.url;
-            overlay.className = 'reference-overlay';
-            // Override styles with config
-            overlay.style.width = overlayConfig.w + 'px';
-            overlay.style.height = 'auto'; // Maintain aspect ratio
-            overlay.style.left = '0px'; // Reset base
-            overlay.style.top = '0px';
-            overlay.style.marginLeft = overlayConfig.x + 'px'; // Using margin for offset as per original CSS logic
-            overlay.style.marginTop = overlayConfig.y + 'px';
-            overlay.style.opacity = overlayConfig.opacity;
-            overlay.style.display = overlayConfig.visible ? 'block' : 'none';
-            overlay.id = 'ref-overlay-img';
-            mapContainer.appendChild(overlay);
 
-            // Ensure container covers overlay if overlay is huge
-            // (Optional, user might prefer scrollbars)
-            if (overlayConfig.w > (mapWidthTiles * TILE_SIZE)) {
-                mapContainer.style.width = overlayConfig.w + 'px';
-            }
 
             // Render Tiles
             for (let y = 0; y < mapHeightTiles; y++) {
@@ -845,37 +793,7 @@
             document.getElementById('zoom-level').innerText = Math.round(zoomLevel * 100) + "%";
         }
 
-        function updateOverlayConfig() {
-            overlayConfig.url = document.getElementById('overlay-url').value;
-            overlayConfig.w = parseInt(document.getElementById('overlay-width').value) || 0;
-            overlayConfig.x = parseInt(document.getElementById('overlay-offset-x').value) || 0;
-            overlayConfig.y = parseInt(document.getElementById('overlay-offset-y').value) || 0;
-            overlayConfig.opacity = parseFloat(document.getElementById('overlay-opacity').value) || 0.5;
 
-            const overlay = document.getElementById('ref-overlay-img');
-            if (overlay) {
-                overlay.src = overlayConfig.url;
-                overlay.style.width = overlayConfig.w + 'px';
-                overlay.style.marginLeft = overlayConfig.x + 'px'; // margin logic
-                overlay.style.marginTop = overlayConfig.y + 'px';
-                overlay.style.opacity = overlayConfig.opacity;
-            }
-
-            // Expand container if needed
-            const mapContainer = document.getElementById('map');
-            const mapW = mapWidthTiles * TILE_SIZE;
-            if (mapContainer && overlayConfig.w > mapW) {
-                mapContainer.style.width = overlayConfig.w + 'px';
-            }
-        }
-
-        function toggleOverlay() {
-            overlayConfig.visible = !overlayConfig.visible;
-            const overlay = document.getElementById('ref-overlay-img');
-            if (overlay) {
-                overlay.style.display = overlayConfig.visible ? 'block' : 'none';
-            }
-        }
 
         function paintTile(el, gx, gy) {
             // Update visual
@@ -914,9 +832,7 @@
                 },
                 tiles: data,
                 animations: animations,
-                editor: {
-                    overlay: overlayConfig
-                },
+
                 collisions: Array.from(collisionTiles).map(k => {
                     const [x, y] = k.split(',').map(Number);
                     return { x, y };
