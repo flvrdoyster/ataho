@@ -219,22 +219,25 @@ a:hover {
     background: white;
     padding: 2rem;
     border-radius: 8px;
-    max-width: 500px;
+    max-width: 300px;
     width: 90%;
     position: relative;
     color: #333;
-    text-align: center;
+    font-size: 1rem;
+    text-align: left;
     text-shadow: none;
 }
 
 .modal-content h2 {
     margin-top: 0;
     color: #444;
+    font-size: 1.4rem;
 }
 
 .modal-content ul {
     padding-left: 0;
-    list-style: none;
+    list-style: disc;
+    list-style-position: inside;
 }
 
 .modal-content li {
@@ -245,7 +248,9 @@ a:hover {
     position: absolute;
     top: 10px;
     right: 15px;
-    font-size: 28px;
+    top: 10px;
+    right: 15px;
+    font-size: 50px;
     font-weight: bold;
     cursor: pointer;
     color: #aaa;
@@ -253,4 +258,23 @@ a:hover {
 
 .close-modal:hover {
     color: black;
+}
+
+/* Mobile Adjustments */
+@media (max-width: 768px) {
+    .modal-content {
+        width: 75%;
+        padding: 1.5rem;
+        font-size: 1.2rem;
+    }
+
+    /* Hide prompt on mobile since it auto-triggers */
+    #interaction-prompt {
+        display: none !important;
+    }
+
+    /* Footer: Hide desktop-only spans */
+    .desktop-only {
+        display: none;
+    }
 }
