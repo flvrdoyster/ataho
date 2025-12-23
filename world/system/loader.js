@@ -72,6 +72,17 @@ const keys = {
     d: false
 };
 
+const touchInput = {
+    active: false,
+    dx: 0,
+    dy: 0,
+    originX: 0,
+    originY: 0
+};
+
+let lastTrigger = null;
+let isTouchDevice = false;
+
 // Initialize
 let triggers = [];
 let activeTrigger = null;
@@ -181,6 +192,16 @@ async function initGame() {
     window.addEventListener('keyup', e => {
         if (keys.hasOwnProperty(e.key)) keys[e.key] = false;
     });
+
+    // Handle Touch
+    canvas.addEventListener('touchstart', handleTouchStart, { passive: false });
+    canvas.addEventListener('touchmove', handleTouchMove, { passive: false });
+    canvas.addEventListener('touchend', handleTouchEnd, { passive: false });
+
+    // Detect generic touch support
+    if ('ontouchstart' in window || navigator.maxTouchPoints > 0) {
+        isTouchDevice = true;
+    }
 
     // Close modal on click outside
     document.querySelectorAll('.modal').forEach(modal => {
@@ -301,6 +322,62 @@ function resizeCanvas() {
     if (ctx) ctx.imageSmoothingEnabled = false;
 }
 
+function handleTouchStart(e) {
+    if (e.target !== canvas) return;
+    e.preventDefault();
+    touchInput.active = true;
+    updateTouchInput(e.touches[0]);
+}
+
+function handleTouchMove(e) {
+    if (e.target !== canvas) return;
+    e.preventDefault();
+    if (touchInput.active) {
+        updateTouchInput(e.touches[0]);
+    }
+}
+
+function handleTouchEnd(e) {
+    if (e.target !== canvas) return;
+    e.preventDefault();
+    touchInput.active = false;
+    touchInput.dx = 0;
+    touchInput.dy = 0;
+}
+
+function updateTouchInput(touch) {
+    // Calculate direction relative to screen center (which is where player is approximately)
+    // Calculate direction relative to Player's Screen Position
+
+    // 1. Get Player Center in Internal Canvas Coordinates
+    // player.x/y are world coordinates. camera.x/y are world coordinates of top-left view.
+    const pCanvasX = player.x + player.width / 2 - camera.x;
+    const pCanvasY = player.y + player.height / 2 - camera.y;
+
+    // 2. Map Touch to Internal Canvas Coordinates
+    const rect = canvas.getBoundingClientRect();
+    // Scale factor between CSS pixels (Display) and Internal pixels
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+
+    const touchInternalX = (touch.clientX - rect.left) * scaleX;
+    const touchInternalY = (touch.clientY - rect.top) * scaleY;
+
+    // 3. Vector from Player to Touch
+    let tx = touchInternalX - pCanvasX;
+    let ty = touchInternalY - pCanvasY;
+
+    // Normalize
+    const len = Math.sqrt(tx * tx + ty * ty);
+    if (len > 10) { // Deadzone in internal pixels
+        touchInput.dx = tx / len;
+        touchInput.dy = ty / len;
+    } else {
+        touchInput.dx = 0;
+        touchInput.dy = 0;
+    }
+}
+
 function update() {
     // Player Movement
     let dx = 0;
@@ -316,6 +393,24 @@ function update() {
         const factor = Math.SQRT1_2; // 1 / sqrt(2) approx 0.707
         dx *= factor;
         dy *= factor;
+    }
+
+    // Touch Input Overlay (if active)
+    if (touchInput.active) {
+        // If touch is active, it overrides or adds to keyboard? 
+        // Let's have touch take priority if active, or just add.
+        // Adding allows testing both.
+        // But usually touch direction is normalized vector.
+
+        // Update direction enum based on predominant touch axis
+        if (Math.abs(touchInput.dx) > Math.abs(touchInput.dy)) {
+            player.direction = touchInput.dx > 0 ? 3 : 1;
+        } else {
+            player.direction = touchInput.dy > 0 ? 0 : 2;
+        }
+
+        dx = touchInput.dx;
+        dy = touchInput.dy;
     }
 
     // Apply Speed
@@ -404,6 +499,17 @@ function checkTriggers() {
             break;
         }
     }
+
+    // Auto-Open for Touch Devices (Mobile)
+    // Rule: Open only on *entry* to avoid infinite loop after closing.
+    // If we are on the same trigger as last frame, do nothing.
+    if (isTouchDevice) {
+        if (activeTrigger && activeTrigger !== lastTrigger) {
+            openModal(activeTrigger.targetId);
+        }
+    }
+
+    lastTrigger = activeTrigger;
 
     const prompt = document.getElementById('interaction-prompt');
     if (activeTrigger) {
