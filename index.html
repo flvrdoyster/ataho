@@ -29,54 +29,72 @@
     <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-PR4S897C" height="0" width="0"
             style="display:none;visibility:hidden"></iframe></noscript>
     <!-- End Google Tag Manager (noscript) -->
+
+    <canvas id="gameCanvas"></canvas>
+
     <div id="header">
         <h1>All Things Archived Here</h1>
     </div>
 
-    <hr />
+    <div id="ui-layer">
+        <div id="interaction-prompt" class="prompt hidden">Space를 누르세요.</div>
 
-    <div id="content">
+        <!-- Modals -->
+        <div id="popup-minigames" class="modal hidden">
+            <div class="modal-content">
+                <span class="close-modal">&times;</span>
+                <h2>아타호 미니게임</h2>
+                <ul>
+                    <li><a href="swim/index.html">헤엄치기</a></li>
+                    <li><a href="balance/index.html">평균대 동작수련</a></li>
+                </ul>
+            </div>
+        </div>
 
-        <div class="section">
-            <h2>아타호 미니게임</h2>
-            <ul>
-                <li><a href="swim/index.html">헤엄치기</a></li>
-                <li><a href="balance/index.html">평균대 동작수련</a></li>
-            </ul>
+        <div id="popup-haiyuki" class="modal hidden">
+            <div class="modal-content">
+                <span class="close-modal">&times;</span>
+                <h2>환세패유기</h2>
+                <ul>
+                    <li><a href="haiyuki_web/index.html">웹 버전</a> (ko) - 개발 중</li>
+                    <li><a href="haiyuki_manual/index.html">매뉴얼</a> (ko)<br />
+                        [<a href="haiyuki_manual/ref/manual_thebest.pdf">원본 1</a>, <a
+                            href="haiyuki_manual/ref/manual_D4.pdf">원본 2</a>]</li>
+                </ul>
+            </div>
         </div>
-        <div class="section">
-            <h2>환세패유기</h2>
-            <ul>
-                <li><a href="haiyuki_web/index.html">웹 버전</a> (ko) - 개발 중</li>
-                <li><a href="haiyuki_manual/index.html">매뉴얼</a> (ko)<br />
-                    [<a href="haiyuki_manual/ref/manual_thebest.pdf">원본 1</a>, <a
-                        href="haiyuki_manual/ref/manual_D4.pdf">원본 2</a>]</li>
-            </ul>
-        </div>
-        <div class="section">
-            <h2>환세 시리즈 일러스트</h2>
-            <ul>
-                <li><a href="#resource/img/ds04.png">Disc Station 04</a></li>
-                <li><a href="#resource/img/ds10.png">Disc Station 10</a></li>
-                <li><a href="#resource/img/ds14.png">Disc Station 14</a></li>
-                <li><a href="#resource/img/ds20.png">Disc Station 20</a></li>
-            </ul>
-        </div>
-        <div class="section"></div>
 
+        <div id="popup-gallery" class="modal hidden">
+            <div class="modal-content">
+                <span class="close-modal">&times;</span>
+                <h2>환세 시리즈 일러스트</h2>
+                <ul>
+                    <li><a href="#resource/img/ds04.png">Disc Station 04</a></li>
+                    <li><a href="#resource/img/ds10.png">Disc Station 10</a></li>
+                    <li><a href="#resource/img/ds14.png">Disc Station 14</a></li>
+                    <li><a href="#resource/img/ds20.png">Disc Station 20</a></li>
+                </ul>
+            </div>
+        </div>
     </div>
-
-    <hr />
 
     <div id="footer">
         <p>
-            Code magic by <a href="https://antigravity.google/">Google Antigravity</a><br />
-            Everything else, merely collected by <a href="https://github.com/flvrdoyster">flvrdoyster</a><br />
+            Code magic by <a href="https://antigravity.google/">Google Antigravity</a> <span
+                style="color: #333;">|</span>
+            Everything else, merely collected by <a href="https://github.com/flvrdoyster">flvrdoyster</a> <span
+                style="color: #333;">|</span>
             Visual and audio assets © original creators.
         </p>
     </div>
 
 </body>
+
+<script>window.MAP_NAME = 'cave';</script>
+<!-- Game Data & Logic -->
+<script src="world/maps/cave/data.js"></script>
+<script src="world/maps/cave/triggers.js"></script>
+<script src="world/system/loader.js"></script>
 
 <div id="lightbox">
     <span class="close">&times;</span>

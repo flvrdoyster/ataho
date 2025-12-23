@@ -1,0 +1,847 @@
+<html>
+
+<head>
+    <title>Map Editor</title>
+    <style>
+        body {
+            background: #222;
+            display: flex;
+            flex-direction: row;
+            font-family: sans-serif;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+        }
+
+        .editor-container {
+            flex: 1;
+            overflow: auto;
+            background: #333;
+            position: relative;
+            display: flex;
+            justify-content: flex-start;
+            align-items: flex-start;
+            padding: 20px;
+        }
+
+        .map-grid {
+            position: relative;
+            background: #000;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+        }
+
+        .tile {
+            position: absolute;
+            width: 16px;
+            height: 16px;
+            /* pointer-events: none; REMOVED to allow simple clicks, but we handle click on map container usually? 
+               Actually tile has onclick. Keep it. */
+            cursor: pointer;
+            image-rendering: pixelated;
+            background-image: url('assets/cave/cave_tile.png');
+            background-repeat: no-repeat;
+            z-index: 1;
+        }
+
+        .anim-obj {
+            position: absolute;
+            background-repeat: no-repeat;
+            image-rendering: pixelated;
+            z-index: 10;
+            /* Above tiles */
+            border: 1px solid rgba(255, 255, 0, 0.5);
+            /* Highlight bounds */
+            pointer-events: none;
+            /* Let clicks pass to grid? No, we might want to select/delete. */
+            cursor: pointer;
+        }
+
+        .anim-obj:hover {
+            border: 1px solid yellow;
+        }
+
+        .collision-overlay {
+            position: absolute;
+            background: rgba(255, 0, 0, 0.5);
+            z-index: 15;
+            pointer-events: none;
+            cursor: pointer;
+            width: 16px;
+            height: 16px;
+        }
+
+
+
+        .tile:hover {
+            z-index: 100;
+            outline: 1px solid white;
+        }
+
+        .tile.empty {
+            background: none !important;
+        }
+
+        .sidebar {
+            width: 600px;
+            background: #1a1a1a;
+            color: #eee;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            border-right: 1px solid #444;
+            z-index: 200;
+            overflow-y: auto;
+        }
+
+        .palette {
+            display: grid;
+            grid-template-columns: repeat(16, 32px);
+            background: #000;
+            padding: 5px;
+            /* max-height removed to show all tiles */
+            /* overflow-y removed */
+            border: 1px solid #555;
+        }
+
+        .palette-tile {
+            width: 32px;
+            height: 32px;
+            margin: 0;
+            cursor: pointer;
+            border: 2px solid transparent;
+            box-sizing: border-box;
+            image-rendering: pixelated;
+            background-image: url('assets/cave/cave_tile.png');
+            background-size: 512px auto;
+            /* Scale up for palette visibility (32px view of 16px tile) -> 16px * 2 = 32px, so total width * 2 */
+            background-repeat: no-repeat;
+        }
+
+        .palette-tile.selected {
+            border: 2px solid cyan;
+            z-index: 10;
+        }
+
+        .palette-tile:hover {
+            border-color: #888;
+        }
+
+        .controls {
+            margin-top: 20px;
+        }
+
+        button {
+            padding: 10px;
+            width: 100%;
+            margin-bottom: 10px;
+            background: #444;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #555;
+        }
+
+        button.active {
+            background: #d32f2f;
+            font-weight: bold;
+        }
+
+        textarea {
+            width: 100%;
+            height: 100px;
+            background: #222;
+            color: #aaa;
+            border: 1px solid #444;
+            margin-top: 10px;
+            font-size: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="sidebar">
+        <h2>Map Editor</h2>
+
+        <div style="margin-bottom: 10px;">
+            <label>Map:
+                <select id="map-selector" onchange="changeMap()"
+                    style="width: 100px; padding: 5px; background: #333; color: white; border: 1px solid #555;">
+                    <option value="cave">Cave</option>
+                    <option value="bamboo">Bamboo</option>
+                </select>
+            </label>
+        </div>
+
+        <div class="palette" id="palette"></div>
+        <div class="controls">
+            <p>Selected Tile: <span id="selected-id">None</span></p>
+            <p>Hover: <span id="hover-coords">--,--</span></p>
+
+            <div style="margin-bottom: 10px; border-bottom: 1px solid #555; padding-bottom: 10px;">
+                <label><input type="radio" name="mode" value="tile" checked onchange="setMode('tile')"> Tile
+                    Mode</label>
+                <label><input type="radio" name="mode" value="anim" onchange="setMode('anim')"> Animation Mode</label>
+            </div>
+
+            <!-- Animation Palette (Hidden by default) -->
+            <div id="anim-palette" style="display:none; margin-bottom: 15px;">
+                <h3>Animations</h3>
+                <div class="anim-item" onclick="selectAnim('irori')"
+                    style="cursor: pointer; border: 1px solid #444; padding: 5px; margin-bottom: 5px;">
+                    Irori (Hearth)
+                </div>
+            </div>
+
+            <div style="margin-bottom: 10px; display: flex; gap: 5px;">
+                <button onclick="setEraser()" style="flex: 1; background: #c33;">Eraser</button>
+            </div>
+            <div style="margin-bottom: 10px; display: flex; gap: 5px;">
+                <button onclick="changeZoom(0.1)" style="flex: 1;">Zoom +</button>
+                <button onclick="changeZoom(-0.1)" style="flex: 1;">Zoom -</button>
+                <button onclick="resetZoom()" style="flex: 1;">Reset</button>
+            </div>
+            <p>Zoom: <span id="zoom-level">100%</span></p>
+
+            <div style="margin-bottom: 10px;">
+                <button id="collisionBtn" onclick="toggleCollisionMode()">Collision Mode: OFF</button>
+            </div>
+            <button onclick="exportData()">Export JSON</button>
+            <textarea id="output" readonly></textarea>
+
+            <hr style="border-color: #555; margin: 20px 0;">
+            <h3>Map Config</h3>
+            <div style="margin-bottom: 10px;">
+                <label>Width (Tiles): <input type="number" id="map-width" value="40" style="width:50px;"></label>
+            </div>
+            <div style="margin-bottom: 10px;">
+                <label>Height (Tiles): <input type="number" id="map-height" value="30" style="width:50px;"></label>
+            </div>
+
+            <div style="margin-bottom: 10px;">
+                <label>Anchor:
+                    <select id="resize-anchor" style="width: 100px;">
+                        <option value="tl" selected>Top-Left</option>
+                        <option value="tr">Top-Right</option>
+                        <option value="bl">Bottom-Left</option>
+                        <option value="br">Bottom-Right</option>
+                        <option value="c">Center</option>
+                    </select>
+                </label>
+            </div>
+            <button onclick="resizeMap()">Update Size</button>
+
+            <h3>Assets</h3>
+            <div style="margin-bottom: 5px;"><label>Tileset:</label></div>
+            <input type="text" id="asset-tileset" value="map/assets/cave/cave_tile.png"
+                style="width:100%; margin-bottom:10px;">
+
+            <div style="margin-bottom: 5px;"><label>Ceiling:</label></div>
+            <input type="text" id="asset-ceiling" value="map/assets/cave/cave_tile_top.png"
+                style="width:100%; margin-bottom:10px;">
+
+            <div style="margin-bottom: 5px;"><label>Animation:</label></div>
+            <input type="text" id="asset-anim" value="map/assets/cave/cave_tile_irori.png"
+                style="width:100%; margin-bottom:10px;">
+
+            <div style="margin-bottom: 5px;"><label>Character:</label></div>
+            <input type="text" id="asset-char" value="map/assets/char/ataho-1.png"
+                style="width:100%; margin-bottom:10px;">
+
+            <button onclick="updateAssets()">Update Assets</button>
+        </div>
+    </div>
+    <div class="editor-container">
+        <div class="map-grid" id="map"></div>
+    </div>
+
+    <!-- External Data -->
+    <div id="loading" style="color: white; position: absolute; top: 10px; left: 10px; z-index:9999;">Loading Map...
+    </div>
+    <script>
+        // Parse URL parameter for map name
+        const urlParams = new URLSearchParams(window.location.search);
+        const mapName = urlParams.get('map') || 'cave'; // Default to cave
+
+        // Set selector value
+        const mapSelector = document.getElementById('map-selector');
+        if (mapSelector) {
+            mapSelector.value = mapName;
+        }
+
+        function changeMap() {
+            const selectedMap = document.getElementById('map-selector').value;
+            window.location.search = `?map=${selectedMap}`;
+        }
+
+        // Helper for editor to resolve paths relative to the map folder
+        // Only used for DISPLAYing images in the editor DOM.
+        // The data in JSON remains relative to the data.js file (e.g. "assets/tile.png")
+        function resolveEditorPath(path) {
+            if (!path) return '';
+            if (path.startsWith('http') || path.startsWith('/')) return path;
+            // If path is shared "world/system", it might be referenced as "../../system" in data.js
+            // Editor is in "world/system", so "../../system" -> "../" (parent of system is world) -> world + /system ??
+            // Let's trace:
+            // Editor: world/system/editor.html
+            // Path: ../../system/assets/char.png
+            // Target: world/system/assets/char.png
+            // Direct link: assets/char.png (if in same folder)
+            // But data.js is in world/maps/cave/.
+            // ../../system means "up to map", "up to world", then "system".
+            // So from Editor (world/system):
+            // We want to reach world/system/assets/char.png... that is just "assets/char.png"!
+            // BUT, if the path is relative to MAP (assets/tile.png), we need "../maps/cave/assets/tile.png".
+
+            if (path.startsWith('../../system')) {
+                // ../../system/assets/char.png -> assets/char.png (local to editor)
+                return path.replace('../../system/', '');
+            }
+
+            // Assume map-relative path
+            return `../maps/${mapName}/${path}`;
+        }
+
+        const script = document.createElement('script');
+        script.src = `../maps/${mapName}/data.js`;
+        script.onload = () => {
+            // Load triggers.js if it exists, but don't fail hard if it doesn't?
+            // Actually, for now we assume it exists for this map structure.
+            const triggerScript = document.createElement('script');
+            triggerScript.src = `../maps/${mapName}/triggers.js`;
+            triggerScript.onload = () => {
+                document.getElementById('loading').style.display = 'none';
+                if (typeof initEditor === 'function') initEditor();
+            };
+            triggerScript.onerror = () => {
+                console.warn("No triggers.js found, or failed to load. Continuing...");
+                document.getElementById('loading').style.display = 'none';
+                if (typeof initEditor === 'function') initEditor();
+            };
+            document.body.appendChild(triggerScript);
+        };
+        script.onerror = () => {
+            document.getElementById('loading').innerText = `Error: Map '${mapName}' data not found.`;
+        };
+        document.body.appendChild(script);
+    </script>
+
+    <script>
+        // Configuration
+        const TILE_SIZE = 16;
+        const PALETTE_SCALE = 2; // Show tiles 2x bigger in palette
+        let ASSET_PATH = 'assets/cave/cave_tile.png';
+        const EMPTY_TILE = { tx: 1, ty: 0 };
+
+        let mapWidthTiles = 40;
+        let mapHeightTiles = 30;
+        let mapDataGrid = []; // 2D array [y][x] = {tx, ty}
+
+        let currentMode = 'tile'; // 'tile' or 'anim'
+        let selectedAnimType = null;
+
+        let animations = []; // Array of { type, x, y }
+        let isCollisionMode = false;
+        let collisionTiles = new Set(); // Stores "gx,gy" strings
+
+        let selectedTx = 0;
+        let selectedTy = 0;
+        let tilesetWidth = 0;
+        let tilesetHeight = 0;
+        let zoomLevel = 1.0;
+
+
+
+        // Initialize
+        const img = new Image();
+        img.src = ASSET_PATH;
+        img.onload = function () {
+            tilesetWidth = img.width;
+            tilesetHeight = img.height;
+            initEditor();
+        };
+        img.onerror = function () {
+            alert("Failed to load tileset image: " + ASSET_PATH);
+        }
+
+        function initEditor() {
+            console.log("Initializing Editor...");
+
+            // 1. Build Palette
+            const cols = Math.floor(tilesetWidth / TILE_SIZE);
+            const rows = Math.floor(tilesetHeight / TILE_SIZE);
+            const palette = document.getElementById('palette');
+
+            // Adjust background size for palette scaling
+            // Original width is tilesetWidth. We want 16px tile to be 32px.
+            // So we scale the background by PALETTE_SCALE.
+            const bgWidth = tilesetWidth * PALETTE_SCALE;
+
+            // Update CSS rule dynamically for palette scale or just set inline
+
+            for (let y = 0; y < rows; y++) {
+                for (let x = 0; x < cols; x++) {
+                    let d = document.createElement('div');
+                    d.className = 'palette-tile';
+                    // We need to set background position.
+                    // Since background-size is 200% (roughly), position needs to be scaled too?
+                    // No, background-position is in pixels related to the element box or percentage.
+                    // If we set background-size to specific px, we use specific px for position.
+                    d.style.backgroundSize = `${bgWidth}px auto`;
+                    d.style.backgroundPosition = `-${x * TILE_SIZE * PALETTE_SCALE}px -${y * TILE_SIZE * PALETTE_SCALE}px`;
+
+                    d.onclick = function () { selectTile(this, x, y); };
+                    palette.appendChild(d);
+                }
+            }
+
+            // 2. Load Map Data
+            if (window.MAP_DATA) {
+                // Load Assets Config
+                if (window.MAP_DATA.assets) {
+                    document.getElementById('asset-tileset').value = window.MAP_DATA.assets.tileset || "assets/cave_tile.png";
+                    document.getElementById('asset-ceiling').value = window.MAP_DATA.assets.ceilingTileset || "assets/cave_tile_top.png";
+                    document.getElementById('asset-anim').value = window.MAP_DATA.assets.animation || "assets/cave_tile_irori.png";
+                    document.getElementById('asset-char').value = window.MAP_DATA.assets.character || "../../system/assets/char/ataho-1.png";
+
+                    // Resolve path for internal editor usage (Images)
+                    ASSET_PATH = resolveEditorPath(window.MAP_DATA.assets.tileset);
+                }
+
+
+
+
+                // Update UI Inputs for Overlay
+
+
+                // Load Tiles
+                let loadedTiles = [];
+                if (Array.isArray(window.MAP_DATA)) {
+                    loadedTiles = window.MAP_DATA;
+                } else {
+                    loadedTiles = window.MAP_DATA.tiles || [];
+                    animations = window.MAP_DATA.animations || [];
+                    renderAnimations();
+                    if (window.MAP_DATA.collisions) {
+                        window.MAP_DATA.collisions.forEach(c => collisionTiles.add(`${c.x},${c.y}`));
+                    }
+                    renderCollisions();
+                }
+
+                // Determine Size
+                let maxX = 0;
+                let maxY = 0;
+                loadedTiles.forEach(t => {
+                    if (t.gx > maxX) maxX = t.gx;
+                    if (t.gy > maxY) maxY = t.gy;
+                });
+                mapWidthTiles = maxX + 1;
+                mapHeightTiles = maxY + 1;
+
+                // Populate Data Grid
+                mapDataGrid = new Array(mapHeightTiles).fill(0).map(() => new Array(mapWidthTiles).fill(null));
+                loadedTiles.forEach(t => {
+                    if (t.gx < mapWidthTiles && t.gy < mapHeightTiles) {
+                        mapDataGrid[t.gy][t.gx] = { tx: t.tx, ty: t.ty };
+                    }
+                });
+
+                // Fill gaps
+                for (let y = 0; y < mapHeightTiles; y++) {
+                    for (let x = 0; x < mapWidthTiles; x++) {
+                        if (!mapDataGrid[y][x]) mapDataGrid[y][x] = { ...EMPTY_TILE };
+                    }
+                }
+
+            } else {
+                console.warn("No MAP_DATA found, starting empty.");
+                // Init empty
+                mapDataGrid = new Array(mapHeightTiles).fill(0).map(() => new Array(mapWidthTiles).fill(null).map(() => ({ ...EMPTY_TILE })));
+            }
+
+            // Set Inputs
+            document.getElementById('map-width').value = mapWidthTiles;
+            document.getElementById('map-height').value = mapHeightTiles;
+
+            renderMapGrid();
+        }
+
+        function resizeMap() {
+            const newW = parseInt(document.getElementById('map-width').value);
+            const newH = parseInt(document.getElementById('map-height').value);
+            const anchor = document.getElementById('resize-anchor').value;
+
+            if (newW === mapWidthTiles && newH === mapHeightTiles) return;
+
+            if (!confirm("Resizing might crop map data. Continue?")) return;
+
+            // Create new grid
+            const newGrid = new Array(newH).fill(0).map(() => new Array(newW).fill(null));
+
+            let offX = 0;
+            let offY = 0;
+
+            if (anchor === 'tr' || anchor === 'br') offX = newW - mapWidthTiles;
+            if (anchor === 'bl' || anchor === 'br') offY = newH - mapHeightTiles;
+            if (anchor === 'c') {
+                offX = Math.floor((newW - mapWidthTiles) / 2);
+                offY = Math.floor((newH - mapHeightTiles) / 2);
+            }
+
+            for (let y = 0; y < newH; y++) {
+                for (let x = 0; x < newW; x++) {
+                    const srcX = x - offX;
+                    const srcY = y - offY;
+
+                    if (srcX >= 0 && srcX < mapWidthTiles && srcY >= 0 && srcY < mapHeightTiles) {
+                        newGrid[y][x] = mapDataGrid[srcY][srcX];
+                    } else {
+                        newGrid[y][x] = { ...EMPTY_TILE };
+                    }
+                }
+            }
+
+            mapWidthTiles = newW;
+            mapHeightTiles = newH;
+            mapDataGrid = newGrid;
+
+
+
+            renderMapGrid();
+        }
+
+        function updateAssets() {
+            const newVal = document.getElementById('asset-tileset').value;
+            let tPath = newVal;
+            if (tPath && tPath.startsWith('map/')) tPath = tPath.substring(4);
+            ASSET_PATH = tPath;
+
+            // Reload Image
+            const img = new Image();
+            img.src = ASSET_PATH;
+            img.onload = function () {
+                tilesetWidth = img.width;
+                tilesetHeight = img.height;
+                // Rebuild palette?
+                document.getElementById('palette').innerHTML = '';
+                // ... Reinit palette logic needs extraction ...
+                // For now, just reload page or simple alert.
+                // Ideally separate rebuildPalette function.
+                // Quick fix: Just alert user to reload or impl simple palette refresh.
+                alert("Tileset path updated. Please reload logic or save & refresh for palette update.");
+                // Actually, let's just update the css rule for .tile?
+                // .tile background-image
+                const styleSheet = document.styleSheets[0];
+                // Hard to find rule. 
+                // Just set inline style for all tiles?
+                renderMapGrid();
+            };
+        }
+
+        function renderMapGrid() {
+            const mapContainer = document.getElementById('map');
+            mapContainer.innerHTML = '';
+            mapContainer.style.width = (mapWidthTiles * TILE_SIZE) + 'px';
+            mapContainer.style.height = (mapHeightTiles * TILE_SIZE) + 'px';
+
+
+
+            // Render Tiles
+            for (let y = 0; y < mapHeightTiles; y++) {
+                for (let x = 0; x < mapWidthTiles; x++) {
+                    let tileData = mapDataGrid[y][x];
+                    let div = document.createElement('div');
+                    div.className = 'tile';
+                    div.id = `cell_${x}_${y}`;
+                    div.style.left = (x * TILE_SIZE) + 'px';
+                    div.style.top = (y * TILE_SIZE) + 'px';
+
+                    // Use current ASSET_PATH for background
+                    div.style.backgroundImage = `url('${ASSET_PATH}')`;
+
+                    if (tileData.tx === EMPTY_TILE.tx && tileData.ty === EMPTY_TILE.ty) {
+                        div.classList.add('empty');
+                    } else {
+                        div.style.backgroundPosition = `-${tileData.tx * TILE_SIZE}px -${tileData.ty * TILE_SIZE}px`;
+                    }
+
+                    div.dataset.tx = tileData.tx;
+                    div.dataset.ty = tileData.ty;
+
+                    div.onclick = function () { onGridClick(this, x, y); };
+                    div.onmousemove = function () {
+                        document.getElementById('hover-coords').innerText = x + "," + y;
+                    };
+                    mapContainer.appendChild(div);
+                }
+            }
+
+            // Re-render things that float on top (Animations, Collisions)
+            renderAnimations();
+            renderCollisions();
+        }
+
+        function selectTile(el, tx, ty) {
+            setMode('tile'); // Auto switch
+            document.querySelectorAll('.palette-tile').forEach(t => t.classList.remove('selected'));
+            el.classList.add('selected');
+            selectedTx = tx;
+            selectedTy = ty;
+            document.getElementById('selected-id').innerText = tx + "," + ty;
+        }
+
+        function setMode(mode) {
+            currentMode = mode;
+            document.getElementById('palette').style.display = (mode === 'tile') ? 'grid' : 'none';
+            document.getElementById('anim-palette').style.display = (mode === 'anim') ? 'block' : 'none';
+
+            // UI Update
+            document.querySelectorAll('input[name="mode"]').forEach(r => {
+                if (r.value === mode) r.checked = true;
+            });
+        }
+
+        function selectAnim(type) {
+            selectedAnimType = type;
+            document.getElementById('selected-id').innerText = "Anim: " + type;
+        }
+
+        function onGridClick(el, gx, gy) {
+            if (isCollisionMode) {
+                toggleCollisionAt(gx, gy);
+            } else if (currentMode === 'tile') {
+                paintTile(el, gx, gy);
+            } else if (currentMode === 'anim') {
+                placeAnimation(gx, gy);
+            }
+        }
+
+        function placeAnimation(gx, gy) {
+            if (!selectedAnimType) {
+                alert("Select an animation first!");
+                return;
+            }
+
+            // Add new animation
+            // Irori config: 5 frames, 64x48.
+            // Helper to get config based on type
+            let config = { type: 'irori', w: 64, h: 48 }; // Corrected to 4 tiles wide
+
+            // Center logic? Or Top-Left?
+            // User clicks a tile. Let's place Top-Left at that tile?
+            // Or center?
+            // Let's assume user clicks the Top-Left tile of the desired position.
+            // gx, gy -> pixels
+
+            let anim = {
+                type: selectedAnimType,
+                x: gx * TILE_SIZE,
+                y: gy * TILE_SIZE,
+                w: 64,
+                h: 48
+            };
+
+            animations.push(anim);
+            renderAnimations();
+        }
+
+        function renderAnimations() {
+            // Clear existing anim divs?
+            document.querySelectorAll('.anim-obj').forEach(e => e.remove());
+
+            const mapContainer = document.getElementById('map');
+
+            animations.forEach((anim, index) => {
+                const div = document.createElement('div');
+                div.className = 'anim-obj';
+                div.style.left = anim.x + 'px';
+                div.style.top = anim.y + 'px';
+                div.style.width = anim.w + 'px';
+                div.style.height = anim.h + 'px';
+                div.dataset.type = anim.type; // Store type for animator
+
+                // Show first frame
+                if (anim.type === 'irori') {
+                    div.style.backgroundImage = "url('assets/cave/cave_tile_irori.png')";
+                    div.style.backgroundPosition = "0 0";
+                }
+
+                // Delete on right click? or click in delete mode?
+                div.onclick = (e) => {
+                    e.stopPropagation(); // Prevent grid click
+                    if (confirm("Delete this animation?")) {
+                        animations.splice(index, 1);
+                        renderAnimations();
+                    }
+                };
+
+                mapContainer.appendChild(div);
+            });
+        }
+
+        function toggleCollisionMode() {
+            isCollisionMode = !isCollisionMode;
+            const btn = document.getElementById('collisionBtn');
+            if (isCollisionMode) {
+                btn.innerText = "Collision Mode: ON";
+                btn.classList.add('active');
+            } else {
+                btn.innerText = "Collision Mode: OFF";
+                btn.classList.remove('active');
+            }
+            renderCollisions();
+        }
+
+        function toggleCollisionAt(gx, gy) {
+            const key = `${gx},${gy}`;
+            if (collisionTiles.has(key)) {
+                collisionTiles.delete(key);
+            } else {
+                collisionTiles.add(key);
+            }
+            renderCollisions();
+        }
+
+        function renderCollisions() {
+            // Clear existing
+            document.querySelectorAll('.collision-overlay').forEach(e => e.remove());
+
+            if (!isCollisionMode && collisionTiles.size === 0) return;
+            // Even if not in mode, we might want to see them? Or only in mode?
+            // Let's show them if in mode OR we can just show them always? 
+            // Usually editor shows walls always or in a view mode. 
+            // For now, show if isCollisionMode is true? 
+            // Or maybe always show semi-transparent if they exist?
+            // Let's show always for now if the user toggled them on? 
+            // Actually, let's just render them. 
+
+            // Wait, the Requirement was "Visual Feedback: Render placed animations on the map editor grid."
+            // For collisions: "When Collision Mode is active, render a semi-transparent red overlay"
+
+            if (!isCollisionMode) return;
+
+            const mapContainer = document.getElementById('map');
+            collisionTiles.forEach(key => {
+                const [gx, gy] = key.split(',').map(Number);
+                const div = document.createElement('div');
+                div.className = 'collision-overlay';
+                div.style.left = (gx * TILE_SIZE) + 'px';
+                div.style.top = (gy * TILE_SIZE) + 'px';
+                div.onclick = (e) => {
+                    e.stopPropagation(); // Pass through to grid? 
+                    // No, invalidates click if we catch it. 
+                    // But we want to toggle.
+                    if (isCollisionMode) toggleCollisionAt(gx, gy);
+                };
+                mapContainer.appendChild(div);
+            });
+        }
+
+        // Editor Animation Loop
+        function startEditorLoop() {
+            const startTime = Date.now();
+
+            function loop() {
+                const now = Date.now();
+
+                document.querySelectorAll('.anim-obj').forEach(div => {
+                    const type = div.dataset.type;
+                    if (type === 'irori') {
+                        // 5 frames, 200ms each (Slower)
+                        const frames = 5;
+                        const speed = 200;
+                        const width = 64;
+
+                        const frameIndex = Math.floor(now / speed) % frames;
+                        div.style.backgroundPosition = `-${frameIndex * width}px 0px`;
+                    }
+                });
+
+                requestAnimationFrame(loop);
+            }
+            requestAnimationFrame(loop);
+        }
+
+        // Start immediately
+        startEditorLoop();
+
+        function setEraser() {
+            document.querySelectorAll('.palette-tile').forEach(t => t.classList.remove('selected'));
+            selectedTx = EMPTY_TILE.tx;
+            selectedTy = EMPTY_TILE.ty;
+            document.getElementById('selected-id').innerText = "Eraser";
+        }
+
+        function changeZoom(delta) {
+            zoomLevel += delta;
+            if (zoomLevel < 0.1) zoomLevel = 0.1;
+            updateZoom();
+        }
+
+        function resetZoom() {
+            zoomLevel = 1.0;
+            updateZoom();
+        }
+
+        function updateZoom() {
+            const mapGrid = document.getElementById('map');
+            // Use transform-origin top-left to zoom naturally from the corner
+            mapGrid.style.transformOrigin = "0 0";
+            mapGrid.style.transform = `scale(${zoomLevel})`;
+            document.getElementById('zoom-level').innerText = Math.round(zoomLevel * 100) + "%";
+        }
+
+
+
+        function paintTile(el, gx, gy) {
+            // Update visual
+            if (selectedTx === EMPTY_TILE.tx && selectedTy === EMPTY_TILE.ty) {
+                el.classList.add('empty');
+                el.style.backgroundPosition = '';
+            } else {
+                el.classList.remove('empty');
+                el.style.backgroundPosition = `-${selectedTx * TILE_SIZE}px -${selectedTy * TILE_SIZE}px`;
+            }
+            // Update data
+            // Update data
+            el.dataset.tx = selectedTx;
+            el.dataset.ty = selectedTy;
+            mapDataGrid[gy][gx] = { tx: selectedTx, ty: selectedTy };
+        }
+
+        function exportData() {
+            let cells = document.querySelectorAll('.tile');
+            let data = [];
+            cells.forEach(c => {
+                let parts = c.id.split('_');
+                let gx = parseInt(parts[1]);
+                let gy = parseInt(parts[2]);
+                let tx = parseInt(c.dataset.tx);
+                let ty = parseInt(c.dataset.ty);
+                data.push({ gx, gy, tx, ty });
+            });
+
+            const exportData = {
+                assets: {
+                    tileset: document.getElementById('asset-tileset').value,
+                    ceilingTileset: document.getElementById('asset-ceiling').value,
+                    animation: document.getElementById('asset-anim').value,
+                    character: document.getElementById('asset-char').value
+                },
+                tiles: data,
+                animations: animations,
+
+                collisions: Array.from(collisionTiles).map(k => {
+                    const [x, y] = k.split(',').map(Number);
+                    return { x, y };
+                })
+            };
+
+            document.getElementById('output').value = "window.MAP_DATA = " + JSON.stringify(exportData);
+        }
+    </script>
+</body>
+
+</html>
