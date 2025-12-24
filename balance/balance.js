@@ -313,13 +313,11 @@
                         this.jumpLevel = 0;
                     }
                 }
-            }
-            // Logic Fix: Do not return here. Continue to physics so we can balance while charging.
-            // But we must be careful not to overwrite 'jump_charging' with 'walking' later.
-            else if (this.actionState.includes('jump_charging')) {
+                return;
+            } else if (this.actionState.includes('jump_charging')) {
                 this.actionState = 'jumping';
                 this.jumpVelocityY = CONFIG.JUMP.VELOCITIES[this.jumpLevel];
-                return; // Jumping still returns to skip land physics for 1 frame (or handled next frame)
+                return;
             }
 
             let inputForce = 0;
@@ -333,7 +331,7 @@
                 inputForce = CONFIG.PHYSICS.PLAYER_CONTROL_FORCE;
             }
 
-            const currentSwayIntensity = (this.actionState.includes('walking') || this.actionState.includes('jump_charging')) ? CONFIG.PHYSICS.SWAY_INTENSITY_WALK : CONFIG.PHYSICS.SWAY_INTENSITY_IDLE;
+            const currentSwayIntensity = (this.actionState.includes('walking')) ? CONFIG.PHYSICS.SWAY_INTENSITY_WALK : CONFIG.PHYSICS.SWAY_INTENSITY_IDLE;
 
             // Balance Fatigue: Increase sway if staying balanced for too long
             if (Math.abs(this.balanceLevel) < BALANCE_THRESHOLD.SLIGHT) {
@@ -388,8 +386,7 @@
                 this.leanState = `leaning_${direction}_${leanLevel}`;
             }
 
-            // Ensure we don't overwrite jump_charging/jumping states with walking/idle
-            if (this.actionState !== 'falling' && this.actionState !== 'fallen' && !this.actionState.includes('jump_charging') && this.actionState !== 'jumping') {
+            if (this.actionState !== 'falling' && this.actionState !== 'fallen') {
                 // Control Fix: Down = Forward
                 if (inputState.down) {
                     this.actionState = 'walking';
@@ -397,12 +394,6 @@
                     this.actionState = 'idle';
                 }
 
-                // Allow movement while charging if desired (optional: || this.actionState.includes('jump_charging'))
-                // If we want to STOP moving while charging, keep as is.
-                // User compliant "Game Slow" -> usually implies pausing/freezing is bad.
-                // Let's allow movement calculation to update obstacle collision logic, but maybe not distance if we want to "stop" to jump?
-                // "Jump Charging" usually implies preparing, so maybe slowing down?
-                // If we allow 'walking' logic to run, we simply add the check.
                 if (this.actionState === 'walking') {
                     const nextDist = distanceTraveled + CONFIG.SPEED.GAME;
 
@@ -595,15 +586,8 @@
     }
 
     // Event Handlers
-    const GAME_KEYS = ['KeyS', 'ArrowDown', 'KeyW', 'ArrowUp', 'KeyA', 'ArrowLeft', 'KeyD', 'ArrowRight', 'Space'];
-
     const handleKeyDown = (e) => {
-        if (isGameOver) return;
-
-        if (GAME_KEYS.includes(e.code)) {
-            e.preventDefault();
-        }
-
+        if (e.repeat || isGameOver) return;
         switch (e.code) {
             case 'KeyS':
             case 'ArrowDown':
@@ -629,11 +613,6 @@
 
     const handleKeyUp = (e) => {
         if (isGameOver) return;
-
-        if (GAME_KEYS.includes(e.code)) {
-            e.preventDefault();
-        }
-
         switch (e.code) {
             case 'KeyS':
             case 'ArrowDown':
