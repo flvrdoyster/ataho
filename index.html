@@ -64,6 +64,17 @@
             </div>
         </div>
 
+        <div id="popup-ani" class="modal hidden">
+            <div class="modal-content">
+                <span class="close-modal">&times;</span>
+                <h2>DS 애니메이션</h2>
+                <ul>
+                    <li><a href="#resource/mov/ani_orig.mp4">원본</a></li>
+                </ul>
+            </div>
+        </div>
+
+
         <div id="popup-gallery" class="modal hidden">
             <div class="modal-content">
                 <span class="close-modal">&times;</span>
@@ -99,31 +110,99 @@
 <script src="world/maps/cave/data.js"></script>
 <script src="world/maps/cave/triggers.js"></script>
 <script src="world/system/loader.js"></script>
+<script src="resource/mov/subtitles.js"></script>
 
 <div id="lightbox">
     <span class="close">&times;</span>
     <img id="lightbox-img" src="" alt="">
+    <video id="lightbox-video" controls style="display: none;">
+        <track id="lightbox-track" kind="subtitles" srclang="ko" label="Korean" default>
+    </video>
     <div id="lightbox-caption" class="caption"></div>
 </div>
 
 <script>
     const lightbox = document.getElementById('lightbox');
     const lightboxImg = document.getElementById('lightbox-img');
+    const lightboxVideo = document.getElementById('lightbox-video');
+    const lightboxTrack = document.getElementById('lightbox-track');
     const lightboxCaption = document.getElementById('lightbox-caption');
     const closeBtn = document.querySelector('#lightbox .close');
 
     function updateView() {
         const hash = window.location.hash.substring(1);
-        // Simple security/validation: allow only resource/img path
-        if (hash && hash.startsWith('resource/img/') && (hash.endsWith('.png') || hash.endsWith('.jpg') || hash.endsWith('.gif'))) {
-            lightboxImg.src = hash;
-            lightboxCaption.textContent = hash.split('/').pop(); // Show filename only
-            lightbox.classList.add('active');
+        // Simple security/validation: allow resource/img and resource/mov paths
+        if (hash && (hash.startsWith('resource/img/') || hash.startsWith('resource/mov/'))) {
+            const isVideo = hash.endsWith('.mp4');
+
+            if (isVideo) {
+                // Video Mode
+                lightboxImg.style.display = 'none';
+                lightboxVideo.style.display = 'block';
+                lightboxVideo.src = hash;
+
+                // Subtitle handling (Blob for CORS safety)
+                let vttContent = null;
+                if (hash.includes('ani_orig.mp4')) {
+                    vttContent = window.SUBTITLES ? window.SUBTITLES['ani_caption.vtt'] : null;
+                } else {
+                    const vttName = hash.replace('.mp4', '.vtt').split('/').pop();
+                    vttContent = window.SUBTITLES ? window.SUBTITLES[vttName] : null;
+                }
+
+                if (vttContent) {
+                    const blob = new Blob([vttContent], { type: 'text/vtt' });
+                    lightboxTrack.src = URL.createObjectURL(blob);
+                } else {
+                    // Fallback to file path just in case
+                    lightboxTrack.src = hash.replace('.mp4', '.vtt');
+                }
+
+                // Native display prevents fullscreen hiding and handles positioning relative to video
+                const setupTrack = () => {
+                    if (lightboxTrack.track) {
+                        lightboxTrack.track.mode = 'showing';
+
+                        // LOCK: Prevent disabling subtitles
+                        // If user tries to turn it off via menu, force it back on immediately
+                        lightboxTrack.track.addEventListener('modechange', () => {
+                            if (lightboxTrack.track.mode !== 'showing') {
+                                lightboxTrack.track.mode = 'showing';
+                            }
+                        });
+
+                        // Also watch the TextTrackList in case standard events don't fire on direct property change logic
+                        lightboxVideo.textTracks.onchange = () => {
+                            if (lightboxTrack.track.mode !== 'showing') {
+                                lightboxTrack.track.mode = 'showing';
+                            }
+                        };
+                    }
+                };
+                lightboxVideo.addEventListener('loadedmetadata', setupTrack, { once: true });
+                if (lightboxTrack.track) setupTrack();
+
+                lightboxCaption.textContent = hash.split('/').pop();
+                lightbox.classList.add('active');
+
+                // Optional: Auto-play if desired, but controls are safer
+                // lightboxVideo.play();
+            } else if (hash.endsWith('.png') || hash.endsWith('.jpg') || hash.endsWith('.gif')) {
+                // Image Mode
+                lightboxVideo.style.display = 'none';
+                lightboxImg.style.display = 'block';
+                lightboxVideo.pause();
+
+                lightboxImg.src = hash;
+                lightboxCaption.textContent = hash.split('/').pop();
+                lightbox.classList.add('active');
+            } else {
+                lightbox.classList.remove('active');
+                lightboxVideo.pause();
+            }
         } else {
             lightbox.classList.remove('active');
-            // Don't clear src immediately to prevent flash if switching? 
-            // Better to clear to stop loading if it was big.
-            // lightboxImg.src = ''; 
+            lightboxVideo.pause();
         }
     }
 
