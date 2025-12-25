@@ -69,7 +69,8 @@
                 <span class="close-modal">&times;</span>
                 <h2>DS 애니메이션</h2>
                 <ul>
-                    <li><a href="#resource/mov/ani_orig.mp4">원본</a></li>
+                    <li><a href="#resource/mov/ani_orig.mp4" data-caption="환세취호전 오프닝 애니메이션 (원본)"
+                            data-subtitle="ani_caption.vtt">원본</a></li>
                 </ul>
             </div>
         </div>
@@ -80,10 +81,10 @@
                 <span class="close-modal">&times;</span>
                 <h2>환세 시리즈 일러스트</h2>
                 <ul>
-                    <li><a href="#resource/img/ds04.png">Disc Station 04</a></li>
-                    <li><a href="#resource/img/ds10.png">Disc Station 10</a></li>
-                    <li><a href="#resource/img/ds14.png">Disc Station 14</a></li>
-                    <li><a href="#resource/img/ds20.png">Disc Station 20</a></li>
+                    <li><a href="#resource/img/ds04.png" data-caption="Disc Station 04 표지">Disc Station 04</a></li>
+                    <li><a href="#resource/img/ds10.png" data-caption="Disc Station 10 표지">Disc Station 10</a></li>
+                    <li><a href="#resource/img/ds14.png" data-caption="Disc Station 14 표지">Disc Station 14</a></li>
+                    <li><a href="#resource/img/ds20.png" data-caption="Disc Station 20 표지">Disc Station 20</a></li>
                 </ul>
             </div>
         </div>
@@ -135,6 +136,10 @@
         if (hash && (hash.startsWith('resource/img/') || hash.startsWith('resource/mov/'))) {
             const isVideo = hash.endsWith('.mp4');
 
+            // Determine caption text: Try to find a link with this hash and get its data-caption
+            const activeLink = document.querySelector(`a[href="#${hash}"]`);
+            const captionText = activeLink ? activeLink.getAttribute('data-caption') : hash.split('/').pop();
+
             if (isVideo) {
                 // Video Mode
                 lightboxImg.style.display = 'none';
@@ -143,9 +148,15 @@
 
                 // Subtitle handling (Blob for CORS safety)
                 let vttContent = null;
-                if (hash.includes('ani_orig.mp4')) {
-                    vttContent = window.SUBTITLES ? window.SUBTITLES['ani_caption.vtt'] : null;
-                } else {
+                const subtitleKey = activeLink ? activeLink.getAttribute('data-subtitle') : null;
+
+                if (subtitleKey) {
+                    // 1. Try specified subtitle key
+                    vttContent = window.SUBTITLES ? window.SUBTITLES[subtitleKey] : null;
+                }
+
+                if (!vttContent) {
+                    // 2. Generic fallback: try replacing extension
                     const vttName = hash.replace('.mp4', '.vtt').split('/').pop();
                     vttContent = window.SUBTITLES ? window.SUBTITLES[vttName] : null;
                 }
@@ -155,7 +166,11 @@
                     lightboxTrack.src = URL.createObjectURL(blob);
                 } else {
                     // Fallback to file path just in case
-                    lightboxTrack.src = hash.replace('.mp4', '.vtt');
+                    if (subtitleKey) {
+                        lightboxTrack.src = 'resource/mov/' + subtitleKey; // Assumption: subtitles are in same dir roughly or relative
+                    } else {
+                        lightboxTrack.src = hash.replace('.mp4', '.vtt');
+                    }
                 }
 
                 // Native display prevents fullscreen hiding and handles positioning relative to video
