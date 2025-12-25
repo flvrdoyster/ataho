@@ -135,14 +135,19 @@ hr {
     align-items: center;
     justify-content: center;
     z-index: 1000;
+    visibility: hidden;
     opacity: 0;
     pointer-events: none;
-    transition: opacity 0.2s;
+    transition: opacity 0.2s, visibility 0s 0.2s;
+    /* Wait for opacity fade out before hiding */
 }
 
 #lightbox.active {
+    visibility: visible;
     opacity: 1;
     pointer-events: auto;
+    transition: opacity 0.2s;
+    /* Instant visibility for fade in */
 }
 
 #lightbox img,
@@ -215,11 +220,12 @@ video:fullscreen::cue {
     border-radius: 20px;
     font-size: 1.2rem;
     pointer-events: auto;
-    transition: opacity 0.3s;
+    transition: opacity 0.3s, visibility 0s 0.3s;
 }
 
 .prompt.hidden {
     opacity: 0;
+    visibility: hidden;
     pointer-events: none;
 }
 
@@ -238,11 +244,14 @@ video:fullscreen::cue {
     pointer-events: auto;
     opacity: 1;
     transition: opacity 0.3s;
+    visibility: visible;
 }
 
 .modal.hidden {
     opacity: 0;
+    visibility: hidden;
     pointer-events: none;
+    transition: opacity 0.3s, visibility 0s 0.3s;
 }
 
 .modal-content {

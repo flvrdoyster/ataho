@@ -35,6 +35,7 @@ let ceilingTilesetImg;
 let animationImg;
 let charImg;
 let mapData = [];
+let tileGrid = []; // Spatial Index
 let mapAnimations = [];
 let mapCollisions = new Set();
 let mapWidth = 0;
@@ -269,6 +270,17 @@ async function initGame() {
     });
     mapWidth = (maxGx + 1) * CONFIG.TILE_SIZE;
     mapHeight = (maxGy + 1) * CONFIG.TILE_SIZE;
+
+    // Build Spatial Grid for O(1) Rendering
+    const cols = maxGx + 1;
+    const rows = maxGy + 1;
+    tileGrid = Array.from({ length: rows }, () => Array.from({ length: cols }, () => []));
+
+    mapData.forEach(t => {
+        if (t.gx >= 0 && t.gx < cols && t.gy >= 0 && t.gy < rows) {
+            tileGrid[t.gy][t.gx].push(t);
+        }
+    });
 
     // Set initial player position (e.g., center of map or specific start)
     player.x = mapWidth / 2;
@@ -542,24 +554,32 @@ function draw() {
     const viewT = camera.y;
     const viewB = camera.y + camera.height;
 
-    mapData.forEach(tile => {
-        // Tile dest rect in world space
-        const dstX = tile.gx * CONFIG.TILE_SIZE;
-        const dstY = tile.gy * CONFIG.TILE_SIZE;
+    // Spatial Grid Iteration
+    const startCol = Math.max(0, Math.floor(viewL / CONFIG.TILE_SIZE));
 
-        // Simple AABB test
-        if (dstX + CONFIG.TILE_SIZE > viewL && dstX < viewR &&
-            dstY + CONFIG.TILE_SIZE > viewT && dstY < viewB) {
+    // Determine grid dimensions safely
+    const gridRows = tileGrid.length;
+    const gridCols = gridRows > 0 ? tileGrid[0].length : 0;
 
-            ctx.drawImage(
-                tilesetImg,
-                tile.tx * CONFIG.TILE_SIZE, tile.ty * CONFIG.TILE_SIZE,
-                CONFIG.TILE_SIZE, CONFIG.TILE_SIZE,
-                dstX, dstY,
-                CONFIG.TILE_SIZE, CONFIG.TILE_SIZE
-            );
+    const endCol = Math.min(gridCols, Math.ceil(viewR / CONFIG.TILE_SIZE));
+    const startRow = Math.max(0, Math.floor(viewT / CONFIG.TILE_SIZE));
+    const endRow = Math.min(gridRows, Math.ceil(viewB / CONFIG.TILE_SIZE));
+
+    for (let y = startRow; y < endRow; y++) {
+        for (let x = startCol; x < endCol; x++) {
+            const cell = tileGrid[y][x];
+            for (let i = 0; i < cell.length; i++) {
+                const tile = cell[i];
+                ctx.drawImage(
+                    tilesetImg,
+                    tile.tx * CONFIG.TILE_SIZE, tile.ty * CONFIG.TILE_SIZE,
+                    CONFIG.TILE_SIZE, CONFIG.TILE_SIZE,
+                    tile.gx * CONFIG.TILE_SIZE, tile.gy * CONFIG.TILE_SIZE,
+                    CONFIG.TILE_SIZE, CONFIG.TILE_SIZE
+                );
+            }
         }
-    });
+    }
 
     // Draw Animations
     if (animationImg && mapAnimations.length > 0) {
@@ -645,25 +665,31 @@ function draw() {
         const cullT = player.y - CONFIG.CEILING_RENDER.RANGE_TOP;
         const cullB = player.y + player.height + CONFIG.CEILING_RENDER.RANGE_BOTTOM;
 
-        mapData.forEach(tile => {
-            // Tile dest rect in world space
-            const dstX = tile.gx * CONFIG.TILE_SIZE;
-            const dstY = tile.gy * CONFIG.TILE_SIZE;
+        // Spatial Grid Iteration for Ceiling
+        // Determine grid dimensions safely
+        const gridRows = tileGrid.length;
+        const gridCols = gridRows > 0 ? tileGrid[0].length : 0;
 
-            // Strict checking against local culling box
-            // We only draw if the tile is within the "Ceiling Visibility Box"
-            if (dstX + CONFIG.TILE_SIZE > cullL && dstX < cullR &&
-                dstY + CONFIG.TILE_SIZE > cullT && dstY < cullB) {
+        const startCol = Math.max(0, Math.floor(cullL / CONFIG.TILE_SIZE));
+        const endCol = Math.min(gridCols, Math.ceil(cullR / CONFIG.TILE_SIZE));
+        const startRow = Math.max(0, Math.floor(cullT / CONFIG.TILE_SIZE));
+        const endRow = Math.min(gridRows, Math.ceil(cullB / CONFIG.TILE_SIZE));
 
-                ctx.drawImage(
-                    ceilingTilesetImg,
-                    tile.tx * CONFIG.TILE_SIZE, tile.ty * CONFIG.TILE_SIZE,
-                    CONFIG.TILE_SIZE, CONFIG.TILE_SIZE,
-                    dstX, dstY,
-                    CONFIG.TILE_SIZE, CONFIG.TILE_SIZE
-                );
+        for (let y = startRow; y < endRow; y++) {
+            for (let x = startCol; x < endCol; x++) {
+                const cell = tileGrid[y][x];
+                for (let i = 0; i < cell.length; i++) {
+                    const tile = cell[i];
+                    ctx.drawImage(
+                        ceilingTilesetImg,
+                        tile.tx * CONFIG.TILE_SIZE, tile.ty * CONFIG.TILE_SIZE,
+                        CONFIG.TILE_SIZE, CONFIG.TILE_SIZE,
+                        tile.gx * CONFIG.TILE_SIZE, tile.gy * CONFIG.TILE_SIZE,
+                        CONFIG.TILE_SIZE, CONFIG.TILE_SIZE
+                    );
+                }
             }
-        });
+        }
     }
 
     ctx.restore();
