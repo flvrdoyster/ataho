@@ -1,3 +1,6 @@
+/* =========================================
+   1. Fonts
+   ========================================= */
 @font-face {
     font-family: 'KoddiudOngodic';
     src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2105_2@1.0/KoddiUDOnGothic-Regular.woff') format('woff');
@@ -12,10 +15,31 @@
     font-display: swap;
 }
 
+/* =========================================
+   2. Global Styles
+   ========================================= */
 body {
     font-family: 'KoddiudOngodic', sans-serif;
     color: #fff;
-    text-shadow: 1px 1px 0 #000;
+    /* text-shadow removed for cleaner UI elements */
+}
+
+a {
+    text-decoration: none;
+    color: #7ba6de;
+}
+
+a:visited {
+    color: #5a85b9;
+}
+
+a:hover {
+    text-decoration: underline;
+    text-decoration-style: dotted;
+}
+
+hr {
+    margin: 40px 0;
 }
 
 #gameCanvas {
@@ -29,10 +53,9 @@ body {
     background: #000;
 }
 
-hr {
-    margin: 40px 0;
-}
-
+/* =========================================
+   3. Layout & Structure
+   ========================================= */
 #header {
     text-align: center;
     position: fixed;
@@ -69,8 +92,6 @@ hr {
     padding: 10px;
 }
 
-
-
 #footer {
     position: fixed;
     bottom: 0;
@@ -83,7 +104,6 @@ hr {
     font-size: 0.9rem;
     z-index: 100;
     pointer-events: auto;
-    /* Allow link clicks */
 }
 
 #footer p {
@@ -99,21 +119,11 @@ hr {
     color: white;
 }
 
-a {
-    text-decoration: none;
-    color: #7ba6de;
-}
+/* =========================================
+   4. Components
+   ========================================= */
 
-a:visited {
-    color: #5a85b9;
-}
-
-a:hover {
-    text-decoration: underline;
-    text-decoration-style: dotted;
-}
-
-/* Lightbox Styles (Moved from viewer.html) */
+/* --- Lightbox (Images & Video) --- */
 #lightbox {
     position: fixed;
     top: 0;
@@ -135,11 +145,17 @@ a:hover {
     pointer-events: auto;
 }
 
-#lightbox img {
+#lightbox img,
+#lightbox video {
     max-width: 90vw;
     max-height: 90vh;
     box-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
     object-fit: contain;
+}
+
+/* Hide Native Caption Button to force subtitles permanently */
+video::-webkit-media-controls-toggle-closed-captions-button {
+    display: none !important;
 }
 
 #lightbox .close {
@@ -159,9 +175,25 @@ a:hover {
     text-align: center;
     color: #ddd;
     font-size: 1rem;
+    z-index: 1001;
 }
 
-/* UI Layer */
+/* --- Subtitles (Video) --- */
+/* Customize subtitle appearance here */
+video::cue {
+    background: transparent;
+    color: #fff;
+    font-size: 1.8rem;
+    font-weight: regular;
+    font-family: 'KoddiudOngodic', sans-serif;
+}
+
+/* Fullscreen subtitle override */
+video:fullscreen::cue {
+    font-size: 2.5rem;
+}
+
+/* --- UI Layer (Modals, Prompts) --- */
 #ui-layer {
     position: fixed;
     top: 0;
@@ -169,11 +201,9 @@ a:hover {
     width: 100%;
     height: 100%;
     pointer-events: none;
-    /* Let clicks pass through to canvas when no modal is open */
     z-index: 500;
 }
 
-/* Prompt */
 .prompt {
     position: absolute;
     bottom: 100px;
@@ -193,7 +223,7 @@ a:hover {
     pointer-events: none;
 }
 
-/* Modal */
+/* Modals */
 .modal {
     position: fixed;
     top: 0;
@@ -248,8 +278,6 @@ a:hover {
     position: absolute;
     top: 10px;
     right: 15px;
-    top: 10px;
-    right: 15px;
     font-size: 50px;
     font-weight: bold;
     cursor: pointer;
@@ -260,7 +288,9 @@ a:hover {
     color: black;
 }
 
-/* Mobile Adjustments */
+/* =========================================
+   5. Media Queries (Mobile)
+   ========================================= */
 @media (max-width: 768px) {
     .modal-content {
         width: 75%;
@@ -268,12 +298,10 @@ a:hover {
         font-size: 1.2rem;
     }
 
-    /* Hide prompt on mobile since it auto-triggers */
     #interaction-prompt {
         display: none !important;
     }
 
-    /* Footer: Hide desktop-only spans */
     .desktop-only {
         display: none;
     }
