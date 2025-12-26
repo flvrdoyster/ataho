@@ -29,7 +29,7 @@
 
         // Dynamic Data Loader
         const dataScript = document.createElement('script');
-        dataScript.src = `../maps/${mapName}/data.js`;
+        dataScript.src = `maps/${mapName}/data.js`;
         dataScript.onload = () => {
             document.getElementById('loading').style.display = 'none';
             // Start the game loader after data is ready

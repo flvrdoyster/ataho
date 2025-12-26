@@ -283,9 +283,9 @@
             if (!path) return '';
             if (path.startsWith('http') || path.startsWith('/')) return path;
             // If path is shared "world/system", it might be referenced as "../../system" in data.js
-            // Editor is in "world/system", so "../../system" -> "../" (parent of system is world) -> world + /system ??
+            // Editor is in "world/", so "../../system" -> "system" ??
             // Let's trace:
-            // Editor: world/system/editor.html
+            // Editor: world/editor.html
             // Path: ../../system/assets/char.png
             // Target: world/system/assets/char.png
             // Direct link: assets/char.png (if in same folder)
@@ -296,21 +296,31 @@
             // BUT, if the path is relative to MAP (assets/tile.png), we need "../maps/cave/assets/tile.png".
 
             if (path.startsWith('../../system')) {
-                // ../../system/assets/char.png -> assets/char.png (local to editor)
+                // ../../system/assets/char.png -> system/assets/char.png (local to editor)
+                // But wait, system/ is being removed?
+                // The User said "world/system assets" are moved/unnecessary.
+                // If there are legacy paths, we might need to fix them or they are broken.
+                // Assuming legacy "../../system" paths might now point to "assets/" if they were moved?
+                // For now, let's assume they shouldn't occur or are handled.
+                // But let's look at the CHAR path.
                 return path.replace('../../system/', '');
             }
 
+            if (path.startsWith('../../char')) {
+                return path.replace('../../char', 'char');
+            }
+
             // Assume map-relative path
-            return `../maps/${mapName}/${path}`;
+            return `maps/${mapName}/${path}`;
         }
 
         const script = document.createElement('script');
-        script.src = `../maps/${mapName}/data.js`;
+        script.src = `maps/${mapName}/data.js`;
         script.onload = () => {
             // Load triggers.js if it exists, but don't fail hard if it doesn't?
             // Actually, for now we assume it exists for this map structure.
             const triggerScript = document.createElement('script');
-            triggerScript.src = `../maps/${mapName}/triggers.js`;
+            triggerScript.src = `maps/${mapName}/triggers.js`;
             triggerScript.onload = () => {
                 document.getElementById('loading').style.display = 'none';
                 if (typeof initEditor === 'function') initEditor();
@@ -404,7 +414,7 @@
                     document.getElementById('asset-tileset').value = window.MAP_DATA.assets.tileset || "assets/cave_tile.png";
                     document.getElementById('asset-ceiling').value = window.MAP_DATA.assets.ceilingTileset || "assets/cave_tile_top.png";
                     document.getElementById('asset-anim').value = window.MAP_DATA.assets.animation || "assets/cave_tile_irori.png";
-                    document.getElementById('asset-char').value = window.MAP_DATA.assets.character || "../../system/assets/char/ataho-1.png";
+                    document.getElementById('asset-char').value = window.MAP_DATA.assets.character || "../../char/ataho-1.png";
 
                     // Resolve path for internal editor usage (Images)
                     ASSET_PATH = resolveEditorPath(window.MAP_DATA.assets.tileset);
