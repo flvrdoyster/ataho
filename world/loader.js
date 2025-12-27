@@ -12,9 +12,9 @@
 let CONFIG = {
     TILE_SIZE: 16,
     SCALE: 2,
-    MOVEMENT_SPEED: 4,
-    ANIMATION_SPEED: 40,
-    MAP_ANIM_DEFAULT_SPEED: 200,
+    MOVEMENT_SPEED: 240, // pixels per second
+    ANIMATION_SPEED: 0.15, // seconds per frame (approx 6-7 fps)
+    MAP_ANIM_DEFAULT_SPEED: 0.2, // seconds per frame
     COLLISION_PADDING: 4,
     CEILING_RENDER: {
         RANGE_TOP: 16,
@@ -88,6 +88,7 @@ let isTouchDevice = false;
 let triggers = [];
 let activeTrigger = null;
 let isModalOpen = false;
+let lastTime = 0;
 
 // Initialize
 async function initGame() {
@@ -288,6 +289,7 @@ async function initGame() {
     player.y = mapHeight / 2;
 
     // Start Loop
+    lastTime = performance.now();
     requestAnimationFrame(gameLoop);
     console.log("Game initialized!");
 }
@@ -391,7 +393,7 @@ function updateTouchInput(touch) {
     }
 }
 
-function update() {
+function update(dt) {
     // Player Movement
     let dx = 0;
     let dy = 0;
@@ -427,13 +429,13 @@ function update() {
     }
 
     // Apply Speed
-    dx *= CONFIG.MOVEMENT_SPEED;
-    dy *= CONFIG.MOVEMENT_SPEED;
+    dx *= CONFIG.MOVEMENT_SPEED * dt;
+    dy *= CONFIG.MOVEMENT_SPEED * dt;
 
     player.isMoving = (dx !== 0 || dy !== 0);
 
     if (player.isMoving) {
-        player.stepTimer += 16; // approx 60fps -> 16ms
+        player.stepTimer += dt;
         if (player.stepTimer >= CONFIG.ANIMATION_SPEED) {
             player.stepTimer = 0;
             player.animFrame = (player.animFrame + 1) % WALK_SEQUENCE.length;
@@ -584,14 +586,16 @@ function draw() {
 
     // Draw Animations
     if (animationImg && mapAnimations.length > 0) {
-        const now = Date.now();
+        const now = performance.now() / 1000; // Use seconds
         mapAnimations.forEach(anim => {
             // Check visibility (simplified AABB)
             if (anim.x + anim.w > viewL && anim.x < viewR &&
                 anim.y + anim.h > viewT && anim.y < viewB) {
 
                 // Calculate Frame
-                const frameIndex = Math.floor(now / anim.speed) % anim.frames;
+                // Original speed was in ms, let's assume it was intended as ms per frame
+                const speedInSeconds = anim.speed / 1000;
+                const frameIndex = Math.floor(now / speedInSeconds) % anim.frames;
                 const srcX = frameIndex * anim.w;
 
                 ctx.drawImage(
@@ -718,8 +722,14 @@ function checkCollision(x, y, w, h) {
     return false;
 }
 
-function gameLoop() {
-    update();
+function gameLoop(currentTime) {
+    const dt = (currentTime - lastTime) / 1000;
+    lastTime = currentTime;
+
+    // Cap dt to avoid huge jumps (e.g., if tab was inactive)
+    const cappedDt = Math.min(dt, 0.1);
+
+    update(cappedDt);
     draw();
     requestAnimationFrame(gameLoop);
 }
