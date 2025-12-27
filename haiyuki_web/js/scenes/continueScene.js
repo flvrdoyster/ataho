@@ -51,11 +51,12 @@ const ContinueScene = {
         Assets.playMusic('audio/bgm_inn', false); // Play Inn BGM once
     },
 
-    update: function () {
-        this.timer++;
+    update: function (dt = 1.0) {
+        dt = dt || 1.0;
+        this.timer += dt;
 
         // Pointer anim
-        this.pointerTimer++;
+        this.pointerTimer += dt;
 
 
 
@@ -77,8 +78,12 @@ const ContinueScene = {
             return false;
         };
 
-        if (checkHit(opts.YES.y)) this.selectedOption = 0;
-        if (checkHit(opts.NO.y)) this.selectedOption = 1;
+        if (checkHit(opts.YES.y)) {
+            if (Input.hasMouseMoved()) this.selectedOption = 0;
+        }
+        if (checkHit(opts.NO.y)) {
+            if (Input.hasMouseMoved()) this.selectedOption = 1;
+        }
 
         // Confirm
         if (Input.isJustPressed(Input.SPACE) || Input.isJustPressed(Input.Z) || Input.isJustPressed(Input.ENTER) || Input.isMouseJustPressed()) {

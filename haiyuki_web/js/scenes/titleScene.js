@@ -88,14 +88,16 @@ const TitleScene = {
         Assets.playMusic('audio/bgm_title');
     },
 
-    update: function () {
+    update: function (dt = 1.0) {
+        dt = dt || 1.0;
         // Update Local Confirm Dialog
         if (this.confirmActive) {
-            this.updateConfirm();
+            this.updateConfirm(dt);
             return;
         }
 
-        this.blinkTimer++;
+        this.blinkTimer += dt;
+        this.pointerTimer += dt;
         if (this.blinkTimer > 40) { // Slower blink
             this.showPushKey = !this.showPushKey;
             this.blinkTimer = 0;
@@ -127,9 +129,13 @@ const TitleScene = {
             const t2 = TitleConfig.MENU.ITEM2.text;
             const t3 = TitleConfig.MENU.ITEM3.text;
 
-            if (checkHover(t1, TitleConfig.MENU.ITEM1.y, 0)) this.menuIndex = 0;
-            else if (checkHover(t2, TitleConfig.MENU.ITEM2.y, 1)) this.menuIndex = 1;
-            else if (checkHover(t3, TitleConfig.MENU.ITEM3.y, 2)) this.menuIndex = 2;
+            if (checkHover(t1, TitleConfig.MENU.ITEM1.y, 0)) {
+                if (Input.hasMouseMoved()) this.menuIndex = 0;
+            } else if (checkHover(t2, TitleConfig.MENU.ITEM2.y, 1)) {
+                if (Input.hasMouseMoved()) this.menuIndex = 1;
+            } else if (checkHover(t3, TitleConfig.MENU.ITEM3.y, 2)) {
+                if (Input.hasMouseMoved()) this.menuIndex = 2;
+            }
 
             if (Input.isJustPressed(Input.UP)) {
                 this.menuIndex = (this.menuIndex - 1 + 3) % 3;
@@ -158,9 +164,9 @@ const TitleScene = {
         }
     },
 
-    updateConfirm: function () {
+    updateConfirm: function (dt = 1.0) {
         if (this.confirmTimer > 0) {
-            this.confirmTimer--;
+            this.confirmTimer -= dt;
             return;
         }
 
@@ -178,7 +184,7 @@ const TitleScene = {
         const isOverNo = (mx >= no.x && mx <= no.x + no.w && my >= no.y && my <= no.y + no.h);
 
         if (isOverYes) {
-            this.confirmSelected = 0;
+            if (Input.hasMouseMoved()) this.confirmSelected = 0;
             if (Input.isMouseJustPressed()) {
                 // YES - Reset Data
                 Game.saveData = { unlocked: [], clearedOpponents: [] };
@@ -190,7 +196,7 @@ const TitleScene = {
                 return;
             }
         } else if (isOverNo) {
-            this.confirmSelected = 1;
+            if (Input.hasMouseMoved()) this.confirmSelected = 1;
             if (Input.isMouseJustPressed()) {
                 this.confirmActive = false;
                 return;
