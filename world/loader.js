@@ -112,8 +112,9 @@ async function initGame() {
 
         // Determine base path to the map folder based on current page location
         let mapBase = '';
-        if (window.location.pathname.includes('/world/system/')) {
-            mapBase = `../maps/${mapName}/`;
+        // Check if running from world/viewer.html or world/editor.html (if it used this)
+        if (window.location.pathname.indexOf('/world/') !== -1 && window.location.pathname.indexOf('/world/maps/') === -1) {
+            mapBase = `maps/${mapName}/`;
         } else {
             // Assumes running from root
             mapBase = `world/maps/${mapName}/`;
