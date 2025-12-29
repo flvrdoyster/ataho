@@ -297,6 +297,16 @@ video:fullscreen::cue {
     color: black;
 }
 
+.modal-content a.focused {
+    background-color: #ffd700; /* Gold highlight */
+    color: black;
+    text-decoration: none;
+    font-weight: bold;
+    padding: 2px 5px;
+    border-radius: 4px;
+    box-shadow: 0 0 5px rgba(0,0,0,0.2);
+}
+
 /* =========================================
    5. Media Queries (Mobile)
    ========================================= */
