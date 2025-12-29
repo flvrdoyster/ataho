@@ -107,8 +107,6 @@ async function initGame() {
     const resolvePath = (path) => {
         // Get map name from URL or default to 'cave'
         const urlParams = new URLSearchParams(window.location.search);
-        // Note: For index.html, we might not have a map param, but we default to cave for now.
-        // Ideally index.html should explicitly set a global MAP_NAME variable if it's not 'cave'.
         const mapName = window.MAP_NAME || urlParams.get('map') || 'cave';
 
         // Determine base path to the map folder based on current page location
@@ -122,7 +120,6 @@ async function initGame() {
         }
 
         // Combine base and path
-        // Browser handles "folder/../other" resolution automatically in src attributes
         return mapBase + path;
     };
 
@@ -183,6 +180,9 @@ async function initGame() {
     window.addEventListener('keydown', e => {
         if (isModalOpen) {
             if (e.key === 'Escape') closeModal();
+            if (e.key === 'ArrowUp') handleModalNav(-1);
+            if (e.key === 'ArrowDown') handleModalNav(1);
+            if (e.key === 'Enter' || e.key === ' ') handleModalAction();
             return;
         }
 
@@ -317,12 +317,58 @@ function openModal(modalId) {
             content.style.transform = '';
             content.style.margin = '';
         }
+
+        // Auto-focus first link
+        resetModalFocus(modal);
     }
 }
 
 function closeModal() {
     document.querySelectorAll('.modal').forEach(m => m.classList.add('hidden'));
+    document.querySelectorAll('.modal a').forEach(a => a.classList.remove('focused')); // Clear focus
     isModalOpen = false;
+}
+
+function resetModalFocus(modal) {
+    const links = modal.querySelectorAll('a');
+    links.forEach(l => l.classList.remove('focused'));
+    if (links.length > 0) {
+        links[0].classList.add('focused');
+        focusedLinkIndex = 0;
+    } else {
+        focusedLinkIndex = -1;
+    }
+}
+
+let focusedLinkIndex = -1;
+
+function handleModalNav(direction) {
+    // Find active modal
+    const modal = document.querySelector('.modal:not(.hidden)');
+    if (!modal) return;
+
+    const links = Array.from(modal.querySelectorAll('a'));
+    if (links.length === 0) return;
+
+    // Clear current
+    links.forEach(l => l.classList.remove('focused'));
+
+    // Update index
+    focusedLinkIndex += direction;
+    if (focusedLinkIndex >= links.length) focusedLinkIndex = 0;
+    if (focusedLinkIndex < 0) focusedLinkIndex = links.length - 1;
+
+    // Set focus
+    links[focusedLinkIndex].classList.add('focused');
+}
+
+function handleModalAction() {
+    const modal = document.querySelector('.modal:not(.hidden)');
+    if (!modal) return;
+    const links = Array.from(modal.querySelectorAll('a'));
+    if (focusedLinkIndex >= 0 && focusedLinkIndex < links.length) {
+        links[focusedLinkIndex].click();
+    }
 }
 
 function resizeCanvas() {
@@ -507,9 +553,22 @@ function checkTriggers() {
     const prevTrigger = activeTrigger;
     activeTrigger = null;
 
+    // Facing Logic Interaction
+    // Instead of checking center point, we check a point in front of the player
+    let targetX = pCx;
+    let targetY = pCy;
+    const reach = 16; // Interaction range
+
+    // Direction: 0=Down, 1=Left, 2=Up, 3=Right
+    if (player.direction === 0) targetY += reach;
+    else if (player.direction === 1) targetX -= reach;
+    else if (player.direction === 2) targetY -= reach;
+    else if (player.direction === 3) targetX += reach;
+
     for (let t of triggers) {
-        if (pCx >= t.x && pCx <= t.x + t.w &&
-            pCy >= t.y && pCy <= t.y + t.h) {
+        // Facing Logic: Check if point in front of player is inside trigger
+        if (targetX >= t.x && targetX <= t.x + t.w &&
+            targetY >= t.y && targetY <= t.y + t.h) {
             activeTrigger = t;
             break;
         }
