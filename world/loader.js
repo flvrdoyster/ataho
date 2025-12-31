@@ -13,7 +13,7 @@ let CONFIG = {
     TILE_SIZE: 16,
     SCALE: 2,
     MOVEMENT_SPEED: 240, // pixels per second
-    ANIMATION_SPEED: 0.15, // seconds per frame (approx 6-7 fps)
+    ANIMATION_SPEED: 0.1, // seconds per frame (approx 6-7 fps)
     MAP_ANIM_DEFAULT_SPEED: 0.2, // seconds per frame
     COLLISION_PADDING: 4,
     CEILING_RENDER: {
