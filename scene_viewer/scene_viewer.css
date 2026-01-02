@@ -1,0 +1,288 @@
+:root {
+    --stage-width: 800px;
+    --stage-height: 600px;
+    --bg-color: #000;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    background-color: #1a1a1a;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    font-family: 'Gulim', 'Malgun Gothic', sans-serif;
+    /* Retro feel */
+    color: white;
+}
+
+#app {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+
+.stage {
+    width: var(--stage-width);
+    height: var(--stage-height);
+    background-color: var(--bg-color);
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+    border: 2px solid #333;
+}
+
+/* Layer Management */
+.layer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+}
+
+.layer.background {
+    z-index: 0;
+}
+
+.layer.content {
+    z-index: 10;
+}
+
+.layer.ui {
+    z-index: 20;
+}
+
+/* Utilities */
+.hidden {
+    display: none !important;
+}
+
+img.fit-cover {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* Text Styles - Cinematic */
+.dialogue-box {
+    position: absolute;
+    bottom: 15%;
+    /* Positioned lower but with some space */
+    left: 0;
+    width: 100%;
+    text-align: center;
+    color: white;
+    font-size: 28px;
+    line-height: 1.5;
+    text-shadow: 2px 2px 0 #000;
+    pointer-events: none;
+    white-space: pre-wrap;
+    z-index: 100;
+}
+
+/* Center Stage Area for Sprites */
+.center-stage {
+    position: absolute;
+    top: 20%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60%;
+    /* Same dimensions as center-image logic roughly */
+    height: 50%;
+    /* You might want this flexible */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 10;
+}
+
+/* Bottom Right Stage (for Staff Roll) */
+.bottom-right-stage {
+    position: absolute;
+    bottom: 50px;
+    right: 50px;
+    width: 320px;
+    /* Exact size of staffroll.png */
+    height: 224px;
+    z-index: 5;
+}
+
+.sprite {
+    position: absolute;
+    /* Stack on top of each other */
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+}
+
+/* Example Animation Classes */
+.shake {
+    animation: shake 0.5s infinite;
+}
+
+@keyframes shake {
+    0% {
+        transform: translate(1px, 1px) rotate(0deg);
+    }
+
+    10% {
+        transform: translate(-1px, -2px) rotate(-1deg);
+    }
+
+    20% {
+        transform: translate(-3px, 0px) rotate(1deg);
+    }
+
+    30% {
+        transform: translate(3px, 2px) rotate(0deg);
+    }
+
+    40% {
+        transform: translate(1px, -1px) rotate(1deg);
+    }
+
+    50% {
+        transform: translate(-1px, 2px) rotate(-1deg);
+    }
+
+    60% {
+        transform: translate(-3px, 1px) rotate(0deg);
+    }
+
+    70% {
+        transform: translate(3px, 1px) rotate(-1deg);
+    }
+
+    80% {
+        transform: translate(-1px, -1px) rotate(1deg);
+    }
+
+    90% {
+        transform: translate(1px, 2px) rotate(0deg);
+    }
+
+    100% {
+        transform: translate(1px, -2px) rotate(-1deg);
+    }
+}
+
+/* Tail Wag Animation */
+.wag {
+    animation: wag 1s infinite alternate ease-in-out;
+    transform-origin: bottom center;
+    /* Pivot from base */
+}
+
+@keyframes wag {
+    from {
+        transform: rotate(-5deg);
+    }
+
+    to {
+        transform: rotate(5deg);
+    }
+}
+
+/* Lantern Sway Animation */
+.sway {
+    animation: sway 2s infinite alternate ease-in-out;
+    transform-origin: top center;
+}
+
+@keyframes sway {
+    from {
+        transform: rotate(-2deg);
+    }
+
+    to {
+        transform: rotate(2deg);
+    }
+}
+
+/* Sprite Sheet Logic */
+.sheet {
+    background-repeat: no-repeat;
+    /* Default to fitting content? No, controlled by sheet type */
+}
+
+/* Horizontal Strip: Width is N * 100%, Height is 100% */
+.sheet-h {
+    background-size: calc(var(--frame-count) * 100%) 100%;
+}
+
+.sheet-loop.sheet-h {
+    animation: sheet-h-anim var(--anim-duration, 1s) steps(var(--frame-count)) infinite;
+}
+
+@keyframes sheet-h-anim {
+    from {
+        background-position: 0 0;
+    }
+
+    to {
+        background-position: 100% 0;
+    }
+}
+
+/* Vertical Strip: Width is 100%, Height is N * 100% */
+.sheet-v {
+    background-size: 100% calc(var(--frame-count) * 100%);
+}
+
+.sheet-loop.sheet-v {
+    animation: sheet-v-anim var(--anim-duration, 1s) steps(var(--frame-count)) infinite;
+}
+
+@keyframes sheet-v-anim {
+    from {
+        background-position: 0 0;
+    }
+
+    to {
+        background-position: 0 100%;
+    }
+}
+
+/* Centered Image (Cutscenes) - Legacy/Fallback */
+.center-image {
+    position: absolute;
+    top: 20%;
+    left: 50%;
+    transform: translateX(-50%);
+    max-width: 60%;
+    max-height: 50%;
+    border: 2px solid #333;
+    /* Optional framer */
+    box-shadow: 0 0 10px #000;
+    display: block;
+}
+
+/* Staff Roll Animation */
+.staff-roll {
+    position: absolute;
+    width: 100%;
+    text-align: center;
+    color: white;
+    font-size: 20px;
+    line-height: 2;
+    text-shadow: 2px 2px 0 #000;
+    /* Initial state set by JS usually, but defaults here */
+}
+
+.staff-section {
+    margin-bottom: 40px;
+}
+
+.staff-title {
+    color: #ffff00;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.staff-name {
+    color: #ffffff;
+}
