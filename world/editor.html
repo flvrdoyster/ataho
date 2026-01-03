@@ -505,6 +505,14 @@
                     }
                 }
 
+                // PRUNE existing ghost collisions on load
+                collisionTiles.forEach(key => {
+                    const [x, y] = key.split(',').map(Number);
+                    if (x >= mapWidthTiles || y >= mapHeightTiles) {
+                        collisionTiles.delete(key);
+                    }
+                });
+
             } else {
                 console.warn("No MAP_DATA found, starting empty.");
                 // Init empty
@@ -557,9 +565,16 @@
             mapHeightTiles = newH;
             mapDataGrid = newGrid;
 
-
+            // Prune collisions outside new bounds
+            collisionTiles.forEach(key => {
+                const [x, y] = key.split(',').map(Number);
+                if (x >= newW || y >= newH) {
+                    collisionTiles.delete(key);
+                }
+            });
 
             renderMapGrid();
+            renderCollisions();
         }
 
         // Removed updateAssets function: assets are handled via data.js baseline
@@ -765,6 +780,9 @@
             // Clear existing trigger divs
             document.querySelectorAll('.trigger-overlay').forEach(e => e.remove());
 
+            // User said: "Irrelevant content should not be displayed/clicked when mode changes"
+            if (currentMode !== 'trigger') return;
+
             const mapContainer = document.getElementById('map');
             triggers.forEach((trig, index) => {
                 const div = document.createElement('div');
@@ -823,19 +841,8 @@
             // Clear existing
             document.querySelectorAll('.collision-overlay').forEach(e => e.remove());
 
-            if (!isCollisionMode && collisionTiles.size === 0) return;
-            // Even if not in mode, we might want to see them? Or only in mode?
-            // Let's show them if in mode OR we can just show them always? 
-            // Usually editor shows walls always or in a view mode. 
-            // For now, show if isCollisionMode is true? 
-            // Or maybe always show semi-transparent if they exist?
-            // Let's show always for now if the user toggled them on? 
-            // Actually, let's just render them. 
-
-            // Wait, the Requirement was "Visual Feedback: Render placed animations on the map editor grid."
-            // For collisions: "When Collision Mode is active, render a semi-transparent red overlay"
-
-            if (!isCollisionMode) return;
+            // User said: "Irrelevant content should not be displayed/clicked when mode changes"
+            if (currentMode !== 'collision') return;
 
             const mapContainer = document.getElementById('map');
             collisionTiles.forEach(key => {
@@ -949,11 +956,16 @@
 
             const result = {
                 assets: (window.MAP_DATA && window.MAP_DATA.assets) ? window.MAP_DATA.assets : {},
-                collisions: Array.from(collisionTiles).map(k => {
-                    const [x, y] = k.split(',').map(Number);
-                    return { x, y };
-                }),
-                tiles: data
+                tiles: data,
+                animations: (window.MAP_DATA && window.MAP_DATA.animations) ? window.MAP_DATA.animations : [],
+                editor: (window.MAP_DATA && window.MAP_DATA.editor) ? window.MAP_DATA.editor : {},
+                collisions: Array.from(collisionTiles)
+                    .map(k => {
+                        const [x, y] = k.split(',').map(Number);
+                        return { x, y };
+                    })
+                    // Filter out-of-bounds collisions
+                    .filter(c => c.x < mapWidthTiles && c.y < mapHeightTiles)
             };
 
             document.getElementById('output').value = "window.MAP_DATA = " + JSON.stringify(result, null, 2);

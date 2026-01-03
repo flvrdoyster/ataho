@@ -26,14 +26,25 @@ let CONFIG = {
         TILESET: '',
         CEILING_TILESET: '',
         ANIMATION: '',
-        CHAR: ''
-    }
+        CHAR: '',
+        IDLE: ''
+    },
+    IDLE_START_TIME: 4, // seconds before sitting
+    YAWN_MIN_INTERVAL: 4, // min seconds between yawns
+    YAWN_MAX_INTERVAL: 8,   // max seconds between yawns
+    YAWN_DURATION: 1.0,   // duration of yawn animation
+    YAWN_COUNT_LIE_DOWN: 3, // Yawns before lying down
+    LIE_DOWN_ANIM_SPEED: 1.0, // seconds per frame for breathing while lying
+    SLEEP_BUBBLE_ANIM_SPEED: 0.15, // seconds per frame for bubble
+    SLEEP_BUBBLE_OFFSET_X: 12, // X offset relative to sprite dstX
+    SLEEP_BUBBLE_OFFSET_Y: 0   // Y offset relative to sprite dstY
 };
 
 let tilesetImg;
 let ceilingTilesetImg;
 let animationImg;
 let charImg;
+let idleImg;
 let mapData = [];
 let tileGrid = []; // Spatial Index
 let mapAnimations = [];
@@ -50,10 +61,31 @@ const player = {
     direction: 0,
     animFrame: 0,
     isMoving: false,
-    stepTimer: 0
+    stepTimer: 0,
+    idleTimer: 0,
+    yawnTimer: 0,
+    currentYawnInterval: 6, // Initial random value
+    isIdle: false,
+    isYawning: false,
+    isLyingDown: false,
+    yawnFrame: 0,
+    yawnCount: 0,
+    lieDownFrame: 0,
+    lieDownTimer: 0,
+    bubbleFrame: 0,
+    bubbleTimer: 0,
+    debugMode: false // When true, input doesn't reset idle
 };
 
+// Helper: Get random yawn interval
+function getNextYawnInterval() {
+    return CONFIG.YAWN_MIN_INTERVAL + Math.random() * (CONFIG.YAWN_MAX_INTERVAL - CONFIG.YAWN_MIN_INTERVAL);
+}
+
 const WALK_SEQUENCE = [0, 1, 2, 1, 0, 3, 4, 3];
+const YAWN_SEQUENCE = [0, 1, 2, 3, 2, 1]; // Sequence for yawning frames
+const LIE_DOWN_SEQUENCE = [0, 1, 2, 1]; // Sequence for breathing while lying down
+const BUBBLE_SEQUENCE = [0, 1, 2, 3, 4, 5, 6, 5, 4, 3, 2, 1]; // 7 frames for sleeping bubble
 
 const camera = {
     x: 0,
@@ -130,6 +162,7 @@ async function initGame() {
             CONFIG.PATHS.CEILING_TILESET = resolvePath(window.MAP_DATA.assets.ceilingTileset || '');
             CONFIG.PATHS.ANIMATION = resolvePath(window.MAP_DATA.assets.animation || '');
             CONFIG.PATHS.CHAR = resolvePath(window.MAP_DATA.assets.character || '');
+            CONFIG.PATHS.IDLE = resolvePath("../../char/ataho-idle.png"); // Hardcoded for now based on file list
         }
 
         // Map Data
@@ -188,7 +221,10 @@ async function initGame() {
             return;
         }
 
-        if (keys.hasOwnProperty(e.key)) keys[e.key] = true;
+        if (keys.hasOwnProperty(e.key)) {
+            keys[e.key] = true;
+            if (!player.debugMode) player.idleTimer = 0;
+        }
         if (e.code === 'Space' && activeTrigger) {
             openModal(activeTrigger);
         }
@@ -259,6 +295,16 @@ async function initGame() {
         await new Promise((resolve, reject) => {
             charImg.onload = resolve;
             charImg.onerror = () => { console.warn("Char load failed"); resolve(); };
+        });
+    }
+
+    // 1.7 Load Idle Sprite
+    if (CONFIG.PATHS.IDLE) {
+        idleImg = new Image();
+        idleImg.src = CONFIG.PATHS.IDLE;
+        await new Promise((resolve, reject) => {
+            idleImg.onload = resolve;
+            idleImg.onerror = () => { console.warn("Idle load failed"); resolve(); };
         });
     }
 
@@ -416,6 +462,7 @@ function handleTouchStart(e) {
     if (e.target !== canvas) return;
     e.preventDefault();
     touchInput.active = true;
+    if (!player.debugMode) player.idleTimer = 0;
     updateTouchInput(e.touches[0]);
 }
 
@@ -509,7 +556,16 @@ function update(dt) {
 
     player.isMoving = (dx !== 0 || dy !== 0);
 
+    // Idle Logic
     if (player.isMoving) {
+        player.idleTimer = 0;
+        player.yawnTimer = 0;
+        player.yawnCount = 0;
+        player.isIdle = false;
+        player.isYawning = false;
+        player.isLyingDown = false;
+        player.lieDownTimer = 0;
+
         player.stepTimer += dt;
         if (player.stepTimer >= CONFIG.ANIMATION_SPEED) {
             player.stepTimer = 0;
@@ -518,7 +574,78 @@ function update(dt) {
     } else {
         player.animFrame = 0; // Reset to standing
         player.stepTimer = 0;
+
+        player.idleTimer += dt;
+        if (player.idleTimer >= CONFIG.IDLE_START_TIME) {
+            if (!player.isIdle) {
+                player.isIdle = true;
+                player.currentYawnInterval = getNextYawnInterval(); // Randomize first yawn
+            }
+
+            if (player.isLyingDown) {
+                // Animate breathing/sleeping
+                player.lieDownTimer += dt;
+                if (player.lieDownTimer >= CONFIG.LIE_DOWN_ANIM_SPEED) {
+                    player.lieDownTimer = 0;
+                    player.lieDownFrame = (player.lieDownFrame + 1) % LIE_DOWN_SEQUENCE.length;
+                }
+
+                // Animate Bubble
+                player.bubbleTimer += dt;
+                if (player.bubbleTimer >= CONFIG.SLEEP_BUBBLE_ANIM_SPEED) {
+                    player.bubbleTimer = 0;
+                    player.bubbleFrame = (player.bubbleFrame + 1) % BUBBLE_SEQUENCE.length;
+                }
+            } else {
+                // Periodically Yawn or Lie Down
+                player.yawnTimer += dt;
+                if (player.isYawning) {
+                    const totalYawnFrames = YAWN_SEQUENCE.length;
+                    const frameTime = CONFIG.YAWN_DURATION / totalYawnFrames;
+                    player.yawnFrame = Math.floor((player.yawnTimer - player.currentYawnInterval) / frameTime);
+
+                    if (player.yawnFrame >= totalYawnFrames) {
+                        player.isYawning = false;
+                        player.yawnTimer = 0;
+                        player.yawnCount++;
+                        player.currentYawnInterval = getNextYawnInterval();
+                    }
+                } else if (player.yawnTimer >= player.currentYawnInterval) {
+                    if (player.yawnCount >= CONFIG.YAWN_COUNT_LIE_DOWN) {
+                        player.isLyingDown = true;
+                    } else {
+                        player.isYawning = true;
+                        player.yawnFrame = 0;
+                    }
+                }
+            }
+        } else {
+            player.isIdle = false;
+            player.isYawning = false;
+            player.isLyingDown = false;
+            player.yawnCount = 0;
+        }
     }
+
+    // --- Idle Debug Commands ---
+    window.skipToSitting = () => {
+        player.idleTimer = CONFIG.IDLE_START_TIME;
+        player.isMoving = false;
+        console.log("Idle: Skipped to Sitting");
+    };
+
+    window.skipToLying = () => {
+        player.idleTimer = CONFIG.IDLE_START_TIME;
+        player.yawnCount = CONFIG.YAWN_COUNT_LIE_DOWN;
+        player.isMoving = false;
+        player.yawnTimer = player.currentYawnInterval; // Trigger next interval check
+        console.log("Idle: Skipped to Lying Down");
+    };
+
+    window.toggleIdleDebug = () => {
+        player.debugMode = !player.debugMode;
+        console.log("Idle Debug Mode:", player.debugMode ? "ON (Input won't reset idle)" : "OFF");
+    };
 
     const pad = CONFIG.COLLISION_PADDING || 0;
 
@@ -624,11 +751,10 @@ function checkTriggers() {
 }
 
 function draw() {
-    // Clear
-    ctx.fillStyle = '#000';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    if (!ctx) return;
 
-    // Save context for camera offset
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
     ctx.save();
     ctx.translate(-Math.floor(camera.x), -Math.floor(camera.y));
 
@@ -671,31 +797,115 @@ function draw() {
 
     // Draw Animations
     if (animationImg && mapAnimations.length > 0) {
-        const now = performance.now() / 1000; // Use seconds
+        const now = performance.now() / 1000;
         mapAnimations.forEach(anim => {
-            // Check visibility (simplified AABB)
             if (anim.x + anim.w > viewL && anim.x < viewR &&
                 anim.y + anim.h > viewT && anim.y < viewB) {
-
-                // Calculate Frame
-                // Original speed was in ms, let's assume it was intended as ms per frame
                 const speedInSeconds = anim.speed / 1000;
                 const frameIndex = Math.floor(now / speedInSeconds) % anim.frames;
                 const srcX = frameIndex * anim.w;
-
-                ctx.drawImage(
-                    animationImg,
-                    srcX, 0,
-                    anim.w, anim.h,
-                    anim.x, anim.y,
-                    anim.w, anim.h
-                );
+                ctx.drawImage(animationImg, srcX, 0, anim.w, anim.h, anim.x, anim.y, anim.w, anim.h);
             }
         });
     }
 
     // Draw Player
-    if (charImg) {
+    drawPlayer(ctx);
+
+    // Draw Ceiling Layer (Over Player)
+    if (ceilingTilesetImg) {
+        // Calculate Culling Bounds based on Player Position
+        const cullL = player.x - CONFIG.CEILING_RENDER.RANGE_LEFT;
+        const cullR = player.x + player.width + CONFIG.CEILING_RENDER.RANGE_RIGHT;
+        const cullT = player.y - CONFIG.CEILING_RENDER.RANGE_TOP;
+        const cullB = player.y + player.height + CONFIG.CEILING_RENDER.RANGE_BOTTOM;
+
+        // Spatial Grid Iteration for Ceiling
+        // Determine grid dimensions safely
+        const gridRows = tileGrid.length;
+        const gridCols = gridRows > 0 ? tileGrid[0].length : 0;
+
+        const cStartCol = Math.max(0, Math.floor(cullL / CONFIG.TILE_SIZE));
+        const cEndCol = Math.min(gridCols, Math.ceil(cullR / CONFIG.TILE_SIZE));
+        const cStartRow = Math.max(0, Math.floor(cullT / CONFIG.TILE_SIZE));
+        const cEndRow = Math.min(gridRows, Math.ceil(cullB / CONFIG.TILE_SIZE));
+
+        for (let y = cStartRow; y < cEndRow; y++) {
+            for (let x = cStartCol; x < cEndCol; x++) {
+                const cell = tileGrid[y][x];
+                for (let i = 0; i < cell.length; i++) {
+                    const tile = cell[i];
+                    ctx.drawImage(
+                        ceilingTilesetImg,
+                        tile.tx * CONFIG.TILE_SIZE, tile.ty * CONFIG.TILE_SIZE,
+                        CONFIG.TILE_SIZE, CONFIG.TILE_SIZE,
+                        tile.gx * CONFIG.TILE_SIZE, tile.gy * CONFIG.TILE_SIZE,
+                        CONFIG.TILE_SIZE, CONFIG.TILE_SIZE
+                    );
+                }
+            }
+        }
+    }
+
+    ctx.restore();
+}
+
+/**
+ * Renders the player sprite based on its current state (idling, walking, lying down)
+ * @param {CanvasRenderingContext2D} ctx 
+ */
+function drawPlayer(ctx) {
+    if (player.isIdle && idleImg) {
+        let srcX, srcY, spriteW, spriteH;
+
+        if (player.isLyingDown) {
+            // Draw Lying Down Sprite (Second Row: Y=54, 56x32)
+            spriteW = 56;
+            spriteH = 32;
+            const frameIdx = LIE_DOWN_SEQUENCE[player.lieDownFrame] || 0;
+            srcX = frameIdx * spriteW;
+            srcY = 54;
+        } else {
+            // Draw Idle/Sitting/Yawning Sprite (First Row: Y=0, 48x54)
+            spriteW = 48;
+            spriteH = 54;
+            let frameIdx = 4; // Default: Sitting
+            if (player.isYawning) {
+                frameIdx = YAWN_SEQUENCE[player.yawnFrame] || 0;
+            }
+            srcX = frameIdx * spriteW;
+            srcY = 0;
+        }
+
+        const dstX = Math.floor(player.x + 8 - spriteW / 2);
+        const dstY = Math.floor(player.y + 16 - spriteH);
+
+        ctx.drawImage(
+            idleImg,
+            srcX, srcY,
+            spriteW, spriteH,
+            dstX, dstY,
+            spriteW, spriteH
+        );
+
+        // Draw Sleeping Bubble Animation
+        if (player.isLyingDown) {
+            const bubbleW = 16;
+            const bubbleH = 16;
+            const bFrameIdx = BUBBLE_SEQUENCE[player.bubbleFrame] || 0;
+            const bSrcX = bFrameIdx * bubbleW;
+            const bSrcY = 86; // Third row offset
+
+            ctx.drawImage(
+                idleImg,
+                bSrcX, bSrcY,
+                bubbleW, bubbleH,
+                dstX + CONFIG.SLEEP_BUBBLE_OFFSET_X,
+                dstY + CONFIG.SLEEP_BUBBLE_OFFSET_Y,
+                bubbleW, bubbleH
+            );
+        }
+    } else if (charImg) {
         const spriteW = 48;
         const spriteH = 64;
         const seqIndex = WALK_SEQUENCE[player.animFrame];
@@ -731,59 +941,11 @@ function draw() {
             dstX, dstY,
             spriteW, spriteH
         );
-
-        // Debug: Show collision box
-        // ctx.strokeStyle = 'red';
-        // ctx.strokeRect(player.x, player.y, player.width, player.height);
-
     } else {
         // Fallback
         ctx.fillStyle = player.color;
-        ctx.fillRect(
-            player.x,
-            player.y,
-            player.width,
-            player.height
-        );
+        ctx.fillRect(player.x, player.y, player.width, player.height);
     }
-
-    // Draw Ceiling Layer (Over Player)
-    if (ceilingTilesetImg) {
-        // Calculate Culling Bounds based on Player Position
-        const cullL = player.x - CONFIG.CEILING_RENDER.RANGE_LEFT;
-        const cullR = player.x + player.width + CONFIG.CEILING_RENDER.RANGE_RIGHT;
-        const cullT = player.y - CONFIG.CEILING_RENDER.RANGE_TOP;
-        const cullB = player.y + player.height + CONFIG.CEILING_RENDER.RANGE_BOTTOM;
-
-        // Spatial Grid Iteration for Ceiling
-        // Determine grid dimensions safely
-        const gridRows = tileGrid.length;
-        const gridCols = gridRows > 0 ? tileGrid[0].length : 0;
-
-        const startCol = Math.max(0, Math.floor(cullL / CONFIG.TILE_SIZE));
-        const endCol = Math.min(gridCols, Math.ceil(cullR / CONFIG.TILE_SIZE));
-        const startRow = Math.max(0, Math.floor(cullT / CONFIG.TILE_SIZE));
-        const endRow = Math.min(gridRows, Math.ceil(cullB / CONFIG.TILE_SIZE));
-
-        for (let y = startRow; y < endRow; y++) {
-            for (let x = startCol; x < endCol; x++) {
-                const cell = tileGrid[y][x];
-                for (let i = 0; i < cell.length; i++) {
-                    const tile = cell[i];
-                    ctx.drawImage(
-                        ceilingTilesetImg,
-                        tile.tx * CONFIG.TILE_SIZE, tile.ty * CONFIG.TILE_SIZE,
-                        CONFIG.TILE_SIZE, CONFIG.TILE_SIZE,
-                        tile.gx * CONFIG.TILE_SIZE, tile.gy * CONFIG.TILE_SIZE,
-                        CONFIG.TILE_SIZE, CONFIG.TILE_SIZE
-                    );
-                }
-            }
-        }
-    }
-
-    ctx.restore();
-    ctx.restore();
 }
 
 function checkCollision(x, y, w, h) {
