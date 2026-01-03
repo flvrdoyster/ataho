@@ -60,28 +60,28 @@ window.MAP_DATA.triggers = [
                 "text": "Disc Station 04",
                 "href": "#resource/img/ds04.png",
                 "data": {
-                    "caption": "Disc Station 04 표지"
+                    "caption": "Disc Station 04 메뉴 화면 일러스트"
                 }
             },
             {
                 "text": "Disc Station 10",
                 "href": "#resource/img/ds10.png",
                 "data": {
-                    "caption": "Disc Station 10 표지"
+                    "caption": "Disc Station 10 메뉴 화면 일러스트"
                 }
             },
             {
                 "text": "Disc Station 14",
                 "href": "#resource/img/ds14.png",
                 "data": {
-                    "caption": "Disc Station 14 표지"
+                    "caption": "Disc Station 14 메뉴 화면 일러스트"
                 }
             },
             {
                 "text": "Disc Station 20",
                 "href": "#resource/img/ds20.png",
                 "data": {
-                    "caption": "Disc Station 20 표지"
+                    "caption": "Disc Station 20 메뉴 화면 일러스트"
                 }
             }
         ]
@@ -91,14 +91,14 @@ window.MAP_DATA.triggers = [
         "y": 21,
         "w": 2,
         "h": 2,
-        "title": "숏 애니메이션",
+        "title": "DS 아니메 총집편 '98",
         "type": "menu",
         "items": [
             {
-                "text": "그런 계절 / 싱크로 / 본능 / 쿠킹 DE GO / 물가의 사랑",
+                "text": "환세 시리즈 부분 컷",
                 "href": "#resource/mov/ani_orig.mp4",
                 "data": {
-                    "caption": "환세 시리즈 부분 컷 (from DS 아니메 총집편 '98)",
+                    "caption": "그런 계절 / 싱크로 / 본능 / 쿠킹 DE GO / 물가의 사랑",
                     "subtitle": "ani_caption.vtt"
                 }
             }
