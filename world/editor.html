@@ -38,7 +38,6 @@
                Actually tile has onclick. Keep it. */
             cursor: pointer;
             image-rendering: pixelated;
-            background-image: url('assets/cave/cave_tile.png');
             background-repeat: no-repeat;
             z-index: 1;
         }
@@ -71,6 +70,14 @@
         }
 
 
+        .trigger-overlay {
+            position: absolute;
+            background: rgba(0, 100, 255, 0.5);
+            z-index: 12;
+            pointer-events: none;
+            cursor: pointer;
+            outline: 1px solid rgba(0, 200, 255, 0.8);
+        }
 
         .tile:hover {
             z-index: 100;
@@ -79,6 +86,11 @@
 
         .tile.empty {
             background: none !important;
+        }
+
+        .trigger-overlay {
+            pointer-events: auto !important;
+            /* Allow clicking the overlay itself */
         }
 
         .sidebar {
@@ -110,8 +122,7 @@
             cursor: pointer;
             border: 2px solid transparent;
             box-sizing: border-box;
-            image-rendering: pixelated;
-            background-image: url('assets/cave/cave_tile.png');
+            /* background-image set via JS */
             background-size: 512px auto;
             /* Scale up for palette visibility (32px view of 16px tile) -> 16px * 2 = 32px, so total width * 2 */
             background-repeat: no-repeat;
@@ -180,23 +191,64 @@
             <p>Selected Tile: <span id="selected-id">None</span></p>
             <p>Hover: <span id="hover-coords">--,--</span></p>
 
-            <div style="margin-bottom: 10px; border-bottom: 1px solid #555; padding-bottom: 10px;">
-                <label><input type="radio" name="mode" value="tile" checked onchange="setMode('tile')"> Tile
-                    Mode</label>
-                <label><input type="radio" name="mode" value="anim" onchange="setMode('anim')"> Animation Mode</label>
+            <div
+                style="margin-bottom: 10px; border-bottom: 1px solid #555; padding-bottom: 10px; display: flex; flex-direction: column; gap: 5px;">
+                <label><input type="radio" name="mode" value="tile" checked onchange="setMode('tile')"> 타일 모드
+                    (Tile)</label>
+                <label><input type="radio" name="mode" value="trigger" onchange="setMode('trigger')"> 트리거 생성 모드
+                    (Trigger)</label>
+                <label><input type="radio" name="mode" value="collision" onchange="setMode('collision')"> 충돌 판정 모드
+                    (Collision)</label>
             </div>
 
-            <!-- Animation Palette (Hidden by default) -->
-            <div id="anim-palette" style="display:none; margin-bottom: 15px;">
-                <h3>Animations</h3>
-                <div class="anim-item" onclick="selectAnim('irori')"
-                    style="cursor: pointer; border: 1px solid #444; padding: 5px; margin-bottom: 5px;">
-                    Irori (Hearth)
+            <!-- Trigger Palette -->
+            <div id="trigger-palette"
+                style="display:none; margin-bottom: 15px; border: 1px solid #444; padding: 10px; background: #222;">
+                <h3 style="margin-top: 0;">Trigger Properties</h3>
+                <div style="margin-bottom: 5px;"><label>Title: <input type="text" id="trigger-title" value="New Trigger"
+                            style="width:100%"></label></div>
+                <div style="margin-bottom: 5px;"><label>Type:
+                        <select id="trigger-type" style="width:100%">
+                            <option value="menu">Menu</option>
+                            <option value="warp">Warp</option>
+                        </select>
+                    </label></div>
+                <div style="margin-bottom: 5px; display: flex; gap: 5px;">
+                    <label style="flex:1;">X: <input type="number" id="trigger-x" value="0" style="width:100%"></label>
+                    <label style="flex:1;">Y: <input type="number" id="trigger-y" value="0" style="width:100%"></label>
+                </div>
+                <div style="margin-bottom: 5px; display: flex; gap: 5px;">
+                    <label style="flex:1;">W: <input type="number" id="trigger-w" value="1" style="width:100%"></label>
+                    <label style="flex:1;">H: <input type="number" id="trigger-h" value="1" style="width:100%"></label>
+                </div>
+                <div style="margin-bottom: 20px;">
+                    <label>Items (JSON):</label>
+                    <textarea id="trigger-items"
+                        style="height: 60px; font-family: monospace;">[{"text": "Sample", "href": "#"}]</textarea>
+                </div>
+                <div style="display: flex; gap: 5px; margin-top: 10px;">
+                    <button id="btn-place-trigger" onclick="placeTriggerAction()"
+                        style="flex: 2; background: #2e7d32;">Create Trigger</button>
+                    <button id="btn-update-trigger" onclick="updateTrigger()"
+                        style="flex: 2; background: #01579b; display: none;">Update Selected</button>
+                    <button id="btn-cancel-trigger" onclick="cancelTriggerEdit()"
+                        style="flex: 1; background: #444; display: none;">Cancel</button>
+                </div>
+                <div id="editing-status" style="font-size: 11px; color: #ffeb3b; margin-top: 5px; display: none;">*
+                    Editing existing trigger</div>
+                <div style="font-size: 11px; color: #888; margin-top: 5px;">
+                    * 영역 크기는 일단 1x1로 생성 후 데이터를 수정하세요.<br>
+                    * 그리드를 클릭하여 생성하거나 기존 트리거를 편집합니다.
                 </div>
             </div>
 
             <div style="margin-bottom: 10px; display: flex; gap: 5px;">
-                <button onclick="setEraser()" style="flex: 1; background: #c33;">Eraser</button>
+                <button id="btn-brush" onclick="setBrush()" style="flex: 1; background: #2e7d32;">Brush</button>
+                <button id="btn-eraser" onclick="setEraser()" style="flex: 1; background: #444;">Eraser</button>
+            </div>
+            <div style="margin-bottom: 20px; display: flex; flex-direction: column; gap: 5px;">
+                <button onclick="exportMapData()" style="background: #4527a0;">Export Map Data (data.js)</button>
+                <button onclick="exportTriggers()" style="background: #1565c0;">Export Triggers (triggers.js)</button>
             </div>
             <div style="margin-bottom: 10px; display: flex; gap: 5px;">
                 <button onclick="changeZoom(0.1)" style="flex: 1;">Zoom +</button>
@@ -205,10 +257,6 @@
             </div>
             <p>Zoom: <span id="zoom-level">100%</span></p>
 
-            <div style="margin-bottom: 10px;">
-                <button id="collisionBtn" onclick="toggleCollisionMode()">Collision Mode: OFF</button>
-            </div>
-            <button onclick="exportData()">Export JSON</button>
             <textarea id="output" readonly></textarea>
 
             <hr style="border-color: #555; margin: 20px 0;">
@@ -233,24 +281,7 @@
             </div>
             <button onclick="resizeMap()">Update Size</button>
 
-            <h3>Assets</h3>
-            <div style="margin-bottom: 5px;"><label>Tileset:</label></div>
-            <input type="text" id="asset-tileset" value="map/assets/cave/cave_tile.png"
-                style="width:100%; margin-bottom:10px;">
-
-            <div style="margin-bottom: 5px;"><label>Ceiling:</label></div>
-            <input type="text" id="asset-ceiling" value="map/assets/cave/cave_tile_top.png"
-                style="width:100%; margin-bottom:10px;">
-
-            <div style="margin-bottom: 5px;"><label>Animation:</label></div>
-            <input type="text" id="asset-anim" value="map/assets/cave/cave_tile_irori.png"
-                style="width:100%; margin-bottom:10px;">
-
-            <div style="margin-bottom: 5px;"><label>Character:</label></div>
-            <input type="text" id="asset-char" value="map/assets/char/ataho-1.png"
-                style="width:100%; margin-bottom:10px;">
-
-            <button onclick="updateAssets()">Update Assets</button>
+            <!-- Assets section removed: handled via data.js baseline -->
         </div>
     </div>
     <div class="editor-container">
@@ -322,13 +353,12 @@
             const triggerScript = document.createElement('script');
             triggerScript.src = `maps/${mapName}/triggers.js`;
             triggerScript.onload = () => {
-                document.getElementById('loading').style.display = 'none';
-                if (typeof initEditor === 'function') initEditor();
+                // startEditor will hide the loading message when ready
+                if (typeof startEditor === 'function') startEditor();
             };
             triggerScript.onerror = () => {
                 console.warn("No triggers.js found, or failed to load. Continuing...");
-                document.getElementById('loading').style.display = 'none';
-                if (typeof initEditor === 'function') initEditor();
+                if (typeof startEditor === 'function') startEditor();
             };
             document.body.appendChild(triggerScript);
         };
@@ -342,7 +372,7 @@
         // Configuration
         const TILE_SIZE = 16;
         const PALETTE_SCALE = 2; // Show tiles 2x bigger in palette
-        let ASSET_PATH = 'assets/cave/cave_tile.png';
+        let ASSET_PATH = '';
         const EMPTY_TILE = { tx: 1, ty: 0 };
 
         let mapWidthTiles = 40;
@@ -352,7 +382,8 @@
         let currentMode = 'tile'; // 'tile' or 'anim'
         let selectedAnimType = null;
 
-        let animations = []; // Array of { type, x, y }
+        let triggers = []; // Array of { x, y, w, h, title, type, items }
+        let editingTriggerIndex = -1; // Index of trigger being edited
         let isCollisionMode = false;
         let collisionTiles = new Set(); // Stores "gx,gy" strings
 
@@ -362,22 +393,38 @@
         let tilesetHeight = 0;
         let zoomLevel = 1.0;
 
+        // Central Start Function called after scripts load
+        function startEditor() {
+            if (!window.MAP_DATA) {
+                alert("Map data not found!");
+                return;
+            }
 
+            // 1. Determine Asset Path
+            if (window.MAP_DATA.assets && window.MAP_DATA.assets.tileset) {
+                ASSET_PATH = resolveEditorPath(window.MAP_DATA.assets.tileset);
+            } else {
+                ASSET_PATH = resolveEditorPath('assets/cave_tile.png'); // Fallback
+            }
 
-        // Initialize
-        const img = new Image();
-        img.src = ASSET_PATH;
-        img.onload = function () {
-            tilesetWidth = img.width;
-            tilesetHeight = img.height;
-            initEditor();
-        };
-        img.onerror = function () {
-            alert("Failed to load tileset image: " + ASSET_PATH);
+            // 2. Load Tileset Image to get dimensions
+            const img = new Image();
+            img.src = ASSET_PATH;
+            img.onload = function () {
+                tilesetWidth = img.width;
+                tilesetHeight = img.height;
+                initEditor(); // Now we have dimensions, build everything
+
+                document.getElementById('loading').style.display = 'none';
+            };
+            img.onerror = function () {
+                alert("Tileset image mismatch or not found at: " + ASSET_PATH + "\nCheck if the path is relative to the maps folder.");
+                document.getElementById('loading').innerText = "Failed to load assets.";
+            }
         }
 
         function initEditor() {
-            console.log("Initializing Editor...");
+            console.log("Initializing Editor Components...");
 
             // 1. Build Palette
             const cols = Math.floor(tilesetWidth / TILE_SIZE);
@@ -399,6 +446,7 @@
                     // Since background-size is 200% (roughly), position needs to be scaled too?
                     // No, background-position is in pixels related to the element box or percentage.
                     // If we set background-size to specific px, we use specific px for position.
+                    d.style.backgroundImage = `url('${ASSET_PATH}')`;
                     d.style.backgroundSize = `${bgWidth}px auto`;
                     d.style.backgroundPosition = `-${x * TILE_SIZE * PALETTE_SCALE}px -${y * TILE_SIZE * PALETTE_SCALE}px`;
 
@@ -411,19 +459,9 @@
             if (window.MAP_DATA) {
                 // Load Assets Config
                 if (window.MAP_DATA.assets) {
-                    document.getElementById('asset-tileset').value = window.MAP_DATA.assets.tileset || "assets/cave_tile.png";
-                    document.getElementById('asset-ceiling').value = window.MAP_DATA.assets.ceilingTileset || "assets/cave_tile_top.png";
-                    document.getElementById('asset-anim').value = window.MAP_DATA.assets.animation || "assets/cave_tile_irori.png";
-                    document.getElementById('asset-char').value = window.MAP_DATA.assets.character || "../../char/ataho-1.png";
-
                     // Resolve path for internal editor usage (Images)
                     ASSET_PATH = resolveEditorPath(window.MAP_DATA.assets.tileset);
                 }
-
-
-
-
-                // Update UI Inputs for Overlay
 
 
                 // Load Tiles
@@ -432,13 +470,15 @@
                     loadedTiles = window.MAP_DATA;
                 } else {
                     loadedTiles = window.MAP_DATA.tiles || [];
-                    animations = window.MAP_DATA.animations || [];
-                    renderAnimations();
-                    if (window.MAP_DATA.collisions) {
-                        window.MAP_DATA.collisions.forEach(c => collisionTiles.add(`${c.x},${c.y}`));
-                    }
-                    renderCollisions();
                 }
+
+                triggers = window.MAP_DATA.triggers || [];
+                renderTriggers();
+
+                if (window.MAP_DATA.collisions) {
+                    window.MAP_DATA.collisions.forEach(c => collisionTiles.add(`${c.x},${c.y}`));
+                }
+                renderCollisions();
 
                 // Determine Size
                 let maxX = 0;
@@ -522,33 +562,7 @@
             renderMapGrid();
         }
 
-        function updateAssets() {
-            const newVal = document.getElementById('asset-tileset').value;
-            let tPath = newVal;
-            if (tPath && tPath.startsWith('map/')) tPath = tPath.substring(4);
-            ASSET_PATH = tPath;
-
-            // Reload Image
-            const img = new Image();
-            img.src = ASSET_PATH;
-            img.onload = function () {
-                tilesetWidth = img.width;
-                tilesetHeight = img.height;
-                // Rebuild palette?
-                document.getElementById('palette').innerHTML = '';
-                // ... Reinit palette logic needs extraction ...
-                // For now, just reload page or simple alert.
-                // Ideally separate rebuildPalette function.
-                // Quick fix: Just alert user to reload or impl simple palette refresh.
-                alert("Tileset path updated. Please reload logic or save & refresh for palette update.");
-                // Actually, let's just update the css rule for .tile?
-                // .tile background-image
-                const styleSheet = document.styleSheets[0];
-                // Hard to find rule. 
-                // Just set inline style for all tiles?
-                renderMapGrid();
-            };
-        }
+        // Removed updateAssets function: assets are handled via data.js baseline
 
         function renderMapGrid() {
             const mapContainer = document.getElementById('map');
@@ -588,102 +602,204 @@
                 }
             }
 
-            // Re-render things that float on top (Animations, Collisions)
-            renderAnimations();
+            // Re-render things that float on top (Triggers, Collisions)
+            renderTriggers();
             renderCollisions();
         }
 
         function selectTile(el, tx, ty) {
             setMode('tile'); // Auto switch
-            document.querySelectorAll('.palette-tile').forEach(t => t.classList.remove('selected'));
-            el.classList.add('selected');
             selectedTx = tx;
             selectedTy = ty;
-            document.getElementById('selected-id').innerText = tx + "," + ty;
+            updateToolUI();
+
+            // Explicitly highlight this one
+            el.classList.add('selected');
         }
 
         function setMode(mode) {
             currentMode = mode;
-            document.getElementById('palette').style.display = (mode === 'tile') ? 'grid' : 'none';
-            document.getElementById('anim-palette').style.display = (mode === 'anim') ? 'block' : 'none';
+            if (mode !== 'trigger' && editingTriggerIndex !== -1) {
+                cancelTriggerEdit();
+            }
+            isCollisionMode = (mode === 'collision');
 
-            // UI Update
+            document.getElementById('palette').style.display = (mode === 'tile') ? 'block' : 'none';
+            document.getElementById('trigger-palette').style.display = (mode === 'trigger') ? 'block' : 'none';
+
+            // UI Update: Ensure radio checked
             document.querySelectorAll('input[name="mode"]').forEach(r => {
                 if (r.value === mode) r.checked = true;
             });
-        }
 
-        function selectAnim(type) {
-            selectedAnimType = type;
-            document.getElementById('selected-id').innerText = "Anim: " + type;
+            renderCollisions(); // Refresh visibility if needed
+            renderTriggers();   // Refresh visibility if needed
         }
-
         function onGridClick(el, gx, gy) {
             if (isCollisionMode) {
                 toggleCollisionAt(gx, gy);
             } else if (currentMode === 'tile') {
                 paintTile(el, gx, gy);
-            } else if (currentMode === 'anim') {
-                placeAnimation(gx, gy);
+            } else if (currentMode === 'trigger') {
+                const isEraser = (selectedTx === EMPTY_TILE.tx && selectedTy === EMPTY_TILE.ty);
+                if (isEraser) {
+                    deleteTriggerAt(gx, gy);
+                    if (editingTriggerIndex !== -1) cancelTriggerEdit();
+                } else {
+                    // Brush mode
+                    const existingIndex = triggers.findIndex(t =>
+                        gx >= t.x && gx < t.x + (t.w || 1) &&
+                        gy >= t.y && gy < t.y + (t.h || 1)
+                    );
+
+                    if (existingIndex !== -1) {
+                        loadTriggerToUI(existingIndex);
+                    } else {
+                        placeTrigger(gx, gy);
+                    }
+                }
             }
         }
 
-        function placeAnimation(gx, gy) {
-            if (!selectedAnimType) {
-                alert("Select an animation first!");
+        function loadTriggerToUI(index) {
+            editingTriggerIndex = index;
+            const trig = triggers[index];
+            document.getElementById('trigger-title').value = trig.title;
+            document.getElementById('trigger-type').value = trig.type || 'menu';
+            document.getElementById('trigger-x').value = trig.x;
+            document.getElementById('trigger-y').value = trig.y;
+            document.getElementById('trigger-w').value = trig.w || 1;
+            document.getElementById('trigger-h').value = trig.h || 1;
+            document.getElementById('trigger-items').value = JSON.stringify(trig.items || []);
+
+            // UI Update
+            document.getElementById('btn-place-trigger').style.display = 'none';
+            document.getElementById('btn-update-trigger').style.display = 'block';
+            document.getElementById('btn-cancel-trigger').style.display = 'block';
+            document.getElementById('editing-status').style.display = 'block';
+
+            renderTriggers();
+        }
+
+        function cancelTriggerEdit() {
+            editingTriggerIndex = -1;
+            document.getElementById('btn-place-trigger').style.display = 'block';
+            document.getElementById('btn-update-trigger').style.display = 'none';
+            document.getElementById('btn-cancel-trigger').style.display = 'none';
+            document.getElementById('editing-status').style.display = 'none';
+            renderTriggers();
+        }
+
+        function updateTrigger() {
+            if (editingTriggerIndex === -1) return;
+
+            const title = document.getElementById('trigger-title').value;
+            const type = document.getElementById('trigger-type').value;
+            const tx = parseInt(document.getElementById('trigger-x').value);
+            const ty = parseInt(document.getElementById('trigger-y').value);
+            const tw = parseInt(document.getElementById('trigger-w').value);
+            const th = parseInt(document.getElementById('trigger-h').value);
+
+            let items = [];
+            try {
+                items = JSON.parse(document.getElementById('trigger-items').value);
+            } catch (e) {
+                alert("Invalid Items JSON!");
                 return;
             }
 
-            // Add new animation
-            // Irori config: 5 frames, 64x48.
-            // Helper to get config based on type
-            let config = { type: 'irori', w: 64, h: 48 }; // Corrected to 4 tiles wide
+            triggers[editingTriggerIndex].title = title;
+            triggers[editingTriggerIndex].type = type;
+            triggers[editingTriggerIndex].x = tx;
+            triggers[editingTriggerIndex].y = ty;
+            triggers[editingTriggerIndex].w = tw;
+            triggers[editingTriggerIndex].h = th;
+            triggers[editingTriggerIndex].items = items;
 
-            // Center logic? Or Top-Left?
-            // User clicks a tile. Let's place Top-Left at that tile?
-            // Or center?
-            // Let's assume user clicks the Top-Left tile of the desired position.
-            // gx, gy -> pixels
-
-            let anim = {
-                type: selectedAnimType,
-                x: gx * TILE_SIZE,
-                y: gy * TILE_SIZE,
-                w: 64,
-                h: 48
-            };
-
-            animations.push(anim);
-            renderAnimations();
+            alert("Trigger updated!");
+            cancelTriggerEdit();
         }
 
-        function renderAnimations() {
-            // Clear existing anim divs?
-            document.querySelectorAll('.anim-obj').forEach(e => e.remove());
+        function placeTriggerAction() {
+            // This is just a helper for the button if someone clicks it manually
+            alert("그리드를 클릭하여 새 트리거를 배치하세요.");
+        }
+
+        function deleteTriggerAt(gx, gy) {
+            const index = triggers.findIndex(t =>
+                gx >= t.x && gx < t.x + (t.w || 1) &&
+                gy >= t.y && gy < t.y + (t.h || 1)
+            );
+            if (index !== -1) {
+                triggers.splice(index, 1);
+                renderTriggers();
+            }
+        }
+
+        function placeTrigger(gx, gy) {
+            const title = document.getElementById('trigger-title').value;
+            const type = document.getElementById('trigger-type').value;
+            let items = [];
+            try {
+                items = JSON.parse(document.getElementById('trigger-items').value);
+            } catch (e) {
+                alert("Invalid Items JSON!");
+                return;
+            }
+
+            let trigger = {
+                title: title,
+                type: type,
+                x: gx,
+                y: gy,
+                w: parseInt(document.getElementById('trigger-w').value) || 1,
+                h: parseInt(document.getElementById('trigger-h').value) || 1,
+                items: items
+            };
+
+            triggers.push(trigger);
+            renderTriggers();
+        }
+
+        function renderTriggers() {
+            // Clear existing trigger divs
+            document.querySelectorAll('.trigger-overlay').forEach(e => e.remove());
 
             const mapContainer = document.getElementById('map');
-
-            animations.forEach((anim, index) => {
+            triggers.forEach((trig, index) => {
                 const div = document.createElement('div');
-                div.className = 'anim-obj';
-                div.style.left = anim.x + 'px';
-                div.style.top = anim.y + 'px';
-                div.style.width = anim.w + 'px';
-                div.style.height = anim.h + 'px';
-                div.dataset.type = anim.type; // Store type for animator
-
-                // Show first frame
-                if (anim.type === 'irori') {
-                    div.style.backgroundImage = "url('assets/cave/cave_tile_irori.png')";
-                    div.style.backgroundPosition = "0 0";
+                div.className = 'trigger-overlay';
+                if (index === editingTriggerIndex) {
+                    div.style.background = 'rgba(255, 235, 59, 0.6)'; // Highlight yellow
+                    div.style.outline = '2px solid #ffeb3b';
+                    div.style.zIndex = '15';
                 }
+                div.style.left = (trig.x * TILE_SIZE) + 'px';
+                div.style.top = (trig.y * TILE_SIZE) + 'px';
+                div.style.width = (trig.w * TILE_SIZE) + 'px';
+                div.style.height = (trig.h * TILE_SIZE) + 'px';
+                div.innerHTML = `<span style="font-size: 8px; color: white;">${trig.title}</span>`;
 
-                // Delete on right click? or click in delete mode?
                 div.onclick = (e) => {
-                    e.stopPropagation(); // Prevent grid click
-                    if (confirm("Delete this animation?")) {
-                        animations.splice(index, 1);
-                        renderAnimations();
+                    e.stopPropagation();
+                    const isEraser = (selectedTx === EMPTY_TILE.tx && selectedTy === EMPTY_TILE.ty);
+                    if (isEraser) {
+                        // Eraser Tool -> Delete immediately
+                        triggers.splice(index, 1);
+                        if (editingTriggerIndex === index) cancelTriggerEdit();
+                        else if (editingTriggerIndex > index) editingTriggerIndex--; // Adjust index
+                        renderTriggers();
+                    } else if (currentMode === 'trigger') {
+                        // Brush Tool + Trigger Mode -> Edit
+                        loadTriggerToUI(index);
+                    } else {
+                        // Other Mode -> Ask to delete (Safety)
+                        if (confirm(`Delete this trigger (${trig.title})?`)) {
+                            triggers.splice(index, 1);
+                            if (editingTriggerIndex === index) cancelTriggerEdit();
+                            else if (editingTriggerIndex > index) editingTriggerIndex--;
+                            renderTriggers();
+                        }
                     }
                 };
 
@@ -691,18 +807,7 @@
             });
         }
 
-        function toggleCollisionMode() {
-            isCollisionMode = !isCollisionMode;
-            const btn = document.getElementById('collisionBtn');
-            if (isCollisionMode) {
-                btn.innerText = "Collision Mode: ON";
-                btn.classList.add('active');
-            } else {
-                btn.innerText = "Collision Mode: OFF";
-                btn.classList.remove('active');
-            }
-            renderCollisions();
-        }
+        // Removed toggleCollisionMode: handled via unified setMode
 
         function toggleCollisionAt(gx, gy) {
             const key = `${gx},${gy}`;
@@ -749,39 +854,46 @@
             });
         }
 
-        // Editor Animation Loop
-        function startEditorLoop() {
-            const startTime = Date.now();
+        // startEditorLoop removed (Animation Mode replaced by Trigger Mode)
 
-            function loop() {
-                const now = Date.now();
+        // Removed immediate startEditorLoop call
 
-                document.querySelectorAll('.anim-obj').forEach(div => {
-                    const type = div.dataset.type;
-                    if (type === 'irori') {
-                        // 5 frames, 200ms each (Slower)
-                        const frames = 5;
-                        const speed = 200;
-                        const width = 64;
-
-                        const frameIndex = Math.floor(now / speed) % frames;
-                        div.style.backgroundPosition = `-${frameIndex * width}px 0px`;
-                    }
-                });
-
-                requestAnimationFrame(loop);
+        function setBrush() {
+            // If it was eraser, reset to a valid tile (0,0 or last known?)
+            if (selectedTx === EMPTY_TILE.tx && selectedTy === EMPTY_TILE.ty) {
+                selectedTx = 0;
+                selectedTy = 0;
             }
-            requestAnimationFrame(loop);
+            updateToolUI();
         }
 
-        // Start immediately
-        startEditorLoop();
-
         function setEraser() {
-            document.querySelectorAll('.palette-tile').forEach(t => t.classList.remove('selected'));
             selectedTx = EMPTY_TILE.tx;
             selectedTy = EMPTY_TILE.ty;
-            document.getElementById('selected-id').innerText = "Eraser";
+            if (editingTriggerIndex !== -1) cancelTriggerEdit();
+            updateToolUI();
+        }
+
+        function updateToolUI() {
+            const isEraser = (selectedTx === EMPTY_TILE.tx && selectedTy === EMPTY_TILE.ty);
+            const eraserBtn = document.getElementById('btn-eraser');
+            const brushBtn = document.getElementById('btn-brush');
+
+            if (isEraser) {
+                eraserBtn.style.background = '#c33';
+                brushBtn.style.background = '#444';
+                document.getElementById('selected-id').innerText = "Eraser";
+                document.querySelectorAll('.palette-tile').forEach(t => t.classList.remove('selected'));
+            } else {
+                eraserBtn.style.background = '#444';
+                brushBtn.style.background = '#2e7d32';
+                document.getElementById('selected-id').innerText = selectedTx + "," + selectedTy;
+
+                // Highlight corresponding tile in palette if it's visible
+                document.querySelectorAll('.palette-tile').forEach(t => t.classList.remove('selected'));
+                // Note: We don't force highlight here because we don't have the element reference easily,
+                // but selectTile handles it when clicked.
+            }
         }
 
         function changeZoom(delta) {
@@ -821,7 +933,7 @@
             mapDataGrid[gy][gx] = { tx: selectedTx, ty: selectedTy };
         }
 
-        function exportData() {
+        function exportMapData() {
             let cells = document.querySelectorAll('.tile');
             let data = [];
             cells.forEach(c => {
@@ -830,26 +942,32 @@
                 let gy = parseInt(parts[2]);
                 let tx = parseInt(c.dataset.tx);
                 let ty = parseInt(c.dataset.ty);
-                data.push({ gx, gy, tx, ty });
+                if (tx !== EMPTY_TILE.tx || ty !== EMPTY_TILE.ty) {
+                    data.push({ gx, gy, tx, ty });
+                }
             });
 
-            const exportData = {
-                assets: {
-                    tileset: document.getElementById('asset-tileset').value,
-                    ceilingTileset: document.getElementById('asset-ceiling').value,
-                    animation: document.getElementById('asset-anim').value,
-                    character: document.getElementById('asset-char').value
-                },
-                tiles: data,
-                animations: animations,
-
+            const result = {
+                assets: (window.MAP_DATA && window.MAP_DATA.assets) ? window.MAP_DATA.assets : {},
                 collisions: Array.from(collisionTiles).map(k => {
                     const [x, y] = k.split(',').map(Number);
                     return { x, y };
-                })
+                }),
+                tiles: data
             };
 
-            document.getElementById('output').value = "window.MAP_DATA = " + JSON.stringify(exportData);
+            document.getElementById('output').value = "window.MAP_DATA = " + JSON.stringify(result, null, 2);
+            alert(`Map Data exported!\n- Tiles: ${data.length}\n- Collisions: ${collisionTiles.size}`);
+        }
+
+        function exportTriggers() {
+            const result = {
+                triggers: triggers
+            };
+            // Note: Triggers.js usually appends to window.MAP_DATA.triggers or similar
+            // Here we provide the full data for window.MAP_DATA.triggers update
+            document.getElementById('output').value = "window.MAP_DATA.triggers = " + JSON.stringify(triggers, null, 2);
+            alert(`Triggers exported!\n- Count: ${triggers.length}`);
         }
     </script>
 </body>

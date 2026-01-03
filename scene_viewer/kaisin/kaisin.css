@@ -1,0 +1,21 @@
+/* Kaisin Story Specific Styles */
+
+.custom-stage {
+    position: absolute;
+    top: auto;
+    left: auto;
+    pointer-events: none;
+    z-index: 5;
+}
+
+/* Cinematic Staff Roll Overrides */
+.staff-title {
+    color: #ffffff;
+    font-size: 40px;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.staff-name {
+    color: #ffffff;
+}

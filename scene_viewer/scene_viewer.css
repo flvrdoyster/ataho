@@ -1,0 +1,343 @@
+:root {
+    --stage-width: 800px;
+    --stage-height: 600px;
+    --bg-color: #000;
+}
+
+@font-face {
+    font-family: 'KoddiudOngodic';
+    src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2105_2@1.0/KoddiUDOnGothic-Regular.woff') format('woff');
+    font-weight: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'KoddiudOngodic';
+    src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2105_2@1.0/KoddiUDOnGothic-Bold.woff') format('woff');
+    font-weight: 700;
+    font-display: swap;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    background-color: #1a1a1a;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    font-family: 'KoddiudOngodic', 'Gulim', 'Malgun Gothic', sans-serif;
+    color: white;
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+}
+
+img {
+    -webkit-user-drag: none;
+    pointer-events: none;
+}
+
+#app {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+
+#controls {
+    width: var(--stage-width);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+input[type=range] {
+    width: 100%;
+    cursor: pointer;
+}
+
+.stage {
+    width: var(--stage-width);
+    height: var(--stage-height);
+    background-color: var(--bg-color);
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+    border: 2px solid #333;
+    image-rendering: pixelated;
+    image-rendering: -moz-crisp-edges;
+    image-rendering: crisp-edges;
+}
+
+/* Layer Management */
+.layer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+}
+
+.layer.background {
+    z-index: 0;
+}
+
+.layer.content {
+    z-index: 10;
+}
+
+.layer.ui {
+    z-index: 20;
+}
+
+.hidden {
+    display: none !important;
+}
+
+img.fit-cover {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* Text Styles - Cinematic */
+.dialogue-box {
+    position: absolute;
+    bottom: 15%;
+    left: 0;
+    width: 100%;
+    text-align: center;
+    color: white;
+    font-size: 28px;
+    line-height: 1.5;
+    text-shadow: 2px 2px 0 #000;
+    pointer-events: none;
+    white-space: pre-wrap;
+    z-index: 100;
+}
+
+.dialogue-box.full-area {
+    top: 0;
+    bottom: 0;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 20px 0;
+    /* Added spacing from top/bottom edges */
+    box-sizing: border-box;
+    /* Ensure padding doesn't exceed 100% height */
+}
+
+.text-lg {
+    font-size: 54px;
+}
+
+.text-left {
+    text-align: left;
+    padding: 0 200px;
+}
+
+.text-right {
+    text-align: right;
+    padding: 0 200px;
+}
+
+.text-center {
+    text-align: center;
+}
+
+/* Vertical Positioning Modifiers */
+.dialogue-box:not(.full-area).pos-bottom {
+    bottom: 15%;
+    top: auto;
+}
+
+.dialogue-box:not(.full-area).pos-top {
+    top: 15%;
+    bottom: auto;
+}
+
+.dialogue-box:not(.full-area).pos-center {
+    top: 50%;
+    transform: translateY(-50%);
+    bottom: auto;
+}
+
+/* Full-area alignment overrides */
+.dialogue-box.full-area.pos-top {
+    justify-content: flex-start;
+    padding-top: 15%;
+}
+
+.dialogue-box.full-area.pos-center {
+    justify-content: center;
+}
+
+.dialogue-box.full-area.pos-bottom {
+    justify-content: flex-end;
+    padding-bottom: 15%;
+}
+
+/* Center Stage Area for Sprites */
+.center-stage {
+    position: absolute;
+    top: 20%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60%;
+    height: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 10;
+}
+
+.clip-sprites {
+    overflow: hidden !important;
+}
+
+.sprite {
+    position: absolute;
+    image-rendering: pixelated;
+}
+
+/* Sprite Sheet Animation (CSS-based) */
+@keyframes sheet-anim-h {
+    from {
+        background-position: 0 0;
+    }
+
+    to {
+        background-position: var(--sheet-end-pos, -100%) 0;
+    }
+}
+
+.sheet-anim {
+    animation-name: sheet-anim-h;
+    animation-duration: var(--sheet-duration, 1s);
+    animation-timing-function: steps(var(--sheet-frames, 1));
+    animation-iteration-count: infinite;
+}
+
+/* Utility Animations */
+.anim-pulse {
+    animation: pulse 2s infinite ease-in-out;
+}
+
+@keyframes pulse {
+
+    0%,
+    100% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.1);
+    }
+}
+
+.anim-bounce {
+    animation: bounce 1s infinite ease-in-out;
+}
+
+@keyframes bounce {
+
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(var(--bounce-height, -32px));
+    }
+}
+
+.anim-float {
+    animation: float 3s infinite ease-in-out;
+}
+
+@keyframes float {
+
+    0%,
+    100% {
+        transform: translate(0, 0);
+    }
+
+    50% {
+        transform: translate(5px, -5px);
+    }
+}
+
+.anim-move {
+    animation: move var(--move-duration, 1s) var(--move-delay, 0s) var(--move-timing, ease-in-out) forwards;
+}
+
+@keyframes move {
+    from {
+        transform: translate(0, 0);
+    }
+
+    to {
+        transform: translate(var(--move-x, 0), var(--move-y, 0));
+    }
+}
+
+.anim-fall {
+    animation: fall var(--fall-duration, 5s) var(--fall-delay, 0s) var(--fall-timing, linear) forwards;
+}
+
+@keyframes fall {
+    from {
+        transform: translate(var(--fall-x, 0), 0);
+    }
+
+    to {
+        transform: translate(var(--fall-x, 0), var(--fall-y, 600px));
+    }
+}
+
+/* Centered Image (Cutscenes) */
+.center-image {
+    position: absolute;
+    top: 20%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: auto;
+    height: auto;
+    max-width: 80%;
+    max-height: 60%;
+    border: 0px;
+    box-shadow: 0 0 10px #000;
+    display: block;
+    object-fit: contain;
+}
+
+/* Staff Roll Animation */
+.staff-roll {
+    position: absolute;
+    width: 100%;
+    text-align: center;
+    color: white;
+    font-size: 20px;
+    line-height: 2;
+    text-shadow: 2px 2px 0 #000;
+}
+
+.staff-section {
+    margin-bottom: 40px;
+}
+
+.staff-title {
+    color: #ffff00;
+    font-weight: bold;
+    font-size: 24px;
+    margin-bottom: 5px;
+}
+
+.staff-name {
+    color: #ffffff;
+}

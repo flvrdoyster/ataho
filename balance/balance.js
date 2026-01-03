@@ -19,23 +19,21 @@
     // PHYSICS & DIFFICULTY
     const CONFIG = {
         PHYSICS: {
-            SWAY_INTENSITY_IDLE: 0.008,   // Intensity of random sway when standing still (higher = harder)
-            SWAY_INTENSITY_WALK: 0.005,   // Intensity of random sway when walking (lower than idle for stability)
-            PLAYER_CONTROL_FORCE: 0.8,   // Force applied by player input (Left/Right arrows or touch)
-            FRICTION: 0.90,              // Damping factor for balance velocity (lower = slippery, higher = sticky)
+            SWAY_INTENSITY_IDLE: 0.02,   // Base intensity of directional sway
+            SWAY_INTENSITY_WALK: 0.01,   // Reduced sway when walking
+            PLAYER_CONTROL_FORCE: 0.8,   // Force applied by player input
+            FRICTION: 0.92,              // Damping factor (higher = more slippery/momentum)
             MAX_VELOCITY: 3.5,           // Maximum speed the character can tilt
-            INERTIA_CONSTANT: 0.0008,    // Force added based on current tilt (makes it harder to recover from large tilts)
+            INERTIA_CONSTANT: 0.001,     // Force added based on current tilt
             GRAVITY: 0.4,                // Gravity applied during jumps
-            EDGE_THRESHOLD: 0,           // Tilt threshold where "edge resistance" kicks in (0 = disabled)
-            EDGE_RESISTANCE: 0.02,       // Force pushing back against the tilt at extreme angles (helper)
-            FATIGUE_RATE: 0.005          // Rate at which sway intensity increases over time if perfectly balanced
+            FATIGUE_RATE: 0.002          // Rate at which instability increases
         },
         JUMP: {
             CHARGE_TIME: 60,             // Frames required to charge each jump level (hold space)
             JUMP_COOLDOWN: 20,           // Frames to wait before jumping again
-            DISTANCES: [28, 46, 58],     // Forward distance traveled for each jump level [Level 1, Level 2, Level 3]
+            DISTANCES: [28, 46, 58],     // Forward distance traveled for each jump level
             VELOCITIES: [2, 3, 4],       // Vertical jump velocity (height) for each level
-            LANDING_PENALTIES: [5, 10, 15] // Instability added to balance upon landing for each level
+            LANDING_PENALTIES: [5, 10, 15] // Instability added to balance upon landing
         },
         OBSTACLES: {
             START_DELAY: 66,            // Initial distance before the first obstacle appears
@@ -53,14 +51,14 @@
             ]
         },
         HITBOXES: {
-            CHAR: { x: 34, y: 64, w: 12, h: 12 }, // Character hitbox relative to sprite [x, y, width, height]
-            OBS: { x: 26, y: 0, w: 16, h: 16 }    // Obstacle hitbox relative to sprite [x, y, width, height]
+            CHAR: { x: 34, y: 64, w: 12, h: 12 }, // Character hitbox relative to sprite
+            OBS: { x: 26, y: 0, w: 16, h: 16 }    // Obstacle hitbox relative to sprite
         },
         SPEED: {
             GAME: 2                      // Global game speed (pixels per frame)
         },
         DEBUG: {
-            SHOW_HITBOX: false           // Toggle to show/hide debug hitboxes (red/blue rectangles)
+            SHOW_HITBOX: false           // Toggle to show/hide debug hitboxes
         }
     };
 
@@ -208,6 +206,13 @@
 
         balanceLevel: 0,
         balanceVelocity: 0,
+
+        // Sway Logic
+        swayCurrent: 0,
+        swayTarget: 0,
+        swayTimer: 0,
+        swayChangeInterval: 120, // Frames between potential sway direction changes
+
         fallDirection: null,
         fallTimer: 0,
         balanceTimer: 0,
@@ -220,80 +225,71 @@
         visualY: 0,
 
         update() {
+            // --- JUMPING STATE ---
             if (this.actionState === 'jumping') {
-                this.visualY -= this.jumpVelocityY;
-                this.jumpVelocityY -= CONFIG.PHYSICS.GRAVITY;
-
-                // Calculate required speed to hit target distance
-                // Air Time = (2 * InitialVelocity) / Gravity
-                const airTime = (2 * CONFIG.JUMP.VELOCITIES[this.jumpLevel]) / CONFIG.PHYSICS.GRAVITY;
-                const currentJumpSpeed = CONFIG.JUMP.DISTANCES[this.jumpLevel] / airTime;
-
-                distanceTraveled += currentJumpSpeed;
-                backgroundY -= currentJumpSpeed;
-
-                if (this.visualY >= 0) {
-                    this.visualY = 0;
-                    this.actionState = 'idle';
-                    this.jumpVelocityY = 0;
-                    this.jumpCooldown = CONFIG.JUMP.JUMP_COOLDOWN;
-
-                    // Prevent auto-walking upon landing (require fresh input)
-                    inputState.down = false;
-                    inputState.up = false;
-
-                    // Landing Instability
-                    const penalty = CONFIG.JUMP.LANDING_PENALTIES[this.jumpLevel];
-                    const direction = Math.random() < 0.5 ? -1 : 1;
-                    this.balanceLevel += penalty * direction;
-                    this.balanceVelocity += (penalty * direction) * 0.1; // Add some momentum
-
-                    // Obstacle Landing Collision
-                    // Check if feet (ataho.y + ataho.height) are inside any obstacle in SCREEN SPACE
-                    // Player Feet Y is constant: ataho.y + ataho.height
-                    // Obstacle Screen Y: startY - distanceTraveled + obs.y
-
-                    const playerFeetY = this.y + this.height;
-                    const startY = canvas.height / 2;
-
-                    const landedOnObstacle = obstacles.some(obs => {
-                        // Ignore obstacles behind us
-                        if (distanceTraveled > obs.y + obs.height) return false;
-
-                        const obsScreenY = startY - distanceTraveled + obs.y;
-
-                        // Tight Hitbox Collision - Landing
-                        const playerHitboxTop = this.y + CONFIG.HITBOXES.CHAR.y;
-                        const playerHitboxBottom = this.y + CONFIG.HITBOXES.CHAR.y + CONFIG.HITBOXES.CHAR.h;
-
-                        const obsHitboxTop = obsScreenY + CONFIG.HITBOXES.OBS.y;
-                        const obsHitboxBottom = obsScreenY + CONFIG.HITBOXES.OBS.y + CONFIG.HITBOXES.OBS.h;
-
-                        // We land if our feet (hitbox vertical range) overlaps the obstacle's vertical range
-                        // AABB Overlap: (Range1.Start < Range2.End) && (Range1.End > Range2.Start)
-                        const isHit = playerHitboxTop < obsHitboxBottom && playerHitboxBottom > obsHitboxTop;
-                        if (isHit) {
-                            obs.causedDeath = true;
-                        }
-                        return isHit;
-                    });
-
-                    if (landedOnObstacle) {
-                        this.actionState = 'falling';
-                        // Fall towards the tilt, or random if perfectly balanced
-                        if (this.balanceLevel !== 0) {
-                            this.fallDirection = this.balanceLevel > 0 ? 'right' : 'left';
-                        } else {
-                            this.fallDirection = Math.random() < 0.5 ? 'right' : 'left';
-                        }
-                    }
-                }
+                this.updateJump();
                 return;
             }
 
-            if (this.jumpCooldown > 0) {
-                this.jumpCooldown--;
+            // --- JUMP CHARGING & INPUT ---
+            this.handleJumpInput();
+            if (this.actionState.includes('jump_charging') || this.actionState === 'jumping') return;
+
+            // --- PHYSICS UPDATE ---
+            this.updatePhysics();
+
+            // --- MOVEMENT & ANIMATION ---
+            if (this.actionState !== 'falling' && this.actionState !== 'fallen') {
+                this.updateMovement();
             }
+
+            // --- FALLING STATE ---
+            if (this.actionState === 'falling') {
+                this.fallTimer++;
+                if (this.fallTimer >= 30) {
+                    this.triggerGameOver();
+                }
+            }
+
+            if (this.actionState.includes('walking')) {
+                this.animationTimer++;
+            }
+        },
+
+        updateJump() {
+            this.visualY -= this.jumpVelocityY;
+            this.jumpVelocityY -= CONFIG.PHYSICS.GRAVITY;
+
+            // Calculate forward movement
+            const airTime = (2 * CONFIG.JUMP.VELOCITIES[this.jumpLevel]) / CONFIG.PHYSICS.GRAVITY;
+            const currentJumpSpeed = CONFIG.JUMP.DISTANCES[this.jumpLevel] / airTime;
+
+            distanceTraveled += currentJumpSpeed;
+            backgroundY -= currentJumpSpeed;
+
+            if (this.visualY >= 0) {
+                // Landed
+                this.visualY = 0;
+                this.actionState = 'idle';
+                this.jumpVelocityY = 0;
+                this.jumpCooldown = CONFIG.JUMP.JUMP_COOLDOWN;
+
+                // Reset inputs to prevent auto-move
+                inputState.down = false;
+                inputState.up = false;
+
+                // Landing Penalty
+                const penalty = CONFIG.JUMP.LANDING_PENALTIES[this.jumpLevel];
+                const direction = Math.random() < 0.5 ? -1 : 1;
+                this.balanceLevel += penalty * direction;
+                this.balanceVelocity += (penalty * direction) * 0.1;
+
+                this.checkLandingCollision();
+            }
+        },
+
+        handleJumpInput() {
+            if (this.jumpCooldown > 0) this.jumpCooldown--;
 
             if (inputState.space && this.jumpCooldown <= 0 && !this.actionState.includes('fall')) {
                 if (!this.actionState.includes('jump_charging')) {
@@ -304,73 +300,75 @@
                     this.jumpChargeTimer++;
                     const cycleTime = CONFIG.JUMP.CHARGE_TIME * 3;
                     const effectiveTimer = this.jumpChargeTimer % cycleTime;
-
-                    if (effectiveTimer >= CONFIG.JUMP.CHARGE_TIME * 2) {
-                        this.jumpLevel = 2;
-                    } else if (effectiveTimer >= CONFIG.JUMP.CHARGE_TIME) {
-                        this.jumpLevel = 1;
-                    } else {
-                        this.jumpLevel = 0;
-                    }
+                    if (effectiveTimer >= CONFIG.JUMP.CHARGE_TIME * 2) this.jumpLevel = 2;
+                    else if (effectiveTimer >= CONFIG.JUMP.CHARGE_TIME) this.jumpLevel = 1;
+                    else this.jumpLevel = 0;
                 }
-                return;
             } else if (this.actionState.includes('jump_charging')) {
                 this.actionState = 'jumping';
                 this.jumpVelocityY = CONFIG.JUMP.VELOCITIES[this.jumpLevel];
-                return;
             }
+        },
 
+        updatePhysics() {
             let inputForce = 0;
-
             if (typeof inputState.touchForce === 'number' && inputState.touchForce !== 0) {
                 inputForce = inputState.touchForce * CONFIG.PHYSICS.PLAYER_CONTROL_FORCE * 1.5;
-            }
-            else if (inputState.left) {
+            } else if (inputState.left) {
                 inputForce = -CONFIG.PHYSICS.PLAYER_CONTROL_FORCE;
             } else if (inputState.right) {
                 inputForce = CONFIG.PHYSICS.PLAYER_CONTROL_FORCE;
             }
 
-            const currentSwayIntensity = (this.actionState.includes('walking')) ? CONFIG.PHYSICS.SWAY_INTENSITY_WALK : CONFIG.PHYSICS.SWAY_INTENSITY_IDLE;
-
-            // Balance Fatigue: Increase sway if staying balanced for too long
+            // --- FATIGUE & SWAY LOGIC ---
+            // If close to center, accumulate fatigue (balanceTimer)
             if (Math.abs(this.balanceLevel) < BALANCE_THRESHOLD.SLIGHT) {
                 this.balanceTimer++;
             } else {
-                this.balanceTimer = 0;
+                // Decay fatigue slowly if struggling, so it doesn't reset instantly
+                this.balanceTimer = Math.max(0, this.balanceTimer - 2);
             }
 
             const instabilityMultiplier = 1 + (this.balanceTimer * CONFIG.PHYSICS.FATIGUE_RATE);
-            const swayForce = (Math.random() - 0.5) * currentSwayIntensity * instabilityMultiplier;
+            const baseSwayIntensity = (this.actionState.includes('walking')) ? CONFIG.PHYSICS.SWAY_INTENSITY_WALK : CONFIG.PHYSICS.SWAY_INTENSITY_IDLE;
+
+            // Random Directional Sway (Wind)
+            this.swayTimer++;
+            if (this.swayTimer > this.swayChangeInterval) {
+                // Chance to change sway direction
+                if (Math.random() < 0.3) {
+                    this.swayTarget = (Math.random() - 0.5) * 2; // -1 to 1
+                    this.swayChangeInterval = 60 + Math.random() * 120; // Randomize interval
+                    this.swayTimer = 0;
+                }
+            }
+            // Smoothly interpolate current sway to target
+            this.swayCurrent += (this.swayTarget - this.swayCurrent) * 0.02;
+
+            const directionalSway = this.swayCurrent * baseSwayIntensity * instabilityMultiplier;
+            const randomJitter = (Math.random() - 0.5) * 0.005; // Small vibration
 
             const inertiaForce = this.balanceLevel * CONFIG.PHYSICS.INERTIA_CONSTANT;
 
-            // Edge Resistance (Reverse Acceleration)
-            let edgeForce = 0;
-            if (Math.abs(this.balanceLevel) > CONFIG.PHYSICS.EDGE_THRESHOLD) {
-                const sign = this.balanceLevel > 0 ? 1 : -1;
-                edgeForce = -sign * CONFIG.PHYSICS.EDGE_RESISTANCE;
-            }
-
-            this.balanceVelocity += inputForce + swayForce + inertiaForce + edgeForce;
+            // Apply Forces
+            this.balanceVelocity += inputForce + directionalSway + randomJitter + inertiaForce;
             this.balanceVelocity *= CONFIG.PHYSICS.FRICTION;
 
-            if (this.balanceVelocity > CONFIG.PHYSICS.MAX_VELOCITY) this.balanceVelocity = CONFIG.PHYSICS.MAX_VELOCITY;
-            if (this.balanceVelocity < -CONFIG.PHYSICS.MAX_VELOCITY) this.balanceVelocity = -CONFIG.PHYSICS.MAX_VELOCITY;
+            // Clamp Velocity
+            this.balanceVelocity = Math.max(-CONFIG.PHYSICS.MAX_VELOCITY, Math.min(CONFIG.PHYSICS.MAX_VELOCITY, this.balanceVelocity));
 
             this.balanceLevel += this.balanceVelocity;
 
+            // Check Falling Conditions
             if (this.balanceLevel >= BALANCE_THRESHOLD.MAX) {
-                this.actionState = 'falling';
-                this.fallDirection = 'right';
+                this.startFalling('right');
             } else if (this.balanceLevel <= -BALANCE_THRESHOLD.MAX) {
-                this.actionState = 'falling';
-                this.fallDirection = 'left';
+                this.startFalling('left');
             } else if (distanceTraveled < -20) {
-                this.actionState = 'falling';
-                this.fallDirection = this.balanceLevel >= 0 ? 'right' : 'left';
+                this.startFalling(this.balanceLevel >= 0 ? 'right' : 'left');
             }
 
+            // Update Lean State for Animation
             const absBalance = Math.abs(this.balanceLevel);
             const direction = this.balanceLevel < 0 ? 'left' : 'right';
 
@@ -378,76 +376,94 @@
                 this.leanState = 'balanced';
             } else {
                 let leanLevel = 'slight';
-                if (absBalance >= BALANCE_THRESHOLD.LARGE) {
-                    leanLevel = 'large';
-                } else if (absBalance >= BALANCE_THRESHOLD.MEDIUM) {
-                    leanLevel = 'medium';
-                }
+                if (absBalance >= BALANCE_THRESHOLD.LARGE) leanLevel = 'large';
+                else if (absBalance >= BALANCE_THRESHOLD.MEDIUM) leanLevel = 'medium';
                 this.leanState = `leaning_${direction}_${leanLevel}`;
             }
+        },
 
-            if (this.actionState !== 'falling' && this.actionState !== 'fallen') {
-                // Control Fix: Down = Forward
-                if (inputState.down) {
-                    this.actionState = 'walking';
-                } else {
-                    this.actionState = 'idle';
-                }
-
-                if (this.actionState === 'walking') {
-                    const nextDist = distanceTraveled + CONFIG.SPEED.GAME;
-
-                    // Obstacle Walking Collision
-                    const startY = canvas.height / 2;
-
-                    const blocked = obstacles.some(obs => {
-                        // Ignore obstacles behind us
-                        if (distanceTraveled > obs.y + obs.height) return false;
-
-                        const obsScreenY = startY - nextDist + obs.y;
-
-                        // Tight Hitbox Collision - Walking
-                        const playerTop = this.y + CONFIG.HITBOXES.CHAR.y;
-                        const playerBottom = this.y + CONFIG.HITBOXES.CHAR.y + CONFIG.HITBOXES.CHAR.h;
-
-                        const obsTop = obsScreenY + CONFIG.HITBOXES.OBS.y;
-                        const obsBottom = obsScreenY + CONFIG.HITBOXES.OBS.y + CONFIG.HITBOXES.OBS.h;
-
-                        // Standard AABB overlap check
-                        const isOverlapping = (playerTop < obsBottom && playerBottom > obsTop);
-                        return isOverlapping;
-                    });
-
-                    if (!blocked) {
-                        distanceTraveled += CONFIG.SPEED.GAME;
-                        backgroundY -= CONFIG.SPEED.GAME;
-                    }
-                    // If blocked, we don't move, but animation continues (feet shuffling)
-                }
+        updateMovement() {
+            if (inputState.down) {
+                this.actionState = 'walking';
+            } else {
+                this.actionState = 'idle';
             }
 
-            if (this.actionState === 'falling') {
-                this.fallTimer++;
-                if (this.fallTimer >= 30) {
-                    this.actionState = 'fallen';
-                    isGameOver = true;
-                    if (bgm) {
-                        bgm.pause();
-                        bgm.currentTime = 0;
-                    }
-                    if (overBgm) {
-                        overBgm.currentTime = 0;
-                        overBgm.play().catch(e => console.log('Over BGM play failed', e));
-                    }
-                    const jumpBtn = document.getElementById('mobile-jump-btn');
-                    if (jumpBtn) jumpBtn.style.display = 'none';
+            if (this.actionState === 'walking') {
+                const nextDist = distanceTraveled + CONFIG.SPEED.GAME;
+                if (!this.checkObstacleCollision(nextDist)) {
+                    distanceTraveled += CONFIG.SPEED.GAME;
+                    backgroundY -= CONFIG.SPEED.GAME;
                 }
-            }
-
-            if (this.actionState.includes('walking')) {
-                this.animationTimer++;
             }
         },
+
+        startFalling(direction) {
+            this.actionState = 'falling';
+            this.fallDirection = direction;
+        },
+
+        triggerGameOver() {
+            this.actionState = 'fallen';
+            isGameOver = true;
+            if (bgm) {
+                bgm.pause();
+                bgm.currentTime = 0;
+            }
+            if (overBgm) {
+                overBgm.currentTime = 0;
+                overBgm.play().catch(e => console.log('Over BGM play failed', e));
+            }
+            const jumpBtn = document.getElementById('mobile-jump-btn');
+            if (jumpBtn) jumpBtn.style.display = 'none';
+        },
+
+        checkLandingCollision() {
+            const playerFeetY = this.y + this.height;
+            const startY = canvas.height / 2;
+            const landedOnObstacle = obstacles.some(obs => {
+                if (distanceTraveled > obs.y + obs.height) return false;
+                const obsScreenY = startY - distanceTraveled + obs.y;
+
+                // Simplified AABB for feet vs obstacle body
+                const feetTop = playerFeetY - 10;
+                const feetBottom = playerFeetY;
+                const obsTop = obsScreenY + CONFIG.HITBOXES.OBS.y;
+                const obsBottom = obsScreenY + CONFIG.HITBOXES.OBS.y + CONFIG.HITBOXES.OBS.h;
+
+                const isHit = feetTop < obsBottom && feetBottom > obsTop &&
+                    (this.y + CONFIG.HITBOXES.CHAR.y) < obsBottom; // Ensure body is also generally aligned
+
+                // Reuse more precise hitbox logic from original if strictness is needed, 
+                // but essentially we check if we overlapped the obstacle at landing height
+                const playerHitboxTop = this.y + CONFIG.HITBOXES.CHAR.y;
+                const playerHitboxBottom = this.y + CONFIG.HITBOXES.CHAR.y + CONFIG.HITBOXES.CHAR.h;
+                const overlap = playerHitboxTop < obsBottom && playerHitboxBottom > obsTop;
+
+                if (overlap) obs.causedDeath = true;
+                return overlap;
+            });
+
+            if (landedOnObstacle) {
+                this.startFalling(this.balanceLevel >= 0 || Math.random() < 0.5 ? 'right' : 'left');
+            }
+        },
+
+        checkObstacleCollision(nextDist) {
+            const startY = canvas.height / 2;
+            return obstacles.some(obs => {
+                if (distanceTraveled > obs.y + obs.height) return false;
+                const obsScreenY = startY - nextDist + obs.y;
+
+                const playerTop = this.y + CONFIG.HITBOXES.CHAR.y;
+                const playerBottom = this.y + CONFIG.HITBOXES.CHAR.y + CONFIG.HITBOXES.CHAR.h;
+                const obsTop = obsScreenY + CONFIG.HITBOXES.OBS.y;
+                const obsBottom = obsScreenY + CONFIG.HITBOXES.OBS.y + CONFIG.HITBOXES.OBS.h;
+
+                return (playerTop < obsBottom && playerBottom > obsTop);
+            });
+        },
+
 
         draw() {
             let currentFrameSet = frames.walking;
@@ -646,7 +662,7 @@
         const clickX = (e.clientX - rect.left) * scaleX;
         const clickY = (e.clientY - rect.top) * scaleY;
 
-        console.log('Click:', clickX, clickY, 'Btn:', buttons.continue);
+
 
         if (isClickInsideButton(clickX, clickY, buttons.continue)) {
             resetGame();
@@ -759,6 +775,13 @@
         ctx.setTransform(1, 0, 0, 1, 0, 0);
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
+        // Draw Background (Outside of Camera Zoom)
+        if (images.background) {
+            const bgY = Math.floor(backgroundY);
+            ctx.drawImage(images.background, 0, bgY, canvas.width, canvas.height);
+            ctx.drawImage(images.background, 0, bgY + canvas.height, canvas.width, canvas.height);
+        }
+
         // Save context for camera zoom
         ctx.save();
         try {
@@ -829,11 +852,7 @@
                 }
             }
 
-            if (images.background) {
-                const bgY = Math.floor(backgroundY);
-                ctx.drawImage(images.background, 0, bgY, canvas.width, canvas.height);
-                ctx.drawImage(images.background, 0, bgY + canvas.height, canvas.width, canvas.height);
-            }
+
 
             if (images.beamStart && images.beamMid) {
                 const beamStartX = canvas.width / 2 - images.beamStart.width / 2;
@@ -1007,34 +1026,36 @@
     canvas.addEventListener('touchmove', handleTouch, { passive: false });
     canvas.addEventListener('touchend', handleTouchEnd);
 
-    canvas.addEventListener('touchend', handleTouchEnd);
+    // Jump Button Injection (Mobile Only)
+    const isTouchDevice = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
 
-    // Jump Button Injection (Always Active)
-    const jumpBtn = document.createElement('button');
-    jumpBtn.id = 'mobile-jump-btn';
-    jumpBtn.innerText = 'JUMP';
-    jumpBtn.style.display = 'block';
-    document.body.appendChild(jumpBtn);
+    if (isTouchDevice) {
+        const jumpBtn = document.createElement('button');
+        jumpBtn.id = 'mobile-jump-btn';
+        jumpBtn.innerText = 'JUMP';
+        jumpBtn.style.display = 'block';
+        document.body.appendChild(jumpBtn);
 
-    const handleJumpStart = (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        inputState.space = true;
-    };
+        const handleJumpStart = (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            inputState.space = true;
+        };
 
-    const handleJumpEnd = (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        inputState.space = false;
-    };
+        const handleJumpEnd = (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            inputState.space = false;
+        };
 
-    jumpBtn.addEventListener('touchstart', handleJumpStart, { passive: false });
-    jumpBtn.addEventListener('touchend', handleJumpEnd, { passive: false });
+        jumpBtn.addEventListener('touchstart', handleJumpStart, { passive: false });
+        jumpBtn.addEventListener('touchend', handleJumpEnd, { passive: false });
 
-    // Mouse events for desktop
-    jumpBtn.addEventListener('mousedown', handleJumpStart);
-    jumpBtn.addEventListener('mouseup', handleJumpEnd);
-    jumpBtn.addEventListener('mouseleave', handleJumpEnd);
+        // Mouse events for hybrid devices
+        jumpBtn.addEventListener('mousedown', handleJumpStart);
+        jumpBtn.addEventListener('mouseup', handleJumpEnd);
+        jumpBtn.addEventListener('mouseleave', handleJumpEnd);
+    }
 
     Promise.all([loadImages(), loadFonts(), loadAudio()]).then(() => {
         // Optimization: Pre-render Red Spike
