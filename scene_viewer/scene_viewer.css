@@ -4,6 +4,20 @@
     --bg-color: #000;
 }
 
+@font-face {
+    font-family: 'KoddiudOngodic';
+    src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2105_2@1.0/KoddiUDOnGothic-Regular.woff') format('woff');
+    font-weight: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'KoddiudOngodic';
+    src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2105_2@1.0/KoddiUDOnGothic-Bold.woff') format('woff');
+    font-weight: 700;
+    font-display: swap;
+}
+
 body {
     margin: 0;
     padding: 0;
@@ -12,9 +26,17 @@ body {
     justify-content: center;
     align-items: center;
     height: 100vh;
-    font-family: 'Gulim', 'Malgun Gothic', sans-serif;
-    /* Retro feel */
+    font-family: 'KoddiudOngodic', 'Gulim', 'Malgun Gothic', sans-serif;
     color: white;
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+}
+
+img {
+    -webkit-user-drag: none;
+    pointer-events: none;
 }
 
 #app {
@@ -22,6 +44,18 @@ body {
     flex-direction: column;
     align-items: center;
     gap: 10px;
+}
+
+#controls {
+    width: var(--stage-width);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+input[type=range] {
+    width: 100%;
+    cursor: pointer;
 }
 
 .stage {
@@ -32,6 +66,9 @@ body {
     overflow: hidden;
     box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
     border: 2px solid #333;
+    image-rendering: pixelated;
+    image-rendering: -moz-crisp-edges;
+    image-rendering: crisp-edges;
 }
 
 /* Layer Management */
@@ -56,7 +93,6 @@ body {
     z-index: 20;
 }
 
-/* Utilities */
 .hidden {
     display: none !important;
 }
@@ -71,7 +107,6 @@ img.fit-cover {
 .dialogue-box {
     position: absolute;
     bottom: 15%;
-    /* Positioned lower but with some space */
     left: 0;
     width: 100%;
     text-align: center;
@@ -84,6 +119,69 @@ img.fit-cover {
     z-index: 100;
 }
 
+.dialogue-box.full-area {
+    top: 0;
+    bottom: 0;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 20px 0;
+    /* Added spacing from top/bottom edges */
+    box-sizing: border-box;
+    /* Ensure padding doesn't exceed 100% height */
+}
+
+.text-lg {
+    font-size: 54px;
+}
+
+.text-left {
+    text-align: left;
+    padding: 0 200px;
+}
+
+.text-right {
+    text-align: right;
+    padding: 0 200px;
+}
+
+.text-center {
+    text-align: center;
+}
+
+/* Vertical Positioning Modifiers */
+.dialogue-box:not(.full-area).pos-bottom {
+    bottom: 15%;
+    top: auto;
+}
+
+.dialogue-box:not(.full-area).pos-top {
+    top: 15%;
+    bottom: auto;
+}
+
+.dialogue-box:not(.full-area).pos-center {
+    top: 50%;
+    transform: translateY(-50%);
+    bottom: auto;
+}
+
+/* Full-area alignment overrides */
+.dialogue-box.full-area.pos-top {
+    justify-content: flex-start;
+    padding-top: 15%;
+}
+
+.dialogue-box.full-area.pos-center {
+    justify-content: center;
+}
+
+.dialogue-box.full-area.pos-bottom {
+    justify-content: flex-end;
+    padding-bottom: 15%;
+}
+
 /* Center Stage Area for Sprites */
 .center-stage {
     position: absolute;
@@ -91,174 +189,131 @@ img.fit-cover {
     left: 50%;
     transform: translateX(-50%);
     width: 60%;
-    /* Same dimensions as center-image logic roughly */
     height: 50%;
-    /* You might want this flexible */
     display: flex;
     justify-content: center;
     align-items: center;
     z-index: 10;
 }
 
-/* Bottom Right Stage (for Staff Roll) */
-.bottom-right-stage {
-    position: absolute;
-    bottom: 50px;
-    right: 50px;
-    width: 320px;
-    /* Exact size of staffroll.png */
-    height: 224px;
-    z-index: 5;
+.clip-sprites {
+    overflow: hidden !important;
 }
 
 .sprite {
     position: absolute;
-    /* Stack on top of each other */
-    max-width: 100%;
-    max-height: 100%;
-    object-fit: contain;
+    image-rendering: pixelated;
 }
 
-/* Example Animation Classes */
-.shake {
-    animation: shake 0.5s infinite;
+/* Sprite Sheet Animation (CSS-based) */
+@keyframes sheet-anim-h {
+    from {
+        background-position: 0 0;
+    }
+
+    to {
+        background-position: var(--sheet-end-pos, -100%) 0;
+    }
 }
 
-@keyframes shake {
-    0% {
-        transform: translate(1px, 1px) rotate(0deg);
-    }
+.sheet-anim {
+    animation-name: sheet-anim-h;
+    animation-duration: var(--sheet-duration, 1s);
+    animation-timing-function: steps(var(--sheet-frames, 1));
+    animation-iteration-count: infinite;
+}
 
-    10% {
-        transform: translate(-1px, -2px) rotate(-1deg);
-    }
+/* Utility Animations */
+.anim-pulse {
+    animation: pulse 2s infinite ease-in-out;
+}
 
-    20% {
-        transform: translate(-3px, 0px) rotate(1deg);
-    }
+@keyframes pulse {
 
-    30% {
-        transform: translate(3px, 2px) rotate(0deg);
-    }
-
-    40% {
-        transform: translate(1px, -1px) rotate(1deg);
+    0%,
+    100% {
+        transform: scale(1);
     }
 
     50% {
-        transform: translate(-1px, 2px) rotate(-1deg);
+        transform: scale(1.1);
     }
+}
 
-    60% {
-        transform: translate(-3px, 1px) rotate(0deg);
-    }
+.anim-bounce {
+    animation: bounce 1s infinite ease-in-out;
+}
 
-    70% {
-        transform: translate(3px, 1px) rotate(-1deg);
-    }
+@keyframes bounce {
 
-    80% {
-        transform: translate(-1px, -1px) rotate(1deg);
-    }
-
-    90% {
-        transform: translate(1px, 2px) rotate(0deg);
-    }
-
+    0%,
     100% {
-        transform: translate(1px, -2px) rotate(-1deg);
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(var(--bounce-height, -32px));
     }
 }
 
-/* Tail Wag Animation */
-.wag {
-    animation: wag 1s infinite alternate ease-in-out;
-    transform-origin: bottom center;
-    /* Pivot from base */
+.anim-float {
+    animation: float 3s infinite ease-in-out;
 }
 
-@keyframes wag {
+@keyframes float {
+
+    0%,
+    100% {
+        transform: translate(0, 0);
+    }
+
+    50% {
+        transform: translate(5px, -5px);
+    }
+}
+
+.anim-move {
+    animation: move var(--move-duration, 1s) var(--move-delay, 0s) var(--move-timing, ease-in-out) forwards;
+}
+
+@keyframes move {
     from {
-        transform: rotate(-5deg);
+        transform: translate(0, 0);
     }
 
     to {
-        transform: rotate(5deg);
+        transform: translate(var(--move-x, 0), var(--move-y, 0));
     }
 }
 
-/* Lantern Sway Animation */
-.sway {
-    animation: sway 2s infinite alternate ease-in-out;
-    transform-origin: top center;
+.anim-fall {
+    animation: fall var(--fall-duration, 5s) var(--fall-delay, 0s) var(--fall-timing, linear) forwards;
 }
 
-@keyframes sway {
+@keyframes fall {
     from {
-        transform: rotate(-2deg);
+        transform: translate(var(--fall-x, 0), 0);
     }
 
     to {
-        transform: rotate(2deg);
+        transform: translate(var(--fall-x, 0), var(--fall-y, 600px));
     }
 }
 
-/* Sprite Sheet Logic */
-.sheet {
-    background-repeat: no-repeat;
-    /* Default to fitting content? No, controlled by sheet type */
-}
-
-/* Horizontal Strip: Width is N * 100%, Height is 100% */
-.sheet-h {
-    background-size: calc(var(--frame-count) * 100%) 100%;
-}
-
-.sheet-loop.sheet-h {
-    animation: sheet-h-anim var(--anim-duration, 1s) steps(var(--frame-count)) infinite;
-}
-
-@keyframes sheet-h-anim {
-    from {
-        background-position: 0 0;
-    }
-
-    to {
-        background-position: 100% 0;
-    }
-}
-
-/* Vertical Strip: Width is 100%, Height is N * 100% */
-.sheet-v {
-    background-size: 100% calc(var(--frame-count) * 100%);
-}
-
-.sheet-loop.sheet-v {
-    animation: sheet-v-anim var(--anim-duration, 1s) steps(var(--frame-count)) infinite;
-}
-
-@keyframes sheet-v-anim {
-    from {
-        background-position: 0 0;
-    }
-
-    to {
-        background-position: 0 100%;
-    }
-}
-
-/* Centered Image (Cutscenes) - Legacy/Fallback */
+/* Centered Image (Cutscenes) */
 .center-image {
     position: absolute;
     top: 20%;
     left: 50%;
     transform: translateX(-50%);
-    max-width: 60%;
-    max-height: 50%;
-    border: 2px solid #333;
-    /* Optional framer */
+    width: auto;
+    height: auto;
+    max-width: 80%;
+    max-height: 60%;
+    border: 0px;
     box-shadow: 0 0 10px #000;
     display: block;
+    object-fit: contain;
 }
 
 /* Staff Roll Animation */
@@ -270,7 +325,6 @@ img.fit-cover {
     font-size: 20px;
     line-height: 2;
     text-shadow: 2px 2px 0 #000;
-    /* Initial state set by JS usually, but defaults here */
 }
 
 .staff-section {
@@ -280,6 +334,7 @@ img.fit-cover {
 .staff-title {
     color: #ffff00;
     font-weight: bold;
+    font-size: 24px;
     margin-bottom: 5px;
 }
 
