@@ -163,7 +163,9 @@ async function initGame() {
                 y: t.y * CONFIG.TILE_SIZE,
                 w: (t.w || 1) * CONFIG.TILE_SIZE,
                 h: (t.h || 1) * CONFIG.TILE_SIZE,
-                targetId: t.targetId
+                targetId: t.targetId,
+                title: t.title,
+                items: t.items
             }));
         }
     } else {
@@ -188,7 +190,7 @@ async function initGame() {
 
         if (keys.hasOwnProperty(e.key)) keys[e.key] = true;
         if (e.code === 'Space' && activeTrigger) {
-            openModal(activeTrigger.targetId);
+            openModal(activeTrigger);
         }
     });
 
@@ -294,33 +296,60 @@ async function initGame() {
     console.log("Game initialized!");
 }
 
-function openModal(modalId) {
-    const modal = document.getElementById(modalId);
-    if (modal) {
-        modal.classList.remove('hidden');
-        isModalOpen = true;
+/**
+ * 트리거 데이터를 기반으로 동적 모달을 생성하고 엽니다.
+ */
+function openModal(trigger) {
+    const modal = document.getElementById('dynamic-modal');
+    if (!modal || !trigger) return;
 
-        // Stop player movement
-        keys.ArrowUp = false;
-        keys.ArrowDown = false;
-        keys.ArrowLeft = false;
-        keys.ArrowRight = false;
-        player.isMoving = false; // Assuming currentSpeed is player.isMoving or similar
+    // 제목 설정
+    const titleEl = document.getElementById('modal-title');
+    if (titleEl) titleEl.textContent = trigger.title || '알림';
 
-        // Position Logic - ALWAYS CENTERED (Default CSS)
-        // We ensure any previous manual positioning is cleared
-        const content = modal.querySelector('.modal-content');
-        if (content) {
-            content.style.position = '';
-            content.style.left = '';
-            content.style.top = '';
-            content.style.transform = '';
-            content.style.margin = '';
+    // 목록 아이템 생성
+    const listEl = document.getElementById('modal-list');
+    if (listEl) {
+        listEl.innerHTML = '';
+        if (trigger.items) {
+            trigger.items.forEach(item => {
+                const li = document.createElement('li');
+                const a = document.createElement('a');
+                a.href = item.href || '#';
+                a.textContent = item.text || '';
+
+                // 데이터 속성 복사 (라이트박스 캡션, 자막 등)
+                if (item.data) {
+                    for (const [key, val] of Object.entries(item.data)) {
+                        a.setAttribute(`data-${key}`, val);
+                    }
+                }
+
+                // 내부 링크(해시) 클릭 시 모달 닫기 (라이트박스 연동용)
+                if (a.href.includes('#')) {
+                    a.addEventListener('click', () => {
+                        setTimeout(closeModal, 10);
+                    });
+                }
+
+                li.appendChild(a);
+                listEl.appendChild(li);
+            });
         }
-
-        // Auto-focus first link
-        resetModalFocus(modal);
     }
+
+    modal.classList.remove('hidden');
+    isModalOpen = true;
+
+    // 플레이어 이동 정지
+    keys.ArrowUp = false;
+    keys.ArrowDown = false;
+    keys.ArrowLeft = false;
+    keys.ArrowRight = false;
+    player.isMoving = false;
+
+    // 모달 내부 첫 번째 아이템으로 포커스 이동
+    resetModalFocus(modal);
 }
 
 function closeModal() {
@@ -546,40 +575,37 @@ function update(dt) {
 function checkTriggers() {
     if (isModalOpen) return;
 
-    const pCx = player.x + player.width / 2;
-    const pCy = player.y + player.height / 2;
-
     // Simple point-in-rect for now, or center-in-rect
     const prevTrigger = activeTrigger;
     activeTrigger = null;
 
-    // Facing Logic Interaction
-    // Instead of checking center point, we check a point in front of the player
+    // 플레이어 중앙 좌표 계산
+    const pCx = player.x + player.width / 2;
+    const pCy = player.y + player.height / 2;
+
+    // 캐릭터의 현재 방향 정면으로 특정 거리(reach)만큼 떨어진 지점을 체크
     let targetX = pCx;
     let targetY = pCy;
-    const reach = 16; // Interaction range
+    const reach = 20; // 상호작용 가능한 거리
 
-    // Direction: 0=Down, 1=Left, 2=Up, 3=Right
+    // 방향에 따른 타겟 지점 보정 (0:아래, 1:왼쪽, 2:위, 3:오른쪽)
     if (player.direction === 0) targetY += reach;
     else if (player.direction === 1) targetX -= reach;
     else if (player.direction === 2) targetY -= reach;
     else if (player.direction === 3) targetX += reach;
 
-    for (let t of triggers) {
-        // Facing Logic: Check if point in front of player is inside trigger
-        if (targetX >= t.x && targetX <= t.x + t.w &&
-            targetY >= t.y && targetY <= t.y + t.h) {
-            activeTrigger = t;
-            break;
-        }
-    }
+    // 정면의 타겟 지점이 트리거 영역 안에 있는지 검사
+    activeTrigger = triggers.find(t =>
+        targetX >= t.x && targetX <= t.x + t.w &&
+        targetY >= t.y && targetY <= t.y + t.h
+    );
 
     // Auto-Open for Touch Devices (Mobile)
     // Rule: Open only on *entry* to avoid infinite loop after closing.
     // If we are on the same trigger as last frame, do nothing.
     if (isTouchDevice) {
         if (activeTrigger && activeTrigger !== lastTrigger) {
-            openModal(activeTrigger.targetId);
+            openModal(activeTrigger);
         }
     }
 

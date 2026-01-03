@@ -39,52 +39,12 @@
     <div id="ui-layer">
         <div id="interaction-prompt" class="prompt hidden">Space를 누르세요.</div>
 
-        <!-- Modals -->
-        <div id="popup-minigames" class="modal hidden">
+        <!-- Dynamic Modal -->
+        <div id="dynamic-modal" class="modal hidden">
             <div class="modal-content">
                 <span class="close-modal">&times;</span>
-                <h2>미니게임</h2>
-                <ul>
-                    <li><a href="swim/index.html">헤엄치기</a></li>
-                    <li><a href="balance/index.html">평균대 동작수련</a></li>
-                </ul>
-            </div>
-        </div>
-
-        <div id="popup-haiyuki" class="modal hidden">
-            <div class="modal-content">
-                <span class="close-modal">&times;</span>
-                <h2>환세패유기</h2>
-                <ul>
-                    <li><a href="haiyuki_web/index.html">웹 버전</a> (ko) - 개발 중</li>
-                    <li><a href="haiyuki_manual/index.html">매뉴얼</a> (ko) [<a
-                            href="haiyuki_manual/ref/manual_thebest.pdf">원본 1</a>, <a
-                            href="haiyuki_manual/ref/manual_D4.pdf">원본 2</a>]</li>
-                </ul>
-            </div>
-        </div>
-
-        <div id="popup-ani" class="modal hidden">
-            <div class="modal-content">
-                <span class="close-modal">&times;</span>
-                <h2>숏 애니메이션</h2>
-                <ul>
-                    <li><a href="#resource/mov/ani_orig.mp4" data-caption="환세 시리즈 부분 컷 (from DS 아니메 총집편 '98)"
-                            data-subtitle="ani_caption.vtt">그런 계절 / 싱크로 / 본능 / 쿠킹 DE GO / 물가의 사랑</a></li>
-                </ul>
-            </div>
-        </div>
-
-        <div id="popup-gallery" class="modal hidden">
-            <div class="modal-content">
-                <span class="close-modal">&times;</span>
-                <h2>일러스트</h2>
-                <ul>
-                    <li><a href="#resource/img/ds04.png" data-caption="Disc Station 04 표지">Disc Station 04</a></li>
-                    <li><a href="#resource/img/ds10.png" data-caption="Disc Station 10 표지">Disc Station 10</a></li>
-                    <li><a href="#resource/img/ds14.png" data-caption="Disc Station 14 표지">Disc Station 14</a></li>
-                    <li><a href="#resource/img/ds20.png" data-caption="Disc Station 20 표지">Disc Station 20</a></li>
-                </ul>
+                <h2 id="modal-title"></h2>
+                <ul id="modal-list"></ul>
             </div>
         </div>
     </div>
@@ -121,121 +81,6 @@
     <div id="lightbox-caption" class="caption"></div>
 </div>
 
-<script>
-    const lightbox = document.getElementById('lightbox');
-    const lightboxImg = document.getElementById('lightbox-img');
-    const lightboxVideo = document.getElementById('lightbox-video');
-    const lightboxTrack = document.getElementById('lightbox-track');
-    const lightboxCaption = document.getElementById('lightbox-caption');
-    const closeBtn = document.querySelector('#lightbox .close');
-
-    function updateView() {
-        const hash = window.location.hash.substring(1);
-        // Simple security/validation: allow resource/img and resource/mov paths
-        if (hash && (hash.startsWith('resource/img/') || hash.startsWith('resource/mov/'))) {
-            const isVideo = hash.endsWith('.mp4');
-
-            // Determine caption text: Try to find a link with this hash and get its data-caption
-            const activeLink = document.querySelector(`a[href="#${hash}"]`);
-            const captionText = activeLink ? activeLink.getAttribute('data-caption') : hash.split('/').pop();
-
-            if (isVideo) {
-                // Video Mode
-                lightboxImg.style.display = 'none';
-                lightboxVideo.style.display = 'block';
-                lightboxVideo.src = hash;
-
-                // Subtitle handling (Blob for CORS safety)
-                let vttContent = null;
-                const subtitleKey = activeLink ? activeLink.getAttribute('data-subtitle') : null;
-
-                if (subtitleKey) {
-                    // 1. Try specified subtitle key
-                    vttContent = window.SUBTITLES ? window.SUBTITLES[subtitleKey] : null;
-                }
-
-                if (!vttContent) {
-                    // 2. Generic fallback: try replacing extension
-                    const vttName = hash.replace('.mp4', '.vtt').split('/').pop();
-                    vttContent = window.SUBTITLES ? window.SUBTITLES[vttName] : null;
-                }
-
-                if (vttContent) {
-                    const blob = new Blob([vttContent], { type: 'text/vtt' });
-                    lightboxTrack.src = URL.createObjectURL(blob);
-                } else {
-                    // Fallback to file path just in case
-                    if (subtitleKey) {
-                        lightboxTrack.src = 'resource/mov/' + subtitleKey; // Assumption: subtitles are in same dir roughly or relative
-                    } else {
-                        lightboxTrack.src = hash.replace('.mp4', '.vtt');
-                    }
-                }
-
-                // Native display prevents fullscreen hiding and handles positioning relative to video
-                const setupTrack = () => {
-                    if (lightboxTrack.track) {
-                        lightboxTrack.track.mode = 'showing';
-
-                        // LOCK: Prevent disabling subtitles
-                        // If user tries to turn it off via menu, force it back on immediately
-                        lightboxTrack.track.addEventListener('modechange', () => {
-                            if (lightboxTrack.track.mode !== 'showing') {
-                                lightboxTrack.track.mode = 'showing';
-                            }
-                        });
-
-                        // Also watch the TextTrackList in case standard events don't fire on direct property change logic
-                        lightboxVideo.textTracks.onchange = () => {
-                            if (lightboxTrack.track.mode !== 'showing') {
-                                lightboxTrack.track.mode = 'showing';
-                            }
-                        };
-                    }
-                };
-                lightboxVideo.addEventListener('loadedmetadata', setupTrack, { once: true });
-                if (lightboxTrack.track) setupTrack();
-
-                lightboxCaption.textContent = hash.split('/').pop();
-                lightbox.classList.add('active');
-
-                // Optional: Auto-play if desired, but controls are safer
-                // lightboxVideo.play();
-            } else if (hash.endsWith('.png') || hash.endsWith('.jpg') || hash.endsWith('.gif')) {
-                // Image Mode
-                lightboxVideo.style.display = 'none';
-                lightboxImg.style.display = 'block';
-                lightboxVideo.pause();
-
-                lightboxImg.src = hash;
-                lightboxCaption.textContent = hash.split('/').pop();
-                lightbox.classList.add('active');
-            } else {
-                lightbox.classList.remove('active');
-                lightboxVideo.pause();
-            }
-        } else {
-            lightbox.classList.remove('active');
-            lightboxVideo.pause();
-        }
-    }
-
-    function closeLightbox() {
-        // Clear hash
-        history.pushState("", document.title, window.location.pathname + window.location.search);
-        updateView();
-    }
-
-    closeBtn.addEventListener('click', closeLightbox);
-    lightbox.addEventListener('click', (e) => {
-        if (e.target === lightbox) closeLightbox();
-    });
-    document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape') closeLightbox();
-    });
-
-    window.addEventListener('hashchange', updateView);
-    window.addEventListener('DOMContentLoaded', updateView);
-</script>
+<script src="ui.js"></script>
 
 </html>
