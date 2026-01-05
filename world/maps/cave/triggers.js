@@ -5,10 +5,25 @@ if (!window.MAP_DATA.triggers) window.MAP_DATA.triggers = [];
 
 window.MAP_DATA.triggers = [
     {
+        "x": 12,
+        "y": 12,
+        "w": 3,
+        "h": 1,
+        "id": "sake",
+        "type": "dialog",
+        "sprite": "../../object/object_sake.png",
+        "text": [
+            "술병이다. 아직 내용물이 남아있는 것 같다.",
+            "한 모금 마셨다. 맛이 좋다.",
+            "취기가 오른다..."
+        ]
+    },
+    {
         "x": 15,
         "y": 46,
         "w": 3,
         "h": 2,
+        "id": "minigame",
         "title": "미니게임",
         "type": "menu",
         "items": [
@@ -27,6 +42,7 @@ window.MAP_DATA.triggers = [
         "y": 16,
         "w": 4,
         "h": 4,
+        "id": "haiyuki",
         "title": "환세패유기",
         "type": "menu",
         "items": [
@@ -53,6 +69,7 @@ window.MAP_DATA.triggers = [
         "y": 17,
         "w": 2,
         "h": 2,
+        "id": "illust",
         "title": "일러스트",
         "type": "menu",
         "items": [
@@ -91,6 +108,7 @@ window.MAP_DATA.triggers = [
         "y": 21,
         "w": 2,
         "h": 2,
+        "id": "ds_anime",
         "title": "DS 아니메 총집편 '98",
         "type": "menu",
         "items": [
@@ -105,6 +123,7 @@ window.MAP_DATA.triggers = [
         ]
     },
     {
+        "id": "scene_viewer",
         "title": "장면 뷰어",
         "type": "menu",
         "x": 28,

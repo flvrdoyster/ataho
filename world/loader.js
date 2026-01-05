@@ -37,7 +37,10 @@ let CONFIG = {
     LIE_DOWN_ANIM_SPEED: 1.0, // seconds per frame for breathing while lying
     SLEEP_BUBBLE_ANIM_SPEED: 0.15, // seconds per frame for bubble
     SLEEP_BUBBLE_OFFSET_X: 12, // X offset relative to sprite dstX
-    SLEEP_BUBBLE_OFFSET_Y: 0   // Y offset relative to sprite dstY
+    SLEEP_BUBBLE_OFFSET_Y: 0,   // Y offset relative to sprite dstY
+
+    // UI Config
+    SPEECH_BUBBLE_OFFSET_Y: -100 // Global offset for speech bubble (from player top)
 };
 
 let tilesetImg;
@@ -48,6 +51,7 @@ let idleImg;
 let mapData = [];
 let tileGrid = []; // Spatial Index
 let mapAnimations = [];
+let mapObjects = [];
 let mapCollisions = new Set();
 let mapWidth = 0;
 let mapHeight = 0;
@@ -119,8 +123,11 @@ let isTouchDevice = false;
 // Initialize
 let triggers = [];
 let activeTrigger = null;
+
 let isModalOpen = false;
+let isBubbleOpen = false; // Separate flag for bubble to allow movement
 let lastTime = 0;
+let bubbleTimeout = null; // Timer for speech bubble auto-close
 
 // Initialize
 async function initGame() {
@@ -189,6 +196,7 @@ async function initGame() {
             });
         }
 
+        // Let's rewrite the trigger mapping block AND the object extraction block together
         // Triggers
         if (window.MAP_DATA.triggers) {
             triggers = window.MAP_DATA.triggers.map(t => ({
@@ -198,8 +206,53 @@ async function initGame() {
                 h: (t.h || 1) * CONFIG.TILE_SIZE,
                 targetId: t.targetId,
                 title: t.title,
-                items: t.items
+                id: t.id,       // Passed through
+                type: t.type,   // Passed through
+                text: t.text,   // Passed through (for dialog)
+                bubbleOffsetY: t.bubbleOffsetY, // Configurable offset
+                items: t.items,
+                sprite: t.sprite,
+                collision: t.collision
             }));
+
+            // Apply Collision for Triggers
+            triggers.forEach(t => {
+                // Collision Logic:
+                // 1. If 'collision' is explicitly set, use it.
+                // 2. If 'sprite' is present, default to true.
+                // 3. Otherwise default to false.
+                let hasCollision = false;
+                if (t.collision !== undefined) {
+                    hasCollision = t.collision;
+                } else if (t.sprite) {
+                    hasCollision = true;
+                }
+
+                if (hasCollision) {
+                    const gw = t.w / CONFIG.TILE_SIZE;
+                    const gh = t.h / CONFIG.TILE_SIZE;
+                    const gx = t.x / CONFIG.TILE_SIZE;
+                    const gy = t.y / CONFIG.TILE_SIZE;
+
+                    for (let dy = 0; dy < gh; dy++) {
+                        for (let dx = 0; dx < gw; dx++) {
+                            mapCollisions.add(`${gx + dx},${gy + dy}`);
+                        }
+                    }
+                }
+            });
+
+            // Create objects from triggers
+            mapObjects = triggers.filter(t => t.sprite).map(t => {
+                return {
+                    x: t.x,
+                    y: t.y,
+                    src: resolvePath(t.sprite),
+                    img: null,
+                    width: 0,
+                    height: 0
+                };
+            });
         }
     } else {
         console.warn("No MAP_DATA found in window");
@@ -308,6 +361,24 @@ async function initGame() {
         });
     }
 
+    // 1.8 Load Object Images
+    if (mapObjects.length > 0) {
+        await Promise.all(mapObjects.map(obj => new Promise((resolve) => {
+            const img = new Image();
+            img.src = obj.src;
+            img.onload = () => {
+                obj.img = img;
+                obj.width = img.width;
+                obj.height = img.height;
+                resolve();
+            };
+            img.onerror = () => {
+                console.warn("Failed to load object image:", obj.src);
+                resolve();
+            };
+        })));
+    }
+
     console.log("Map Loaded:", mapData.length, "tiles");
     console.log("Animations:", mapAnimations);
 
@@ -339,6 +410,14 @@ async function initGame() {
     // Start Loop
     lastTime = performance.now();
     requestAnimationFrame(gameLoop);
+    // Inject Speech Bubble
+    if (!document.getElementById('speech-bubble')) {
+        const bubble = document.createElement('div');
+        bubble.id = 'speech-bubble';
+        bubble.className = 'hidden';
+        document.body.appendChild(bubble); // Append to body to sit over canvas
+    }
+
     console.log("Game initialized!");
 }
 
@@ -346,17 +425,63 @@ async function initGame() {
  * 트리거 데이터를 기반으로 동적 모달을 생성하고 엽니다.
  */
 function openModal(trigger) {
+    // Handle Dialog Type (Speech Bubble)
+    if (trigger.type === 'dialog') {
+        const bubble = document.getElementById('speech-bubble');
+        if (bubble) {
+            let textContent = trigger.text;
+
+            // Handle Array Text (Alternating)
+            if (Array.isArray(trigger.text)) {
+                if (typeof trigger.dialogIndex === 'undefined') {
+                    trigger.dialogIndex = 0;
+                }
+                textContent = trigger.text[trigger.dialogIndex];
+
+                // Cycle to next for next time
+                trigger.dialogIndex = (trigger.dialogIndex + 1) % trigger.text.length;
+            }
+
+            bubble.textContent = textContent || '';
+            // Store offset for draw loop
+            bubble.dataset.offsetY = trigger.bubbleOffsetY || 0;
+            bubble.classList.remove('hidden');
+            isModalOpen = true; // Use same flag to block movement
+
+            // Clear existing timeout
+            if (bubbleTimeout) clearTimeout(bubbleTimeout);
+
+            // Auto close after 3 seconds
+            bubbleTimeout = setTimeout(() => {
+                closeModal();
+            }, 3000);
+
+            // Stop Player
+            keys.ArrowUp = false;
+            keys.ArrowDown = false;
+            keys.ArrowLeft = false;
+            keys.ArrowRight = false;
+            player.isMoving = false;
+        }
+        return;
+    }
+
+    // Default: Menu Modal
     const modal = document.getElementById('dynamic-modal');
     if (!modal || !trigger) return;
 
-    // 제목 설정
+    // 제목/ID 설정
+    // If id exists and title is missing, use id? Or just blank.
     const titleEl = document.getElementById('modal-title');
-    if (titleEl) titleEl.textContent = trigger.title || '알림';
+    if (titleEl) {
+        titleEl.textContent = trigger.title || '알림';
+        titleEl.style.display = 'block';
+    }
 
-    // 목록 아이템 생성
     const listEl = document.getElementById('modal-list');
     if (listEl) {
         listEl.innerHTML = '';
+
         if (trigger.items) {
             trigger.items.forEach(item => {
                 const li = document.createElement('li');
@@ -401,7 +526,18 @@ function openModal(trigger) {
 function closeModal() {
     document.querySelectorAll('.modal').forEach(m => m.classList.add('hidden'));
     document.querySelectorAll('.modal a').forEach(a => a.classList.remove('focused')); // Clear focus
+
+    // Hide Speech Bubble
+    const bubble = document.getElementById('speech-bubble');
+    if (bubble) bubble.classList.add('hidden');
+
+    if (bubbleTimeout) {
+        clearTimeout(bubbleTimeout);
+        bubbleTimeout = null;
+    }
+
     isModalOpen = false;
+    isBubbleOpen = false;
 }
 
 function resetModalFocus(modal) {
@@ -556,6 +692,11 @@ function update(dt) {
 
     player.isMoving = (dx !== 0 || dy !== 0);
 
+    // If moving and bubble is open, close it (Move-to-Close)
+    if (player.isMoving && isBubbleOpen) {
+        closeModal();
+    }
+
     // Idle Logic
     if (player.isMoving) {
         player.idleTimer = 0;
@@ -575,7 +716,18 @@ function update(dt) {
         player.animFrame = 0; // Reset to standing
         player.stepTimer = 0;
 
-        player.idleTimer += dt;
+        // Only increment idle timer if no modal/dialog is open
+        if (!isModalOpen && !isBubbleOpen) {
+            player.idleTimer += dt;
+        } else {
+            // Reset idle if modal opens? Or just pause?
+            // "Prevent sitting while dialog is displayed" -> Pause or Reset.
+            // If we just pause, they might sit immediately after.
+            // Resetting is safer to prevent awkward jumps.
+            player.idleTimer = 0;
+            player.isIdle = false;
+        }
+
         if (player.idleTimer >= CONFIG.IDLE_START_TIME) {
             if (!player.isIdle) {
                 player.isIdle = true;
@@ -648,6 +800,37 @@ function update(dt) {
     };
 
     const pad = CONFIG.COLLISION_PADDING || 0;
+
+    // Determine intended movement
+
+    let moveSpeed = CONFIG.MOVEMENT_SPEED * dt;
+
+    if (keys.ArrowUp) dy -= 1;
+    if (keys.ArrowDown) dy += 1;
+    if (keys.ArrowLeft) dx -= 1;
+    if (keys.ArrowRight) dx += 1;
+
+    // Normalize
+    if (dx !== 0 || dy !== 0) {
+        const len = Math.sqrt(dx * dx + dy * dy);
+        dx = (dx / len) * moveSpeed;
+        dy = (dy / len) * moveSpeed;
+        player.isMoving = true;
+
+        // If moving explicitly (keys pressed) and bubble is open, close it
+        if (isBubbleOpen) {
+            closeModal();
+            // Note: closeModal clears isBubbleOpen, so this runs once per bubble
+        }
+
+        // Set direction
+        if (dx > 0) player.direction = 2; // Right (assuming sprite layout)
+        if (dx < 0) player.direction = 1; // Left
+        if (dy > 0) player.direction = 0; // Down
+        if (dy < 0) player.direction = 3; // Up
+    } else {
+        player.isMoving = false;
+    }
 
     // Try Move X
     let nextX = player.x + dx;
@@ -809,8 +992,46 @@ function draw() {
         });
     }
 
-    // Draw Player
-    drawPlayer(ctx);
+    // Draw Entities (Player + Objects) Ordered by Y (Bottom of sprite/collision box)
+    const renderList = [];
+
+    // 1. Add Player
+    renderList.push({
+        type: 'player',
+        ySort: player.y + player.height // Bottom of player collision box
+    });
+
+    // 2. Add Visible Objects
+    mapObjects.forEach(obj => {
+        if (obj.img &&
+            obj.x + obj.width > viewL && obj.x < viewR &&
+            obj.y + obj.height > viewT && obj.y < viewB) {
+
+            // Sorting Y is the bottom of the map tile the object sits on
+            renderList.push({
+                type: 'object',
+                data: obj,
+                ySort: obj.y + CONFIG.TILE_SIZE
+            });
+        }
+    });
+
+    // 3. Sort
+    renderList.sort((a, b) => a.ySort - b.ySort);
+
+    // 4. Draw
+    renderList.forEach(item => {
+        if (item.type === 'player') {
+            drawPlayer(ctx);
+        } else {
+            const obj = item.data;
+            // Render at integer positions
+            const drawX = Math.floor(obj.x);
+            // Visual position: bottom aligned with tile bottom
+            const drawY = Math.floor(obj.y - obj.height + CONFIG.TILE_SIZE);
+            ctx.drawImage(obj.img, drawX, drawY);
+        }
+    });
 
     // Draw Ceiling Layer (Over Player)
     if (ceilingTilesetImg) {
@@ -845,6 +1066,37 @@ function draw() {
                 }
             }
         }
+    }
+
+    // Update Speech Bubble Position
+    const bubble = document.getElementById('speech-bubble');
+    if (bubble && !bubble.classList.contains('hidden')) {
+        // Calculate Player Position on Screen
+        // Player is drawn at dstX, dstY relative to Canvas Top-Left (which is translated by camera)
+        // BUT bubble is HTML absolute element, so we need Canvas Screen Coordinates.
+
+        // getBoundingClientRect for canvas
+        const rect = canvas.getBoundingClientRect();
+        const scaleX = rect.width / canvas.width;
+        const scaleY = rect.height / canvas.height;
+
+        // Player Center relative to Camera Viewport
+        const pViewX = player.x + player.width / 2 - camera.x;
+        const pViewY = player.y - camera.y; // Top of player
+
+        // Screen Coordinates
+        const screenX = rect.left + pViewX * scaleX;
+        const screenY = rect.top + pViewY * scaleY;
+
+        // Position bubble above player
+        // Global offset from CONFIG, plus optional custom offset from trigger
+        const globalOffset = CONFIG.SPEECH_BUBBLE_OFFSET_Y || -50;
+        const customOffset = parseInt(bubble.dataset.offsetY) || 0;
+        const finalOffset = globalOffset + customOffset;
+
+        bubble.style.left = `${screenX}px`;
+        bubble.style.top = `${screenY + finalOffset}px`;
+        bubble.style.transform = 'translate(-50%, -100%)';
     }
 
     ctx.restore();
