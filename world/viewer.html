@@ -32,10 +32,22 @@
         dataScript.src = `maps/${mapName}/data.js`;
         dataScript.onload = () => {
             document.getElementById('loading').style.display = 'none';
-            // Start the game loader after data is ready
-            const loaderScript = document.createElement('script');
-            loaderScript.src = 'loader.js';
-            document.body.appendChild(loaderScript);
+            // Load Triggers (overwriting data.js triggers)
+            const triggerScript = document.createElement('script');
+            triggerScript.src = `maps/${mapName}/triggers.js`;
+            triggerScript.onload = () => {
+                // Start the game loader after data and triggers are ready
+                const loaderScript = document.createElement('script');
+                loaderScript.src = 'loader.js';
+                document.body.appendChild(loaderScript);
+            };
+            triggerScript.onerror = () => {
+                console.warn("triggers.js not found, continuing with data.js only.");
+                const loaderScript = document.createElement('script');
+                loaderScript.src = 'loader.js';
+                document.body.appendChild(loaderScript);
+            };
+            document.body.appendChild(triggerScript);
         };
         dataScript.onerror = () => {
             document.getElementById('loading').innerText = `Error: Map '${mapName}' not found.`;
