@@ -41,11 +41,13 @@ window.MAP_DATA.triggers = [
         "items": [
             {
                 "label": "헤엄치기",
-                "href": "swim/index.html"
+                "href": "swim/index.html",
+                "target": "_blank"
             },
             {
                 "label": "평균대 동작수련",
-                "href": "balance/index.html"
+                "href": "balance/index.html",
+                "target": "_blank"
             }
         ]
     },
@@ -68,19 +70,23 @@ window.MAP_DATA.triggers = [
         "items": [
             {
                 "label": "웹 버전 (ko)",
-                "href": "haiyuki_web/index.html"
+                "href": "haiyuki_web/index.html",
+                "target": "_blank"
             },
             {
                 "label": "매뉴얼 (ko)",
-                "href": "haiyuki_manual/index.html"
+                "href": "haiyuki_manual/index.html",
+                "target": "_blank"
             },
             {
                 "label": "매뉴얼 원본 1 (PDF)",
-                "href": "haiyuki_manual/ref/manual_thebest.pdf"
+                "href": "haiyuki_manual/ref/manual_thebest.pdf",
+                "target": "_blank"
             },
             {
                 "label": "매뉴얼 원본 2 (PDF)",
-                "href": "haiyuki_manual/ref/manual_D4.pdf"
+                "href": "haiyuki_manual/ref/manual_D4.pdf",
+                "target": "_blank"
             }
         ]
     },
@@ -156,7 +162,8 @@ window.MAP_DATA.triggers = [
         "items": [
             {
                 "label": "환세쾌진극 엔딩",
-                "href": "scene_viewer/scene.html"
+                "href": "scene_viewer/scene.html",
+                "target": "_blank"
             }
         ]
     }

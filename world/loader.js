@@ -531,6 +531,15 @@ function openModal(trigger, skipDialogue = false) {
                     }
                 }
 
+                // 타겟 속성 설정 (새 창 열기 등)
+                if (item.target) {
+                    a.setAttribute('target', item.target);
+                    // 보안 및 성능을 위한 rel 추가
+                    if (item.target === '_blank') {
+                        a.setAttribute('rel', 'noopener noreferrer');
+                    }
+                }
+
                 // 내부 링크(해시) 클릭 시 모달 닫기 (라이트박스 연동용)
                 if (a.href.includes('#')) {
                     a.addEventListener('click', () => {
