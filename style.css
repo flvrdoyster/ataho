@@ -257,14 +257,16 @@ video:fullscreen::cue {
 .modal-content {
     background: white;
     padding: 2rem;
-    border-radius: 8px;
+    border: 2px solid black;
+    border-radius: 10px;
     max-width: 300px;
     width: 90%;
     position: relative;
-    color: #333;
+    color: black;
     font-size: 1rem;
-    text-align: left;
+    text-align: center;
     text-shadow: none;
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
 }
 
 .modal-content h2 {
@@ -275,8 +277,8 @@ video:fullscreen::cue {
 
 .modal-content ul {
     padding-left: 0;
-    list-style: disc;
-    list-style-position: inside;
+    list-style: none;
+    /* Removed disc for cleaner centered look */
 }
 
 .modal-content li {
@@ -285,9 +287,9 @@ video:fullscreen::cue {
 
 .close-modal {
     position: absolute;
-    top: 10px;
-    right: 15px;
-    font-size: 50px;
+    top: 5px;
+    right: 10px;
+    font-size: 30px;
     font-weight: bold;
     cursor: pointer;
     color: #aaa;
@@ -298,13 +300,14 @@ video:fullscreen::cue {
 }
 
 .modal-content a.focused {
-    background-color: #ffd700; /* Gold highlight */
+    background-color: #ffd700;
+    /* Gold highlight */
     color: black;
     text-decoration: none;
     font-weight: bold;
-    padding: 2px 5px;
+    padding: 4px 10px;
     border-radius: 4px;
-    box-shadow: 0 0 5px rgba(0,0,0,0.2);
+    box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.2);
 }
 
 /* =========================================
@@ -347,8 +350,9 @@ video:fullscreen::cue {
     font-size: 1rem;
     max-width: 250px;
     z-index: 2000;
-    pointer-events: none; /* Let clicks pass through if needed, though usually blocking */
-    box-shadow: 2px 2px 5px rgba(0,0,0,0.3);
+    pointer-events: none;
+    /* Let clicks pass through if needed, though usually blocking */
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
     text-align: center;
     /* Arrow */
 }
@@ -360,7 +364,8 @@ video:fullscreen::cue {
 #speech-bubble::after {
     content: '';
     position: absolute;
-    bottom: -10px; /* Adjust based on border width */
+    bottom: -10px;
+    /* Adjust based on border width */
     left: 50%;
     transform: translateX(-50%);
     border-width: 10px 10px 0;

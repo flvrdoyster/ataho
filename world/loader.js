@@ -15,7 +15,8 @@ let CONFIG = {
     MOVEMENT_SPEED: 240, // pixels per second
     ANIMATION_SPEED: 0.1, // seconds per frame (approx 6-7 fps)
     MAP_ANIM_DEFAULT_SPEED: 0.2, // seconds per frame
-    COLLISION_PADDING: 4,
+    COLLISION_PADDING_X: 8,
+    COLLISION_PADDING_Y: 0,
     CEILING_RENDER: {
         RANGE_TOP: 16,
         RANGE_BOTTOM: 32,
@@ -45,12 +46,10 @@ let CONFIG = {
 
 let tilesetImg;
 let ceilingTilesetImg;
-let animationImg;
 let charImg;
 let idleImg;
 let mapData = [];
 let tileGrid = []; // Spatial Index
-let mapAnimations = [];
 let mapObjects = [];
 let mapCollisions = new Set();
 let mapWidth = 0;
@@ -78,7 +77,8 @@ const player = {
     lieDownTimer: 0,
     bubbleFrame: 0,
     bubbleTimer: 0,
-    debugMode: false // When true, input doesn't reset idle
+    debugMode: false,
+    pendingMenuTrigger: null // For sequential Dialog -> Menu flow
 };
 
 // Helper: Get random yawn interval
@@ -175,19 +175,6 @@ async function initGame() {
         // Map Data
         mapData = window.MAP_DATA.tiles || [];
 
-        // Animations
-        if (window.MAP_DATA.animations) {
-            window.MAP_DATA.animations.forEach(animDef => {
-                mapAnimations.push({
-                    x: animDef.x,
-                    y: animDef.y,
-                    w: animDef.w || 64,
-                    h: animDef.h || 48,
-                    frames: animDef.frames || 5,
-                    speed: animDef.speed || CONFIG.MAP_ANIM_DEFAULT_SPEED
-                });
-            });
-        }
 
         // Collisions
         if (window.MAP_DATA.collisions) {
@@ -199,21 +186,25 @@ async function initGame() {
         // Let's rewrite the trigger mapping block AND the object extraction block together
         // Triggers
         if (window.MAP_DATA.triggers) {
-            triggers = window.MAP_DATA.triggers.map(t => ({
-                x: t.x * CONFIG.TILE_SIZE,
-                y: t.y * CONFIG.TILE_SIZE,
-                w: (t.w || 1) * CONFIG.TILE_SIZE,
-                h: (t.h || 1) * CONFIG.TILE_SIZE,
-                targetId: t.targetId,
-                title: t.title,
-                id: t.id,       // Passed through
-                type: t.type,   // Passed through
-                text: t.text,   // Passed through (for dialog)
-                bubbleOffsetY: t.bubbleOffsetY, // Configurable offset
-                items: t.items,
-                sprite: t.sprite,
-                collision: t.collision
-            }));
+            triggers = window.MAP_DATA.triggers.map(t => {
+                const height = t.h || 1;
+                return {
+                    x: t.x * CONFIG.TILE_SIZE,
+                    y: (t.y - (height - 1)) * CONFIG.TILE_SIZE, // Top of interactive area
+                    anchorY: t.y * CONFIG.TILE_SIZE,         // Original bottom row
+                    w: (t.w || 1) * CONFIG.TILE_SIZE,
+                    h: height * CONFIG.TILE_SIZE,
+                    targetId: t.targetId,
+                    title: t.title,
+                    id: t.id,       // Passed through
+                    type: t.type,   // Passed through
+                    text: t.text,   // Passed through (for dialog)
+                    bubbleOffsetY: t.bubbleOffsetY, // Configurable offset
+                    items: t.items,
+                    sprite: t.sprite,
+                    collision: t.collision
+                };
+            });
 
             // Apply Collision for Triggers
             triggers.forEach(t => {
@@ -232,7 +223,7 @@ async function initGame() {
                     const gw = t.w / CONFIG.TILE_SIZE;
                     const gh = t.h / CONFIG.TILE_SIZE;
                     const gx = t.x / CONFIG.TILE_SIZE;
-                    const gy = t.y / CONFIG.TILE_SIZE;
+                    const gy = t.y / CONFIG.TILE_SIZE; // Use shifted top coordinate
 
                     for (let dy = 0; dy < gh; dy++) {
                         for (let dx = 0; dx < gw; dx++) {
@@ -244,13 +235,20 @@ async function initGame() {
 
             // Create objects from triggers
             mapObjects = triggers.filter(t => t.sprite).map(t => {
+                const triggerSource = window.MAP_DATA.triggers.find(orig => orig.id === t.id && orig.x * CONFIG.TILE_SIZE === t.x && orig.y * CONFIG.TILE_SIZE === t.anchorY) || {};
                 return {
                     x: t.x,
-                    y: t.y,
+                    y: t.y, // shifted top
+                    h: t.h, // box height
                     src: resolvePath(t.sprite),
                     img: null,
                     width: 0,
-                    height: 0
+                    height: 0,
+                    // Animation Props
+                    frames: triggerSource.frames || 0,
+                    speed: triggerSource.speed || 0,
+                    animW: triggerSource.animW || 0,
+                    animH: triggerSource.animH || 0
                 };
             });
         }
@@ -278,8 +276,12 @@ async function initGame() {
             keys[e.key] = true;
             if (!player.debugMode) player.idleTimer = 0;
         }
-        if (e.code === 'Space' && activeTrigger) {
-            openModal(activeTrigger);
+        if (e.code === 'Space') {
+            if (isBubbleOpen) {
+                closeModal();
+            } else if (activeTrigger) {
+                openModal(activeTrigger);
+            }
         }
     });
 
@@ -297,15 +299,10 @@ async function initGame() {
         isTouchDevice = true;
     }
 
-    // Close modal on click outside
-    document.querySelectorAll('.modal').forEach(modal => {
-        modal.addEventListener('click', (e) => {
-            if (e.target === modal) closeModal();
-        });
-
-        const closeBtn = modal.querySelector('.close-modal');
-        if (closeBtn) closeBtn.addEventListener('click', closeModal);
-    });
+    // Detect generic touch support
+    if ('ontouchstart' in window || navigator.maxTouchPoints > 0) {
+        isTouchDevice = true;
+    }
 
     // Handle Resize
     window.addEventListener('resize', resizeCanvas);
@@ -331,15 +328,6 @@ async function initGame() {
         });
     }
 
-    // 1.5 Load Animation
-    if (CONFIG.PATHS.ANIMATION) {
-        animationImg = new Image();
-        animationImg.src = CONFIG.PATHS.ANIMATION;
-        await new Promise((resolve, reject) => {
-            animationImg.onload = resolve;
-            animationImg.onerror = () => { console.warn("Anim load failed"); resolve(); };
-        });
-    }
 
     // 1.6 Load Character
     if (CONFIG.PATHS.CHAR) {
@@ -380,7 +368,9 @@ async function initGame() {
     }
 
     console.log("Map Loaded:", mapData.length, "tiles");
-    console.log("Animations:", mapAnimations);
+
+    // Inject UI (Prompt, Modal, Speech Bubble)
+    injectUI();
 
     // Calculate Map Bounds
     let maxGx = 0;
@@ -410,23 +400,71 @@ async function initGame() {
     // Start Loop
     lastTime = performance.now();
     requestAnimationFrame(gameLoop);
-    // Inject Speech Bubble
-    if (!document.getElementById('speech-bubble')) {
-        const bubble = document.createElement('div');
-        bubble.id = 'speech-bubble';
-        bubble.className = 'hidden';
-        document.body.appendChild(bubble); // Append to body to sit over canvas
-    }
 
     console.log("Game initialized!");
 }
 
 /**
- * 트리거 데이터를 기반으로 동적 모달을 생성하고 엽니다.
+ * 게임에 필요한 UI 요소(상호작용 프롬프트, 모달, 말풍선)를 동적으로 주입합니다.
  */
-function openModal(trigger) {
-    // Handle Dialog Type (Speech Bubble)
-    if (trigger.type === 'dialog') {
+function injectUI() {
+    // 1. UI Layer
+    if (!document.getElementById('ui-layer')) {
+        const uiLayer = document.createElement('div');
+        uiLayer.id = 'ui-layer';
+        document.body.appendChild(uiLayer);
+    }
+    const uiLayer = document.getElementById('ui-layer');
+
+    // 2. Interaction Prompt
+    if (!document.getElementById('interaction-prompt')) {
+        const prompt = document.createElement('div');
+        prompt.id = 'interaction-prompt';
+        prompt.className = 'prompt hidden';
+        prompt.textContent = 'Space를 누르세요.';
+        uiLayer.appendChild(prompt);
+    }
+
+    // 3. Dynamic Modal
+    if (!document.getElementById('dynamic-modal')) {
+        const modal = document.createElement('div');
+        modal.id = 'dynamic-modal';
+        modal.className = 'modal hidden';
+        modal.innerHTML = `
+            <div class="modal-content">
+                <span class="close-modal">&times;</span>
+                <h2 id="modal-title"></h2>
+                <ul id="modal-list"></ul>
+            </div>
+        `;
+        uiLayer.appendChild(modal);
+
+        // Bind closeModal to close button
+        const closeBtn = modal.querySelector('.close-modal');
+        if (closeBtn) closeBtn.addEventListener('click', closeModal);
+
+        // Close on background click
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) closeModal();
+        });
+    }
+
+    // 4. Speech Bubble
+    if (!document.getElementById('speech-bubble')) {
+        const bubble = document.createElement('div');
+        bubble.id = 'speech-bubble';
+        bubble.className = 'hidden';
+        document.body.appendChild(bubble);
+    }
+}
+
+/**
+ * 트리거 데이터를 기반으로 동적 모달을 생성하고 엽니다.
+ * skipDialogue: true면 대사(text)가 있어도 건너뛰고 바로 메뉴를 엽니다.
+ */
+function openModal(trigger, skipDialogue = false) {
+    // Handle Dialog/Menu Sequential Logic or Direct Dialog
+    if (!skipDialogue && (trigger.type === 'dialog' || (trigger.type === 'menu' && trigger.text))) {
         const bubble = document.getElementById('speech-bubble');
         if (bubble) {
             let textContent = trigger.text;
@@ -437,31 +475,28 @@ function openModal(trigger) {
                     trigger.dialogIndex = 0;
                 }
                 textContent = trigger.text[trigger.dialogIndex];
-
-                // Cycle to next for next time
+                // Cycle for next time? 
+                // For direct 'dialog' type, we cycle. For 'menu' leading dialog, maybe just first?
+                // Let's cycle both for consistency.
                 trigger.dialogIndex = (trigger.dialogIndex + 1) % trigger.text.length;
             }
 
             bubble.textContent = textContent || '';
-            // Store offset for draw loop
             bubble.dataset.offsetY = trigger.bubbleOffsetY || 0;
             bubble.classList.remove('hidden');
-            isModalOpen = true; // Use same flag to block movement
+            isBubbleOpen = true;
 
-            // Clear existing timeout
+            // If it's a menu trigger, queue the modal to open after bubble closes
+            if (trigger.type === 'menu') {
+                player.pendingMenuTrigger = trigger;
+            } else {
+                player.pendingMenuTrigger = null;
+            }
+
             if (bubbleTimeout) clearTimeout(bubbleTimeout);
-
-            // Auto close after 3 seconds
             bubbleTimeout = setTimeout(() => {
                 closeModal();
             }, 3000);
-
-            // Stop Player
-            keys.ArrowUp = false;
-            keys.ArrowDown = false;
-            keys.ArrowLeft = false;
-            keys.ArrowRight = false;
-            player.isMoving = false;
         }
         return;
     }
@@ -487,7 +522,7 @@ function openModal(trigger) {
                 const li = document.createElement('li');
                 const a = document.createElement('a');
                 a.href = item.href || '#';
-                a.textContent = item.text || '';
+                a.textContent = item.label || item.text || ''; // Support new 'label' and fallback to 'text' for compatibility
 
                 // 데이터 속성 복사 (라이트박스 캡션, 자막 등)
                 if (item.data) {
@@ -538,6 +573,16 @@ function closeModal() {
 
     isModalOpen = false;
     isBubbleOpen = false;
+
+    // After closing bubble, if there's a pending menu, open it
+    if (player.pendingMenuTrigger) {
+        const trig = player.pendingMenuTrigger;
+        player.pendingMenuTrigger = null; // Clear first to avoid loop
+        // Recursively call openModal but ensure text is bypassed this time 
+        // Actually, we can just call the modal part.
+        // Let's modify openModal slightly to accept a 'skipDialogue' flag
+        openModal(trig, true);
+    }
 }
 
 function resetModalFocus(modal) {
@@ -799,49 +844,20 @@ function update(dt) {
         console.log("Idle Debug Mode:", player.debugMode ? "ON (Input won't reset idle)" : "OFF");
     };
 
-    const pad = CONFIG.COLLISION_PADDING || 0;
+    const padX = CONFIG.COLLISION_PADDING_X || 0;
+    const padY = CONFIG.COLLISION_PADDING_Y || 0;
 
-    // Determine intended movement
-
-    let moveSpeed = CONFIG.MOVEMENT_SPEED * dt;
-
-    if (keys.ArrowUp) dy -= 1;
-    if (keys.ArrowDown) dy += 1;
-    if (keys.ArrowLeft) dx -= 1;
-    if (keys.ArrowRight) dx += 1;
-
-    // Normalize
-    if (dx !== 0 || dy !== 0) {
-        const len = Math.sqrt(dx * dx + dy * dy);
-        dx = (dx / len) * moveSpeed;
-        dy = (dy / len) * moveSpeed;
-        player.isMoving = true;
-
-        // If moving explicitly (keys pressed) and bubble is open, close it
-        if (isBubbleOpen) {
-            closeModal();
-            // Note: closeModal clears isBubbleOpen, so this runs once per bubble
-        }
-
-        // Set direction
-        if (dx > 0) player.direction = 2; // Right (assuming sprite layout)
-        if (dx < 0) player.direction = 1; // Left
-        if (dy > 0) player.direction = 0; // Down
-        if (dy < 0) player.direction = 3; // Up
-    } else {
-        player.isMoving = false;
-    }
 
     // Try Move X
     let nextX = player.x + dx;
     // Inflate Collision Box by padding
-    if (!checkCollision(nextX - pad, player.y - pad, player.width + pad * 2, player.height + pad * 2)) {
+    if (!checkCollision(nextX - padX, player.y - padY, player.width + padX * 2, player.height + padY * 2)) {
         player.x = nextX;
     }
 
     // Try Move Y
     let nextY = player.y + dy;
-    if (!checkCollision(player.x - pad, nextY - pad, player.width + pad * 2, player.height + pad * 2)) {
+    if (!checkCollision(player.x - padX, nextY - padY, player.width + padX * 2, player.height + padY * 2)) {
         player.y = nextY;
     }
 
@@ -978,19 +994,6 @@ function draw() {
         }
     }
 
-    // Draw Animations
-    if (animationImg && mapAnimations.length > 0) {
-        const now = performance.now() / 1000;
-        mapAnimations.forEach(anim => {
-            if (anim.x + anim.w > viewL && anim.x < viewR &&
-                anim.y + anim.h > viewT && anim.y < viewB) {
-                const speedInSeconds = anim.speed / 1000;
-                const frameIndex = Math.floor(now / speedInSeconds) % anim.frames;
-                const srcX = frameIndex * anim.w;
-                ctx.drawImage(animationImg, srcX, 0, anim.w, anim.h, anim.x, anim.y, anim.w, anim.h);
-            }
-        });
-    }
 
     // Draw Entities (Player + Objects) Ordered by Y (Bottom of sprite/collision box)
     const renderList = [];
@@ -1011,7 +1014,7 @@ function draw() {
             renderList.push({
                 type: 'object',
                 data: obj,
-                ySort: obj.y + CONFIG.TILE_SIZE
+                ySort: obj.y + obj.h // Bottom of interaction box
             });
         }
     });
@@ -1025,11 +1028,21 @@ function draw() {
             drawPlayer(ctx);
         } else {
             const obj = item.data;
-            // Render at integer positions
             const drawX = Math.floor(obj.x);
-            // Visual position: bottom aligned with tile bottom
-            const drawY = Math.floor(obj.y - obj.height + CONFIG.TILE_SIZE);
-            ctx.drawImage(obj.img, drawX, drawY);
+            // Visual position: bottom aligned with interaction box bottom
+            const drawY = Math.floor(obj.y + obj.h - (obj.animH || obj.height));
+
+            if (obj.frames > 1) {
+                // Animated Object
+                const now = performance.now() / 1000;
+                const speedInSeconds = (obj.speed || 200) / 1000;
+                const frameIndex = Math.floor(now / speedInSeconds) % obj.frames;
+                const srcX = frameIndex * (obj.animW || obj.width);
+                ctx.drawImage(obj.img, srcX, 0, (obj.animW || obj.width), (obj.animH || obj.height), drawX, drawY, (obj.animW || obj.width), (obj.animH || obj.height));
+            } else {
+                // Static Object
+                ctx.drawImage(obj.img, drawX, drawY);
+            }
         }
     });
 

@@ -210,9 +210,12 @@
                 <div style="margin-bottom: 5px;"><label>Type:
                         <select id="trigger-type" style="width:100%">
                             <option value="menu">Menu</option>
+                            <option value="dialog">Dialog</option>
                             <option value="warp">Warp</option>
                         </select>
                     </label></div>
+                <div style="margin-bottom: 5px;"><label>Sprite Path: <input type="text" id="trigger-sprite" value=""
+                            placeholder="../../object/..." style="width:100%"></label></div>
                 <div style="margin-bottom: 5px; display: flex; gap: 5px;">
                     <label style="flex:1;">X: <input type="number" id="trigger-x" value="0" style="width:100%"></label>
                     <label style="flex:1;">Y: <input type="number" id="trigger-y" value="0" style="width:100%"></label>
@@ -221,10 +224,37 @@
                     <label style="flex:1;">W: <input type="number" id="trigger-w" value="1" style="width:100%"></label>
                     <label style="flex:1;">H: <input type="number" id="trigger-h" value="1" style="width:100%"></label>
                 </div>
-                <div style="margin-bottom: 20px;">
-                    <label>Items (JSON):</label>
+                <!-- Dialogue & Bubble -->
+                <div style="margin-bottom: 5px;">
+                    <label>Dialog Text (One line or JSON Array):</label>
+                    <textarea id="trigger-text" style="height: 40px; font-family: monospace;"></textarea>
+                </div>
+                <div style="margin-bottom: 5px;">
+                    <label>Bubble Offset Y: <input type="number" id="trigger-bubble-y" value="0"
+                            style="width:60px;"></label>
+                </div>
+                <div style="margin-bottom: 5px;">
+                    <label><input type="checkbox" id="trigger-collision"> Collision Enable</label>
+                </div>
+
+                <!-- Animation Settings -->
+                <div style="margin-top: 10px; border-top: 1px dotted #555; padding-top: 5px;">
+                    <label><input type="checkbox" id="trigger-is-anim"> Use Animation</label>
+                    <div id="anim-settings" style="display:none; margin-top: 5px; font-size: 11px;">
+                        <div style="display: flex; gap: 5px; margin-bottom: 5px;">
+                            <label>AW: <input type="number" id="anim-w" value="64" style="width:40px;"></label>
+                            <label>AH: <input type="number" id="anim-h" value="48" style="width:40px;"></label>
+                            <label>Frames: <input type="number" id="anim-frames" value="5" style="width:40px;"></label>
+                        </div>
+                        <label>Speed (ms/f): <input type="number" id="anim-speed" value="200"
+                                style="width:60px;"></label>
+                    </div>
+                </div>
+
+                <div style="margin-bottom: 10px; margin-top: 10px;">
+                    <label>Menu Items (JSON):</label>
                     <textarea id="trigger-items"
-                        style="height: 60px; font-family: monospace;">[{"text": "Sample", "href": "#"}]</textarea>
+                        style="height: 60px; font-family: monospace;">[{"label": "Sample", "href": "#"}]</textarea>
                 </div>
                 <div style="display: flex; gap: 5px; margin-top: 10px;">
                     <button id="btn-place-trigger" onclick="placeTriggerAction()"
@@ -679,12 +709,33 @@
         function loadTriggerToUI(index) {
             editingTriggerIndex = index;
             const trig = triggers[index];
-            document.getElementById('trigger-title').value = trig.title;
+            document.getElementById('trigger-title').value = trig.title || '';
             document.getElementById('trigger-type').value = trig.type || 'menu';
+            document.getElementById('trigger-sprite').value = trig.sprite || '';
             document.getElementById('trigger-x').value = trig.x;
             document.getElementById('trigger-y').value = trig.y;
             document.getElementById('trigger-w').value = trig.w || 1;
             document.getElementById('trigger-h').value = trig.h || 1;
+
+            // Text Handling
+            if (Array.isArray(trig.text)) {
+                document.getElementById('trigger-text').value = JSON.stringify(trig.text);
+            } else {
+                document.getElementById('trigger-text').value = trig.text || '';
+            }
+
+            document.getElementById('trigger-bubble-y').value = trig.bubbleOffsetY || 0;
+            document.getElementById('trigger-collision').checked = !!trig.collision;
+
+            // Animation
+            const isAnim = !!(trig.animW || trig.frames || trig.speed);
+            document.getElementById('trigger-is-anim').checked = isAnim;
+            document.getElementById('anim-settings').style.display = isAnim ? 'block' : 'none';
+            document.getElementById('anim-w').value = trig.animW || 64;
+            document.getElementById('anim-h').value = trig.animH || 48;
+            document.getElementById('anim-frames').value = trig.frames || 5;
+            document.getElementById('anim-speed').value = trig.speed || 200;
+
             document.getElementById('trigger-items').value = JSON.stringify(trig.items || []);
 
             // UI Update
@@ -696,54 +747,88 @@
             renderTriggers();
         }
 
+        // Toggle Animation Settings visibility
+        document.getElementById('trigger-is-anim').onchange = function () {
+            document.getElementById('anim-settings').style.display = this.checked ? 'block' : 'none';
+        };
+
         function cancelTriggerEdit() {
             editingTriggerIndex = -1;
             document.getElementById('btn-place-trigger').style.display = 'block';
             document.getElementById('btn-update-trigger').style.display = 'none';
             document.getElementById('btn-cancel-trigger').style.display = 'none';
             document.getElementById('editing-status').style.display = 'none';
+
+            // Clear fields (Optional but good)
+            document.getElementById('trigger-sprite').value = '';
+            document.getElementById('trigger-text').value = '';
+            document.getElementById('trigger-is-anim').checked = false;
+            document.getElementById('anim-settings').style.display = 'none';
+
             renderTriggers();
         }
 
         function updateTrigger() {
             if (editingTriggerIndex === -1) return;
 
-            const title = document.getElementById('trigger-title').value;
-            const type = document.getElementById('trigger-type').value;
-            const tx = parseInt(document.getElementById('trigger-x').value);
-            const ty = parseInt(document.getElementById('trigger-y').value);
-            const tw = parseInt(document.getElementById('trigger-w').value);
-            const th = parseInt(document.getElementById('trigger-h').value);
-
-            let items = [];
-            try {
-                items = JSON.parse(document.getElementById('trigger-items').value);
-            } catch (e) {
-                alert("Invalid Items JSON!");
-                return;
-            }
-
-            triggers[editingTriggerIndex].title = title;
-            triggers[editingTriggerIndex].type = type;
-            triggers[editingTriggerIndex].x = tx;
-            triggers[editingTriggerIndex].y = ty;
-            triggers[editingTriggerIndex].w = tw;
-            triggers[editingTriggerIndex].h = th;
-            triggers[editingTriggerIndex].items = items;
+            const trig = triggers[editingTriggerIndex];
+            collectTriggerFields(trig);
 
             alert("Trigger updated!");
             cancelTriggerEdit();
         }
 
+        function collectTriggerFields(trig) {
+            trig.title = document.getElementById('trigger-title').value;
+            trig.type = document.getElementById('trigger-type').value;
+            trig.sprite = document.getElementById('trigger-sprite').value;
+            trig.x = parseInt(document.getElementById('trigger-x').value);
+            trig.y = parseInt(document.getElementById('trigger-y').value);
+            trig.w = parseInt(document.getElementById('trigger-w').value);
+            trig.h = parseInt(document.getElementById('trigger-h').value);
+
+            // Text Handling
+            const rawText = document.getElementById('trigger-text').value;
+            if (rawText.startsWith('[') && rawText.endsWith(']')) {
+                try {
+                    trig.text = JSON.parse(rawText);
+                } catch (e) {
+                    trig.text = rawText;
+                }
+            } else {
+                trig.text = rawText;
+            }
+
+            trig.bubbleOffsetY = parseInt(document.getElementById('trigger-bubble-y').value) || 0;
+            trig.collision = document.getElementById('trigger-collision').checked;
+
+            if (document.getElementById('trigger-is-anim').checked) {
+                trig.animW = parseInt(document.getElementById('anim-w').value);
+                trig.animH = parseInt(document.getElementById('anim-h').value);
+                trig.frames = parseInt(document.getElementById('anim-frames').value);
+                trig.speed = parseInt(document.getElementById('anim-speed').value);
+            } else {
+                delete trig.animW;
+                delete trig.animH;
+                delete trig.frames;
+                delete trig.speed;
+            }
+
+            try {
+                trig.items = JSON.parse(document.getElementById('trigger-items').value);
+            } catch (e) {
+                alert("Invalid Items JSON!");
+            }
+        }
+
         function placeTriggerAction() {
-            // This is just a helper for the button if someone clicks it manually
             alert("그리드를 클릭하여 새 트리거를 배치하세요.");
         }
 
         function deleteTriggerAt(gx, gy) {
             const index = triggers.findIndex(t =>
                 gx >= t.x && gx < t.x + (t.w || 1) &&
-                gy >= t.y && gy < t.y + (t.h || 1)
+                gy <= t.y && gy > t.y - (t.h || 1)
             );
             if (index !== -1) {
                 triggers.splice(index, 1);
@@ -752,26 +837,8 @@
         }
 
         function placeTrigger(gx, gy) {
-            const title = document.getElementById('trigger-title').value;
-            const type = document.getElementById('trigger-type').value;
-            let items = [];
-            try {
-                items = JSON.parse(document.getElementById('trigger-items').value);
-            } catch (e) {
-                alert("Invalid Items JSON!");
-                return;
-            }
-
-            let trigger = {
-                title: title,
-                type: type,
-                x: gx,
-                y: gy,
-                w: parseInt(document.getElementById('trigger-w').value) || 1,
-                h: parseInt(document.getElementById('trigger-h').value) || 1,
-                items: items
-            };
-
+            let trigger = { x: gx, y: gy };
+            collectTriggerFields(trigger);
             triggers.push(trigger);
             renderTriggers();
         }
@@ -793,7 +860,7 @@
                     div.style.zIndex = '15';
                 }
                 div.style.left = (trig.x * TILE_SIZE) + 'px';
-                div.style.top = (trig.y * TILE_SIZE) + 'px';
+                div.style.top = ((trig.y - (trig.h - 1)) * TILE_SIZE) + 'px';
                 div.style.width = (trig.w * TILE_SIZE) + 'px';
                 div.style.height = (trig.h * TILE_SIZE) + 'px';
                 div.innerHTML = `<span style="font-size: 8px; color: white;">${trig.title}</span>`;
@@ -957,7 +1024,6 @@
             const result = {
                 assets: (window.MAP_DATA && window.MAP_DATA.assets) ? window.MAP_DATA.assets : {},
                 tiles: data,
-                animations: (window.MAP_DATA && window.MAP_DATA.animations) ? window.MAP_DATA.animations : [],
                 editor: (window.MAP_DATA && window.MAP_DATA.editor) ? window.MAP_DATA.editor : {},
                 collisions: Array.from(collisionTiles)
                     .map(k => {
