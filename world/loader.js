@@ -28,9 +28,15 @@ let CONFIG = {
         CEILING_TILESET: '',
         ANIMATION: '',
         CHAR: '',
-        IDLE: ''
+        IDLE: '',
+        EAT: '',
+        DRUNK: ''
     },
     IDLE_START_TIME: 4, // seconds before sitting
+    DRUNK_DURATION: 10, // persistent drunk state duration
+    HICCUP_MIN_INTERVAL: 1.0,
+    HICCUP_MAX_INTERVAL: 3.0,
+    HICCUP_PULSE_DURATION: 0.3, // One loop (approx 2 frames * 0.15s)
     YAWN_MIN_INTERVAL: 4, // min seconds between yawns
     YAWN_MAX_INTERVAL: 8,   // max seconds between yawns
     YAWN_DURATION: 1.0,   // duration of yawn animation
@@ -48,6 +54,8 @@ let tilesetImg;
 let ceilingTilesetImg;
 let charImg;
 let idleImg;
+let eatImg;
+let drunkImg;
 let mapData = [];
 let tileGrid = []; // Spatial Index
 let mapObjects = [];
@@ -77,6 +85,20 @@ const player = {
     lieDownTimer: 0,
     bubbleFrame: 0,
     bubbleTimer: 0,
+    isEating: false,
+    isDrinking: false,
+    animTimer: 0,
+    animFrame: 0,
+    animRemaining: Infinity,
+    lastAnimLoopIdx: 0,
+    drinkCount: 0,
+    isDrunk: false,
+    drunkTimer: 0,
+    isHiccuping: false,
+    hiccupPulseTimer: 0,
+    hiccupIntervalTimer: 0,
+    lastBubbleTime: 0,
+    lastAutoTriggerId: null, // To prevent re-triggering same tile
     debugMode: false,
     pendingMenuTrigger: null // For sequential Dialog -> Menu flow
 };
@@ -90,6 +112,9 @@ const WALK_SEQUENCE = [0, 1, 2, 1, 0, 3, 4, 3];
 const YAWN_SEQUENCE = [0, 1, 2, 3, 2, 1]; // Sequence for yawning frames
 const LIE_DOWN_SEQUENCE = [0, 1, 2, 1]; // Sequence for breathing while lying down
 const BUBBLE_SEQUENCE = [0, 1, 2, 3, 4, 5, 6, 5, 4, 3, 2, 1]; // 7 frames for sleeping bubble
+const EAT_SEQUENCE = [0, 1, 2, 3, 2, 1, 0];
+const DRINK_SEQUENCE = [4, 5, 6, 7, 7, 6, 5, 4];
+const HICCUP_SEQUENCE = [0, 1];
 
 const camera = {
     x: 0,
@@ -170,6 +195,8 @@ async function initGame() {
             CONFIG.PATHS.ANIMATION = resolvePath(window.MAP_DATA.assets.animation || '');
             CONFIG.PATHS.CHAR = resolvePath(window.MAP_DATA.assets.character || '');
             CONFIG.PATHS.IDLE = resolvePath("../../char/ataho-idle.png"); // Hardcoded for now based on file list
+            CONFIG.PATHS.EAT = resolvePath("../../char/ataho-eat.png");
+            CONFIG.PATHS.DRUNK = resolvePath("../../char/ataho-drunk.png");
         }
 
         // Map Data
@@ -188,18 +215,22 @@ async function initGame() {
         if (window.MAP_DATA.triggers) {
             triggers = window.MAP_DATA.triggers.map(t => {
                 const height = t.h || 1;
+                // 'sprite'가 있는 경우에만 y좌표를 위로 보정 (anchor-to-top logic)
+                // 'sprite'가 없는 타일 기반 트리거는 y를 상단 시작점으로 간주
+                const yShift = t.sprite ? (height - 1) : 0;
+
                 return {
                     x: t.x * CONFIG.TILE_SIZE,
-                    y: (t.y - (height - 1)) * CONFIG.TILE_SIZE, // Top of interactive area
-                    anchorY: t.y * CONFIG.TILE_SIZE,         // Original bottom row
+                    y: (t.y - yShift) * CONFIG.TILE_SIZE,
+                    anchorY: t.y * CONFIG.TILE_SIZE,
                     w: (t.w || 1) * CONFIG.TILE_SIZE,
                     h: height * CONFIG.TILE_SIZE,
                     targetId: t.targetId,
                     title: t.title,
-                    id: t.id,       // Passed through
-                    type: t.type,   // Passed through
-                    text: t.text,   // Passed through (for dialog)
-                    bubbleOffsetY: t.bubbleOffsetY, // Configurable offset
+                    id: t.id,
+                    type: t.type,
+                    text: t.text,
+                    bubbleOffsetY: t.bubbleOffsetY,
                     items: t.items,
                     sprite: t.sprite,
                     collision: t.collision
@@ -276,10 +307,14 @@ async function initGame() {
             keys[e.key] = true;
             if (!player.debugMode) player.idleTimer = 0;
         }
-        if (e.code === 'Space') {
+        if (e.code === 'Space' || e.key === 'Enter') {
             if (isBubbleOpen) {
-                closeModal();
-            } else if (activeTrigger) {
+                // Grace period to prevent immediate closing from the same keypress
+                if (performance.now() - player.lastBubbleTime > 200) {
+                    closeModal();
+                }
+            } else if (activeTrigger && e.code === 'Space') {
+                // For Space only, trigger openModal (Enter is usually for links only)
                 openModal(activeTrigger);
             }
         }
@@ -349,7 +384,27 @@ async function initGame() {
         });
     }
 
-    // 1.8 Load Object Images
+    // 1.8 Load Eat/Drink Sprite
+    if (CONFIG.PATHS.EAT) {
+        eatImg = new Image();
+        eatImg.src = CONFIG.PATHS.EAT;
+        await new Promise((resolve, reject) => {
+            eatImg.onload = resolve;
+            eatImg.onerror = () => { console.warn("Eat load failed"); resolve(); };
+        });
+    }
+
+    // 1.8.1 Load Drunk Sprite
+    if (CONFIG.PATHS.DRUNK) {
+        drunkImg = new Image();
+        drunkImg.src = CONFIG.PATHS.DRUNK;
+        await new Promise((resolve) => {
+            drunkImg.onload = resolve;
+            drunkImg.onerror = () => { console.warn("Drunk load failed"); resolve(); };
+        });
+    }
+
+    // 1.9 Load Object Images
     if (mapObjects.length > 0) {
         await Promise.all(mapObjects.map(obj => new Promise((resolve) => {
             const img = new Image();
@@ -465,38 +520,13 @@ function injectUI() {
 function openModal(trigger, skipDialogue = false) {
     // Handle Dialog/Menu Sequential Logic or Direct Dialog
     if (!skipDialogue && (trigger.type === 'dialog' || (trigger.type === 'menu' && trigger.text))) {
-        const bubble = document.getElementById('speech-bubble');
-        if (bubble) {
-            let textContent = trigger.text;
+        showSpeechBubble(trigger.text, trigger.bubbleOffsetY, trigger);
 
-            // Handle Array Text (Alternating)
-            if (Array.isArray(trigger.text)) {
-                if (typeof trigger.dialogIndex === 'undefined') {
-                    trigger.dialogIndex = 0;
-                }
-                textContent = trigger.text[trigger.dialogIndex];
-                // Cycle for next time? 
-                // For direct 'dialog' type, we cycle. For 'menu' leading dialog, maybe just first?
-                // Let's cycle both for consistency.
-                trigger.dialogIndex = (trigger.dialogIndex + 1) % trigger.text.length;
-            }
-
-            bubble.textContent = textContent || '';
-            bubble.dataset.offsetY = trigger.bubbleOffsetY || 0;
-            bubble.classList.remove('hidden');
-            isBubbleOpen = true;
-
-            // If it's a menu trigger, queue the modal to open after bubble closes
-            if (trigger.type === 'menu') {
-                player.pendingMenuTrigger = trigger;
-            } else {
-                player.pendingMenuTrigger = null;
-            }
-
-            if (bubbleTimeout) clearTimeout(bubbleTimeout);
-            bubbleTimeout = setTimeout(() => {
-                closeModal();
-            }, 3000);
+        // If it's a menu trigger, queue the modal to open after bubble closes
+        if (trigger.type === 'menu') {
+            player.pendingMenuTrigger = trigger;
+        } else {
+            player.pendingMenuTrigger = null;
         }
         return;
     }
@@ -505,12 +535,15 @@ function openModal(trigger, skipDialogue = false) {
     const modal = document.getElementById('dynamic-modal');
     if (!modal || !trigger) return;
 
-    // 제목/ID 설정
-    // If id exists and title is missing, use id? Or just blank.
+    // 제목 설정 (없으면 숨김)
     const titleEl = document.getElementById('modal-title');
     if (titleEl) {
-        titleEl.textContent = trigger.title || '알림';
-        titleEl.style.display = 'block';
+        if (trigger.title) {
+            titleEl.textContent = trigger.title;
+            titleEl.style.display = 'block';
+        } else {
+            titleEl.style.display = 'none';
+        }
     }
 
     const listEl = document.getElementById('modal-list');
@@ -541,7 +574,8 @@ function openModal(trigger, skipDialogue = false) {
                 }
 
                 // 내부 링크(해시) 클릭 시 모달 닫기 (라이트박스 연동용)
-                if (a.href.includes('#')) {
+                // 단, 커스텀 액션이나 텍스트가 설정된 경우 해당 핸들러에서 처리하도록 제외
+                if (a.href.includes('#') && !item.action && !item.text) {
                     a.addEventListener('click', () => {
                         setTimeout(closeModal, 10);
                     });
@@ -549,6 +583,24 @@ function openModal(trigger, skipDialogue = false) {
 
                 li.appendChild(a);
                 listEl.appendChild(li);
+
+                // Handle custom actions
+                if (item.action) {
+                    a.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        handleAction(item.action, item.count);
+                        closeModal();
+                    });
+                }
+
+                // Handle dialogue text
+                if (item.text) {
+                    a.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        closeModal();
+                        showSpeechBubble(item.text, trigger.bubbleOffsetY);
+                    });
+                }
             });
         }
     }
@@ -556,11 +608,8 @@ function openModal(trigger, skipDialogue = false) {
     modal.classList.remove('hidden');
     isModalOpen = true;
 
-    // 플레이어 이동 정지
-    keys.ArrowUp = false;
-    keys.ArrowDown = false;
-    keys.ArrowLeft = false;
-    keys.ArrowRight = false;
+    // 플레이어 이동 정지 및 모든 이동 키 리셋 (WASD 포함)
+    Object.keys(keys).forEach(k => keys[k] = false);
     player.isMoving = false;
 
     // 모달 내부 첫 번째 아이템으로 포커스 이동
@@ -572,6 +621,60 @@ function closeModal() {
     document.querySelectorAll('.modal a').forEach(a => a.classList.remove('focused')); // Clear focus
 
     // Hide Speech Bubble
+    hideSpeechBubble(true); // skipPending check here as we handle it below
+
+    isModalOpen = false;
+
+    // After closing bubble or modal, if there's a pending menu, open it
+    if (player.pendingMenuTrigger) {
+        const trig = player.pendingMenuTrigger;
+        player.pendingMenuTrigger = null; // Clear first to avoid loop
+        openModal(trig, true);
+    }
+}
+
+/**
+ * 말풍선을 표시합니다.
+ * @param {string|string[]} text - 표시할 텍스트 (배열일 경우 순차 출력)
+ * @param {number} offsetY - Y축 오프셋
+ * @param {object} trigger - (선택) 트리거 객체 (대사 인덱스 관리용)
+ */
+function showSpeechBubble(text, offsetY = 0, trigger = null) {
+    const bubble = document.getElementById('speech-bubble');
+    if (!bubble) return;
+
+    let textContent = text;
+
+    // Handle Array Text (Alternating)
+    if (Array.isArray(text)) {
+        if (trigger) {
+            if (typeof trigger.dialogIndex === 'undefined') {
+                trigger.dialogIndex = 0;
+            }
+            textContent = text[trigger.dialogIndex];
+            trigger.dialogIndex = (trigger.dialogIndex + 1) % text.length;
+        } else {
+            // If no trigger context, just show first or random? 
+            // Let's stick to first for simple items.
+            textContent = text[0];
+        }
+    }
+
+    bubble.textContent = textContent || '';
+    bubble.dataset.offsetY = offsetY || 0;
+    bubble.classList.remove('hidden');
+    isBubbleOpen = true;
+    player.lastBubbleTime = performance.now();
+
+    if (bubbleTimeout) clearTimeout(bubbleTimeout);
+    bubbleTimeout = setTimeout(hideSpeechBubble, 3000);
+}
+
+/**
+ * 말풍선을 숨깁니다.
+ * @param {boolean} skipPending - true면 대기 중인 메뉴를 열지 않습니다.
+ */
+function hideSpeechBubble(skipPending = false) {
     const bubble = document.getElementById('speech-bubble');
     if (bubble) bubble.classList.add('hidden');
 
@@ -579,18 +682,11 @@ function closeModal() {
         clearTimeout(bubbleTimeout);
         bubbleTimeout = null;
     }
-
-    isModalOpen = false;
     isBubbleOpen = false;
 
-    // After closing bubble, if there's a pending menu, open it
-    if (player.pendingMenuTrigger) {
-        const trig = player.pendingMenuTrigger;
-        player.pendingMenuTrigger = null; // Clear first to avoid loop
-        // Recursively call openModal but ensure text is bypassed this time 
-        // Actually, we can just call the modal part.
-        // Let's modify openModal slightly to accept a 'skipDialogue' flag
-        openModal(trig, true);
+    // 말풍선이 자연스럽게 닫혔을 때(타이머 등), 대기 중인 메뉴가 있다면 레이어링을 위해 closeModal 호출
+    if (!skipPending && player.pendingMenuTrigger) {
+        closeModal();
     }
 }
 
@@ -603,6 +699,61 @@ function resetModalFocus(modal) {
     } else {
         focusedLinkIndex = -1;
     }
+}
+
+/**
+ * 전역 액션(애니메이션 상태)을 처리합니다.
+ * 'eat', 'drink' 등은 사용자가 움직이기 전까지 루프 애니메이션을 유지합니다.
+ * 'sit', 'lie', 'yawn'은 아타호의 기존 idle 로직을 강제로 트리거합니다.
+ * 
+ * @param {string} actionType - 'eat', 'drink', 'sit', 'lie', 'yawn'
+ * @param {number} count - (선택) 애니메이션 반복 횟수 (기본값: Infinity)
+ */
+function handleAction(actionType, count = Infinity) {
+    player.isEating = false;
+    player.isDrinking = false;
+
+    // 플레이어 이동 정지 및 모든 이동 키 리셋 (WASD 포함)
+    Object.keys(keys).forEach(k => keys[k] = false);
+    player.isMoving = false;
+
+    // Reset core idle states first to allow clean override
+    player.isIdle = false;
+    player.isYawning = false;
+    player.isLyingDown = false;
+
+    if (actionType === 'eat') {
+        player.isEating = true;
+        player.idleTimer = 0;
+    } else if (actionType === 'drink') {
+        player.isDrinking = true;
+        player.idleTimer = 0;
+        player.drinkCount++;
+        // Hiccup trigger moved to loop completion in update()
+    } else if (actionType === 'sit') {
+        player.isIdle = true;
+        player.idleTimer = CONFIG.IDLE_START_TIME;
+    } else if (actionType === 'lie') {
+        player.isIdle = true;
+        player.isLyingDown = true;
+        player.yawnCount = CONFIG.YAWN_COUNT_LIE_DOWN;
+        player.idleTimer = CONFIG.IDLE_START_TIME;
+    } else if (actionType === 'yawn') {
+        player.isIdle = true;
+        player.isYawning = true;
+        player.yawnFrame = 0;
+        player.yawnTimer = player.currentYawnInterval;
+        player.idleTimer = CONFIG.IDLE_START_TIME;
+    } else {
+        player.idleTimer = 0;
+    }
+
+    player.animTimer = 0;
+    player.animFrame = 0;
+    player.lastAnimLoopIdx = 0;
+    player.animRemaining = count || Infinity;
+
+    console.log("State Changed:", actionType);
 }
 
 let focusedLinkIndex = -1;
@@ -664,9 +815,34 @@ function handleTouchMove(e) {
     }
 }
 
+/**
+ * 터치 종료 이벤트를 처리합니다.
+ * 1. 이동 정보를 초기화합니다.
+ * 2. 모달이 닫혀 있고 activeTrigger(인접한 트리거)가 있을 때, 
+ *    터치 지점이 트리거 영역 내부라면 모달을 엽니다. (Touch-to-Activate)
+ */
 function handleTouchEnd(e) {
     if (e.target !== canvas) return;
     e.preventDefault();
+
+    // If it was a quick tap (not moving much), check for trigger activation
+    if (touchInput.active && !isModalOpen) {
+        const touch = e.changedTouches[0];
+        const rect = canvas.getBoundingClientRect();
+        const scaleX = canvas.width / rect.width;
+        const scaleY = canvas.height / rect.height;
+        const touchX = (touch.clientX - rect.left) * scaleX + camera.x;
+        const touchY = (touch.clientY - rect.top) * scaleY + camera.y;
+
+        // Check if tap was on activeTrigger
+        if (activeTrigger) {
+            if (touchX >= activeTrigger.x && touchX <= activeTrigger.x + activeTrigger.w &&
+                touchY >= activeTrigger.y && touchY <= activeTrigger.y + activeTrigger.h) {
+                openModal(activeTrigger);
+            }
+        }
+    }
+
     touchInput.active = false;
     touchInput.dx = 0;
     touchInput.dy = 0;
@@ -744,10 +920,55 @@ function update(dt) {
     dx *= CONFIG.MOVEMENT_SPEED * dt;
     dy *= CONFIG.MOVEMENT_SPEED * dt;
 
+    // Custom State Animation Logic
+    if (player.isEating || player.isDrinking) {
+        player.animTimer += dt;
+        const sequence = player.isEating ? EAT_SEQUENCE : DRINK_SEQUENCE;
+        const frameTime = 0.15;
+
+        const totalFramesPassed = Math.floor(player.animTimer / frameTime);
+        const currentLoopIdx = Math.floor(totalFramesPassed / sequence.length);
+
+        if (player.isEating || player.isDrinking) {
+            player.animFrame = totalFramesPassed % sequence.length;
+        }
+
+        // Loop Completion Detection (for count-based termination & Drunk trigger)
+        if (currentLoopIdx > player.lastAnimLoopIdx) {
+            if (player.isDrinking && player.drinkCount >= 3) {
+                player.isDrunk = true;
+                player.drunkTimer = CONFIG.DRUNK_DURATION;
+                console.log("Status: DRUNK. Persistent for", CONFIG.DRUNK_DURATION, "s");
+            }
+
+            if (player.animRemaining !== Infinity) {
+                player.animRemaining--;
+                if (player.animRemaining <= 0) {
+                    player.isEating = false;
+                    player.isDrinking = false;
+                    player.animRemaining = Infinity;
+                }
+            }
+            player.lastAnimLoopIdx = currentLoopIdx;
+        }
+    }
+
+    // Drunk State Timer Logic (Independent of actions)
+    if (player.isDrunk) {
+        player.drunkTimer -= dt;
+        if (player.drunkTimer <= 0) {
+            player.isDrunk = false;
+            player.drinkCount = 0;
+            player.isHiccuping = false;
+            console.log("Status: SOBRE.");
+        }
+    }
+
     player.isMoving = (dx !== 0 || dy !== 0);
 
     // If moving and bubble is open, close it (Move-to-Close)
-    if (player.isMoving && isBubbleOpen) {
+    // Add grace period to prevent immediate closing if moving while/after interaction
+    if (player.isMoving && isBubbleOpen && performance.now() - player.lastBubbleTime > 500) {
         closeModal();
     }
 
@@ -759,6 +980,10 @@ function update(dt) {
         player.isIdle = false;
         player.isYawning = false;
         player.isLyingDown = false;
+        player.isEating = false;
+        player.isDrinking = false;
+        // player.isHiccuping = false; // PERSISTENT
+        // player.drinkCount = 0;      // PERSISTENT
         player.lieDownTimer = 0;
 
         player.stepTimer += dt;
@@ -767,8 +992,47 @@ function update(dt) {
             player.animFrame = (player.animFrame + 1) % WALK_SEQUENCE.length;
         }
     } else {
-        player.animFrame = 0; // Reset to standing
+        if (!player.isEating && !player.isDrinking && !player.isHiccuping) {
+            player.animFrame = 0; // Reset to standing
+        }
         player.stepTimer = 0;
+
+        // If Drunk and Idle, force Intermittent Hiccuping (딸꾹)
+        if (player.isDrunk && !player.isEating && !player.isDrinking) {
+            player.isIdle = false; // Bypass normal sit
+            player.isYawning = false;
+            player.isLyingDown = false;
+
+            player.idleTimer += dt;
+
+            // Only start timing hiccups after a short initial idle delay
+            if (player.idleTimer >= 0.5) {
+                if (!player.isHiccuping) {
+                    player.hiccupIntervalTimer -= dt;
+                    if (player.hiccupIntervalTimer <= 0) {
+                        player.isHiccuping = true;
+                        player.hiccupPulseTimer = CONFIG.HICCUP_PULSE_DURATION;
+                        player.animTimer = 0; // Reset pulse animation
+                    }
+                } else {
+                    player.hiccupPulseTimer -= dt;
+                    if (player.hiccupPulseTimer <= 0) {
+                        player.isHiccuping = false;
+                        // Reset interval to random
+                        player.hiccupIntervalTimer = CONFIG.HICCUP_MIN_INTERVAL + Math.random() * (CONFIG.HICCUP_MAX_INTERVAL - CONFIG.HICCUP_MIN_INTERVAL);
+                    } else {
+                        // Play hiccup animation during pulse
+                        const sequence = HICCUP_SEQUENCE;
+                        const frameTime = 0.15;
+                        player.animFrame = Math.floor((CONFIG.HICCUP_PULSE_DURATION - player.hiccupPulseTimer) / frameTime) % sequence.length;
+                    }
+                }
+            }
+            return; // Skip normal idle logic
+        }
+
+        player.isHiccuping = false;
+        player.hiccupIntervalTimer = 0; // Reset
 
         // Only increment idle timer if no modal/dialog is open
         if (!isModalOpen && !isBubbleOpen) {
@@ -935,19 +1199,23 @@ function checkTriggers() {
         targetY >= t.y && targetY <= t.y + t.h
     );
 
-    // Auto-Open for Touch Devices (Mobile)
-    // Rule: Open only on *entry* to avoid infinite loop after closing.
-    // If we are on the same trigger as last frame, do nothing.
-    if (isTouchDevice) {
-        if (activeTrigger && activeTrigger !== lastTrigger) {
+    // Auto-Activation for Tile-type Triggers (No sprite)
+    if (activeTrigger && !activeTrigger.sprite) {
+        if (activeTrigger.id !== player.lastAutoTriggerId && !isModalOpen && !isBubbleOpen) {
+            player.lastAutoTriggerId = activeTrigger.id;
             openModal(activeTrigger);
         }
+    } else {
+        // Reset auto-trigger when leaving the area
+        // Note: We only reset if NOT currently in any sprite-less trigger
+        player.lastAutoTriggerId = null;
     }
 
     lastTrigger = activeTrigger;
 
     const prompt = document.getElementById('interaction-prompt');
-    if (activeTrigger) {
+    if (activeTrigger && activeTrigger.sprite) {
+        // Only show prompt for Object-type triggers (Manual)
         if (prompt && prompt.classList.contains('hidden')) {
             prompt.classList.remove('hidden');
         }
@@ -1090,12 +1358,12 @@ function draw() {
         }
     }
 
-    // Update Speech Bubble Position
+    // Update Modal/Speech Bubble Position
     const bubble = document.getElementById('speech-bubble');
-    if (bubble && !bubble.classList.contains('hidden')) {
-        // Calculate Player Position on Screen
-        // Player is drawn at dstX, dstY relative to Canvas Top-Left (which is translated by camera)
-        // BUT bubble is HTML absolute element, so we need Canvas Screen Coordinates.
+    const modal = document.getElementById('dynamic-modal');
+
+    if ((bubble && !bubble.classList.contains('hidden')) || (modal && !modal.classList.contains('hidden'))) {
+        const target = (modal && !modal.classList.contains('hidden')) ? modal : bubble;
 
         // getBoundingClientRect for canvas
         const rect = canvas.getBoundingClientRect();
@@ -1110,15 +1378,15 @@ function draw() {
         const screenX = rect.left + pViewX * scaleX;
         const screenY = rect.top + pViewY * scaleY;
 
-        // Position bubble above player
-        // Global offset from CONFIG, plus optional custom offset from trigger
+        // Position above player
         const globalOffset = CONFIG.SPEECH_BUBBLE_OFFSET_Y || -50;
-        const customOffset = parseInt(bubble.dataset.offsetY) || 0;
+        // For modal, we use the activeTrigger's offset if available, otherwise 0
+        const customOffset = (target === modal && activeTrigger) ? (activeTrigger.bubbleOffsetY || 0) : (parseInt(target.dataset.offsetY) || 0);
         const finalOffset = globalOffset + customOffset;
 
-        bubble.style.left = `${screenX}px`;
-        bubble.style.top = `${screenY + finalOffset}px`;
-        bubble.style.transform = 'translate(-50%, -100%)';
+        target.style.left = `${screenX}px`;
+        target.style.top = `${screenY + finalOffset}px`;
+        target.style.transform = 'translate(-50%, -100%)';
     }
 
     ctx.restore();
@@ -1129,7 +1397,49 @@ function draw() {
  * @param {CanvasRenderingContext2D} ctx 
  */
 function drawPlayer(ctx) {
-    if (player.isIdle && idleImg) {
+    // Hiccup/Drunk has priority when NOT moving and NOT performing other specific actions
+    if (player.isDrunk && !player.isMoving && !player.isEating && !player.isDrinking && drunkImg) {
+        const spriteW = 48;
+        const spriteH = 64;
+        const sequence = HICCUP_SEQUENCE;
+        // If hiccuping, animate. If just drunk idle, use frame 0.
+        const frameIdx = player.isHiccuping ? (sequence[player.animFrame] || 0) : 0;
+
+        // ataho-drunk.png top row frames
+        const srcX = frameIdx * spriteW;
+        const srcY = 0;
+
+        const dstX = Math.floor(player.x + 8 - spriteW / 2);
+        const dstY = Math.floor(player.y + 16 - spriteH);
+
+        ctx.drawImage(
+            drunkImg,
+            srcX, srcY,
+            spriteW, spriteH,
+            dstX, dstY,
+            spriteW, spriteH
+        );
+    } else if ((player.isEating || player.isDrinking) && eatImg) {
+        const spriteW = 48;
+        const spriteH = 64;
+        const sequence = player.isEating ? EAT_SEQUENCE : DRINK_SEQUENCE;
+        const frameIdx = sequence[player.animFrame] || 0;
+
+        // ataho-eat.png is 8x1 (384x64)
+        const srcX = frameIdx * spriteW;
+        const srcY = 0;
+
+        const dstX = Math.floor(player.x + 8 - spriteW / 2);
+        const dstY = Math.floor(player.y + 16 - spriteH);
+
+        ctx.drawImage(
+            eatImg,
+            srcX, srcY,
+            spriteW, spriteH,
+            dstX, dstY,
+            spriteW, spriteH
+        );
+    } else if (player.isIdle && idleImg) {
         let srcX, srcY, spriteW, spriteH;
 
         if (player.isLyingDown) {
