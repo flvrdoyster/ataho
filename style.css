@@ -92,32 +92,6 @@ hr {
     padding: 10px;
 }
 
-#footer {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    background: linear-gradient(to top, rgba(0, 0, 0, 0.9), rgba(0, 0, 0, 0));
-    text-align: center;
-    padding: 15px 0;
-    color: #bbb;
-    font-size: 0.9rem;
-    z-index: 100;
-    pointer-events: auto;
-}
-
-#footer p {
-    margin: 0;
-}
-
-#footer a {
-    color: #ddd;
-    text-decoration: underline;
-}
-
-#footer a:hover {
-    color: white;
-}
 
 /* =========================================
    4. Components

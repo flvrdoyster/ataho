@@ -59,7 +59,7 @@ window.MAP_DATA.triggers = [
         "id": "haiyuki",
         "title": "환세패유기",
         "type": "menu",
-        "sprite": "assets/cave_tile_irori.png",
+        "sprite": "../../object/object_irori.png",
         "animW": 64,
         "animH": 48,
         "frames": 4,
