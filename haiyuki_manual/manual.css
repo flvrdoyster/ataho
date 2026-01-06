@@ -174,15 +174,6 @@ a:hover {
     /* Wrap spacing */
 }
 
-/* Footer */
-.manual-footer {
-    text-align: center;
-    margin-top: 50px;
-    padding-top: 20px;
-    border-top: 1px solid #ccc;
-    font-size: 0.9em;
-    color: #666;
-}
 
 /* Mobile Adjustments */
 @media (max-width: 600px) {
