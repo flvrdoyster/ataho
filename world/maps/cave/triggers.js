@@ -30,8 +30,8 @@ window.MAP_DATA.triggers = [
         "type": "menu",
         "sprite": "../../object/object_sake.png",
         "text": [
-            "호랑이 마을, 내 집에 있던 특주다.",
-            "이건 아직도 누가 보냈는지 모르겠어.",
+            "호랑이 마을, 내 집에 있던 화주다.",
+            "내 팬이 준 선물인데 아직도 누가 보낸 건지 모르겠어.",
             "한 모금만 마실까?"
         ],
         "items": [
@@ -191,7 +191,7 @@ window.MAP_DATA.triggers = [
         "id": "jar-2",
         "sprite": "../../object/object_jar.png",
         "text": [
-            "그러고보니 스마슈 녀석이 이상한 책을 줬었지."
+            "그러고보니 스마슈 녀석이 수상한 책을 줬었지."
         ],
         "title": "장면 뷰어",
         "type": "menu",
