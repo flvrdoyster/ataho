@@ -607,6 +607,7 @@ function openModal(trigger, skipDialogue = false) {
 
     modal.classList.remove('hidden');
     isModalOpen = true;
+    player.lastBubbleTime = performance.now(); // Initialize grace period for Move-to-Close logic
 
     // 플레이어 이동 정지 및 모든 이동 키 리셋 (WASD 포함)
     Object.keys(keys).forEach(k => keys[k] = false);
@@ -966,9 +967,9 @@ function update(dt) {
 
     player.isMoving = (dx !== 0 || dy !== 0);
 
-    // If moving and bubble is open, close it (Move-to-Close)
+    // If moving and bubble or modal is open, close it (Move-to-Close)
     // Add grace period to prevent immediate closing if moving while/after interaction
-    if (player.isMoving && isBubbleOpen && performance.now() - player.lastBubbleTime > 500) {
+    if (player.isMoving && (isBubbleOpen || isModalOpen) && performance.now() - player.lastBubbleTime > 500) {
         closeModal();
     }
 
