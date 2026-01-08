@@ -240,6 +240,8 @@ video:fullscreen::cue {
     text-shadow: none;
     box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
     pointer-events: auto;
+    word-break: keep-all;
+    overflow-wrap: break-word;
 }
 
 .modal-content h2 {
@@ -324,6 +326,8 @@ video:fullscreen::cue {
     /* Let clicks pass through if needed, though usually blocking */
     box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
     text-align: center;
+    word-break: keep-all;
+    overflow-wrap: break-word;
     /* Arrow */
 }
 
