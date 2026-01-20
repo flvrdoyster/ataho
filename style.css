@@ -15,6 +15,13 @@
     font-display: swap;
 }
 
+@font-face {
+    font-family: 'RasterForge';
+    src: url('https://fonts.cdnfonts.com/s/123917/RasterForgeRegular-XGDg9.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+}
+
 /* =========================================
    2. Global Styles
    ========================================= */
@@ -240,6 +247,8 @@ video:fullscreen::cue {
     text-shadow: none;
     box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
     pointer-events: auto;
+    word-break: keep-all;
+    overflow-wrap: break-word;
 }
 
 .modal-content h2 {
@@ -299,8 +308,44 @@ video:fullscreen::cue {
     }
 
     #interaction-prompt {
-        display: none !important;
+        display: flex !important;
+        position: fixed;
+        bottom: var(--mobile-btn-bottom, 40px);
+        left: var(--mobile-btn-left, 50%);
+        right: var(--mobile-btn-right, auto);
+        transform: var(--mobile-btn-transform, translateX(-50%));
+        width: var(--mobile-btn-width, 80px);
+        height: var(--mobile-btn-height, 64px);
+        background: var(--mobile-btn-bg, #f5f5f5);
+        color: var(--mobile-btn-color, #000);
+        border: var(--mobile-btn-border, 1px solid #d3d3d3);
+        border-bottom: var(--mobile-btn-border-bottom, 6px solid #bebebe);
+        border-radius: var(--mobile-btn-radius, 8px);
+        font-size: var(--mobile-btn-font-size, 18px);
+        box-shadow: var(--mobile-btn-shadow, 0 4px 6px rgba(0, 0, 0, 0.2));
+        align-items: center;
+        justify-content: center;
+        z-index: 1001;
+        pointer-events: auto;
+        text-align: center;
+        line-height: 1.2;
+        font-family: var(--mobile-btn-font-family, inherit);
+        text-transform: uppercase;
+        user-select: none;
+        -webkit-tap-highlight-color: transparent;
+        transition: transform 0.05s, border-bottom-width 0.05s, box-shadow 0.05s;
     }
+
+    #interaction-prompt:active {
+        /* Push button down and squash the 3D base */
+        transform: var(--mobile-btn-transform, translateX(-50%)) translateY(4px);
+        border-bottom-width: 2px !important;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2) !important;
+    }
+
+
+
+
 
     .desktop-only {
         display: none;
@@ -324,6 +369,8 @@ video:fullscreen::cue {
     /* Let clicks pass through if needed, though usually blocking */
     box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
     text-align: center;
+    word-break: keep-all;
+    overflow-wrap: break-word;
     /* Arrow */
 }
 
