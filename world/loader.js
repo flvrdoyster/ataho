@@ -47,7 +47,29 @@ let CONFIG = {
     SLEEP_BUBBLE_OFFSET_Y: 0,   // Y offset relative to sprite dstY
 
     // UI Config
-    SPEECH_BUBBLE_OFFSET_Y: -100 // Global offset for speech bubble (from player top)
+    SPEECH_BUBBLE_OFFSET_Y: -100, // Global offset for speech bubble (from player top)
+    UI: {
+        DESKTOP_PROMPT: {
+            LABEL: 'Space를 누르세요.'
+        },
+        MOBILE_BUTTON: {
+            LABEL: 'Space',
+            WIDTH: '80px',
+            HEIGHT: '34px',
+            BOTTOM: '60px',
+            LEFT: '50%',
+            RIGHT: 'auto',
+            BG_COLOR: '#f5f5f5',
+            TEXT_COLOR: '#000',
+            BORDER: '1px solid #d3d3d3',
+            BORDER_BOTTOM: '6px solid #bebebe',
+            RADIUS: '8px',
+            FONT_SIZE: '18px',
+            SHADOW: '0 4px 6px rgba(0,0,0,0.2)',
+            TRANSFORM: 'translateX(-50%)',
+            FONT_FAMILY: "'RasterForge', 'KoddiudOngodic', sans-serif"
+        }
+    }
 };
 
 let tilesetImg;
@@ -478,6 +500,34 @@ function injectUI() {
         prompt.className = 'prompt hidden';
         prompt.textContent = 'Space를 누르세요.';
         uiLayer.appendChild(prompt);
+
+        // Apply Mobile Button Config via CSS Variables
+        const mBtn = CONFIG.UI.MOBILE_BUTTON;
+        prompt.style.setProperty('--mobile-btn-width', mBtn.WIDTH);
+        prompt.style.setProperty('--mobile-btn-height', mBtn.HEIGHT);
+        prompt.style.setProperty('--mobile-btn-bottom', mBtn.BOTTOM);
+        prompt.style.setProperty('--mobile-btn-left', mBtn.LEFT);
+        prompt.style.setProperty('--mobile-btn-right', mBtn.RIGHT);
+        prompt.style.setProperty('--mobile-btn-bg', mBtn.BG_COLOR);
+        prompt.style.setProperty('--mobile-btn-color', mBtn.TEXT_COLOR);
+        prompt.style.setProperty('--mobile-btn-border', mBtn.BORDER);
+        prompt.style.setProperty('--mobile-btn-border-bottom', mBtn.BORDER_BOTTOM);
+        prompt.style.setProperty('--mobile-btn-radius', mBtn.RADIUS);
+        prompt.style.setProperty('--mobile-btn-font-size', mBtn.FONT_SIZE);
+        prompt.style.setProperty('--mobile-btn-shadow', mBtn.SHADOW);
+        prompt.style.setProperty('--mobile-btn-transform', mBtn.TRANSFORM);
+        prompt.style.setProperty('--mobile-btn-font-family', mBtn.FONT_FAMILY);
+
+        // Mobile interaction handler
+        prompt.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            if (activeTrigger) openModal(activeTrigger);
+        });
+        // Prevent touch for player movement
+        prompt.addEventListener('touchstart', (e) => {
+            e.stopPropagation();
+        });
     }
 
     // 3. Dynamic Modal
@@ -1217,8 +1267,16 @@ function checkTriggers() {
     const prompt = document.getElementById('interaction-prompt');
     if (activeTrigger && activeTrigger.sprite) {
         // Only show prompt for Object-type triggers (Manual)
-        if (prompt && prompt.classList.contains('hidden')) {
-            prompt.classList.remove('hidden');
+        if (prompt) {
+            if (isTouchDevice) {
+                const label = CONFIG.UI.MOBILE_BUTTON.LABEL.replace(/\\n/g, '<br>');
+                prompt.innerHTML = label;
+            } else {
+                prompt.textContent = CONFIG.UI.DESKTOP_PROMPT.LABEL;
+            }
+            if (prompt.classList.contains('hidden')) {
+                prompt.classList.remove('hidden');
+            }
         }
     } else {
         if (prompt && !prompt.classList.contains('hidden')) {
