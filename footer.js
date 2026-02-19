@@ -2,7 +2,7 @@
     const footerHTML = `
         <p>
             <span class="desktop-only">
-                Code magic by <a href="https://antigravity.google/">Google Antigravity</a> <span class="footer-sep">|</span>
+                Code magic by <a href="https://antigravity.google/">Antigravity</a> <span class="footer-sep">|</span>
                 Everything else by <a href="https://github.com/flvrdoyster">flvrdoyster</a> <span class="footer-sep">|</span>
             </span>
             Visual and audio assets © original creators.
