@@ -28,7 +28,7 @@ window.MAP_DATA.triggers = [
         "h": 1,
         "id": "sake",
         "type": "menu",
-        "sprite": "../../object/object_sake.png",
+        "sprite": "object/object_sake.png",
         "text": [
             "호랑이 마을, 내 집에 있던 화주다.",
             "내 팬이 준 선물인데 아직도 누가 보낸 건지 모르겠어.",
@@ -53,7 +53,7 @@ window.MAP_DATA.triggers = [
         "h": 1,
         "id": "jar-3",
         "type": "dialog",
-        "sprite": "../../object/object_jar.png",
+        "sprite": "object/object_jar.png",
         "text": [
             "아무 것도 안 들었어."
         ]
@@ -90,7 +90,7 @@ window.MAP_DATA.triggers = [
         "id": "haiyuki",
         "title": "환세패유기",
         "type": "menu",
-        "sprite": "../../object/object_irori.png",
+        "sprite": "object/object_irori.png",
         "animW": 64,
         "animH": 48,
         "frames": 4,
@@ -127,7 +127,7 @@ window.MAP_DATA.triggers = [
         "w": 2,
         "h": 2,
         "id": "jar-1",
-        "sprite": "../../object/object_jar.png",
+        "sprite": "object/object_jar.png",
         "title": "DS 메뉴 화면 일러스트",
         "type": "menu",
         "text": [
@@ -170,7 +170,7 @@ window.MAP_DATA.triggers = [
         "w": 2,
         "h": 1,
         "id": "jar-4",
-        "sprite": "../../object/object_jar.png",
+        "sprite": "object/object_jar.png",
         "title": "DS 아니메 총집편 '98",
         "type": "menu",
         "text": [
@@ -189,7 +189,7 @@ window.MAP_DATA.triggers = [
     },
     {
         "id": "jar-2",
-        "sprite": "../../object/object_jar.png",
+        "sprite": "object/object_jar.png",
         "text": [
             "그러고보니 스마슈 녀석이 수상한 책을 줬었지."
         ],

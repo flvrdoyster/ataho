@@ -1,9 +1,12 @@
 window.MAP_DATA = {
     "assets": {
-        "tileset": "assets/cave_tile.png",
-        "ceilingTileset": "assets/cave_tile_top.png",
-        "animation": "assets/cave_tile_irori.png",
-        "character": "../../char/ataho-walk.png"
+        "tileset": "maps/cave/assets/cave_tile.png",
+        "ceilingTileset": "maps/cave/assets/cave_tile_top.png",
+        "animation": "maps/cave/assets/cave_tile_irori.png"
+    },
+    "startPos": {
+        "x": 15,
+        "y": 15
     },
     "tiles": [
         {
