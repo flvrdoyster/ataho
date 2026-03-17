@@ -3,6 +3,10 @@
 <head>
     <title>Map Editor</title>
     <style>
+        * {
+            box-sizing: border-box;
+        }
+
         body {
             background: #222;
             display: flex;
@@ -30,12 +34,17 @@
             box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
         }
 
+        .map-grid.show-grid {
+            background-image:
+                linear-gradient(to right, rgba(255, 255, 255, 0.08) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(255, 255, 255, 0.08) 1px, transparent 1px);
+            background-size: 16px 16px;
+        }
+
         .tile {
             position: absolute;
             width: 16px;
             height: 16px;
-            /* pointer-events: none; REMOVED to allow simple clicks, but we handle click on map container usually? 
-               Actually tile has onclick. Keep it. */
             cursor: pointer;
             image-rendering: pixelated;
             background-repeat: no-repeat;
@@ -47,11 +56,8 @@
             background-repeat: no-repeat;
             image-rendering: pixelated;
             z-index: 10;
-            /* Above tiles */
             border: 1px solid rgba(255, 255, 0, 0.5);
-            /* Highlight bounds */
             pointer-events: none;
-            /* Let clicks pass to grid? No, we might want to select/delete. */
             cursor: pointer;
         }
 
@@ -69,6 +75,14 @@
             height: 16px;
         }
 
+        .collision-overlay.interactive {
+            pointer-events: auto !important;
+        }
+
+        .collision-overlay.ghost {
+            background: rgba(255, 0, 0, 0.15);
+            pointer-events: none !important;
+        }
 
         .trigger-overlay {
             position: absolute;
@@ -77,6 +91,16 @@
             pointer-events: none;
             cursor: pointer;
             outline: 1px solid rgba(0, 200, 255, 0.8);
+        }
+
+        .trigger-overlay.interactive {
+            pointer-events: auto !important;
+        }
+
+        .trigger-overlay.ghost {
+            background: rgba(0, 100, 255, 0.15);
+            outline: 1px solid rgba(0, 200, 255, 0.3);
+            pointer-events: none !important;
         }
 
         .tile:hover {
@@ -88,9 +112,17 @@
             background: none !important;
         }
 
-        .trigger-overlay {
-            pointer-events: auto !important;
-            /* Allow clicking the overlay itself */
+        .spawn-indicator {
+            position: absolute;
+            background: rgba(0, 255, 0, 0.4);
+            border: 2px solid lime;
+            box-sizing: border-box;
+            z-index: 5;
+            pointer-events: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
         }
 
         .sidebar {
@@ -105,14 +137,53 @@
             overflow-y: auto;
         }
 
+        .sidebar h2 {
+            margin-top: 0;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .sidebar h2 .map-badge {
+            font-size: 12px;
+            background: #444;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-weight: normal;
+        }
+
+        /* Palette */
+        .palette-wrapper {
+            border: 1px solid #555;
+            background: #000;
+            margin-bottom: 10px;
+        }
+
+        .palette-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 5px 8px;
+            background: #333;
+            cursor: pointer;
+            font-size: 12px;
+            color: #aaa;
+            user-select: none;
+        }
+
+        .palette-header:hover {
+            background: #3a3a3a;
+        }
+
         .palette {
             display: grid;
             grid-template-columns: repeat(16, 32px);
-            background: #000;
             padding: 5px;
-            /* max-height removed to show all tiles */
-            /* overflow-y removed */
-            border: 1px solid #555;
+        }
+
+        .palette.collapsed {
+            display: none;
         }
 
         .palette-tile {
@@ -122,10 +193,9 @@
             cursor: pointer;
             border: 2px solid transparent;
             box-sizing: border-box;
-            /* background-image set via JS */
             background-size: 512px auto;
-            /* Scale up for palette visibility (32px view of 16px tile) -> 16px * 2 = 32px, so total width * 2 */
             background-repeat: no-repeat;
+            position: relative;
         }
 
         .palette-tile.selected {
@@ -137,18 +207,88 @@
             border-color: #888;
         }
 
+        .palette-tile:hover::after {
+            content: attr(data-coord);
+            position: absolute;
+            bottom: -18px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.85);
+            color: #fff;
+            font-size: 9px;
+            padding: 1px 4px;
+            border-radius: 2px;
+            white-space: nowrap;
+            z-index: 100;
+            pointer-events: none;
+        }
+
+        /* Controls */
         .controls {
-            margin-top: 20px;
+            margin-top: 10px;
+        }
+
+        .section-label {
+            font-size: 11px;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 6px;
+            margin-top: 14px;
+        }
+
+        .mode-tabs {
+            display: flex;
+            gap: 0;
+            margin-bottom: 12px;
+            border: 1px solid #555;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .mode-tab {
+            flex: 1;
+            padding: 8px 4px;
+            background: #333;
+            color: #aaa;
+            border: none;
+            cursor: pointer;
+            font-size: 12px;
+            text-align: center;
+            transition: background 0.15s, color 0.15s;
+            margin: 0;
+        }
+
+        .mode-tab:not(:last-child) {
+            border-right: 1px solid #555;
+        }
+
+        .mode-tab.active {
+            background: #555;
+            color: white;
+            font-weight: bold;
+        }
+
+        .mode-tab:hover:not(.active) {
+            background: #3a3a3a;
+        }
+
+        .mode-tab .shortcut {
+            font-size: 9px;
+            opacity: 0.5;
+            display: block;
         }
 
         button {
-            padding: 10px;
+            padding: 8px 10px;
             width: 100%;
-            margin-bottom: 10px;
+            margin-bottom: 6px;
             background: #444;
             color: white;
             border: none;
             cursor: pointer;
+            border-radius: 3px;
+            font-size: 12px;
         }
 
         button:hover {
@@ -169,44 +309,200 @@
             margin-top: 10px;
             font-size: 10px;
         }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            color: #999;
+            margin-bottom: 8px;
+        }
+
+        .info-row span {
+            color: #ddd;
+        }
+
+        /* Layer Visibility Checkboxes */
+        .layer-options {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 8px;
+            font-size: 11px;
+            color: #aaa;
+        }
+
+        .layer-options label {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            cursor: pointer;
+        }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #333;
+            color: #eee;
+            padding: 12px 20px;
+            border-radius: 6px;
+            font-size: 13px;
+            z-index: 9999;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+            opacity: 0;
+            transform: translateY(10px);
+            transition: opacity 0.3s, transform 0.3s;
+            pointer-events: none;
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* New Map Dialog */
+        .dialog-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.6);
+            z-index: 9000;
+            display: none;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .dialog-overlay.show {
+            display: flex;
+        }
+
+        .dialog-box {
+            background: #2a2a2a;
+            border: 1px solid #555;
+            border-radius: 8px;
+            padding: 24px;
+            min-width: 340px;
+            color: #eee;
+        }
+
+        .dialog-box h3 {
+            margin-top: 0;
+        }
+
+        .dialog-box label {
+            display: block;
+            margin-bottom: 10px;
+            font-size: 13px;
+        }
+
+        .dialog-box input {
+            width: 100%;
+            padding: 6px;
+            background: #1a1a1a;
+            color: #eee;
+            border: 1px solid #555;
+            border-radius: 3px;
+            margin-top: 3px;
+        }
+
+        .dialog-box .dialog-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 16px;
+        }
+
+        .dialog-box .dialog-actions button {
+            flex: 1;
+        }
+
+        /* Keyboard shortcut hints */
+        kbd {
+            background: #333;
+            border: 1px solid #555;
+            border-radius: 3px;
+            padding: 1px 5px;
+            font-size: 10px;
+            font-family: monospace;
+            color: #aaa;
+        }
     </style>
 </head>
 
 <body>
     <div class="sidebar">
-        <h2>Map Editor</h2>
+        <h2>Map Editor <span class="map-badge" id="map-badge">cave</span></h2>
 
-        <div style="margin-bottom: 10px;">
-            <label>Map:
-                <select id="map-selector" onchange="changeMap()"
-                    style="width: 100px; padding: 5px; background: #333; color: white; border: 1px solid #555;">
-                    <option value="cave">Cave</option>
-                    <option value="bamboo">Bamboo</option>
-                </select>
-            </label>
+        <div style="margin-bottom: 10px; display: flex; gap: 5px;">
+            <select id="map-selector" onchange="changeMap()"
+                style="flex: 1; padding: 5px; background: #333; color: white; border: 1px solid #555; border-radius: 3px;">
+                <option value="cave">Cave</option>
+                <option value="souko">Souko</option>
+            </select>
+            <button onclick="showNewMapDialog()"
+                style="flex: 0 0 auto; width: auto; padding: 8px 12px; background: #2e7d32;">+ New</button>
         </div>
 
-        <div class="palette" id="palette"></div>
-        <div class="controls">
-            <p>Selected Tile: <span id="selected-id">None</span></p>
-            <p>Hover: <span id="hover-coords">--,--</span></p>
+        <!-- Tile Palette (always present, visibility managed) -->
+        <div class="palette-wrapper" id="palette-wrapper">
+            <div class="palette-header" onclick="togglePalette()">
+                <span>🎨 Tile Palette</span>
+                <span id="palette-toggle-icon">▼</span>
+            </div>
+            <div class="palette" id="palette"></div>
+        </div>
 
-            <div
-                style="margin-bottom: 10px; border-bottom: 1px solid #555; padding-bottom: 10px; display: flex; flex-direction: column; gap: 5px;">
-                <label><input type="radio" name="mode" value="tile" checked onchange="setMode('tile')"> 타일 모드
-                    (Tile)</label>
-                <label><input type="radio" name="mode" value="trigger" onchange="setMode('trigger')"> 트리거 생성 모드
-                    (Trigger)</label>
-                <label><input type="radio" name="mode" value="collision" onchange="setMode('collision')"> 충돌 판정 모드
-                    (Collision)</label>
+        <div class="controls">
+            <div class="info-row">
+                <span>Selected: <span id="selected-id">None</span></span>
+                <span>Hover: <span id="hover-coords">--,--</span></span>
             </div>
 
-            <!-- Trigger Palette -->
+            <!-- Mode Tabs -->
+            <div class="section-label">Mode</div>
+            <div class="mode-tabs">
+                <button class="mode-tab active" data-mode="tile" onclick="setMode('tile')">
+                    🖌️ Tile<span class="shortcut">1</span>
+                </button>
+                <button class="mode-tab" data-mode="trigger" onclick="setMode('trigger')">
+                    ⚡ Trigger<span class="shortcut">2</span>
+                </button>
+                <button class="mode-tab" data-mode="collision" onclick="setMode('collision')">
+                    🧱 Collision<span class="shortcut">3</span>
+                </button>
+                <button class="mode-tab" data-mode="spawn" onclick="setMode('spawn')">
+                    🚩 Spawn<span class="shortcut">4</span>
+                </button>
+            </div>
+
+            <!-- Layer Visibility -->
+            <div class="layer-options">
+                <label><input type="checkbox" id="chk-show-triggers" onchange="renderTriggers()"> Show Triggers</label>
+                <label><input type="checkbox" id="chk-show-collisions" onchange="renderCollisions()"> Show
+                    Collisions</label>
+                <label><input type="checkbox" id="chk-show-grid" checked onchange="toggleGrid()"> Grid
+                    <kbd>G</kbd></label>
+            </div>
+
+            <!-- Tile Mode Tools -->
+            <div id="tile-tools">
+                <div style="margin-bottom: 10px; display: flex; gap: 5px;">
+                    <button id="btn-brush" onclick="setBrush()" style="flex: 1; background: #2e7d32;">Brush
+                        <kbd>B</kbd></button>
+                    <button id="btn-eraser" onclick="setEraser()" style="flex: 1;">Eraser <kbd>E</kbd></button>
+                </div>
+            </div>
+
+            <!-- Trigger Mode Panel -->
             <div id="trigger-palette"
-                style="display:none; margin-bottom: 15px; border: 1px solid #444; padding: 10px; background: #222;">
-                <h3 style="margin-top: 0;">Trigger Properties</h3>
+                style="display:none; margin-bottom: 15px; border: 1px solid #444; padding: 10px; background: #222; border-radius: 4px;">
+                <h3 style="margin-top: 0; font-size: 14px;">Trigger Properties</h3>
                 <div style="margin-bottom: 5px;"><label>Title: <input type="text" id="trigger-title" value="New Trigger"
                             style="width:100%"></label></div>
+                <div style="margin-bottom: 5px;"><label>ID: <input type="text" id="trigger-id" value=""
+                            placeholder="unique-id" style="width:100%"></label></div>
                 <div style="margin-bottom: 5px;"><label>Type:
                         <select id="trigger-type" style="width:100%">
                             <option value="menu">Menu</option>
@@ -260,62 +556,90 @@
                     <button id="btn-place-trigger" onclick="placeTriggerAction()"
                         style="flex: 2; background: #2e7d32;">Create Trigger</button>
                     <button id="btn-update-trigger" onclick="updateTrigger()"
-                        style="flex: 2; background: #01579b; display: none;">Update Selected</button>
+                        style="flex: 2; background: #01579b; display: none;">Update</button>
+                    <button id="btn-delete-trigger" onclick="deleteEditingTrigger()"
+                        style="flex: 1; background: #c33; display: none;">Delete</button>
                     <button id="btn-cancel-trigger" onclick="cancelTriggerEdit()"
                         style="flex: 1; background: #444; display: none;">Cancel</button>
                 </div>
                 <div id="editing-status" style="font-size: 11px; color: #ffeb3b; margin-top: 5px; display: none;">*
                     Editing existing trigger</div>
                 <div style="font-size: 11px; color: #888; margin-top: 5px;">
-                    * 영역 크기는 일단 1x1로 생성 후 데이터를 수정하세요.<br>
-                    * 그리드를 클릭하여 생성하거나 기존 트리거를 편집합니다.
+                    * 그리드를 클릭하여 생성하거나 기존 트리거를 클릭하여 편집합니다.
                 </div>
             </div>
 
+            <!-- Action Buttons -->
+            <div class="section-label">Actions</div>
             <div style="margin-bottom: 10px; display: flex; gap: 5px;">
-                <button id="btn-brush" onclick="setBrush()" style="flex: 1; background: #2e7d32;">Brush</button>
-                <button id="btn-eraser" onclick="setEraser()" style="flex: 1; background: #444;">Eraser</button>
-            </div>
-            <div style="margin-bottom: 20px; display: flex; flex-direction: column; gap: 5px;">
-                <button onclick="exportMapData()" style="background: #4527a0;">Export Map Data (data.js)</button>
-                <button onclick="exportTriggers()" style="background: #1565c0;">Export Triggers (triggers.js)</button>
-            </div>
-            <div style="margin-bottom: 10px; display: flex; gap: 5px;">
-                <button onclick="changeZoom(0.1)" style="flex: 1;">Zoom +</button>
-                <button onclick="changeZoom(-0.1)" style="flex: 1;">Zoom -</button>
-                <button onclick="resetZoom()" style="flex: 1;">Reset</button>
-            </div>
-            <p>Zoom: <span id="zoom-level">100%</span></p>
-
-            <textarea id="output" readonly></textarea>
-
-            <hr style="border-color: #555; margin: 20px 0;">
-            <h3>Map Config</h3>
-            <div style="margin-bottom: 10px;">
-                <label>Width (Tiles): <input type="number" id="map-width" value="40" style="width:50px;"></label>
-            </div>
-            <div style="margin-bottom: 10px;">
-                <label>Height (Tiles): <input type="number" id="map-height" value="30" style="width:50px;"></label>
+                <button onclick="exportMapData()" style="flex: 1; background: #4527a0;">Export Data 📋</button>
+                <button onclick="exportTriggers()" style="flex: 1; background: #1565c0;">Export Triggers 📋</button>
             </div>
 
-            <div style="margin-bottom: 10px;">
-                <label>Anchor:
-                    <select id="resize-anchor" style="width: 100px;">
-                        <option value="tl" selected>Top-Left</option>
-                        <option value="tr">Top-Right</option>
-                        <option value="bl">Bottom-Left</option>
-                        <option value="br">Bottom-Right</option>
+            <!-- Zoom -->
+            <div class="section-label">Zoom</div>
+            <div style="margin-bottom: 10px; display: flex; gap: 5px; align-items: center;">
+                <button onclick="changeZoom(-0.1)" style="flex: 0 0 36px; width: 36px;">−</button>
+                <span id="zoom-level" style="flex: 1; text-align: center; font-size: 12px;">100%</span>
+                <button onclick="changeZoom(0.1)" style="flex: 0 0 36px; width: 36px;">+</button>
+                <button onclick="resetZoom()" style="flex: 0 0 50px; width: 50px;">Reset</button>
+            </div>
+
+            <hr style="border-color: #555; margin: 12px 0;">
+
+            <!-- Map Config -->
+            <div class="section-label">Map Config</div>
+            <div style="display: flex; gap: 8px; margin-bottom: 8px;">
+                <label style="flex: 1;">W: <input type="number" id="map-width" value="40"
+                        style="width: 100%; padding: 4px;"></label>
+                <label style="flex: 1;">H: <input type="number" id="map-height" value="30"
+                        style="width: 100%; padding: 4px;"></label>
+                <label style="flex: 1;">Anchor:
+                    <select id="resize-anchor" style="width: 100%; padding: 4px;">
+                        <option value="tl" selected>TL</option>
+                        <option value="tr">TR</option>
+                        <option value="bl">BL</option>
+                        <option value="br">BR</option>
                         <option value="c">Center</option>
                     </select>
                 </label>
             </div>
             <button onclick="resizeMap()">Update Size</button>
 
-            <!-- Assets section removed: handled via data.js baseline -->
+            <!-- Undo/Redo info -->
+            <div style="font-size: 10px; color: #666; margin-top: 8px; text-align: center;">
+                <kbd>Ctrl+Z</kbd> Undo &nbsp; <kbd>Ctrl+Shift+Z</kbd> Redo
+            </div>
         </div>
     </div>
     <div class="editor-container">
-        <div class="map-grid" id="map"></div>
+        <div class="map-grid show-grid" id="map"></div>
+    </div>
+
+    <!-- Toast notification -->
+    <div class="toast" id="toast"></div>
+
+    <!-- New Map Dialog -->
+    <div class="dialog-overlay" id="new-map-dialog">
+        <div class="dialog-box">
+            <h3>New Map</h3>
+            <label>Map Name:
+                <input type="text" id="new-map-name" placeholder="e.g. forest">
+            </label>
+            <label>Tileset Path (relative to map folder):
+                <input type="text" id="new-map-tileset" value="assets/tile.png">
+            </label>
+            <label>Width (tiles):
+                <input type="number" id="new-map-w" value="30">
+            </label>
+            <label>Height (tiles):
+                <input type="number" id="new-map-h" value="20">
+            </label>
+            <div class="dialog-actions">
+                <button onclick="hideNewMapDialog()" style="background: #555;">Cancel</button>
+                <button onclick="createNewMap()" style="background: #2e7d32;">Create</button>
+            </div>
+        </div>
     </div>
 
     <!-- External Data -->
@@ -324,70 +648,35 @@
     <script>
         // Parse URL parameter for map name
         const urlParams = new URLSearchParams(window.location.search);
-        const mapName = urlParams.get('map') || 'cave'; // Default to cave
+        const mapName = urlParams.get('map') || 'cave';
 
-        // Set selector value
+        // Set selector value & badge
         const mapSelector = document.getElementById('map-selector');
-        if (mapSelector) {
-            mapSelector.value = mapName;
-        }
+        if (mapSelector) mapSelector.value = mapName;
+        document.getElementById('map-badge').textContent = mapName;
 
         function changeMap() {
             const selectedMap = document.getElementById('map-selector').value;
             window.location.search = `?map=${selectedMap}`;
         }
 
-        // Helper for editor to resolve paths relative to the map folder
-        // Only used for DISPLAYing images in the editor DOM.
-        // The data in JSON remains relative to the data.js file (e.g. "assets/tile.png")
+        window.MAP_BASE = '';
         function resolveEditorPath(path) {
             if (!path) return '';
             if (path.startsWith('http') || path.startsWith('/')) return path;
-            // If path is shared "world/system", it might be referenced as "../../system" in data.js
-            // Editor is in "world/", so "../../system" -> "system" ??
-            // Let's trace:
-            // Editor: world/editor.html
-            // Path: ../../system/assets/char.png
-            // Target: world/system/assets/char.png
-            // Direct link: assets/char.png (if in same folder)
-            // But data.js is in world/maps/cave/.
-            // ../../system means "up to map", "up to world", then "system".
-            // So from Editor (world/system):
-            // We want to reach world/system/assets/char.png... that is just "assets/char.png"!
-            // BUT, if the path is relative to MAP (assets/tile.png), we need "../maps/cave/assets/tile.png".
-
-            if (path.startsWith('../../system')) {
-                // ../../system/assets/char.png -> system/assets/char.png (local to editor)
-                // But wait, system/ is being removed?
-                // The User said "world/system assets" are moved/unnecessary.
-                // If there are legacy paths, we might need to fix them or they are broken.
-                // Assuming legacy "../../system" paths might now point to "assets/" if they were moved?
-                // For now, let's assume they shouldn't occur or are handled.
-                // But let's look at the CHAR path.
-                return path.replace('../../system/', '');
-            }
-
-            if (path.startsWith('../../char')) {
-                return path.replace('../../char', 'char');
-            }
-
-            // Assume map-relative path
-            return `maps/${mapName}/${path}`;
+            return window.MAP_BASE + path;
         }
 
         const script = document.createElement('script');
         script.src = `maps/${mapName}/data.js`;
         script.onload = () => {
-            // Load triggers.js if it exists, but don't fail hard if it doesn't?
-            // Actually, for now we assume it exists for this map structure.
             const triggerScript = document.createElement('script');
             triggerScript.src = `maps/${mapName}/triggers.js`;
             triggerScript.onload = () => {
-                // startEditor will hide the loading message when ready
                 if (typeof startEditor === 'function') startEditor();
             };
             triggerScript.onerror = () => {
-                console.warn("No triggers.js found, or failed to load. Continuing...");
+                console.warn("No triggers.js found. Continuing...");
                 if (typeof startEditor === 'function') startEditor();
             };
             document.body.appendChild(triggerScript);
@@ -399,9 +688,9 @@
     </script>
 
     <script>
-        // Configuration
+        // ===== Configuration =====
         const TILE_SIZE = 16;
-        const PALETTE_SCALE = 2; // Show tiles 2x bigger in palette
+        const PALETTE_SCALE = 2;
         let ASSET_PATH = '';
         const EMPTY_TILE = { tx: 1, ty: 0 };
 
@@ -409,92 +698,153 @@
         let mapHeightTiles = 30;
         let mapDataGrid = []; // 2D array [y][x] = {tx, ty}
 
-        let currentMode = 'tile'; // 'tile' or 'anim'
-        let selectedAnimType = null;
+        // ===== State (Refactored) =====
+        let currentMode = 'tile'; // 'tile' | 'trigger' | 'collision' | 'spawn'
 
-        let triggers = []; // Array of { x, y, w, h, title, type, items }
-        let editingTriggerIndex = -1; // Index of trigger being edited
-        let isCollisionMode = false;
-        let collisionTiles = new Set(); // Stores "gx,gy" strings
+        let startPos = null;
+
+        let triggers = [];
+        let editingTriggerIndex = -1;
+        let collisionTiles = new Set();
 
         let selectedTx = 0;
         let selectedTy = 0;
         let tilesetWidth = 0;
         let tilesetHeight = 0;
         let zoomLevel = 1.0;
+        let isEraser = false; // Tile-mode only tool state
 
-        // Central Start Function called after scripts load
+        let paletteCollapsed = false;
+
+        // ===== Undo/Redo =====
+        const MAX_HISTORY = 50;
+        let undoStack = [];
+        let redoStack = [];
+
+        function saveSnapshot() {
+            undoStack.push({
+                grid: mapDataGrid.map(row => row.map(cell => ({ ...cell }))),
+                collisions: new Set(collisionTiles),
+                triggers: JSON.parse(JSON.stringify(triggers)),
+                startPos: startPos ? { ...startPos } : null
+            });
+            if (undoStack.length > MAX_HISTORY) undoStack.shift();
+            redoStack = []; // Clear redo on new action
+        }
+
+        function undo() {
+            if (undoStack.length === 0) return;
+            // Save current as redo
+            redoStack.push({
+                grid: mapDataGrid.map(row => row.map(cell => ({ ...cell }))),
+                collisions: new Set(collisionTiles),
+                triggers: JSON.parse(JSON.stringify(triggers)),
+                startPos: startPos ? { ...startPos } : null
+            });
+            const snapshot = undoStack.pop();
+            restoreSnapshot(snapshot);
+            showToast(`Undo (${undoStack.length} left)`);
+        }
+
+        function redo() {
+            if (redoStack.length === 0) return;
+            undoStack.push({
+                grid: mapDataGrid.map(row => row.map(cell => ({ ...cell }))),
+                collisions: new Set(collisionTiles),
+                triggers: JSON.parse(JSON.stringify(triggers)),
+                startPos: startPos ? { ...startPos } : null
+            });
+            const snapshot = redoStack.pop();
+            restoreSnapshot(snapshot);
+            showToast(`Redo (${redoStack.length} left)`);
+        }
+
+        function restoreSnapshot(snapshot) {
+            mapDataGrid = snapshot.grid;
+            collisionTiles = snapshot.collisions;
+            triggers = snapshot.triggers;
+            startPos = snapshot.startPos ? { ...snapshot.startPos } : null;
+            mapWidthTiles = mapDataGrid[0]?.length || 0;
+            mapHeightTiles = mapDataGrid.length || 0;
+            document.getElementById('map-width').value = mapWidthTiles;
+            document.getElementById('map-height').value = mapHeightTiles;
+            if (editingTriggerIndex !== -1) cancelTriggerEdit();
+            renderMapGrid();
+            renderSpawn();
+        }
+
+        // ===== Toast =====
+        let toastTimer = null;
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            toast.textContent = msg;
+            toast.classList.add('show');
+            if (toastTimer) clearTimeout(toastTimer);
+            toastTimer = setTimeout(() => toast.classList.remove('show'), 2000);
+        }
+
+        // ===== Start =====
         function startEditor() {
             if (!window.MAP_DATA) {
                 alert("Map data not found!");
                 return;
             }
 
-            // 1. Determine Asset Path
             if (window.MAP_DATA.assets && window.MAP_DATA.assets.tileset) {
                 ASSET_PATH = resolveEditorPath(window.MAP_DATA.assets.tileset);
             } else {
-                ASSET_PATH = resolveEditorPath('assets/cave_tile.png'); // Fallback
+                ASSET_PATH = resolveEditorPath('assets/cave_tile.png');
             }
 
-            // 2. Load Tileset Image to get dimensions
             const img = new Image();
             img.src = ASSET_PATH;
             img.onload = function () {
                 tilesetWidth = img.width;
                 tilesetHeight = img.height;
-                initEditor(); // Now we have dimensions, build everything
-
+                initEditor();
                 document.getElementById('loading').style.display = 'none';
             };
             img.onerror = function () {
-                alert("Tileset image mismatch or not found at: " + ASSET_PATH + "\nCheck if the path is relative to the maps folder.");
+                alert("Tileset image not found at: " + ASSET_PATH);
                 document.getElementById('loading').innerText = "Failed to load assets.";
             }
         }
 
         function initEditor() {
-            console.log("Initializing Editor Components...");
+            console.log("Initializing Editor...");
 
-            // 1. Build Palette
+            // Build Palette
             const cols = Math.floor(tilesetWidth / TILE_SIZE);
             const rows = Math.floor(tilesetHeight / TILE_SIZE);
             const palette = document.getElementById('palette');
-
-            // Adjust background size for palette scaling
-            // Original width is tilesetWidth. We want 16px tile to be 32px.
-            // So we scale the background by PALETTE_SCALE.
             const bgWidth = tilesetWidth * PALETTE_SCALE;
-
-            // Update CSS rule dynamically for palette scale or just set inline
 
             for (let y = 0; y < rows; y++) {
                 for (let x = 0; x < cols; x++) {
                     let d = document.createElement('div');
                     d.className = 'palette-tile';
-                    // We need to set background position.
-                    // Since background-size is 200% (roughly), position needs to be scaled too?
-                    // No, background-position is in pixels related to the element box or percentage.
-                    // If we set background-size to specific px, we use specific px for position.
                     d.style.backgroundImage = `url('${ASSET_PATH}')`;
                     d.style.backgroundSize = `${bgWidth}px auto`;
                     d.style.backgroundPosition = `-${x * TILE_SIZE * PALETTE_SCALE}px -${y * TILE_SIZE * PALETTE_SCALE}px`;
-
+                    d.dataset.coord = `${x},${y}`;
+                    d.dataset.tx = x;
+                    d.dataset.ty = y;
                     d.onclick = function () { selectTile(this, x, y); };
                     palette.appendChild(d);
                 }
             }
 
-            // 2. Load Map Data
+            // Load Map Data
             if (window.MAP_DATA) {
-                // Load Assets Config
+                if (window.MAP_DATA.startPos) {
+                    startPos = { ...window.MAP_DATA.startPos };
+                } else {
+                    startPos = null;
+                }
                 if (window.MAP_DATA.assets) {
-                    // Resolve path for internal editor usage (Images)
                     ASSET_PATH = resolveEditorPath(window.MAP_DATA.assets.tileset);
                 }
 
-
-                // Load Tiles
                 let loadedTiles = [];
                 if (Array.isArray(window.MAP_DATA)) {
                     loadedTiles = window.MAP_DATA;
@@ -503,16 +853,13 @@
                 }
 
                 triggers = window.MAP_DATA.triggers || [];
-                renderTriggers();
 
                 if (window.MAP_DATA.collisions) {
                     window.MAP_DATA.collisions.forEach(c => collisionTiles.add(`${c.x},${c.y}`));
                 }
-                renderCollisions();
 
                 // Determine Size
-                let maxX = 0;
-                let maxY = 0;
+                let maxX = 0, maxY = 0;
                 loadedTiles.forEach(t => {
                     if (t.gx > maxX) maxX = t.gx;
                     if (t.gy > maxY) maxY = t.gy;
@@ -535,7 +882,7 @@
                     }
                 }
 
-                // PRUNE existing ghost collisions on load
+                // Prune out-of-bounds collisions
                 collisionTiles.forEach(key => {
                     const [x, y] = key.split(',').map(Number);
                     if (x >= mapWidthTiles || y >= mapHeightTiles) {
@@ -544,32 +891,31 @@
                 });
 
             } else {
-                console.warn("No MAP_DATA found, starting empty.");
-                // Init empty
-                mapDataGrid = new Array(mapHeightTiles).fill(0).map(() => new Array(mapWidthTiles).fill(null).map(() => ({ ...EMPTY_TILE })));
+                mapDataGrid = new Array(mapHeightTiles).fill(0).map(() =>
+                    new Array(mapWidthTiles).fill(null).map(() => ({ ...EMPTY_TILE })));
             }
 
-            // Set Inputs
             document.getElementById('map-width').value = mapWidthTiles;
             document.getElementById('map-height').value = mapHeightTiles;
 
             renderMapGrid();
+            renderSpawn();
+            updateToolUI();
         }
 
+        // ===== Map Resize =====
         function resizeMap() {
             const newW = parseInt(document.getElementById('map-width').value);
             const newH = parseInt(document.getElementById('map-height').value);
             const anchor = document.getElementById('resize-anchor').value;
 
             if (newW === mapWidthTiles && newH === mapHeightTiles) return;
-
             if (!confirm("Resizing might crop map data. Continue?")) return;
 
-            // Create new grid
-            const newGrid = new Array(newH).fill(0).map(() => new Array(newW).fill(null));
+            saveSnapshot();
 
-            let offX = 0;
-            let offY = 0;
+            const newGrid = new Array(newH).fill(0).map(() => new Array(newW).fill(null));
+            let offX = 0, offY = 0;
 
             if (anchor === 'tr' || anchor === 'br') offX = newW - mapWidthTiles;
             if (anchor === 'bl' || anchor === 'br') offY = newH - mapHeightTiles;
@@ -582,7 +928,6 @@
                 for (let x = 0; x < newW; x++) {
                     const srcX = x - offX;
                     const srcY = y - offY;
-
                     if (srcX >= 0 && srcX < mapWidthTiles && srcY >= 0 && srcY < mapHeightTiles) {
                         newGrid[y][x] = mapDataGrid[srcY][srcX];
                     } else {
@@ -595,29 +940,21 @@
             mapHeightTiles = newH;
             mapDataGrid = newGrid;
 
-            // Prune collisions outside new bounds
             collisionTiles.forEach(key => {
                 const [x, y] = key.split(',').map(Number);
-                if (x >= newW || y >= newH) {
-                    collisionTiles.delete(key);
-                }
+                if (x >= newW || y >= newH) collisionTiles.delete(key);
             });
 
             renderMapGrid();
-            renderCollisions();
         }
 
-        // Removed updateAssets function: assets are handled via data.js baseline
-
+        // ===== Rendering =====
         function renderMapGrid() {
             const mapContainer = document.getElementById('map');
             mapContainer.innerHTML = '';
             mapContainer.style.width = (mapWidthTiles * TILE_SIZE) + 'px';
             mapContainer.style.height = (mapHeightTiles * TILE_SIZE) + 'px';
 
-
-
-            // Render Tiles
             for (let y = 0; y < mapHeightTiles; y++) {
                 for (let x = 0; x < mapWidthTiles; x++) {
                     let tileData = mapDataGrid[y][x];
@@ -626,8 +963,6 @@
                     div.id = `cell_${x}_${y}`;
                     div.style.left = (x * TILE_SIZE) + 'px';
                     div.style.top = (y * TILE_SIZE) + 'px';
-
-                    // Use current ASSET_PATH for background
                     div.style.backgroundImage = `url('${ASSET_PATH}')`;
 
                     if (tileData.tx === EMPTY_TILE.tx && tileData.ty === EMPTY_TILE.ty) {
@@ -647,69 +982,146 @@
                 }
             }
 
-            // Re-render things that float on top (Triggers, Collisions)
             renderTriggers();
             renderCollisions();
         }
 
-        function selectTile(el, tx, ty) {
-            setMode('tile'); // Auto switch
-            selectedTx = tx;
-            selectedTy = ty;
-            updateToolUI();
-
-            // Explicitly highlight this one
-            el.classList.add('selected');
-        }
-
+        // ===== Mode Management =====
         function setMode(mode) {
-            currentMode = mode;
-            if (mode !== 'trigger' && editingTriggerIndex !== -1) {
+            // Clean up previous mode
+            if (currentMode === 'trigger' && editingTriggerIndex !== -1) {
                 cancelTriggerEdit();
             }
-            isCollisionMode = (mode === 'collision');
 
-            document.getElementById('palette').style.display = (mode === 'tile') ? 'block' : 'none';
-            document.getElementById('trigger-palette').style.display = (mode === 'trigger') ? 'block' : 'none';
+            currentMode = mode;
 
-            // UI Update: Ensure radio checked
-            document.querySelectorAll('input[name="mode"]').forEach(r => {
-                if (r.value === mode) r.checked = true;
+            // Update tab UI
+            document.querySelectorAll('.mode-tab').forEach(tab => {
+                tab.classList.toggle('active', tab.dataset.mode === mode);
             });
 
-            renderCollisions(); // Refresh visibility if needed
-            renderTriggers();   // Refresh visibility if needed
+            // Show/hide mode-specific panels
+            document.getElementById('palette-wrapper').style.display = (mode === 'tile') ? 'block' : 'none';
+            document.getElementById('tile-tools').style.display = (mode === 'tile') ? 'block' : 'none';
+            document.getElementById('trigger-palette').style.display = (mode === 'trigger') ? 'block' : 'none';
+
+            renderTriggers();
+            renderCollisions();
         }
+
+        // ===== Grid Click Handler =====
         function onGridClick(el, gx, gy) {
-            if (isCollisionMode) {
+            if (currentMode === 'collision') {
+                saveSnapshot();
                 toggleCollisionAt(gx, gy);
             } else if (currentMode === 'tile') {
+                saveSnapshot();
                 paintTile(el, gx, gy);
             } else if (currentMode === 'trigger') {
-                const isEraser = (selectedTx === EMPTY_TILE.tx && selectedTy === EMPTY_TILE.ty);
-                if (isEraser) {
-                    deleteTriggerAt(gx, gy);
-                    if (editingTriggerIndex !== -1) cancelTriggerEdit();
-                } else {
-                    // Brush mode
-                    const existingIndex = triggers.findIndex(t =>
-                        gx >= t.x && gx < t.x + (t.w || 1) &&
-                        gy >= t.y && gy < t.y + (t.h || 1)
-                    );
+                // Check if clicking on existing trigger
+                const existingIndex = triggers.findIndex(t =>
+                    gx >= t.x && gx < t.x + (t.w || 1) &&
+                    gy >= t.y && gy < t.y + (t.h || 1)
+                );
 
-                    if (existingIndex !== -1) {
-                        loadTriggerToUI(existingIndex);
-                    } else {
-                        placeTrigger(gx, gy);
+                if (existingIndex !== -1) {
+                    loadTriggerToUI(existingIndex);
+                } else {
+                    // If editing, cancel first
+                    if (editingTriggerIndex !== -1) {
+                        cancelTriggerEdit();
                     }
+                    saveSnapshot();
+                    placeTrigger(gx, gy);
                 }
+            } else if (currentMode === 'spawn') {
+                saveSnapshot();
+                startPos = { x: gx, y: gy };
+                renderSpawn();
             }
         }
 
+        function renderSpawn() {
+            const existing = document.getElementById('spawn-overlay');
+            if (existing) existing.remove();
+
+            if (!startPos) return;
+
+            const el = document.createElement('div');
+            el.id = 'spawn-overlay';
+            el.className = 'spawn-indicator';
+            el.innerHTML = '🚩';
+            el.style.width = TILE_SIZE + 'px';
+            el.style.height = TILE_SIZE + 'px';
+            el.style.left = (startPos.x * TILE_SIZE) + 'px';
+            el.style.top = (startPos.y * TILE_SIZE) + 'px';
+
+            document.getElementById('map').appendChild(el);
+        }
+
+        // ===== Tile Painting =====
+        function selectTile(el, tx, ty) {
+            if (currentMode !== 'tile') setMode('tile');
+            selectedTx = tx;
+            selectedTy = ty;
+            isEraser = false;
+            updateToolUI();
+        }
+
+        function paintTile(el, gx, gy) {
+            if (isEraser) {
+                el.classList.add('empty');
+                el.style.backgroundPosition = '';
+                el.dataset.tx = EMPTY_TILE.tx;
+                el.dataset.ty = EMPTY_TILE.ty;
+                mapDataGrid[gy][gx] = { ...EMPTY_TILE };
+            } else {
+                el.classList.remove('empty');
+                el.style.backgroundPosition = `-${selectedTx * TILE_SIZE}px -${selectedTy * TILE_SIZE}px`;
+                el.dataset.tx = selectedTx;
+                el.dataset.ty = selectedTy;
+                mapDataGrid[gy][gx] = { tx: selectedTx, ty: selectedTy };
+            }
+        }
+
+        function setBrush() {
+            isEraser = false;
+            updateToolUI();
+        }
+
+        function setEraser() {
+            isEraser = true;
+            updateToolUI();
+        }
+
+        function updateToolUI() {
+            const eraserBtn = document.getElementById('btn-eraser');
+            const brushBtn = document.getElementById('btn-brush');
+
+            if (isEraser) {
+                eraserBtn.style.background = '#c33';
+                brushBtn.style.background = '#444';
+                document.getElementById('selected-id').innerText = "Eraser";
+            } else {
+                eraserBtn.style.background = '#444';
+                brushBtn.style.background = '#2e7d32';
+                document.getElementById('selected-id').innerText = selectedTx + "," + selectedTy;
+            }
+
+            // Update palette highlight
+            document.querySelectorAll('.palette-tile').forEach(t => {
+                const ptx = parseInt(t.dataset.tx);
+                const pty = parseInt(t.dataset.ty);
+                t.classList.toggle('selected', !isEraser && ptx === selectedTx && pty === selectedTy);
+            });
+        }
+
+        // ===== Trigger Management =====
         function loadTriggerToUI(index) {
             editingTriggerIndex = index;
             const trig = triggers[index];
             document.getElementById('trigger-title').value = trig.title || '';
+            document.getElementById('trigger-id').value = trig.id || '';
             document.getElementById('trigger-type').value = trig.type || 'menu';
             document.getElementById('trigger-sprite').value = trig.sprite || '';
             document.getElementById('trigger-x').value = trig.x;
@@ -717,7 +1129,6 @@
             document.getElementById('trigger-w').value = trig.w || 1;
             document.getElementById('trigger-h').value = trig.h || 1;
 
-            // Text Handling
             if (Array.isArray(trig.text)) {
                 document.getElementById('trigger-text').value = JSON.stringify(trig.text);
             } else {
@@ -727,7 +1138,6 @@
             document.getElementById('trigger-bubble-y').value = trig.bubbleOffsetY || 0;
             document.getElementById('trigger-collision').checked = !!trig.collision;
 
-            // Animation
             const isAnim = !!(trig.animW || trig.frames || trig.speed);
             document.getElementById('trigger-is-anim').checked = isAnim;
             document.getElementById('anim-settings').style.display = isAnim ? 'block' : 'none';
@@ -736,67 +1146,83 @@
             document.getElementById('anim-frames').value = trig.frames || 5;
             document.getElementById('anim-speed').value = trig.speed || 200;
 
-            document.getElementById('trigger-items').value = JSON.stringify(trig.items || []);
+            document.getElementById('trigger-items').value = JSON.stringify(trig.items || [], null, 2);
 
-            // UI Update
+            // UI: show edit buttons
             document.getElementById('btn-place-trigger').style.display = 'none';
             document.getElementById('btn-update-trigger').style.display = 'block';
+            document.getElementById('btn-delete-trigger').style.display = 'block';
             document.getElementById('btn-cancel-trigger').style.display = 'block';
             document.getElementById('editing-status').style.display = 'block';
 
             renderTriggers();
         }
 
-        // Toggle Animation Settings visibility
         document.getElementById('trigger-is-anim').onchange = function () {
             document.getElementById('anim-settings').style.display = this.checked ? 'block' : 'none';
         };
+
+        function resetTriggerFields() {
+            document.getElementById('trigger-title').value = 'New Trigger';
+            document.getElementById('trigger-id').value = '';
+            document.getElementById('trigger-type').value = 'menu';
+            document.getElementById('trigger-sprite').value = '';
+            document.getElementById('trigger-x').value = 0;
+            document.getElementById('trigger-y').value = 0;
+            document.getElementById('trigger-w').value = 1;
+            document.getElementById('trigger-h').value = 1;
+            document.getElementById('trigger-text').value = '';
+            document.getElementById('trigger-bubble-y').value = 0;
+            document.getElementById('trigger-collision').checked = false;
+            document.getElementById('trigger-is-anim').checked = false;
+            document.getElementById('anim-settings').style.display = 'none';
+            document.getElementById('trigger-items').value = '[{"label": "Sample", "href": "#"}]';
+        }
 
         function cancelTriggerEdit() {
             editingTriggerIndex = -1;
             document.getElementById('btn-place-trigger').style.display = 'block';
             document.getElementById('btn-update-trigger').style.display = 'none';
+            document.getElementById('btn-delete-trigger').style.display = 'none';
             document.getElementById('btn-cancel-trigger').style.display = 'none';
             document.getElementById('editing-status').style.display = 'none';
-
-            // Clear fields (Optional but good)
-            document.getElementById('trigger-sprite').value = '';
-            document.getElementById('trigger-text').value = '';
-            document.getElementById('trigger-is-anim').checked = false;
-            document.getElementById('anim-settings').style.display = 'none';
-
+            resetTriggerFields();
             renderTriggers();
         }
 
         function updateTrigger() {
             if (editingTriggerIndex === -1) return;
-
+            saveSnapshot();
             const trig = triggers[editingTriggerIndex];
             collectTriggerFields(trig);
+            showToast("Trigger updated!");
+            cancelTriggerEdit();
+        }
 
-            alert("Trigger updated!");
+        function deleteEditingTrigger() {
+            if (editingTriggerIndex === -1) return;
+            if (!confirm(`Delete trigger "${triggers[editingTriggerIndex].title}"?`)) return;
+            saveSnapshot();
+            triggers.splice(editingTriggerIndex, 1);
+            showToast("Trigger deleted.");
             cancelTriggerEdit();
         }
 
         function collectTriggerFields(trig) {
             trig.title = document.getElementById('trigger-title').value;
+            trig.id = document.getElementById('trigger-id').value || undefined;
             trig.type = document.getElementById('trigger-type').value;
-            trig.sprite = document.getElementById('trigger-sprite').value;
+            trig.sprite = document.getElementById('trigger-sprite').value || undefined;
             trig.x = parseInt(document.getElementById('trigger-x').value);
             trig.y = parseInt(document.getElementById('trigger-y').value);
             trig.w = parseInt(document.getElementById('trigger-w').value);
             trig.h = parseInt(document.getElementById('trigger-h').value);
 
-            // Text Handling
             const rawText = document.getElementById('trigger-text').value;
             if (rawText.startsWith('[') && rawText.endsWith(']')) {
-                try {
-                    trig.text = JSON.parse(rawText);
-                } catch (e) {
-                    trig.text = rawText;
-                }
+                try { trig.text = JSON.parse(rawText); } catch (e) { trig.text = rawText; }
             } else {
-                trig.text = rawText;
+                trig.text = rawText || undefined;
             }
 
             trig.bubbleOffsetY = parseInt(document.getElementById('trigger-bubble-y').value) || 0;
@@ -822,78 +1248,63 @@
         }
 
         function placeTriggerAction() {
-            alert("그리드를 클릭하여 새 트리거를 배치하세요.");
-        }
-
-        function deleteTriggerAt(gx, gy) {
-            const index = triggers.findIndex(t =>
-                gx >= t.x && gx < t.x + (t.w || 1) &&
-                gy <= t.y && gy > t.y - (t.h || 1)
-            );
-            if (index !== -1) {
-                triggers.splice(index, 1);
-                renderTriggers();
-            }
+            showToast("그리드를 클릭하여 새 트리거를 배치하세요.");
         }
 
         function placeTrigger(gx, gy) {
             let trigger = { x: gx, y: gy };
             collectTriggerFields(trigger);
+            trigger.x = gx; // Override with click position
+            trigger.y = gy;
             triggers.push(trigger);
             renderTriggers();
+            // Auto-load the new trigger for editing
+            loadTriggerToUI(triggers.length - 1);
         }
 
         function renderTriggers() {
-            // Clear existing trigger divs
             document.querySelectorAll('.trigger-overlay').forEach(e => e.remove());
 
-            // User said: "Irrelevant content should not be displayed/clicked when mode changes"
-            if (currentMode !== 'trigger') return;
+            const isActive = (currentMode === 'trigger');
+            const showGhost = document.getElementById('chk-show-triggers').checked;
+
+            // Don't render if not active and ghost not requested
+            if (!isActive && !showGhost) return;
 
             const mapContainer = document.getElementById('map');
             triggers.forEach((trig, index) => {
                 const div = document.createElement('div');
                 div.className = 'trigger-overlay';
-                if (index === editingTriggerIndex) {
-                    div.style.background = 'rgba(255, 235, 59, 0.6)'; // Highlight yellow
-                    div.style.outline = '2px solid #ffeb3b';
-                    div.style.zIndex = '15';
-                }
-                div.style.left = (trig.x * TILE_SIZE) + 'px';
-                div.style.top = ((trig.y - (trig.h - 1)) * TILE_SIZE) + 'px';
-                div.style.width = (trig.w * TILE_SIZE) + 'px';
-                div.style.height = (trig.h * TILE_SIZE) + 'px';
-                div.innerHTML = `<span style="font-size: 8px; color: white;">${trig.title}</span>`;
 
-                div.onclick = (e) => {
-                    e.stopPropagation();
-                    const isEraser = (selectedTx === EMPTY_TILE.tx && selectedTy === EMPTY_TILE.ty);
-                    if (isEraser) {
-                        // Eraser Tool -> Delete immediately
-                        triggers.splice(index, 1);
-                        if (editingTriggerIndex === index) cancelTriggerEdit();
-                        else if (editingTriggerIndex > index) editingTriggerIndex--; // Adjust index
-                        renderTriggers();
-                    } else if (currentMode === 'trigger') {
-                        // Brush Tool + Trigger Mode -> Edit
-                        loadTriggerToUI(index);
-                    } else {
-                        // Other Mode -> Ask to delete (Safety)
-                        if (confirm(`Delete this trigger (${trig.title})?`)) {
-                            triggers.splice(index, 1);
-                            if (editingTriggerIndex === index) cancelTriggerEdit();
-                            else if (editingTriggerIndex > index) editingTriggerIndex--;
-                            renderTriggers();
-                        }
+                if (isActive) {
+                    div.classList.add('interactive');
+                    if (index === editingTriggerIndex) {
+                        div.style.background = 'rgba(255, 235, 59, 0.6)';
+                        div.style.outline = '2px solid #ffeb3b';
+                        div.style.zIndex = '15';
                     }
-                };
+                } else {
+                    div.classList.add('ghost');
+                }
+
+                div.style.left = (trig.x * TILE_SIZE) + 'px';
+                div.style.top = ((trig.y - ((trig.h || 1) - 1)) * TILE_SIZE) + 'px';
+                div.style.width = ((trig.w || 1) * TILE_SIZE) + 'px';
+                div.style.height = ((trig.h || 1) * TILE_SIZE) + 'px';
+                div.innerHTML = `<span style="font-size: 8px; color: white; text-shadow: 0 0 2px black;">${trig.title || ''}</span>`;
+
+                if (isActive) {
+                    div.onclick = (e) => {
+                        e.stopPropagation();
+                        loadTriggerToUI(index);
+                    };
+                }
 
                 mapContainer.appendChild(div);
             });
         }
 
-        // Removed toggleCollisionMode: handled via unified setMode
-
+        // ===== Collision Management =====
         function toggleCollisionAt(gx, gy) {
             const key = `${gx},${gy}`;
             if (collisionTiles.has(key)) {
@@ -905,74 +1316,55 @@
         }
 
         function renderCollisions() {
-            // Clear existing
             document.querySelectorAll('.collision-overlay').forEach(e => e.remove());
 
-            // User said: "Irrelevant content should not be displayed/clicked when mode changes"
-            if (currentMode !== 'collision') return;
+            const isActive = (currentMode === 'collision');
+            const showGhost = document.getElementById('chk-show-collisions').checked;
+
+            if (!isActive && !showGhost) return;
 
             const mapContainer = document.getElementById('map');
             collisionTiles.forEach(key => {
                 const [gx, gy] = key.split(',').map(Number);
                 const div = document.createElement('div');
                 div.className = 'collision-overlay';
+
+                if (isActive) {
+                    div.classList.add('interactive');
+                    div.onclick = (e) => {
+                        e.stopPropagation();
+                        saveSnapshot();
+                        toggleCollisionAt(gx, gy);
+                    };
+                } else {
+                    div.classList.add('ghost');
+                }
+
                 div.style.left = (gx * TILE_SIZE) + 'px';
                 div.style.top = (gy * TILE_SIZE) + 'px';
-                div.onclick = (e) => {
-                    e.stopPropagation(); // Pass through to grid? 
-                    // No, invalidates click if we catch it. 
-                    // But we want to toggle.
-                    if (isCollisionMode) toggleCollisionAt(gx, gy);
-                };
                 mapContainer.appendChild(div);
             });
         }
 
-        // startEditorLoop removed (Animation Mode replaced by Trigger Mode)
-
-        // Removed immediate startEditorLoop call
-
-        function setBrush() {
-            // If it was eraser, reset to a valid tile (0,0 or last known?)
-            if (selectedTx === EMPTY_TILE.tx && selectedTy === EMPTY_TILE.ty) {
-                selectedTx = 0;
-                selectedTy = 0;
-            }
-            updateToolUI();
+        // ===== Grid Overlay =====
+        function toggleGrid() {
+            const map = document.getElementById('map');
+            const chk = document.getElementById('chk-show-grid');
+            map.classList.toggle('show-grid', chk.checked);
         }
 
-        function setEraser() {
-            selectedTx = EMPTY_TILE.tx;
-            selectedTy = EMPTY_TILE.ty;
-            if (editingTriggerIndex !== -1) cancelTriggerEdit();
-            updateToolUI();
+        // ===== Palette =====
+        function togglePalette() {
+            paletteCollapsed = !paletteCollapsed;
+            document.getElementById('palette').classList.toggle('collapsed', paletteCollapsed);
+            document.getElementById('palette-toggle-icon').textContent = paletteCollapsed ? '▶' : '▼';
         }
 
-        function updateToolUI() {
-            const isEraser = (selectedTx === EMPTY_TILE.tx && selectedTy === EMPTY_TILE.ty);
-            const eraserBtn = document.getElementById('btn-eraser');
-            const brushBtn = document.getElementById('btn-brush');
-
-            if (isEraser) {
-                eraserBtn.style.background = '#c33';
-                brushBtn.style.background = '#444';
-                document.getElementById('selected-id').innerText = "Eraser";
-                document.querySelectorAll('.palette-tile').forEach(t => t.classList.remove('selected'));
-            } else {
-                eraserBtn.style.background = '#444';
-                brushBtn.style.background = '#2e7d32';
-                document.getElementById('selected-id').innerText = selectedTx + "," + selectedTy;
-
-                // Highlight corresponding tile in palette if it's visible
-                document.querySelectorAll('.palette-tile').forEach(t => t.classList.remove('selected'));
-                // Note: We don't force highlight here because we don't have the element reference easily,
-                // but selectTile handles it when clicked.
-            }
-        }
-
+        // ===== Zoom =====
         function changeZoom(delta) {
             zoomLevel += delta;
             if (zoomLevel < 0.1) zoomLevel = 0.1;
+            if (zoomLevel > 5.0) zoomLevel = 5.0;
             updateZoom();
         }
 
@@ -983,30 +1375,12 @@
 
         function updateZoom() {
             const mapGrid = document.getElementById('map');
-            // Use transform-origin top-left to zoom naturally from the corner
             mapGrid.style.transformOrigin = "0 0";
             mapGrid.style.transform = `scale(${zoomLevel})`;
             document.getElementById('zoom-level').innerText = Math.round(zoomLevel * 100) + "%";
         }
 
-
-
-        function paintTile(el, gx, gy) {
-            // Update visual
-            if (selectedTx === EMPTY_TILE.tx && selectedTy === EMPTY_TILE.ty) {
-                el.classList.add('empty');
-                el.style.backgroundPosition = '';
-            } else {
-                el.classList.remove('empty');
-                el.style.backgroundPosition = `-${selectedTx * TILE_SIZE}px -${selectedTy * TILE_SIZE}px`;
-            }
-            // Update data
-            // Update data
-            el.dataset.tx = selectedTx;
-            el.dataset.ty = selectedTy;
-            mapDataGrid[gy][gx] = { tx: selectedTx, ty: selectedTy };
-        }
-
+        // ===== Export =====
         function exportMapData() {
             let cells = document.querySelectorAll('.tile');
             let data = [];
@@ -1023,6 +1397,7 @@
 
             const result = {
                 assets: (window.MAP_DATA && window.MAP_DATA.assets) ? window.MAP_DATA.assets : {},
+                ...(startPos ? { startPos } : {}),
                 tiles: data,
                 editor: (window.MAP_DATA && window.MAP_DATA.editor) ? window.MAP_DATA.editor : {},
                 collisions: Array.from(collisionTiles)
@@ -1030,23 +1405,158 @@
                         const [x, y] = k.split(',').map(Number);
                         return { x, y };
                     })
-                    // Filter out-of-bounds collisions
                     .filter(c => c.x < mapWidthTiles && c.y < mapHeightTiles)
             };
 
-            document.getElementById('output').value = "window.MAP_DATA = " + JSON.stringify(result, null, 2);
-            alert(`Map Data exported!\n- Tiles: ${data.length}\n- Collisions: ${collisionTiles.size}`);
+            const output = "window.MAP_DATA = " + JSON.stringify(result, null, 2);
+            copyToClipboard(output);
+            showToast(`Map Data copied! (${data.length} tiles, ${collisionTiles.size} collisions)`);
         }
 
         function exportTriggers() {
-            const result = {
-                triggers: triggers
-            };
-            // Note: Triggers.js usually appends to window.MAP_DATA.triggers or similar
-            // Here we provide the full data for window.MAP_DATA.triggers update
-            document.getElementById('output').value = "window.MAP_DATA.triggers = " + JSON.stringify(triggers, null, 2);
-            alert(`Triggers exported!\n- Count: ${triggers.length}`);
+            const output = "window.MAP_DATA.triggers = " + JSON.stringify(triggers, null, 2);
+            copyToClipboard(output);
+            showToast(`Triggers copied! (${triggers.length} triggers)`);
         }
+
+        async function copyToClipboard(text) {
+            try {
+                await navigator.clipboard.writeText(text);
+            } catch (e) {
+                // Fallback
+                const ta = document.createElement('textarea');
+                ta.value = text;
+                ta.style.position = 'fixed';
+                ta.style.opacity = '0';
+                document.body.appendChild(ta);
+                ta.select();
+                document.execCommand('copy');
+                document.body.removeChild(ta);
+            }
+        }
+
+        // ===== New Map =====
+        function showNewMapDialog() {
+            document.getElementById('new-map-dialog').classList.add('show');
+        }
+
+        function hideNewMapDialog() {
+            document.getElementById('new-map-dialog').classList.remove('show');
+        }
+
+        function createNewMap() {
+            const name = document.getElementById('new-map-name').value.trim();
+            const tileset = document.getElementById('new-map-tileset').value.trim();
+            const w = parseInt(document.getElementById('new-map-w').value) || 30;
+            const h = parseInt(document.getElementById('new-map-h').value) || 20;
+
+            if (!name) {
+                alert("Map name is required.");
+                return;
+            }
+
+            // Add to selector
+            const opt = document.createElement('option');
+            opt.value = name;
+            opt.textContent = name.charAt(0).toUpperCase() + name.slice(1);
+            document.getElementById('map-selector').appendChild(opt);
+
+            // Create MAP_DATA in memory
+            window.MAP_DATA = {
+                assets: { tileset: tileset },
+                tiles: [],
+                collisions: [],
+                triggers: []
+            };
+
+            // Reset state
+            startPos = null;
+            triggers = [];
+            collisionTiles = new Set();
+            undoStack = [];
+            redoStack = [];
+
+            mapWidthTiles = w;
+            mapHeightTiles = h;
+            mapDataGrid = new Array(h).fill(0).map(() =>
+                new Array(w).fill(null).map(() => ({ ...EMPTY_TILE })));
+
+            document.getElementById('map-width').value = w;
+            document.getElementById('map-height').value = h;
+            document.getElementById('map-badge').textContent = name;
+
+            // Try to load tileset
+            ASSET_PATH = `maps/${name}/${tileset}`;
+            const img = new Image();
+            img.src = ASSET_PATH;
+            img.onload = function () {
+                tilesetWidth = img.width;
+                tilesetHeight = img.height;
+                // Rebuild palette
+                document.getElementById('palette').innerHTML = '';
+                const cols = Math.floor(tilesetWidth / TILE_SIZE);
+                const rows = Math.floor(tilesetHeight / TILE_SIZE);
+                const bgWidth = tilesetWidth * PALETTE_SCALE;
+                for (let y = 0; y < rows; y++) {
+                    for (let x = 0; x < cols; x++) {
+                        let d = document.createElement('div');
+                        d.className = 'palette-tile';
+                        d.style.backgroundImage = `url('${ASSET_PATH}')`;
+                        d.style.backgroundSize = `${bgWidth}px auto`;
+                        d.style.backgroundPosition = `-${x * TILE_SIZE * PALETTE_SCALE}px -${y * TILE_SIZE * PALETTE_SCALE}px`;
+                        d.dataset.coord = `${x},${y}`;
+                        d.dataset.tx = x;
+                        d.dataset.ty = y;
+                        d.onclick = function () { selectTile(this, x, y); };
+                        document.getElementById('palette').appendChild(d);
+                    }
+                }
+                renderMapGrid();
+            };
+            img.onerror = function () {
+                showToast("⚠️ Tileset not found. Create the folder and assets first.");
+                renderMapGrid();
+            };
+
+            hideNewMapDialog();
+            showToast(`New map "${name}" created (${w}x${h})`);
+        }
+
+        // ===== Keyboard Shortcuts =====
+        document.addEventListener('keydown', (e) => {
+            // Don't capture if typing in input/textarea
+            if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT') return;
+
+            // Undo/Redo
+            if ((e.ctrlKey || e.metaKey) && e.key === 'z') {
+                e.preventDefault();
+                if (e.shiftKey) redo();
+                else undo();
+                return;
+            }
+
+            // Mode shortcuts
+            if (e.key === '1') { setMode('tile'); return; }
+            if (e.key === '2') { setMode('trigger'); return; }
+            if (e.key === '3') { setMode('collision'); return; }
+
+            // Tool shortcuts (tile mode)
+            if (e.key === 'b' || e.key === 'B') { setBrush(); return; }
+            if (e.key === 'e' || e.key === 'E') { setEraser(); return; }
+
+            // Grid toggle
+            if (e.key === 'g' || e.key === 'G') {
+                const chk = document.getElementById('chk-show-grid');
+                chk.checked = !chk.checked;
+                toggleGrid();
+                return;
+            }
+
+            // Zoom
+            if (e.key === '=' || e.key === '+') { changeZoom(0.1); return; }
+            if (e.key === '-') { changeZoom(-0.1); return; }
+            if (e.key === '0') { resetZoom(); return; }
+        });
     </script>
 </body>
 

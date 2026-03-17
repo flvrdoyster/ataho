@@ -41,11 +41,13 @@
 
 </body>
 
-<script>window.MAP_NAME = 'cave';</script>
+<script>window.MAP_NAME = 'cave'; window.MAP_BASE = 'world/';</script>
 <!-- Game Data & Logic -->
 <script src="world/maps/cave/data.js"></script>
 <script src="world/maps/cave/triggers.js"></script>
-<script src="world/loader.js"></script>
+<script src="world/engine.js"></script>
+<script src="world/char/char_free.js"></script>
+<script>window.onload = initGame;</script>
 <script src="resource/mov/subtitles.js"></script>
 
 <div id="lightbox">

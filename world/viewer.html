@@ -25,34 +25,36 @@
     <script>
         // Parse URL parameter for map name
         const urlParams = new URLSearchParams(window.location.search);
-        const mapName = urlParams.get('map') || 'cave'; // Default to cave
+        const mapName = urlParams.get('map') || 'cave';
 
-        // Dynamic Data Loader
-        const dataScript = document.createElement('script');
-        dataScript.src = `maps/${mapName}/data.js`;
-        dataScript.onload = () => {
-            document.getElementById('loading').style.display = 'none';
-            // Load Triggers (overwriting data.js triggers)
-            const triggerScript = document.createElement('script');
-            triggerScript.src = `maps/${mapName}/triggers.js`;
-            triggerScript.onload = () => {
-                // Start the game loader after data and triggers are ready
-                const loaderScript = document.createElement('script');
-                loaderScript.src = 'loader.js';
-                document.body.appendChild(loaderScript);
-            };
-            triggerScript.onerror = () => {
-                console.warn("triggers.js not found, continuing with data.js only.");
-                const loaderScript = document.createElement('script');
-                loaderScript.src = 'loader.js';
-                document.body.appendChild(loaderScript);
-            };
-            document.body.appendChild(triggerScript);
-        };
-        dataScript.onerror = () => {
-            document.getElementById('loading').innerText = `Error: Map '${mapName}' not found.`;
-        };
-        document.body.appendChild(dataScript);
+        // Set engine path base (viewer is in world/, paths are world-relative)
+        window.MAP_NAME = mapName;
+        window.MAP_BASE = '';
+
+        // Dynamic Script Loader
+        function loadScript(src) {
+            return new Promise((resolve, reject) => {
+                const s = document.createElement('script');
+                s.src = src;
+                s.onload = resolve;
+                s.onerror = reject;
+                document.body.appendChild(s);
+            });
+        }
+
+        (async function () {
+            try {
+                await loadScript(`maps/${mapName}/data.js`);
+                document.getElementById('loading').style.display = 'none';
+                try { await loadScript(`maps/${mapName}/triggers.js`); }
+                catch (e) { console.warn("triggers.js not found, continuing."); }
+                await loadScript('engine.js');
+                await loadScript('char/char_free.js');
+                initGame();
+            } catch (e) {
+                document.getElementById('loading').innerText = `Error: Map '${mapName}' not found.`;
+            }
+        })();
     </script>
 </body>
 
