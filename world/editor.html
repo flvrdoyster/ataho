@@ -10,11 +10,25 @@
         body {
             background: #222;
             display: flex;
-            flex-direction: row;
+            flex-direction: column;
             font-family: sans-serif;
             height: 100vh;
             margin: 0;
             overflow: hidden;
+        }
+
+        .top-area {
+            display: flex;
+            flex: 1;
+            min-height: 0;
+        }
+
+        .bottom-area {
+            height: 250px;
+            background: #1a1a1a;
+            display: flex;
+            flex-direction: column;
+            border-top: 1px solid #444;
         }
 
         .editor-container {
@@ -126,7 +140,7 @@
         }
 
         .sidebar {
-            width: 600px;
+            width: 350px;
             background: #1a1a1a;
             color: #eee;
             padding: 20px;
@@ -155,9 +169,11 @@
 
         /* Palette */
         .palette-wrapper {
-            border: 1px solid #555;
+            margin: 0;
             background: #000;
-            margin-bottom: 10px;
+            overflow-x: auto;
+            overflow-y: auto;
+            flex: 1;
         }
 
         .palette-header {
@@ -178,7 +194,6 @@
 
         .palette {
             display: grid;
-            grid-template-columns: repeat(16, 32px);
             padding: 5px;
         }
 
@@ -432,7 +447,8 @@
 </head>
 
 <body>
-    <div class="sidebar">
+    <div class="top-area">
+        <div class="sidebar">
         <h2>Map Editor <span class="map-badge" id="map-badge">cave</span></h2>
 
         <div style="margin-bottom: 10px; display: flex; gap: 5px;">
@@ -445,14 +461,7 @@
                 style="flex: 0 0 auto; width: auto; padding: 8px 12px; background: #2e7d32;">+ New</button>
         </div>
 
-        <!-- Tile Palette (always present, visibility managed) -->
-        <div class="palette-wrapper" id="palette-wrapper">
-            <div class="palette-header" onclick="togglePalette()">
-                <span>🎨 Tile Palette</span>
-                <span id="palette-toggle-icon">▼</span>
-            </div>
-            <div class="palette" id="palette"></div>
-        </div>
+        <!-- Palette moved to bottom-area -->
 
         <div class="controls">
             <div class="info-row">
@@ -614,6 +623,17 @@
     </div>
     <div class="editor-container">
         <div class="map-grid show-grid" id="map"></div>
+    </div>
+    </div>
+    <div class="bottom-area" id="bottom-area">
+        <!-- Tile Palette (always present, visibility managed) -->
+        <div class="palette-wrapper" id="palette-wrapper">
+            <div class="palette-header" onclick="togglePalette()">
+                <span>🎨 Tile Palette</span>
+                <span id="palette-toggle-icon">▼</span>
+            </div>
+            <div class="palette" id="palette"></div>
+        </div>
     </div>
 
     <!-- Toast notification -->
@@ -818,6 +838,9 @@
             const rows = Math.floor(tilesetHeight / TILE_SIZE);
             const palette = document.getElementById('palette');
             const bgWidth = tilesetWidth * PALETTE_SCALE;
+
+            palette.innerHTML = '';
+            palette.style.gridTemplateColumns = `repeat(${cols}, 32px)`;
 
             for (let y = 0; y < rows; y++) {
                 for (let x = 0; x < cols; x++) {
