@@ -252,6 +252,9 @@ async function initGame() {
         }
     });
 
+    // Inject UI elements
+    injectUI();
+
     // Start loop
     lastTime = performance.now();
     requestAnimationFrame(gameLoop);
