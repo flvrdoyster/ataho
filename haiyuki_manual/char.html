@@ -1,0 +1,261 @@
+<html>
+
+<head>
+	<title>char</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<link rel="stylesheet" href="manual.css">
+	<style>
+		* {
+			box-sizing: border-box;
+		}
+
+		body {
+			background-image: none;
+		}
+
+		/* --- 레이아웃 --- */
+		.char-container {
+			position: relative;
+			width: 100%;
+		}
+
+		.char-images {
+			display: flex;
+			width: 100%;
+		}
+
+		.char-images img {
+			display: block;
+			width: 100%;
+		}
+
+		.char-overlay {
+			position: absolute;
+			top: 0;
+			left: 0;
+			width: 100%;
+			height: 100%;
+		}
+
+		/* --- 캐릭터 정보 박스 공통 --- */
+		.char-info {
+			position: absolute;
+			width: 10%;
+			font-size: 1vw;
+			line-height: 1.2;
+			outline: 1px solid rgba(0, 0, 0, 0.5);
+		}
+
+		.char-name {
+			font-size: 1.4vw;
+			font-weight: bold;
+			margin-bottom: 0.3em;
+		}
+
+		.char-desc {
+			font-size: 0.9vw;
+			margin-bottom: 0.3em;
+		}
+
+		.char-skills {
+			margin-top: 0.5em;
+		}
+
+		.skill {
+			font-size: 0.8vw;
+			margin-bottom: 0.5em;
+		}
+
+		.skill b {
+			font-size: 0.9vw;
+		}
+
+		.skill-header {
+			/* 스킬명 및 MP 스타일링 영역 */
+		}
+
+		.skill-desc {
+			margin-top: 0.1em;
+		}
+
+		/* --- 캐릭터별 위치 --- */
+		.char-fari {
+			left: 13.5%;
+			top: 10%;
+		}
+
+		.char-rin {
+			left: 25%;
+			top: 10%;
+		}
+
+		.char-pet {
+			left: 25%;
+			bottom: 0%;
+		}
+
+		.char-ata {
+			left: 50%;
+			bottom: 0%;
+		}
+
+		.char-smsh {
+			left: 50%;
+			bottom: 0%;
+		}
+
+		.char-yuri {
+			left: 85%;
+			top: 10%;
+		}
+
+		.char-qqq {
+			left: 85%;
+			bottom: 0%;
+
+		}
+	</style>
+</head>
+
+<body>
+	<div class="char-container">
+
+		<div class="char-images">
+			<div style="width: calc(1129 / 4803 * 100%)"><img src="img/char_fari_pet.jpg" alt=""></div>
+			<div style="width: calc(437 / 4803 * 100%)"></div>
+			<div style="width: calc(793 / 4803 * 100%)"><img src="img/char_rin_ata.jpg" alt=""></div>
+			<div style="width: calc(628 / 4803 * 100%)"></div>
+			<div style="width: calc(1220 / 4803 * 100%)"><img src="img/char_yuri_smsh.jpg" alt=""></div>
+			<div style="width: calc(596 / 4803 * 100%)"></div>
+		</div>
+
+		<div class="char-overlay">
+
+			<div class="char-info char-fari">
+				<div class="char-name">화린</div>
+				<div class="char-desc">
+					여우 민족의 회복·보조 계열 술사.<br>
+					느긋하고 엉뚱한 분위기의 소녀.<br>
+					패 운이 좋아, 이른 시점부터 리치를 거는 타입.
+				</div>
+				<div class="char-skills">
+					<div class="skill">
+						<div class="skill-header"><b>회복</b>　소비MP 24</div>
+						<div class="skill-desc">HP를 조금 회복한다. 한 라운드에 몇 번이고 사용 가능.</div>
+					</div>
+					<div class="skill">
+						<div class="skill-header"><b>버린 패 방어</b>　소비MP 18</div>
+						<div class="skill-desc">5턴 간 상대가 자신이 버린 패로 펑·론을 할 수 없게 한다.</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="char-info char-rin">
+				<div class="char-name">린샹</div>
+				<div class="char-desc">
+					제멋대로인 고양이귀 여권사.<br>
+					방어·공격 기술을 모두 갖춘 밸런스형 캐릭터.
+				</div>
+				<div class="char-skills">
+					<div class="skill">
+						<div class="skill-header"><b>수경</b>　소비MP 22</div>
+						<div class="skill-desc">상대가 났을 때 받는 데미지를 25% 감소.</div>
+					</div>
+					<div class="skill">
+						<div class="skill-header"><b>도라폭진</b>　소비MP 32</div>
+						<div class="skill-desc">리치로 났을 때 숨김 도라를 자신의 패로 바꾼다.</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="char-info char-pet">
+				<div class="char-name">페톰</div>
+				<div class="char-desc">
+					병약한 마술사.<br>
+					공격 계열 기술을 지닌 트릭키한 캐릭터.
+				</div>
+				<div class="char-skills">
+					<div class="skill">
+						<div class="skill-header"><b>크리티컬</b>　소비MP 24</div>
+						<div class="skill-desc">났을 때 상대에게 주는 데미지를 25% 증가.</div>
+					</div>
+					<div class="skill">
+						<div class="skill-header"><b>라스트 찬스</b>　소비MP 18</div>
+						<div class="skill-desc">텐파이 상태에서 나가리일 경우 패 룰렛에 도전할 수 있다.</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="char-info char-ata">
+				<div class="char-name">아타호</div>
+				<div class="char-desc">
+					호랑이 민족의 권법가.<br>
+					한 방 역전을 노릴 수 있는 캐릭터.
+				</div>
+				<div class="char-skills">
+					<div class="skill">
+						<div class="skill-header"><b>맹호일발권</b>　소비MP 100</div>
+						<div class="skill-desc">리치 가능 시 사용하면 다음 쯔모로 반드시 난다. 20턴엔 사용 불가.</div>
+					</div>
+					<div class="skill">
+						<div class="skill-header"><b>지옥 쌓기</b>　소비MP 18</div>
+						<div class="skill-desc">3턴 간 상대가 받는 패를 쓸모 없는 패로 바꿔 쯔모를 막는다.</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="char-info char-smsh">
+				<div class="char-name">스마슈</div>
+				<div class="char-desc">
+					개 민족의 닌자 검사. 주인공.<br>
+					패를 바꿔치기하는 기술을 가지고 있다.
+				</div>
+				<div class="char-skills">
+					<div class="skill">
+						<div class="skill-header"><b>패 교환</b>　소비MP 6×교환 수</div>
+						<div class="skill-desc">라운드 시작 시 불필요한 패를 다른 패로 교환할 수 있다.</div>
+					</div>
+					<div class="skill">
+						<div class="skill-header"><b>론 패 교환</b>　소비MP 10</div>
+						<div class="skill-desc">상대의 론을 패 교환으로 무효로 한다. 리치 중 사용 불가.</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="char-info char-yuri">
+				<div class="char-name">유리와카마루</div>
+				<div class="char-desc">
+					거합 베기의 달인이자 한량.<br>
+					강력한 공격·방어 기술을 겸비. 사실은 남장 미인.
+				</div>
+				<div class="char-skills">
+					<div class="skill">
+						<div class="skill-header"><b>초 거합베기</b>　소비MP 22</div>
+						<div class="skill-desc">상대의 론을 거합베기로 무효로 한다. 리치 중 사용 불가.</div>
+					</div>
+					<div class="skill">
+						<div class="skill-header"><b>기합 리치</b>　소비MP 24</div>
+						<div class="skill-desc">사용하면 5턴 후 쯔모로 반드시 난다. 16턴 이후 사용 불가.</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="char-info char-qqq">
+				<div class="char-name">???</div>
+				<div class="char-desc">
+					수수께끼에 싸인 인물(?).<br>
+					어떤 조건을 만족하면 등장하는 듯한데…?
+				</div>
+				<div class="char-skills">
+					<div class="skill">
+						<div class="skill-header"><b>패 덧칠</b>　소비MP 4×교환 수</div>
+						<div class="skill-desc">라운드 시작 시 불필요한 패를 다른 패로 교환할 수 있다.</div>
+					</div>
+				</div>
+			</div>
+
+		</div>
+	</div>
+</body>
+
+</html>
