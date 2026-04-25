@@ -1,0 +1,400 @@
+<html>
+
+<head>
+	<title>char</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<link rel="stylesheet" href="manual.css">
+	<style>
+		@font-face {
+			font-family: 'Eulyoo1945';
+			src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_2102-01@1.0/Eulyoo1945-Regular.woff') format('woff');
+			font-weight: normal;
+			font-style: normal;
+		}
+
+		@font-face {
+			font-family: 'Eulyoo1945';
+			src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_2102-01@1.0/Eulyoo1945-SemiBold.woff') format('woff');
+			font-weight: bold;
+			font-style: normal;
+		}
+
+		* {
+			box-sizing: border-box;
+		}
+
+		body {
+			background-image: none;
+		}
+
+		/* --- 레이아웃 --- */
+		.char-container {
+			position: relative;
+			width: 100%;
+			padding-bottom: 3vw;
+			display: flex;
+		}
+
+		.group-img {
+			display: block;
+			width: 100%;
+			position: relative;
+			z-index: 2;
+			pointer-events: none;
+		}
+
+		/* --- 캐릭터 정보 박스 공통 --- */
+		.char-info {
+			position: absolute;
+			z-index: 10;
+			width: 9.2%;
+			font-size: 0.75vw;
+			line-height: 1.2;
+			word-break: keep-all;
+			overflow-wrap: break-word;
+		}
+
+		.char-name {
+			font-family: 'Eulyoo1945', serif;
+			font-size: 1.4em;
+			font-weight: bold;
+			font-style: italic;
+			color: white;
+			text-align: center;
+			margin-bottom: 0.2em;
+			background:
+				radial-gradient(circle at 10% 7%, rgba(0, 200, 180, 0.6) 0%, transparent 15%) fixed,
+				radial-gradient(circle at 18% 33%, rgba(0, 200, 180, 0.55) 0%, transparent 18%) fixed,
+				radial-gradient(circle at 40% 7%, rgba(0, 200, 180, 0.6) 0%, transparent 15%) fixed,
+				radial-gradient(circle at 48% 33%, rgba(0, 200, 180, 0.55) 0%, transparent 18%) fixed,
+				radial-gradient(circle at 84% 7%, rgba(0, 200, 180, 0.6) 0%, transparent 18%) fixed,
+				radial-gradient(circle at 76% 35%, rgba(0, 200, 180, 0.55) 0%, transparent 15%) fixed,
+				radial-gradient(circle at 95% 35%, rgba(0, 200, 180, 0.55) 0%, transparent 15%) fixed,
+				linear-gradient(to right, transparent, rgba(18, 13, 61, 0.92), transparent),
+				linear-gradient(to bottom, #05050f, #0d1a5e);
+		}
+
+		.char-desc {
+			font-family: 'Eulyoo1945', serif;
+			font-weight: normal;
+			font-size: 0.9em;
+			margin-bottom: 0.2em;
+		}
+
+		.char-desc-mayu {
+			font-family: 'Eulyoo1945', serif;
+			font-weight: bold;
+			font-size: 1.2em;
+			margin-bottom: 0.2em;
+		}
+
+		.char-skills {
+			margin-top: 0.2em;
+		}
+
+		.skill-header {
+			font-size: 1em;
+			background: #FAF9D0;
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			white-space: nowrap;
+		}
+
+		.skill-header b {
+			flex-shrink: 0;
+			margin-right: 8px;
+		}
+
+		.skill-header span {
+			flex-shrink: 1;
+			min-width: 0;
+			overflow: hidden;
+			text-overflow: ellipsis;
+			text-align: right;
+		}
+
+		.skill-desc {
+			font-size: 0.8em;
+			margin-top: 0.2em;
+			margin-bottom: 0.2em;
+			margin-left: 1em;
+		}
+
+		/* --- 캐릭터별 위치 --- */
+		.char-fari {
+			left: 12.5%;
+			top: 10%;
+		}
+
+		.char-rin {
+			left: 23.8%;
+			top: 10%;
+		}
+
+		.char-pet {
+			left: 24%;
+			bottom: 10%;
+		}
+
+		.char-ata {
+			left: 49.5%;
+			bottom: 10%;
+		}
+
+		.char-smsh {
+			left: 62.5%;
+			bottom: 0%;
+			width: 15%;
+		}
+
+		.char-yuri {
+			right: 3%;
+			top: 10%;
+		}
+
+		.char-mayu {
+			right: 4%;
+			bottom: 0%;
+			width: 16%;
+		}
+
+		.char-mayu-img {
+			position: absolute;
+			z-index: 1;
+			right: 4%;
+			bottom: 16%;
+			width: calc(781 / 4803 * 100%);
+			opacity: 0;
+			transition: opacity 0.3s ease-in-out;
+		}
+
+		.char-mayu:hover+.char-mayu-img,
+		.char-mayu-img:hover {
+			opacity: 1;
+		}
+
+		/* --- 모바일 뷰 (Mobile View) --- */
+		@media (max-width: 1200px) {
+			.char-container {
+				flex-direction: column;
+				padding: 20px 10px 40px;
+			}
+
+			.char-group,
+			.spacer.char-group-mayu {
+				width: 100% !important;
+				display: grid;
+				grid-template-columns: 1fr 1fr;
+				gap: 0 4%;
+				max-width: 600px;
+				margin: 0 auto;
+			}
+
+			.spacer:not(.char-group-mayu) {
+				display: none;
+			}
+
+			.group-img {
+				width: 100%;
+				grid-column: 1 / -1;
+				justify-self: center;
+				margin-bottom: 20px;
+			}
+
+			.group-fari-pet .group-img {
+				width: calc(1129 / 1220 * 100%);
+			}
+
+			.group-rin-ata .group-img {
+				width: calc(793 / 1220 * 100%);
+			}
+
+			.group-yuri-smsh .group-img {
+				width: 100%;
+			}
+
+			.char-info {
+				position: relative;
+				width: auto;
+				left: auto !important;
+				right: auto !important;
+				top: auto !important;
+				bottom: auto !important;
+				margin-bottom: 30px;
+				font-size: 14px;
+				display: grid;
+				grid-template-rows: subgrid;
+				grid-row: span 3;
+			}
+
+			.spacer.char-group-mayu .char-info {
+				grid-column: 1 / -1;
+			}
+
+			.char-name {
+				font-size: 20px;
+				background:
+					radial-gradient(circle at 25% 5%, rgba(0, 200, 180, 0.65) 0%, transparent 18%) fixed,
+					radial-gradient(circle at 75% 12%, rgba(0, 200, 180, 0.6) 0%, transparent 18%) fixed,
+					radial-gradient(circle at 25% 22%, rgba(0, 200, 180, 0.6) 0%, transparent 18%) fixed,
+					radial-gradient(circle at 75% 32%, rgba(0, 200, 180, 0.65) 0%, transparent 18%) fixed,
+					radial-gradient(circle at 25% 42%, rgba(0, 200, 180, 0.6) 0%, transparent 18%) fixed,
+					radial-gradient(circle at 75% 52%, rgba(0, 200, 180, 0.65) 0%, transparent 18%) fixed,
+					radial-gradient(circle at 25% 62%, rgba(0, 200, 180, 0.6) 0%, transparent 18%) fixed,
+					radial-gradient(circle at 75% 72%, rgba(0, 200, 180, 0.65) 0%, transparent 18%) fixed,
+					radial-gradient(circle at 25% 82%, rgba(0, 200, 180, 0.6) 0%, transparent 18%) fixed,
+					radial-gradient(circle at 75% 92%, rgba(0, 200, 180, 0.65) 0%, transparent 18%) fixed,
+					linear-gradient(to right, transparent, rgba(18, 13, 61, 0.92), transparent),
+					linear-gradient(to bottom, #05050f, #0d1a5e);
+			}
+
+			.char-desc {
+				font-size: 14px;
+			}
+
+			.char-desc-mayu {
+				font-size: 16px;
+			}
+
+			.skill-header {
+				font-size: 15px;
+			}
+
+			.skill-desc {
+				font-size: 13px;
+			}
+
+			.char-mayu-img {
+				position: relative;
+				width: calc(781 / 1220 * 100%);
+				grid-column: 1 / -1;
+				justify-self: center;
+				right: auto !important;
+				bottom: auto !important;
+				opacity: 1;
+				pointer-events: auto;
+				margin-top: 10px;
+			}
+		}
+	</style>
+</head>
+
+<body>
+	<div class="char-container">
+
+		<div class="char-group group-fari-pet" style="width: calc(1129 / 4803 * 100%)">
+			<img src="img/char_fari_pet.png" class="group-img" alt="">
+			<div class="char-info char-fari">
+				<div class="char-desc">
+					여우 민족의 마술사. 느긋하고 엉뚱한 분위기의 소녀.<br>
+					패 운이 좋아, 초반부터 리치를 걸어온다.
+				</div>
+				<div class="char-name">화린</div>
+				<div class="char-skills">
+					<div class="skill-header"><b>■ 회복</b><span>소비 MP 24</span></div>
+					<div class="skill-desc">HP를 조금 회복한다. 한 라운드에 몇 번이고 사용 가능.</div>
+					<div class="skill-header"><b>■ 버린 패 방어</b><span>소비 MP 18</span></div>
+					<div class="skill-desc">5턴 간 상대가 자신이 버린 패로 펑·론을 할 수 없게 한다. 한 라운드에 몇 번이고 사용 가능.</div>
+				</div>
+			</div>
+
+			<div class="char-info char-pet">
+				<div class="char-desc">
+					마술사. 대식가에 술꾼, 애연가로 불건강한 생활을 하고 있다.<br>
+					패를 잘 못 뽑는다. 날 수 있는 기회가 2배가 되는 비기를 지녔다.
+				</div>
+				<div class="char-name">페톰</div>
+				<div class="char-skills">
+					<div class="skill-header"><b>■ 크리티컬</b><span>소비 MP 24</span></div>
+					<div class="skill-desc">났을 때 상대에게 주는 데미지를 25퍼센트 증가시킨다.</div>
+					<div class="skill-header"><b>■ 라스트 찬스</b><span>소비 MP 18</span></div>
+					<div class="skill-desc">텐파이인 상태에서 나가리일 경우 남은 패 룰렛에 도전할 수 있다. 역을 완성시키는 패에서 룰렛이 멈추면 난다.</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="spacer" style="width: calc(437 / 4803 * 100%)"></div>
+
+		<div class="char-group group-rin-ata" style="width: calc(793 / 4803 * 100%)">
+			<img src="img/char_rin_ata.png" class="group-img" alt="">
+			<div class="char-info char-rin">
+				<div class="char-desc">
+					고양이 민족의 여권사. 아타호에게 연심을 품고 있다.<br>
+					평균적인 실력을 지녔다. 숨김 도라를 자유자재로 다뤄 점수를 쌓는다.
+				</div>
+				<div class="char-name">린샹</div>
+				<div class="char-skills">
+					<div class="skill-header"><b>■ 수경</b><span>소비 MP 22</span></div>
+					<div class="skill-desc">상대가 났을 때 자신이 받는 데미지를 25퍼센트 감소시킨다.</div>
+					<div class="skill-header"><b>■ 도라폭진</b><span>소비 MP 32</span></div>
+					<div class="skill-desc">리치로 났을 때 숨김 도라를 자신이 가지고 있는 패로 바꾼다.</div>
+				</div>
+			</div>
+
+			<div class="char-info char-ata">
+				<div class="char-desc">
+					호랑이 민족의 권사. 술을 매우 좋아하며 취권의 달인이기도 하다.<br>
+					한 방에 날 수 있는 「맹호일발권」이 강력.
+				</div>
+				<div class="char-name">아타호</div>
+				<div class="char-skills">
+					<div class="skill-header"><b>■ 맹호일발권</b><span>소비 MP 100</span></div>
+					<div class="skill-desc">리치를 걸 수 있을 때 사용하면 다음 쯔모로 반드시 난다. 20턴 째엔 사용할 수 없다.</div>
+					<div class="skill-header"><b>■ 지옥 쌓기</b><span>소비 MP 18</span></div>
+					<div class="skill-desc">3턴 간 상대가 받는 패를 쓸모 없는 패로 바꿔 쯔모로 나는 것을 막는다.</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="spacer" style="width: calc(628 / 4803 * 100%)"></div>
+
+		<div class="char-group group-yuri-smsh" style="width: calc(1220 / 4803 * 100%)">
+			<img src="img/char_yuri_smsh.png" class="group-img" alt="">
+			<div class="char-info char-yuri">
+				<div class="char-desc">
+					남장을 한 여성 사무라이. 자기주장이 강하고 화려한 복장을 즐긴다.<br>
+					상대의 론을 무효화하는 「초 거합베기」로 역전하기 쉽다.
+				</div>
+				<div class="char-name">유리와카마루</div>
+				<div class="char-skills">
+					<div class="skill-header"><b>■ 초 거합베기</b><span>소비 MP 22</span></div>
+					<div class="skill-desc">상대가 론이 되었을 때 버린 패를 거합 발도로 베어내 론을 무효화한다. 자신이 리치를 걸고 있을 경우에는 사용할 수 없다.</div>
+					<div class="skill-header"><b>■ 기합 리치</b><span>소비 MP 24</span></div>
+					<div class="skill-desc">리치를 걸 수 있을 때 사용하면 5턴 후 쯔모로 반드시 난다. 16턴 째 이후에는 사용할 수 없다.</div>
+				</div>
+			</div>
+
+			<div class="char-info char-smsh">
+				<div class="char-desc">
+					개 민족의 닌자 검사. 예쁜 여자를 밝히는 변태 개.<br>
+					「패 교환」이 강력하지만, MP 소비가 심해 장기전에는 불리하다.
+				</div>
+				<div class="char-name">스마슈</div>
+				<div class="char-skills">
+					<div class="skill-header"><b>■ 패 교환</b><span>소비 MP 6×교환한 패 수</span></div>
+					<div class="skill-desc">라운드가 시작할 때 필요 없는 패를 골라 ESC키를 누르거나 오른쪽 클릭하면, 다른 패로 교환할 수 있다.</div>
+					<div class="skill-header"><b>■ 론패 교환</b><span>소비 MP 10</span></div>
+					<div class="skill-desc">상대가 론이 되었을 때 버린 패를 자신이 가진 다른 패로 교환해 론을 무효로 한다. 자신이 리치를 걸고 있을 경우에는 사용할 수 없다.
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="spacer char-group-mayu" style="width: calc(596 / 4803 * 100%)">
+			<div class="char-info char-mayu">
+				<div class="char-desc-mayu">
+					우승자를 기다리는 수수께끼의 인(?)물.
+				</div>
+				<div class="char-name">???</div>
+				<div class="char-skills">
+					<div class="skill-header"><b>■ 패 덧칠</b><span>소비 MP 4×교환한 패 수</span></div>
+					<div class="skill-desc">라운드가 시작할 때 필요 없는 패를 골라 ESC키를 누르거나 오른쪽 클릭하면, 다른 패로 교환할 수 있다.</div>
+				</div>
+			</div>
+			<img src="img/char_mayu.png" class="char-mayu-img" alt="">
+		</div>
+	</div>
+</body>
+
+</html>
