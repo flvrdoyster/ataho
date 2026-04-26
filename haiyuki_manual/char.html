@@ -77,6 +77,8 @@
 		}
 
 		.char-name {
+			--tc: rgba(0, 200, 180, 0.6);
+			--tr: 15%;
 			margin-bottom: 0.2em;
 			font-size: 1.4em;
 			font-weight: bold;
@@ -84,13 +86,12 @@
 			color: white;
 			text-align: center;
 			background:
-				radial-gradient(circle at 10% 7%, rgba(0, 200, 180, 0.6) 0%, transparent 15%) fixed,
-				radial-gradient(circle at 18% 33%, rgba(0, 200, 180, 0.55) 0%, transparent 18%) fixed,
-				radial-gradient(circle at 40% 7%, rgba(0, 200, 180, 0.6) 0%, transparent 15%) fixed,
-				radial-gradient(circle at 48% 33%, rgba(0, 200, 180, 0.55) 0%, transparent 18%) fixed,
-				radial-gradient(circle at 84% 7%, rgba(0, 200, 180, 0.6) 0%, transparent 18%) fixed,
-				radial-gradient(circle at 76% 35%, rgba(0, 200, 180, 0.55) 0%, transparent 15%) fixed,
-				radial-gradient(circle at 95% 35%, rgba(0, 200, 180, 0.55) 0%, transparent 15%) fixed,
+				radial-gradient(circle at 17%  8%, var(--tc) 0%, transparent var(--tr)) fixed,
+				radial-gradient(circle at 67% 13%, var(--tc) 0%, transparent var(--tr)) fixed,
+				radial-gradient(circle at 42% 45%, var(--tc) 0%, transparent var(--tr)) fixed,
+				radial-gradient(circle at 92% 51%, var(--tc) 0%, transparent var(--tr)) fixed,
+				radial-gradient(circle at 17% 88%, var(--tc) 0%, transparent var(--tr)) fixed,
+				radial-gradient(circle at 67% 82%, var(--tc) 0%, transparent var(--tr)) fixed,
 				linear-gradient(to right, transparent, rgba(18, 13, 61, 0.92), transparent),
 				linear-gradient(to bottom, #05050f, #0d1a5e);
 		}
@@ -273,21 +274,6 @@
 				grid-column: 1 / -1;
 			}
 
-			.char-name {
-				background:
-					radial-gradient(circle at 25% 5%, rgba(0, 200, 180, 0.65) 0%, transparent 18%) fixed,
-					radial-gradient(circle at 75% 12%, rgba(0, 200, 180, 0.6) 0%, transparent 18%) fixed,
-					radial-gradient(circle at 25% 22%, rgba(0, 200, 180, 0.6) 0%, transparent 18%) fixed,
-					radial-gradient(circle at 75% 32%, rgba(0, 200, 180, 0.65) 0%, transparent 18%) fixed,
-					radial-gradient(circle at 25% 42%, rgba(0, 200, 180, 0.6) 0%, transparent 18%) fixed,
-					radial-gradient(circle at 75% 52%, rgba(0, 200, 180, 0.65) 0%, transparent 18%) fixed,
-					radial-gradient(circle at 25% 62%, rgba(0, 200, 180, 0.6) 0%, transparent 18%) fixed,
-					radial-gradient(circle at 75% 72%, rgba(0, 200, 180, 0.65) 0%, transparent 18%) fixed,
-					radial-gradient(circle at 25% 82%, rgba(0, 200, 180, 0.6) 0%, transparent 18%) fixed,
-					radial-gradient(circle at 75% 92%, rgba(0, 200, 180, 0.65) 0%, transparent 18%) fixed,
-					linear-gradient(to right, transparent, rgba(18, 13, 61, 0.92), transparent),
-					linear-gradient(to bottom, #05050f, #0d1a5e);
-			}
 
 			.char-mayu-img {
 				position: relative;
