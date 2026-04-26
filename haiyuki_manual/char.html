@@ -1,49 +1,71 @@
-<html>
+<!DOCTYPE html>
+<html lang="ko">
 
 <head>
-	<title>char</title>
-	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<title>DS20 - 환세패유기 : atah.io</title>
+	<meta charset="UTF-8">
+	<link rel="icon" href="https://atah.io/favicon.ico">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<!-- Google Tag Manager -->
+	<script>(function (w, d, s, l, i) {
+			w[l] = w[l] || []; w[l].push({
+				'gtm.start':
+					new Date().getTime(), event: 'gtm.js'
+			}); var f = d.getElementsByTagName(s)[0],
+				j = d.createElement(s), dl = l != 'dataLayer' ? '&l=' + l : ''; j.async = true; j.src =
+					'https://www.googletagmanager.com/gtm.js?id=' + i + dl; f.parentNode.insertBefore(j, f);
+		})(window, document, 'script', 'dataLayer', 'GTM-PR4S897C');</script>
+	<!-- End Google Tag Manager -->
+	<link rel="stylesheet" href="../footer.css">
 	<link rel="stylesheet" href="manual.css">
 	<style>
-		@font-face {
-			font-family: 'Eulyoo1945';
-			src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_2102-01@1.0/Eulyoo1945-Regular.woff') format('woff');
-			font-weight: normal;
-			font-style: normal;
-		}
-
-		@font-face {
-			font-family: 'Eulyoo1945';
-			src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_2102-01@1.0/Eulyoo1945-SemiBold.woff') format('woff');
-			font-weight: bold;
-			font-style: normal;
-		}
-
 		* {
 			box-sizing: border-box;
 		}
 
 		body {
 			background-image: none;
+			-webkit-text-size-adjust: 100%;
+			text-size-adjust: 100%;
 		}
 
-		/* --- 레이아웃 --- */
+		.char-title {
+			padding: 0 0.5vw 1vw;
+			font-size: 1vw;
+			text-align: left;
+			word-break: keep-all;
+			overflow-wrap: break-word;
+		}
+
+		.char-title h1,
+		.char-title h2 {
+			margin: 0;
+			padding: 0;
+			border: none;
+			font-size: 1.4em;
+			font-weight: bold;
+		}
+
+		.char-title-desc {
+			font-size: 0.8em;
+			line-height: 1.4;
+		}
+
 		.char-container {
 			position: relative;
-			width: 100%;
-			padding-bottom: 3vw;
 			display: flex;
+			width: 100%;
+			padding: 0 1vw 3vw;
 		}
 
 		.group-img {
-			display: block;
-			width: 100%;
 			position: relative;
 			z-index: 2;
+			display: block;
+			width: 100%;
 			pointer-events: none;
 		}
 
-		/* --- 캐릭터 정보 박스 공통 --- */
 		.char-info {
 			position: absolute;
 			z-index: 10;
@@ -55,13 +77,12 @@
 		}
 
 		.char-name {
-			font-family: 'Eulyoo1945', serif;
+			margin-bottom: 0.2em;
 			font-size: 1.4em;
 			font-weight: bold;
 			font-style: italic;
 			color: white;
 			text-align: center;
-			margin-bottom: 0.2em;
 			background:
 				radial-gradient(circle at 10% 7%, rgba(0, 200, 180, 0.6) 0%, transparent 15%) fixed,
 				radial-gradient(circle at 18% 33%, rgba(0, 200, 180, 0.55) 0%, transparent 18%) fixed,
@@ -75,17 +96,18 @@
 		}
 
 		.char-desc {
-			font-family: 'Eulyoo1945', serif;
-			font-weight: normal;
-			font-size: 0.9em;
 			margin-bottom: 0.2em;
+			font-size: 0.8em;
+			font-weight: normal;
+			line-height: 1.4;
+			color: #311B4D;
 		}
 
 		.char-desc-mayu {
-			font-family: 'Eulyoo1945', serif;
-			font-weight: bold;
-			font-size: 1.2em;
 			margin-bottom: 0.2em;
+			font-size: 1.2em;
+			font-weight: bold;
+			color: #7A1828;
 		}
 
 		.char-skills {
@@ -93,11 +115,11 @@
 		}
 
 		.skill-header {
-			font-size: 1em;
-			background: #FAF9D0;
 			display: flex;
 			justify-content: space-between;
 			align-items: center;
+			background: #FAF9D0;
+			font-size: 1em;
 			white-space: nowrap;
 		}
 
@@ -110,52 +132,53 @@
 			flex-shrink: 1;
 			min-width: 0;
 			overflow: hidden;
-			text-overflow: ellipsis;
+			font-size: 0.8em;
 			text-align: right;
+			text-overflow: ellipsis;
 		}
 
 		.skill-desc {
-			font-size: 0.8em;
 			margin-top: 0.2em;
-			margin-bottom: 0.2em;
+			margin-right: 0;
+			margin-bottom: 0.4em;
 			margin-left: 1em;
+			font-size: 0.8em;
 		}
 
-		/* --- 캐릭터별 위치 --- */
 		.char-fari {
-			left: 12.5%;
-			top: 10%;
+			top: 7%;
+			left: 13.2%;
 		}
 
 		.char-rin {
-			left: 23.8%;
-			top: 10%;
+			top: 7%;
+			left: 24%;
 		}
 
 		.char-pet {
-			left: 24%;
 			bottom: 10%;
+			left: 24.2%;
 		}
 
 		.char-ata {
-			left: 49.5%;
 			bottom: 10%;
+			left: 49.3%;
 		}
 
 		.char-smsh {
-			left: 62.5%;
 			bottom: 0%;
+			left: 62.5%;
 			width: 15%;
 		}
 
 		.char-yuri {
-			right: 3%;
-			top: 10%;
+			top: 7%;
+			right: 3.5%;
 		}
 
 		.char-mayu {
-			right: 4%;
 			bottom: 0%;
+			right: 4%;
 			width: 16%;
 		}
 
@@ -174,20 +197,33 @@
 			opacity: 1;
 		}
 
-		/* --- 모바일 뷰 (Mobile View) --- */
+		/* 푸터 폰트 크기를 char.html의 특수한 vw 스케일에 동기화 */
+		#footer {
+			font-size: 0.75vw;
+		}
+
 		@media (max-width: 1200px) {
+			.char-title {
+				width: 100%;
+				max-width: 760px;
+				margin: 0 auto;
+				padding: 30px 10px 10px;
+				font-size: clamp(14px, 4vw, 18px);
+			}
+
 			.char-container {
+				display: flex;
 				flex-direction: column;
 				padding: 20px 10px 40px;
 			}
 
 			.char-group,
 			.spacer.char-group-mayu {
-				width: 100% !important;
 				display: grid;
-				grid-template-columns: 1fr 1fr;
+				grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
 				gap: 0 4%;
-				max-width: 600px;
+				width: 100% !important;
+				max-width: 760px;
 				margin: 0 auto;
 			}
 
@@ -196,9 +232,9 @@
 			}
 
 			.group-img {
-				width: 100%;
 				grid-column: 1 / -1;
 				justify-self: center;
+				width: 100%;
 				margin-bottom: 20px;
 			}
 
@@ -216,16 +252,21 @@
 
 			.char-info {
 				position: relative;
-				width: auto;
-				left: auto !important;
-				right: auto !important;
 				top: auto !important;
 				bottom: auto !important;
-				margin-bottom: 30px;
-				font-size: 14px;
+				left: auto !important;
+				right: auto !important;
 				display: grid;
 				grid-template-rows: subgrid;
 				grid-row: span 3;
+				width: auto;
+				margin-bottom: 30px;
+				font-size: clamp(14px, 4vw, 18px);
+			}
+
+			.char-info,
+			.char-info>div {
+				min-width: 0;
 			}
 
 			.spacer.char-group-mayu .char-info {
@@ -233,7 +274,6 @@
 			}
 
 			.char-name {
-				font-size: 20px;
 				background:
 					radial-gradient(circle at 25% 5%, rgba(0, 200, 180, 0.65) 0%, transparent 18%) fixed,
 					radial-gradient(circle at 75% 12%, rgba(0, 200, 180, 0.6) 0%, transparent 18%) fixed,
@@ -249,38 +289,40 @@
 					linear-gradient(to bottom, #05050f, #0d1a5e);
 			}
 
-			.char-desc {
-				font-size: 14px;
-			}
-
-			.char-desc-mayu {
-				font-size: 16px;
-			}
-
-			.skill-header {
-				font-size: 15px;
-			}
-
-			.skill-desc {
-				font-size: 13px;
-			}
-
 			.char-mayu-img {
 				position: relative;
-				width: calc(781 / 1220 * 100%);
+				bottom: auto !important;
+				right: auto !important;
 				grid-column: 1 / -1;
 				justify-self: center;
-				right: auto !important;
-				bottom: auto !important;
+				width: calc(781 / 1220 * 100%);
+				margin-top: 10px;
 				opacity: 1;
 				pointer-events: auto;
-				margin-top: 10px;
+			}
+
+			#footer {
+				font-size: clamp(12px, 3.5vw, 14px);
 			}
 		}
 	</style>
 </head>
 
-<body>
+<body class="footer-static">
+	<!-- Google Tag Manager (noscript) -->
+	<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-PR4S897C" height="0" width="0"
+			style="display:none;visibility:hidden"></iframe></noscript>
+	<!-- End Google Tag Manager (noscript) -->
+
+	<div class="char-title">
+		<h2>캐릭터 & 비기 소개</h2>
+		<div class="char-title-desc">
+			대회에 참가하는 것은 총 6명. 캐릭터에 따라 엔딩이 달라집니다.<br>
+			각 캐릭터는 2종류씩 비기를 지니고 있습니다. 사용 가능한 타이밍은 라운드 시작 시, 라운드가 진행되는 동안 등 비기에 따라 다릅니다.<br>
+			화린을 제외하고는 1라운드에 1회만 사용할 수 있습니다.
+		</div>
+	</div>
+
 	<div class="char-container">
 
 		<div class="char-group group-fari-pet" style="width: calc(1129 / 4803 * 100%)">
@@ -395,6 +437,8 @@
 			<img src="img/char_mayu.png" class="char-mayu-img" alt="">
 		</div>
 	</div>
+	<div id="footer"></div>
+	<script src="../footer.js"></script>
 </body>
 
 </html>

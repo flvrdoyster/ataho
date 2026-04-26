@@ -1,8 +1,8 @@
 #footer {
     text-align: center;
-    color: #bbb;
-    font-size: 0.9rem;
-    font-family: 'KoddiUDOnGothic-Regular', sans-serif;
+    /* 폰트 종류와 크기를 부모 문서에 맞추어 유연하게 상속 */
+    font-size: 0.9em;
+    font-family: inherit;
     z-index: 100;
     line-height: 1.5;
 }
@@ -12,20 +12,20 @@
 }
 
 #footer a {
-    color: #88ccff;
     text-decoration: underline;
+    /* 링크 색상도 부모 문서의 a 태그 전역 속성을 자연스럽게 따라갑니다 */
 }
 
 #footer a:hover {
-    color: white;
+    opacity: 0.7;
 }
 
 #footer .footer-sep {
-    color: #333;
     margin: 0 5px;
+    opacity: 0.5;
 }
 
-/* Fixed footer style (for main page, balance, swim) */
+/* Fixed footer style (배경이 강제로 어두워지므로 밝은 텍스트로 명시) */
 .footer-fixed #footer {
     position: fixed;
     bottom: 0;
@@ -34,21 +34,36 @@
     background: linear-gradient(to top, rgba(0, 0, 0, 0.9), rgba(0, 0, 0, 0));
     padding: 15px 0;
     pointer-events: auto;
+    
+    color: #bbb;
 }
 
-/* Static footer style (for manual, haiyuki_web) */
+.footer-fixed #footer a {
+    color: #88ccff;
+}
+
+.footer-fixed #footer a:hover {
+    color: white;
+    opacity: 1;
+}
+
+/* Static footer style (부모 문서의 테마 색상을 상속받음) */
 .footer-static #footer {
     display: block;
     width: 100%;
     padding: 20px 0;
-    border-top: 1px solid #444;
+    /* 밝은/어두운 테마 모두에서 자연스럽게 어우러지는 반투명 경계선 */
+    border-top: 1px solid rgba(128, 128, 128, 0.3);
     margin-top: 20px;
     text-align: center;
+    
+    color: inherit;
+    opacity: 0.8; /* 본문보다 살짝 옅게 표시하여 푸터 느낌 강조 */
 }
 
 @media (max-width: 768px) {
     #footer {
-        font-size: 0.75rem;
+        font-size: 0.8em;
     }
 
     .desktop-only {
