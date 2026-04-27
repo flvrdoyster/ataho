@@ -5,16 +5,18 @@
 }
 
 @font-face {
-    font-family: 'KoddiudOngodic';
+    font-family: 'KoddiUDOnGothic';
     src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2105_2@1.0/KoddiUDOnGothic-Regular.woff') format('woff');
-    font-weight: normal;
+    font-weight: 400;
+    font-style: normal;
     font-display: swap;
 }
 
 @font-face {
-    font-family: 'KoddiudOngodic';
+    font-family: 'KoddiUDOnGothic';
     src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2105_2@1.0/KoddiUDOnGothic-Bold.woff') format('woff');
     font-weight: 700;
+    font-style: normal;
     font-display: swap;
 }
 
@@ -26,7 +28,7 @@ body {
     justify-content: center;
     align-items: center;
     height: 100vh;
-    font-family: 'KoddiudOngodic', 'Gulim', 'Malgun Gothic', sans-serif;
+    font-family: 'KoddiUDOnGothic', 'Gulim', 'Malgun Gothic', sans-serif;
     color: white;
     user-select: none;
     -webkit-user-select: none;

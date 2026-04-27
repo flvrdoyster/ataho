@@ -2,16 +2,18 @@
    1. Fonts
    ========================================= */
 @font-face {
-    font-family: 'KoddiudOngodic';
+    font-family: 'KoddiUDOnGothic';
     src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2105_2@1.0/KoddiUDOnGothic-Regular.woff') format('woff');
-    font-weight: normal;
+    font-weight: 400;
+    font-style: normal;
     font-display: swap;
 }
 
 @font-face {
-    font-family: 'KoddiudOngodic';
+    font-family: 'KoddiUDOnGothic';
     src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2105_2@1.0/KoddiUDOnGothic-Bold.woff') format('woff');
     font-weight: 700;
+    font-style: normal;
     font-display: swap;
 }
 
@@ -26,7 +28,7 @@
    2. Global Styles
    ========================================= */
 body {
-    font-family: 'KoddiudOngodic', sans-serif;
+    font-family: 'KoddiUDOnGothic', sans-serif;
     color: #fff;
     /* text-shadow removed for cleaner UI elements */
 }
@@ -171,7 +173,7 @@ video::cue {
     color: #fff;
     font-size: 1.8rem;
     font-weight: regular;
-    font-family: 'KoddiudOngodic', sans-serif;
+    font-family: 'KoddiUDOnGothic', sans-serif;
 }
 
 /* Fullscreen subtitle override */

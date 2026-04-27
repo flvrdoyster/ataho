@@ -2,53 +2,15 @@
 <html lang="ko">
 
 <head>
-	<title>DS20 - 환세패유기 : atah.io</title>
+	<title>환세패유기 캐릭터 및 비기 소개 : atah.io</title>
 	<meta charset="UTF-8">
-	<link rel="icon" href="https://atah.io/favicon_haiyuki.ico">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<!-- Google Tag Manager -->
-	<script>(function (w, d, s, l, i) {
-			w[l] = w[l] || []; w[l].push({
-				'gtm.start':
-					new Date().getTime(), event: 'gtm.js'
-			}); var f = d.getElementsByTagName(s)[0],
-				j = d.createElement(s), dl = l != 'dataLayer' ? '&l=' + l : ''; j.async = true; j.src =
-					'https://www.googletagmanager.com/gtm.js?id=' + i + dl; f.parentNode.insertBefore(j, f);
-		})(window, document, 'script', 'dataLayer', 'GTM-PR4S897C');</script>
-	<!-- End Google Tag Manager -->
-	<link rel="stylesheet" href="../footer.css">
 	<link rel="stylesheet" href="manual.css">
 	<style>
-		* {
-			box-sizing: border-box;
-		}
-
 		body {
 			background-image: none;
 			-webkit-text-size-adjust: 100%;
 			text-size-adjust: 100%;
-		}
-
-		.char-title {
-			padding: 0 0.5vw 1vw;
-			font-size: 1vw;
-			text-align: left;
-			word-break: keep-all;
-			overflow-wrap: break-word;
-		}
-
-		.char-title h1,
-		.char-title h2 {
-			margin: 0;
-			padding: 0;
-			border: none;
-			font-size: 1.4em;
-			font-weight: bold;
-		}
-
-		.char-title-desc {
-			font-size: 0.8em;
-			line-height: 1.4;
 		}
 
 		.char-container {
@@ -72,8 +34,6 @@
 			width: 9.2%;
 			font-size: 0.75vw;
 			line-height: 1.2;
-			word-break: keep-all;
-			overflow-wrap: break-word;
 		}
 
 		.char-name {
@@ -93,7 +53,7 @@
 				radial-gradient(circle at 17% 88%, var(--tc) 0%, transparent var(--tr)) fixed,
 				radial-gradient(circle at 67% 82%, var(--tc) 0%, transparent var(--tr)) fixed,
 				linear-gradient(to right, transparent, rgba(18, 13, 61, 0.92), transparent),
-				linear-gradient(to bottom, #05050f, #0d1a5e);
+				linear-gradient(to bottom, rgba(5, 5, 15, 1), rgba(13, 26, 94, 1));
 		}
 
 		.char-desc {
@@ -101,14 +61,14 @@
 			font-size: 0.8em;
 			font-weight: normal;
 			line-height: 1.4;
-			color: #311B4D;
+			color: rgba(49, 27, 77, 1);
 		}
 
 		.char-desc-mayu {
 			margin-bottom: 0.2em;
 			font-size: 1.2em;
 			font-weight: bold;
-			color: #7A1828;
+			color: rgba(122, 24, 40, 1);
 		}
 
 		.char-skills {
@@ -119,7 +79,7 @@
 			display: flex;
 			justify-content: space-between;
 			align-items: center;
-			background: #FAF9D0;
+			background: rgba(250, 249, 208, 1);
 			font-size: 1em;
 			white-space: nowrap;
 		}
@@ -198,19 +158,8 @@
 			opacity: 1;
 		}
 
-		/* 푸터 폰트 크기를 char.html의 특수한 vw 스케일에 동기화 */
-		#footer {
-			font-size: 0.75vw;
-		}
 
-		@media (max-width: 1200px) {
-			.char-title {
-				width: 100%;
-				max-width: 760px;
-				margin: 0 auto;
-				padding: 30px 10px 10px;
-				font-size: clamp(14px, 4vw, 18px);
-			}
+		@media (max-width: 800px) {
 
 			.char-container {
 				display: flex;
@@ -287,28 +236,11 @@
 				pointer-events: auto;
 			}
 
-			#footer {
-				font-size: clamp(12px, 3.5vw, 14px);
-			}
 		}
 	</style>
 </head>
 
-<body class="footer-static">
-	<!-- Google Tag Manager (noscript) -->
-	<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-PR4S897C" height="0" width="0"
-			style="display:none;visibility:hidden"></iframe></noscript>
-	<!-- End Google Tag Manager (noscript) -->
-
-	<div class="char-title">
-		<h2>캐릭터 & 비기 소개</h2>
-		<div class="char-title-desc">
-			대회에 참가하는 것은 총 6명. 캐릭터에 따라 엔딩이 달라집니다.<br>
-			각 캐릭터는 2종류씩 비기를 지니고 있습니다. 사용 가능한 타이밍은 라운드 시작 시, 라운드가 진행되는 동안 등 비기에 따라 다릅니다.<br>
-			화린을 제외하고는 1라운드에 1회만 사용할 수 있습니다.
-		</div>
-	</div>
-
+<body>
 	<div class="char-container">
 
 		<div class="char-group group-fari-pet" style="width: calc(1129 / 4803 * 100%)">
@@ -423,8 +355,15 @@
 			<img src="img/char_mayu.png" class="char-mayu-img" alt="">
 		</div>
 	</div>
-	<div id="footer"></div>
-	<script src="../footer.js"></script>
+	<script>
+		function reportHeight() {
+			var h = document.documentElement.getBoundingClientRect().height;
+			window.parent.postMessage({ charIframeHeight: Math.ceil(h) }, '*');
+		}
+		var ro = new ResizeObserver(reportHeight);
+		ro.observe(document.documentElement);
+		window.addEventListener('load', reportHeight);
+	</script>
 </body>
 
 </html>
