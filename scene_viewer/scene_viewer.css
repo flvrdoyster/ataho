@@ -1,7 +1,7 @@
 :root {
     --stage-width: 800px;
     --stage-height: 600px;
-    --bg-color: #000;
+    --bg-color: rgba(0, 0, 0, 1);
 }
 
 @font-face {
@@ -23,13 +23,13 @@
 body {
     margin: 0;
     padding: 0;
-    background-color: #1a1a1a;
+    background-color: rgba(26, 26, 26, 1);
     display: flex;
     justify-content: center;
     align-items: center;
     height: 100vh;
     font-family: 'KoddiUDOnGothic', 'Gulim', 'Malgun Gothic', sans-serif;
-    color: white;
+    color: rgba(255, 255, 255, 1);
     user-select: none;
     -webkit-user-select: none;
     -moz-user-select: none;
@@ -67,7 +67,7 @@ input[type=range] {
     position: relative;
     overflow: hidden;
     box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
-    border: 2px solid #333;
+    border: 2px solid rgba(51, 51, 51, 1);
     image-rendering: pixelated;
     image-rendering: -moz-crisp-edges;
     image-rendering: crisp-edges;
@@ -112,10 +112,10 @@ img.fit-cover {
     left: 0;
     width: 100%;
     text-align: center;
-    color: white;
+    color: rgba(255, 255, 255, 1);
     font-size: 28px;
     line-height: 1.5;
-    text-shadow: 2px 2px 0 #000;
+    text-shadow: 2px 2px 0 rgba(0, 0, 0, 1);
     pointer-events: none;
     white-space: pre-wrap;
     z-index: 100;
@@ -313,7 +313,7 @@ img.fit-cover {
     max-width: 80%;
     max-height: 60%;
     border: 0px;
-    box-shadow: 0 0 10px #000;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 1);
     display: block;
     object-fit: contain;
 }
@@ -323,10 +323,10 @@ img.fit-cover {
     position: absolute;
     width: 100%;
     text-align: center;
-    color: white;
+    color: rgba(255, 255, 255, 1);
     font-size: 20px;
     line-height: 2;
-    text-shadow: 2px 2px 0 #000;
+    text-shadow: 2px 2px 0 rgba(0, 0, 0, 1);
 }
 
 .staff-section {
@@ -334,12 +334,12 @@ img.fit-cover {
 }
 
 .staff-title {
-    color: #ffff00;
+    color: rgba(255, 255, 0, 1);
     font-weight: bold;
     font-size: 24px;
     margin-bottom: 5px;
 }
 
 .staff-name {
-    color: #ffffff;
+    color: rgba(255, 255, 255, 1);
 }
