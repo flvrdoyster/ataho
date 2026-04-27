@@ -74,6 +74,14 @@
 - **GC 압박 감소**를 단일 타겟으로 설정: `battleRenderer.draw()` 및 `battleEngine.update()` 핫 패스에서 매 프레임 생성되는 임시 배열/객체를 특정하여 제거.
 - 체감 버벅임의 원인이 JS 외부(Canvas GPU 합성, 오디오 스레드 등)일 수 있으므로, **#3 오디오 개선 완료 후 모바일에서 재평가**하여 잔존 증상 여부를 판단하고 다음 타겟 결정.
 
+**코드 분석으로 특정된 GC 타겟 (2026-04-27):**
+
+| 우선순위 | 위치 | 문제 | 수정 방향 |
+|----------|------|------|-----------|
+| 높음 | `input.js:138` | `{ ...this.keys }` 매 프레임 스프레드 — 새 객체 생성 | `Object.assign(this.prevKeys, this.keys)`로 교체 |
+| 중간 | `battleRenderer.js:454` | `getVisualMetrics` 매 프레임 객체 생성 + `forEach` 람다 (draw당 3~4회 호출) | 손패 길이/openSets 변화 시에만 재계산하는 dirty 캐시 |
+| 낮음 | `battleRenderer.js:861,889` | `Date.now()` 매 프레임 호출 (물결 애니메이션) | `BattleEngine.totalTicks` 또는 `stateTimer`로 대체 |
+
 ## 4. 모바일 환경 터치 조작감 개선 (Mobile UX/UI)
 - **현재 상태:** PC 마우스 조작을 우선으로 설계되어, 모바일 브라우저에서 터치 시 조작이 애매하거나 오터치가 발생하기 쉬움 (예: 패 선택 시의 딜레이, 좁은 터치 영역 등).
 - **개선 방향:**
