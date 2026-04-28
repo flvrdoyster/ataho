@@ -363,6 +363,24 @@
 		var ro = new ResizeObserver(reportHeight);
 		ro.observe(document.documentElement);
 		window.addEventListener('load', reportHeight);
+
+		if (window !== window.parent) {
+			function updateCursor() {
+				document.body.style.cursor = window.innerWidth > 800 ? 'pointer' : 'default';
+			}
+			updateCursor();
+			window.addEventListener('resize', updateCursor);
+
+			document.body.addEventListener('click', function () {
+				if (window.innerWidth > 800) {
+					var maxWidth = window.screen.availWidth || window.screen.width || 1800;
+					var popupWidth = Math.min(1800, maxWidth);
+					var ratio = document.documentElement.getBoundingClientRect().height / window.innerWidth;
+					var popupHeight = Math.ceil(popupWidth * ratio);
+					window.open('char.html', 'charPopup', 'width=' + popupWidth + ',height=' + popupHeight + ',scrollbars=yes,resizable=yes,location=no,toolbar=no,menubar=no,status=no');
+				}
+			});
+		}
 	</script>
 </body>
 
