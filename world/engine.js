@@ -441,7 +441,7 @@ function showSpeechBubble(text, offsetY = 0, trigger = null) {
     lastBubbleTime = performance.now();
 
     if (bubbleTimeout) clearTimeout(bubbleTimeout);
-    bubbleTimeout = setTimeout(hideSpeechBubble, 3000);
+    bubbleTimeout = setTimeout(hideSpeechBubble, 2000);
 }
 
 function hideSpeechBubble(skipPending = false) {
@@ -503,7 +503,7 @@ function onKeyDown(e) {
         return;
     }
     if (keys.hasOwnProperty(e.key)) keys[e.key] = true;
-    if (e.code === 'Space' || e.key === 'Enter') {
+    if (e.code === 'Space' || e.key === 'Enter' || e.key.startsWith('Arrow')) {
         if (isBubbleOpen) {
             if (performance.now() - lastBubbleTime > 200) closeModal();
         } else if (activeTrigger && e.code === 'Space') {
