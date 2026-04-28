@@ -35,15 +35,15 @@
     padding: 15px 0;
     pointer-events: auto;
     
-    color: #bbb;
+    color: rgba(187, 187, 187, 1);
 }
 
 .footer-fixed #footer a {
-    color: #88ccff;
+    color: rgba(136, 204, 255, 1);
 }
 
 .footer-fixed #footer a:hover {
-    color: white;
+    color: rgba(255, 255, 255, 1);
     opacity: 1;
 }
 

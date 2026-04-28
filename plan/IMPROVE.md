@@ -5,10 +5,10 @@
 | 순서 | 항목 | 이유 |
 |------|------|------|
 | 1 | **#3 오디오 시스템 개선** | 모바일 체감 품질 직결, assets.js 단일 파일, 다른 작업과 독립적 |
-| 2 | **#5 퍼포먼스 최적화 (지속)** | 오디오 개선 후 잔존 버벅임 여부 재평가, GC 압박 감소 |
+| 2 | **#4 퍼포먼스 최적화 (지속)** | 오디오 개선 후 잔존 버벅임 여부 재평가, GC 압박 감소 |
 | 3 | **#2 상황 인지 대사** | 안정된 기반 위에서 O(N) 휴리스틱 삽입 |
 | 4 | **#1 드로우 로직** | 게임 밸런스 직결, 충분한 안정화 후 수행 |
-| 5 | **#4 모바일 UX** | 로직과 독립적, 마지막 폴리싱 단계 |
+| 5 | **#5 모바일 UX** | 로직과 독립적, 마지막 폴리싱 단계 |
 
 ---
 
@@ -27,16 +27,15 @@
   - 필요시 평가 결과를 캐싱(Memoization)하거나 드로우/타패 시점에 딱 1번만 계산하여 메인 스레드 부하 최소화.
 - **기대 효과:** 버벅임 없이 자연스럽게 캐릭터가 현재 상황(패가 말림, 좋은 패가 들어옴 등)에 반응하는 생동감 있는 대사 출력.
 
-## 3. 오디오 시스템 개선 (모바일 핵심 병목) ← 현재 작업
-- **현재 상태 (문제 2가지):**
+## 3. 오디오 시스템 개선 (완료 2026-04-27)
+- **문제:**
   1. **SFX 씹힘:** `HTMLAudioElement` + `cloneNode()` 풀 방식. 모바일에서 `play()` 호출 시마다 디코딩 파이프라인이 메인 스레드에 묻히고, `currentTime = 0` 리셋이 재디코딩을 트리거함.
-  2. **BGM 미재생:** `audio.play()` 실패 시 Promise `.catch()` 안에서 재시도하는데, iOS Safari는 유저 제스처와 동기적으로 연결되지 않은 async 콜백에서의 `play()`를 거부함. 또한 씬 전환 시 `isWaitingForInteraction` 플래그 경쟁으로 리스너가 등록되지 않는 케이스 존재.
-- **개선 방향 (`assets.js` 단일 파일 변경):**
-  - **SFX → Web Audio API 전환:** 로드 시 `fetch + AudioContext.decodeAudioData()`로 한 번만 디코딩 → `AudioBuffer` 저장. 재생 시 `createBufferSource().start()` — 디코딩 없이 즉시 재생, 풀링 불필요.
-  - **BGM 미재생 → `AudioContext` 잠금 해제 패턴:** 첫 번째 유저 제스처(`touchstart`/`click`) 시점에 `audioContext.resume()`을 동기적으로 한 번 호출. 이후 `HTMLAudioElement.play()`는 context가 `running` 상태이므로 async 여부 무관하게 동작. BGM은 긴 파일이라 스트리밍이 유리하므로 `HTMLAudioElement` 유지.
-- **변경 범위:** `assets.js` 하나.
+  2. **BGM 미재생:** `audio.play()` 실패 시 Promise `.catch()` 안에서 재시도하는데, iOS Safari는 유저 제스처와 동기적으로 연결되지 않은 async 콜백에서의 `play()`를 거부함. 씬 전환 시 `isWaitingForInteraction` 플래그 경쟁으로 리스너가 등록되지 않는 케이스도 존재.
+- **적용 내용 (`assets.js` 단일 파일 변경):**
+  - **SFX → Web Audio API 전환:** 로드 시 XHR + `decodeAudioData()` 콜백으로 한 번만 디코딩 → `AudioBuffer` 저장. 재생 시 `createBufferSource().start()` — 즉시 재생, 풀링 불필요.
+  - **BGM → `AudioContext` 잠금 해제 패턴:** 첫 유저 제스처 시 `audioContext.resume()` + BGM 요소 pre-warm. `playMusic`에서 `resume().then(play)` 패턴으로 async 컨텍스트 거부 문제 해결. BGM은 스트리밍에 유리한 `HTMLAudioElement` 유지.
 
-## 5. 전반적인 게임 퍼포먼스 최적화 (지속 과제)
+## 4. 전반적인 게임 퍼포먼스 최적화 (지속 과제)
 
 ### 프로파일링 및 코드 분석 결과 (2026-04-27)
 
@@ -45,7 +44,6 @@
 **이미 잘 되어 있는 것 (건드리지 않음):**
 - 게임 루프: `requestAnimationFrame` 기반, delta-time 캡 처리 완비.
 - 타이머: 엔진 자체 tick 기반 `setTimeout` 사용 (네이티브 `setTimeout` 없음).
-- 오디오: SFX 풀링(cloneNode, 최대 5개), BGM 단일 인스턴스 — 구조 양호.
 - 렌더링: 순수 Canvas 2D API (DOM 리플로우 없음), bgCanvas/fgCanvas 레이어 분리로 정적 UI는 dirty 시에만 재렌더.
 - `measureText`: `drawCharacterNames` (static 재렌더 시만 호출) + 스킬 확인창(STATE_TILE_EXCHANGE)에서만 사용 — 매 프레임 호출 아님.
 
@@ -82,7 +80,7 @@
 | 중간 | `battleRenderer.js:454` | `getVisualMetrics` 매 프레임 객체 생성 + `forEach` 람다 (draw당 3~4회 호출) | 손패 길이/openSets 변화 시에만 재계산하는 dirty 캐시 |
 | 낮음 | `battleRenderer.js:861,889` | `Date.now()` 매 프레임 호출 (물결 애니메이션) | `BattleEngine.totalTicks` 또는 `stateTimer`로 대체 |
 
-## 4. 모바일 환경 터치 조작감 개선 (Mobile UX/UI)
+## 5. 모바일 환경 터치 조작감 개선 (Mobile UX/UI)
 - **현재 상태:** PC 마우스 조작을 우선으로 설계되어, 모바일 브라우저에서 터치 시 조작이 애매하거나 오터치가 발생하기 쉬움 (예: 패 선택 시의 딜레이, 좁은 터치 영역 등).
 - **개선 방향:**
   - **터치 이벤트 최적화:** `click` 이벤트 외에 `touchstart`, `touchend` 이벤트를 적절히 병행 처리하여 모바일 환경 특유의 클릭 지연(300ms 딜레이)을 최소화.
