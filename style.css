@@ -1,6 +1,4 @@
-/* =========================================
-   1. Fonts
-   ========================================= */
+/* Fonts */
 @font-face {
     font-family: 'KoddiUDOnGothic';
     src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2105_2@1.0/KoddiUDOnGothic-Regular.woff') format('woff');
@@ -24,9 +22,11 @@
     font-style: normal;
 }
 
-/* =========================================
-   2. Global Styles
-   ========================================= */
+/* Global Styles */
+html {
+    font-size: 16px;
+}
+
 body {
     font-family: 'KoddiUDOnGothic', sans-serif;
     color: rgba(255, 255, 255, 1);
@@ -62,9 +62,7 @@ hr {
     background: rgba(0, 0, 0, 1);
 }
 
-/* =========================================
-   3. Layout & Structure
-   ========================================= */
+/* Layout & Structure */
 #header {
     text-align: center;
     position: fixed;
@@ -102,9 +100,7 @@ hr {
 }
 
 
-/* =========================================
-   4. Components
-   ========================================= */
+/* Components */
 
 /* --- Lightbox (Images & Video) --- */
 #lightbox {
@@ -167,18 +163,19 @@ video::-webkit-media-controls-toggle-closed-captions-button {
 }
 
 /* --- Subtitles (Video) --- */
-/* Customize subtitle appearance here */
 video::cue {
-    background: transparent;
-    color: rgba(255, 255, 255, 1);
-    font-size: 1.8rem;
-    font-weight: regular;
+    color: #ffffff;
+    background-color: rgba(0, 0, 0, 0.6);
+    font-size: 1.2rem;
     font-family: 'KoddiUDOnGothic', sans-serif;
+    font-weight: 400;
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.8);
+    line-height: 1.5;
 }
 
 /* Fullscreen subtitle override */
 video:fullscreen::cue {
-    font-size: 2.5rem;
+    font-size: 1.6rem;
 }
 
 /* --- UI Layer (Modals, Prompts) --- */
@@ -291,9 +288,7 @@ video:fullscreen::cue {
     box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.2);
 }
 
-/* =========================================
-   5. Media Queries (Mobile)
-   ========================================= */
+/* Media Queries (Mobile) */
 @media (max-width: 768px) {
     #header h1 {
         font-size: 1rem;
@@ -354,9 +349,7 @@ video:fullscreen::cue {
     }
 }
 
-/* =========================================
-   6. Speech Bubble
-   ========================================= */
+/* Speech Bubble */
 #speech-bubble {
     position: absolute;
     background: rgba(255, 255, 255, 1);
