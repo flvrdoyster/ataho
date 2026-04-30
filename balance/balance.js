@@ -67,6 +67,15 @@
     const ANIMATION_FPS_DIVISOR = 10;
     const BALANCE_THRESHOLD = { SLIGHT: 20, MEDIUM: 55, LARGE: 80, MAX: 100 };
 
+    const STATE = {
+        IDLE: 'idle',
+        WALKING: 'walking',
+        JUMP_CHARGING: 'jump_charging',
+        JUMPING: 'jumping',
+        FALLING: 'falling',
+        FALLEN: 'fallen'
+    };
+
     // SPRITE CONSTANTS
     const SPRITE_WIDTH = 80;
     const SPRITE_HEIGHT = 96;
@@ -91,6 +100,7 @@
 
     let startTime = 0;
     let elapsedTime = 0; // in milliseconds
+    let lastTimestamp = 0;
 
     let obstacles = [];
     let nextObstacleY = CONFIG.OBSTACLES.START_DELAY;
@@ -134,27 +144,26 @@
         });
     }
 
-    // Audio Loading
-    function loadAudio() {
-        const bgmPromise = new Promise((resolve, reject) => {
-            bgm = new Audio('duel.mp3');
-            bgm.loop = true;
-            bgm.volume = 0.5;
-            bgm.addEventListener('canplaythrough', () => resolve(), { once: true });
-            bgm.addEventListener('error', (e) => reject(e));
-            bgm.load();
+    // Audio Loading — always resolves; failed tracks become null
+    function loadAudioFile(src, loop, volume) {
+        return new Promise((resolve) => {
+            const audio = new Audio(src);
+            audio.loop = loop;
+            audio.volume = volume;
+            audio.addEventListener('canplaythrough', () => resolve(audio), { once: true });
+            audio.addEventListener('error', () => {
+                console.warn(`Audio load failed: ${src}`);
+                resolve(null);
+            });
+            audio.load();
         });
+    }
 
-        const overBgmPromise = new Promise((resolve, reject) => {
-            overBgm = new Audio('over.mp3');
-            overBgm.loop = true;
-            overBgm.volume = 0.5;
-            overBgm.addEventListener('canplaythrough', () => resolve(), { once: true });
-            overBgm.addEventListener('error', (e) => reject(e));
-            overBgm.load();
-        });
-
-        return Promise.all([bgmPromise, overBgmPromise]);
+    async function loadAudio() {
+        [bgm, overBgm] = await Promise.all([
+            loadAudioFile('duel.mp3', true, 0.5),
+            loadAudioFile('over.mp3', true, 0.5)
+        ]);
     }
 
     //===========================================
@@ -201,7 +210,7 @@
         width: frames.walking.width * SCALE_FACTOR,
         height: frames.walking.height * SCALE_FACTOR,
 
-        actionState: 'idle',
+        actionState: STATE.IDLE,
         leanState: 'balanced',
 
         balanceLevel: 0,
@@ -224,53 +233,53 @@
         jumpVelocityY: 0,
         visualY: 0,
 
-        update() {
+        update(dt) {
             // --- JUMPING STATE ---
-            if (this.actionState === 'jumping') {
-                this.updateJump();
+            if (this.actionState === STATE.JUMPING) {
+                this.updateJump(dt);
                 return;
             }
 
             // --- JUMP CHARGING & INPUT ---
-            this.handleJumpInput();
-            if (this.actionState.includes('jump_charging') || this.actionState === 'jumping') return;
+            this.handleJumpInput(dt);
+            if (this.actionState === STATE.JUMP_CHARGING || this.actionState === STATE.JUMPING) return;
 
             // --- PHYSICS UPDATE ---
-            this.updatePhysics();
+            this.updatePhysics(dt);
 
             // --- MOVEMENT & ANIMATION ---
-            if (this.actionState !== 'falling' && this.actionState !== 'fallen') {
-                this.updateMovement();
+            if (this.actionState !== STATE.FALLING && this.actionState !== STATE.FALLEN) {
+                this.updateMovement(dt);
             }
 
             // --- FALLING STATE ---
-            if (this.actionState === 'falling') {
-                this.fallTimer++;
+            if (this.actionState === STATE.FALLING) {
+                this.fallTimer += dt;
                 if (this.fallTimer >= 30) {
                     this.triggerGameOver();
                 }
             }
 
-            if (this.actionState.includes('walking')) {
-                this.animationTimer++;
+            if (this.actionState === STATE.WALKING) {
+                this.animationTimer += dt;
             }
         },
 
-        updateJump() {
-            this.visualY -= this.jumpVelocityY;
-            this.jumpVelocityY -= CONFIG.PHYSICS.GRAVITY;
+        updateJump(dt) {
+            this.visualY -= this.jumpVelocityY * dt;
+            this.jumpVelocityY -= CONFIG.PHYSICS.GRAVITY * dt;
 
             // Calculate forward movement
             const airTime = (2 * CONFIG.JUMP.VELOCITIES[this.jumpLevel]) / CONFIG.PHYSICS.GRAVITY;
             const currentJumpSpeed = CONFIG.JUMP.DISTANCES[this.jumpLevel] / airTime;
 
-            distanceTraveled += currentJumpSpeed;
-            backgroundY -= currentJumpSpeed;
+            distanceTraveled += currentJumpSpeed * dt;
+            backgroundY -= currentJumpSpeed * dt;
 
             if (this.visualY >= 0) {
                 // Landed
                 this.visualY = 0;
-                this.actionState = 'idle';
+                this.actionState = STATE.IDLE;
                 this.jumpVelocityY = 0;
                 this.jumpCooldown = CONFIG.JUMP.JUMP_COOLDOWN;
 
@@ -288,29 +297,30 @@
             }
         },
 
-        handleJumpInput() {
-            if (this.jumpCooldown > 0) this.jumpCooldown--;
+        handleJumpInput(dt) {
+            if (this.jumpCooldown > 0) this.jumpCooldown -= dt;
 
-            if (inputState.space && this.jumpCooldown <= 0 && !this.actionState.includes('fall')) {
-                if (!this.actionState.includes('jump_charging')) {
-                    this.actionState = 'jump_charging';
+            const isFalling = this.actionState === STATE.FALLING || this.actionState === STATE.FALLEN;
+            if (inputState.space && this.jumpCooldown <= 0 && !isFalling) {
+                if (this.actionState !== STATE.JUMP_CHARGING) {
+                    this.actionState = STATE.JUMP_CHARGING;
                     this.jumpChargeTimer = 0;
                     this.jumpLevel = 0;
                 } else {
-                    this.jumpChargeTimer++;
+                    this.jumpChargeTimer += dt;
                     const cycleTime = CONFIG.JUMP.CHARGE_TIME * 3;
                     const effectiveTimer = this.jumpChargeTimer % cycleTime;
                     if (effectiveTimer >= CONFIG.JUMP.CHARGE_TIME * 2) this.jumpLevel = 2;
                     else if (effectiveTimer >= CONFIG.JUMP.CHARGE_TIME) this.jumpLevel = 1;
                     else this.jumpLevel = 0;
                 }
-            } else if (this.actionState.includes('jump_charging')) {
-                this.actionState = 'jumping';
+            } else if (this.actionState === STATE.JUMP_CHARGING) {
+                this.actionState = STATE.JUMPING;
                 this.jumpVelocityY = CONFIG.JUMP.VELOCITIES[this.jumpLevel];
             }
         },
 
-        updatePhysics() {
+        updatePhysics(dt) {
             let inputForce = 0;
             if (typeof inputState.touchForce === 'number' && inputState.touchForce !== 0) {
                 inputForce = inputState.touchForce * CONFIG.PHYSICS.PLAYER_CONTROL_FORCE * 1.5;
@@ -321,43 +331,39 @@
             }
 
             // --- FATIGUE & SWAY LOGIC ---
-            // If close to center, accumulate fatigue (balanceTimer)
             if (Math.abs(this.balanceLevel) < BALANCE_THRESHOLD.SLIGHT) {
-                this.balanceTimer++;
+                this.balanceTimer += dt;
             } else {
-                // Decay fatigue slowly if struggling, so it doesn't reset instantly
-                this.balanceTimer = Math.max(0, this.balanceTimer - 2);
+                this.balanceTimer = Math.max(0, this.balanceTimer - 2 * dt);
             }
 
             const instabilityMultiplier = 1 + (this.balanceTimer * CONFIG.PHYSICS.FATIGUE_RATE);
-            const baseSwayIntensity = (this.actionState.includes('walking')) ? CONFIG.PHYSICS.SWAY_INTENSITY_WALK : CONFIG.PHYSICS.SWAY_INTENSITY_IDLE;
+            const baseSwayIntensity = (this.actionState === STATE.WALKING) ? CONFIG.PHYSICS.SWAY_INTENSITY_WALK : CONFIG.PHYSICS.SWAY_INTENSITY_IDLE;
 
             // Random Directional Sway (Wind)
-            this.swayTimer++;
+            this.swayTimer += dt;
             if (this.swayTimer > this.swayChangeInterval) {
-                // Chance to change sway direction
                 if (Math.random() < 0.3) {
-                    this.swayTarget = (Math.random() - 0.5) * 2; // -1 to 1
-                    this.swayChangeInterval = 60 + Math.random() * 120; // Randomize interval
+                    this.swayTarget = (Math.random() - 0.5) * 2;
+                    this.swayChangeInterval = 60 + Math.random() * 120;
                     this.swayTimer = 0;
                 }
             }
-            // Smoothly interpolate current sway to target
-            this.swayCurrent += (this.swayTarget - this.swayCurrent) * 0.02;
+            this.swayCurrent += (this.swayTarget - this.swayCurrent) * 0.02 * dt;
 
             const directionalSway = this.swayCurrent * baseSwayIntensity * instabilityMultiplier;
-            const randomJitter = (Math.random() - 0.5) * 0.005; // Small vibration
+            const randomJitter = (Math.random() - 0.5) * 0.005;
 
             const inertiaForce = this.balanceLevel * CONFIG.PHYSICS.INERTIA_CONSTANT;
 
-            // Apply Forces
-            this.balanceVelocity += inputForce + directionalSway + randomJitter + inertiaForce;
-            this.balanceVelocity *= CONFIG.PHYSICS.FRICTION;
+            // Apply Forces (scale additive forces by dt; friction uses pow for correct per-dt decay)
+            this.balanceVelocity += (inputForce + directionalSway + randomJitter + inertiaForce) * dt;
+            this.balanceVelocity *= Math.pow(CONFIG.PHYSICS.FRICTION, dt);
 
             // Clamp Velocity
             this.balanceVelocity = Math.max(-CONFIG.PHYSICS.MAX_VELOCITY, Math.min(CONFIG.PHYSICS.MAX_VELOCITY, this.balanceVelocity));
 
-            this.balanceLevel += this.balanceVelocity;
+            this.balanceLevel += this.balanceVelocity * dt;
 
             // Check Falling Conditions
             if (this.balanceLevel >= BALANCE_THRESHOLD.MAX) {
@@ -382,29 +388,30 @@
             }
         },
 
-        updateMovement() {
+        updateMovement(dt) {
             if (inputState.down) {
-                this.actionState = 'walking';
+                this.actionState = STATE.WALKING;
             } else {
-                this.actionState = 'idle';
+                this.actionState = STATE.IDLE;
             }
 
-            if (this.actionState === 'walking') {
-                const nextDist = distanceTraveled + CONFIG.SPEED.GAME;
+            if (this.actionState === STATE.WALKING) {
+                const step = CONFIG.SPEED.GAME * dt;
+                const nextDist = distanceTraveled + step;
                 if (!this.checkObstacleCollision(nextDist)) {
-                    distanceTraveled += CONFIG.SPEED.GAME;
-                    backgroundY -= CONFIG.SPEED.GAME;
+                    distanceTraveled += step;
+                    backgroundY -= step;
                 }
             }
         },
 
         startFalling(direction) {
-            this.actionState = 'falling';
+            this.actionState = STATE.FALLING;
             this.fallDirection = direction;
         },
 
         triggerGameOver() {
-            this.actionState = 'fallen';
+            this.actionState = STATE.FALLEN;
             isGameOver = true;
             if (bgm) {
                 bgm.pause();
@@ -471,19 +478,18 @@
             let finalY = this.y;
             let frameIndex = 0;
 
-            if (this.actionState === 'falling') {
+            if (this.actionState === STATE.FALLING) {
                 currentFrameSet = this.fallDirection === 'left' ? frames.falling.left : frames.falling.right;
                 if (this.fallDirection === 'left') finalX -= FALLING_OFFSET_X;
                 else finalX += FALLING_OFFSET_X / 2;
-            } else if (this.actionState === 'fallen') {
+            } else if (this.actionState === STATE.FALLEN) {
                 currentFrameSet = frames.fallen;
                 if (this.fallDirection === 'left') finalX -= FALLEN_OFFSET_X;
                 else finalX += FALLEN_OFFSET_X;
                 finalY += FALLEN_OFFSET_Y;
-            } else if (this.actionState.includes('jump_charging')) {
+            } else if (this.actionState === STATE.JUMP_CHARGING) {
                 currentFrameSet = jumpChargeFrames[this.jumpLevel];
-
-            } else if (this.actionState === 'jumping') {
+            } else if (this.actionState === STATE.JUMPING) {
                 currentFrameSet = jumpingFrame;
             } else {
                 if (leanStateToFrameMap[this.leanState]) {
@@ -493,7 +499,7 @@
 
             finalY += this.visualY;
 
-            if (this.actionState.includes('walking')) {
+            if (this.actionState === STATE.WALKING) {
                 if (currentFrameSet.x && Array.isArray(currentFrameSet.x) && currentFrameSet.x.length > 1) {
                     const sequence = walkAnimationSequence;
                     const sequenceIndex = Math.floor(this.animationTimer / ANIMATION_FPS_DIVISOR) % sequence.length;
@@ -507,7 +513,7 @@
             let sourceY = Array.isArray(currentFrameSet.y) ? currentFrameSet.y[frameIndex] : currentFrameSet.y;
 
             let rotationAngle = 0;
-            if (this.actionState === 'jumping') {
+            if (this.actionState === STATE.JUMPING) {
                 rotationAngle = (this.balanceLevel / BALANCE_THRESHOLD.MAX) * 0.5;
             }
 
@@ -562,10 +568,11 @@
         }
         startTime = Date.now();
         elapsedTime = 0;
+        lastTimestamp = 0;
 
         ataho.balanceLevel = 0;
         ataho.balanceVelocity = 0;
-        ataho.actionState = 'idle';
+        ataho.actionState = STATE.IDLE;
         ataho.leanState = 'balanced';
 
         ataho.fallTimer = 0;
@@ -768,246 +775,213 @@
         exit: { x: 0, y: 0, width: BUTTON_WIDTH, height: BUTTON_HEIGHT, text: 'Exit' }
     };
 
-    function byFrame() {
-        currentRAFId = requestAnimationFrame(byFrame);
+    //===========================================
+    // RENDER HELPERS
+    //===========================================
 
-        // Reset transform to identity to prevent accumulation from errors
-        ctx.setTransform(1, 0, 0, 1, 0, 0);
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
+    function drawBackground() {
+        if (!images.background) return;
+        const bgY = Math.floor(backgroundY);
+        ctx.drawImage(images.background, 0, bgY, canvas.width, canvas.height);
+        ctx.drawImage(images.background, 0, bgY + canvas.height, canvas.width, canvas.height);
+    }
 
-        // Draw Background (Outside of Camera Zoom)
-        if (images.background) {
-            const bgY = Math.floor(backgroundY);
-            ctx.drawImage(images.background, 0, bgY, canvas.width, canvas.height);
-            ctx.drawImage(images.background, 0, bgY + canvas.height, canvas.width, canvas.height);
+    function generateObstacles() {
+        if (!images.beamSpike) return;
+        const spikeHeight = images.beamSpike.height;
+        const generateHorizon = distanceTraveled + canvas.height * 2;
+        while (nextObstacleY < generateHorizon) {
+            const pattern = CONFIG.OBSTACLES.PATTERNS[Math.floor(Math.random() * CONFIG.OBSTACLES.PATTERNS.length)];
+            if (pattern.groups) {
+                pattern.groups.forEach((group, index) => {
+                    for (let i = 0; i < group.count; i++) {
+                        obstacles.push({ y: nextObstacleY, height: spikeHeight });
+                        nextObstacleY += spikeHeight + group.gap;
+                    }
+                    if (index < pattern.groups.length - 1) nextObstacleY += pattern.groupGap;
+                });
+            } else {
+                for (let i = 0; i < pattern.count; i++) {
+                    obstacles.push({ y: nextObstacleY, height: spikeHeight });
+                    nextObstacleY += spikeHeight + pattern.gap;
+                }
+            }
+            nextObstacleY += CONFIG.OBSTACLES.MIN_GAP + (Math.random() * 120);
         }
 
-        // Save context for camera zoom
+        if (obstacles.length > 0) {
+            const firstScreenY = canvas.height / 2 - distanceTraveled + obstacles[0].y;
+            if (firstScreenY + obstacles[0].height < -100) obstacles.shift();
+        }
+    }
+
+    function gameUpdate(dt) {
+        ataho.update(dt);
+        if (backgroundY <= -canvas.height) backgroundY += canvas.height;
+        if (backgroundY > 0) backgroundY -= canvas.height;
+        generateObstacles();
+    }
+
+    function drawBeam() {
+        if (!images.beamStart || !images.beamMid) return;
+        const beamX = canvas.width / 2 - images.beamStart.width / 2;
+        let currentDrawY = canvas.height / 2 - distanceTraveled;
+
+        if (currentDrawY > -images.beamStart.height) {
+            ctx.drawImage(images.beamStart, beamX, Math.floor(currentDrawY));
+        }
+
+        let midDrawY = currentDrawY + images.beamStart.height;
+        if (images.beamMidPattern) {
+            ctx.save();
+            ctx.translate(beamX, Math.floor(midDrawY));
+            ctx.fillStyle = images.beamMidPattern;
+            const heightNeeded = canvas.height - midDrawY;
+            if (heightNeeded > 0) ctx.fillRect(0, 0, images.beamMid.width, heightNeeded);
+            ctx.restore();
+        } else {
+            while (midDrawY < canvas.height) {
+                ctx.drawImage(images.beamMid, beamX, Math.floor(midDrawY));
+                midDrawY += images.beamMid.height;
+            }
+        }
+    }
+
+    function drawObstacles() {
+        if (!images.beamSpike) return;
+        const spikeX = canvas.width / 2 - images.beamSpike.width / 2;
+        const originY = canvas.height / 2;
+        obstacles.forEach(obs => {
+            const drawY = originY - distanceTraveled + obs.y;
+            if (drawY <= -images.beamSpike.height || drawY >= canvas.height) return;
+
+            const sprite = (obs.causedDeath && images.beamSpikeRed) ? images.beamSpikeRed : images.beamSpike;
+            ctx.drawImage(sprite, spikeX, drawY);
+
+            if (CONFIG.DEBUG.SHOW_HITBOX) {
+                ctx.strokeStyle = obs.causedDeath ? 'blue' : 'red';
+                ctx.lineWidth = 2;
+                ctx.strokeRect(
+                    spikeX + CONFIG.HITBOXES.OBS.x,
+                    drawY + CONFIG.HITBOXES.OBS.y,
+                    CONFIG.HITBOXES.OBS.w,
+                    CONFIG.HITBOXES.OBS.h
+                );
+            }
+        });
+    }
+
+    function renderWorld() {
         ctx.save();
         try {
-            // Translate to center, scale, translate back
             ctx.translate(canvas.width / 2, canvas.height / 2);
             ctx.scale(2, 2);
             ctx.translate(-canvas.width / 2, -canvas.height / 2);
-
-            if (!isGameOver) {
-                ataho.update();
-
-                if (backgroundY <= -canvas.height) {
-                    backgroundY += canvas.height;
-                }
-                if (backgroundY > 0) {
-                    backgroundY -= canvas.height;
-                }
-
-                // Obstacle Generation
-                if (images.beamSpike) {
-                    const generateHorizon = distanceTraveled + canvas.height * 2;
-                    while (nextObstacleY < generateHorizon) {
-                        const spikeHeight = images.beamSpike.height;
-
-                        // Pick a random pattern
-                        const pattern = CONFIG.OBSTACLES.PATTERNS[Math.floor(Math.random() * CONFIG.OBSTACLES.PATTERNS.length)];
-
-                        if (pattern.groups) {
-                            pattern.groups.forEach((group, index) => {
-                                for (let i = 0; i < group.count; i++) {
-                                    obstacles.push({
-                                        y: nextObstacleY,
-                                        height: spikeHeight
-                                    });
-                                    nextObstacleY += spikeHeight + group.gap;
-                                }
-                                // Add group gap if not the last group
-                                if (index < pattern.groups.length - 1) {
-                                    nextObstacleY += pattern.groupGap;
-                                }
-                            });
-                        } else {
-                            // Fallback for old patterns (just in case)
-                            for (let i = 0; i < pattern.count; i++) {
-                                obstacles.push({
-                                    y: nextObstacleY,
-                                    height: spikeHeight
-                                });
-                                nextObstacleY += spikeHeight + pattern.gap;
-                            }
-                        }
-
-                        // Add gap before next sequence
-                        nextObstacleY += CONFIG.OBSTACLES.MIN_GAP + (Math.random() * 120);
-                    }
-
-                    // Cleanup old obstacles
-                    if (obstacles.length > 0) {
-                        // Remove if completely off-screen (top)
-                        // Screen Y = startY - distanceTraveled + obs.y
-                        // If Screen Y + height < 0, it's gone.
-                        const startY = canvas.height / 2;
-                        const firstObsScreenY = startY - distanceTraveled + obstacles[0].y;
-                        if (firstObsScreenY + obstacles[0].height < -100) {
-                            obstacles.shift();
-                        }
-                    }
-                }
-            }
-
-
-
-            if (images.beamStart && images.beamMid) {
-                const beamStartX = canvas.width / 2 - images.beamStart.width / 2;
-                const startY = canvas.height / 2;
-
-                let currentDrawY = startY - distanceTraveled;
-
-                if (currentDrawY > -images.beamStart.height) {
-                    ctx.drawImage(images.beamStart, beamStartX, Math.floor(currentDrawY));
-                }
-
-                let midDrawY = currentDrawY + images.beamStart.height;
-
-                if (images.beamMidPattern) {
-                    ctx.save();
-                    ctx.translate(beamStartX, Math.floor(midDrawY));
-                    ctx.fillStyle = images.beamMidPattern;
-                    const heightNeeded = canvas.height - midDrawY;
-                    if (heightNeeded > 0) {
-                        ctx.fillRect(0, 0, images.beamMid.width, heightNeeded);
-                    }
-                    ctx.restore();
-                } else {
-                    while (midDrawY < canvas.height) {
-                        ctx.drawImage(images.beamMid, beamStartX, Math.floor(midDrawY));
-                        midDrawY += images.beamMid.height;
-                    }
-                }
-            }
-
-            // Draw Obstacles
-            if (images.beamSpike) {
-                const beamStartX = canvas.width / 2 - images.beamStart.width / 2; // Assuming spike has same width/center logic
-                // User said "same width as beam". beamStart.width should be used for centering if spike is same width.
-                // But we should use spike's width to be safe.
-                const spikeX = canvas.width / 2 - images.beamSpike.width / 2;
-                const startY = canvas.height / 2;
-
-                obstacles.forEach(obs => {
-                    // Calculate screen Y
-                    // Beam logic: currentDrawY = startY - distanceTraveled
-                    // Obstacle at obs.y is at: startY - distanceTraveled + obs.y
-                    const drawY = startY - distanceTraveled + obs.y;
-
-                    if (drawY > -images.beamSpike.height && drawY < canvas.height) {
-                        let spriteToDraw = images.beamSpike;
-                        if (obs.causedDeath && images.beamSpikeRed) {
-                            spriteToDraw = images.beamSpikeRed;
-                        }
-
-                        ctx.drawImage(spriteToDraw, spikeX, drawY);
-
-                        // Debug Hitbox
-                        if (CONFIG.DEBUG.SHOW_HITBOX) {
-                            ctx.strokeStyle = obs.causedDeath ? 'blue' : 'red';
-                            ctx.lineWidth = 2;
-                            ctx.strokeRect(
-                                spikeX + CONFIG.HITBOXES.OBS.x,
-                                drawY + CONFIG.HITBOXES.OBS.y,
-                                CONFIG.HITBOXES.OBS.w,
-                                CONFIG.HITBOXES.OBS.h
-                            );
-                        }
-                    }
-                });
-            }
-
+            drawBeam();
+            drawObstacles();
             ataho.draw();
         } catch (e) {
-            console.error("Error in render loop:", e);
+            console.error('Error in render loop:', e);
         } finally {
-            // Restore context to remove zoom for UI
             ctx.restore();
         }
+    }
 
-
-        // Calculate Time
-        if (!isGameOver) {
-            elapsedTime = Date.now() - startTime;
-        }
-
+    function buildStats() {
         const totalSeconds = Math.floor(elapsedTime / 1000);
         const minutes = Math.floor(totalSeconds / 60);
         const seconds = totalSeconds % 60;
-        const milliseconds = Math.floor((elapsedTime % 1000) / 10); // 2 digits
+        return {
+            timeText: `Time: ${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`,
+            distanceText: `Dist: ${(distanceTraveled / 100).toFixed(1)}m`
+        };
+    }
 
-        const timeText = `Time: ${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
-        const distanceText = `Dist: ${(distanceTraveled / 100).toFixed(1)}m`;
-
-
-        // Draw HUD
-        ctx.font = '24px "Raster Forge", sans-serif';
-        ctx.textBaseline = 'top';
-        ctx.textAlign = 'center';
-
-        const padding = 10;
-        // Center align box
-        const boxWidth = 220; // Slightly wider to be safe
+    function renderHUD(timeText, distanceText) {
+        const boxWidth = 220;
         const boxHeight = 70;
-        const bgX = (canvas.width / 2) - (boxWidth / 2);
-        const bgY = 10;
+        const boxX = canvas.width / 2 - boxWidth / 2;
+        const boxY = 10;
+        const padding = 10;
 
-        // Draw Background
         ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
         ctx.beginPath();
-        ctx.roundRect(bgX, bgY, boxWidth, boxHeight, 5);
+        ctx.roundRect(boxX, boxY, boxWidth, boxHeight, 5);
         ctx.fill();
 
-        // Draw Text
+        ctx.font = '24px "Raster Forge", sans-serif';
         ctx.fillStyle = 'white';
-        // Time
-        ctx.fillText(timeText, canvas.width / 2, bgY + padding);
-        // Distance
-        ctx.fillText(distanceText, canvas.width / 2, bgY + padding + 30);
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'top';
+        ctx.fillText(timeText, canvas.width / 2, boxY + padding);
+        ctx.fillText(distanceText, canvas.width / 2, boxY + padding + 30);
+    }
 
+    function drawButton(btn) {
+        ctx.strokeStyle = 'white';
+        ctx.lineWidth = 2;
+        ctx.strokeRect(btn.x, btn.y, btn.width, btn.height);
 
-        if (isGameOver) {
-            ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.font = '24px "Raster Forge", sans-serif';
+        ctx.fillStyle = 'white';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(btn.text, btn.x + btn.width / 2, btn.y + btn.height / 2);
+    }
 
-            ctx.font = '48px "Raster Forge", sans-serif';
-            ctx.fillStyle = 'white';
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
-            ctx.fillText('GAME OVER', canvas.width / 2, canvas.height / 2 - 140);
+    function renderGameOver(timeText, distanceText) {
+        const cx = canvas.width / 2;
+        const cy = canvas.height / 2;
 
-            ctx.font = '36px "Raster Forge", sans-serif';
-            ctx.fillStyle = '#FFD700';
-            ctx.fillText(timeText, canvas.width / 2, canvas.height / 2 - 80);
-            ctx.fillText(distanceText, canvas.width / 2, canvas.height / 2 - 30);
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-            const centerX = canvas.width / 2;
-            const centerY = canvas.height / 2;
+        ctx.font = '48px "Raster Forge", sans-serif';
+        ctx.fillStyle = 'white';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('GAME OVER', cx, cy - 140);
 
-            buttons.continue.x = centerX - buttons.continue.width / 2;
-            buttons.continue.y = centerY + 30;
+        ctx.font = '36px "Raster Forge", sans-serif';
+        ctx.fillStyle = '#FFD700';
+        ctx.fillText(timeText, cx, cy - 80);
+        ctx.fillText(distanceText, cx, cy - 30);
 
-            buttons.exit.x = centerX - buttons.exit.width / 2;
-            buttons.exit.y = centerY + 110;
+        buttons.continue.x = cx - buttons.continue.width / 2;
+        buttons.continue.y = cy + 30;
+        buttons.exit.x = cx - buttons.exit.width / 2;
+        buttons.exit.y = cy + 110;
 
-            function drawButton(btn) {
-                ctx.strokeStyle = 'white';
-                ctx.lineWidth = 2;
-                ctx.strokeRect(btn.x, btn.y, btn.width, btn.height);
+        drawButton(buttons.continue);
+        drawButton(buttons.exit);
+    }
 
-                ctx.font = '24px "Raster Forge", sans-serif';
-                ctx.fillStyle = 'white';
-                ctx.textAlign = 'center';
-                ctx.textBaseline = 'middle';
-                ctx.fillText(btn.text, btn.x + btn.width / 2, btn.y + btn.height / 2);
-            }
+    //===========================================
+    // MAIN LOOP
+    //===========================================
 
-            drawButton(buttons.continue);
-            drawButton(buttons.exit);
-        }
+    function byFrame(timestamp) {
+        currentRAFId = requestAnimationFrame(byFrame);
+
+        // Normalize dt to 60fps. Cap at 3 to prevent spiral-of-death after tab focus.
+        // Use (> 0) guard because the first manual byFrame() call has timestamp=undefined.
+        const dt = (lastTimestamp > 0 && timestamp > 0)
+            ? Math.min((timestamp - lastTimestamp) / (1000 / 60), 3)
+            : 1;
+        lastTimestamp = timestamp || 0;
+
+        ctx.setTransform(1, 0, 0, 1, 0, 0);
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        drawBackground();
+        if (!isGameOver) gameUpdate(dt);
+        renderWorld();
+
+        if (!isGameOver) elapsedTime = Date.now() - startTime;
+
+        const { timeText, distanceText } = buildStats();
+        renderHUD(timeText, distanceText);
+        if (isGameOver) renderGameOver(timeText, distanceText);
     }
 
     // Event Listeners
@@ -1080,18 +1054,20 @@
         startTime = Date.now();
 
         // Try to play music immediately
-        bgm.play().catch(e => {
-            console.log('Autoplay prevented. Waiting for user interaction.', e);
-            const playOnInteraction = () => {
-                bgm.play();
+        if (bgm) {
+            bgm.play().catch(e => {
+                console.log('Autoplay prevented. Waiting for user interaction.', e);
+                const playOnInteraction = () => {
+                    bgm.play();
+                    ['keydown', 'touchstart', 'click'].forEach(evt =>
+                        document.removeEventListener(evt, playOnInteraction)
+                    );
+                };
                 ['keydown', 'touchstart', 'click'].forEach(evt =>
-                    document.removeEventListener(evt, playOnInteraction)
+                    document.addEventListener(evt, playOnInteraction, { once: true })
                 );
-            };
-            ['keydown', 'touchstart', 'click'].forEach(evt =>
-                document.addEventListener(evt, playOnInteraction, { once: true })
-            );
-        });
+            });
+        }
 
         byFrame();
     }).catch(error => {
