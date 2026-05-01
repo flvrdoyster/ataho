@@ -16,6 +16,10 @@
     // GAME CONFIGURATION
     //===========================================
 
+    const TILE_SIZE = 16;
+    const KEY_REPEAT_DELAY = 18;    // dt frames before auto-repeat begins
+    const KEY_REPEAT_INTERVAL = 6;  // dt frames between repeated steps
+
     // PHYSICS & DIFFICULTY
     const CONFIG = {
         PHYSICS: {
@@ -31,23 +35,25 @@
         JUMP: {
             CHARGE_TIME: 30,             // Frames required to charge each jump level (hold space)
             JUMP_COOLDOWN: 20,           // Frames to wait before jumping again
-            DISTANCES: [28, 46, 58],     // Forward distance traveled for each jump level
+            DISTANCES: [2 * TILE_SIZE, 3 * TILE_SIZE, 4 * TILE_SIZE], // Forward distance per jump level
             VELOCITIES: [2, 3, 4],       // Vertical jump velocity (height) for each level
             LANDING_PENALTIES: [5, 10, 15] // Instability added to balance upon landing
         },
         OBSTACLES: {
-            START_DELAY: 66,            // Initial distance before the first obstacle appears
-            MIN_GAP: 22,                 // Minimum gap between obstacle groups
-            PATTERNS: [                  // Array of obstacle generation patterns
-                { type: 'SINGLE', groups: [{ count: 1, gap: 0 }] },
-                { type: 'DOUBLE_TIGHT', groups: [{ count: 2, gap: 0 }] },
-                { type: 'DOUBLE_LOOSE', groups: [{ count: 2, gap: 22 }] },
-                { type: 'TRIPLE', groups: [{ count: 3, gap: 0 }] },
-                { type: 'COMBO_2_2', groups: [{ count: 2, gap: 0 }, { count: 2, gap: 0 }], groupGap: 22 },
-                { type: 'COMBO_1_2', groups: [{ count: 1, gap: 0 }, { count: 2, gap: 0 }], groupGap: 22 },
-                { type: 'COMBO_3_1', groups: [{ count: 3, gap: 0 }, { count: 1, gap: 0 }], groupGap: 22 },
-                { type: 'COMBO_3_2', groups: [{ count: 3, gap: 0 }, { count: 2, gap: 0 }], groupGap: 22 },
-                { type: 'COMBO_3_3', groups: [{ count: 3, gap: 0 }, { count: 3, gap: 0 }], groupGap: 22 }
+            START_DELAY: 4 * TILE_SIZE,  // Initial distance before the first obstacle appears
+            MIN_GAP: TILE_SIZE,           // Minimum gap between obstacle groups
+            // Each pattern is an array of group sizes. Groups are tight (no intra-gap).
+            // A 1T gap is inserted between groups automatically.
+            PATTERNS: [
+                [1],
+                [2],
+                [1, 1],
+                [3],
+                [2, 2],
+                [1, 2],
+                [3, 1],
+                [3, 2],
+                [3, 3],
             ]
         },
         HITBOXES: {
@@ -58,11 +64,10 @@
             GAME: 2                      // Global game speed (pixels per frame)
         },
         DEBUG: {
-            SHOW_HITBOX: false           // Toggle to show/hide debug hitboxes
+            SHOW_HITBOX: true           // Toggle to show/hide debug hitboxes
         }
     };
 
-    const ANIMATION_FPS_DIVISOR = 10;
     const BALANCE_THRESHOLD = { SLIGHT: 20, MEDIUM: 55, LARGE: 80, MAX: 100 };
 
     const STATE = {
@@ -76,9 +81,6 @@
 
     const SPRITE_WIDTH = 80;
     const SPRITE_HEIGHT = 96;
-    const TILE_SIZE = 16;
-    const KEY_REPEAT_DELAY = 18;    // dt frames before auto-repeat begins
-    const KEY_REPEAT_INTERVAL = 6;  // dt frames between repeated steps
     const FALLEN_OFFSET_X = 47;
     const FALLING_OFFSET_X = 20;
     const FALLEN_OFFSET_Y = 13;
@@ -95,7 +97,6 @@
     let distanceTraveled = 0;
     let backgroundY = 0;
     let isGameOver = false;
-    let currentRAFId = null;
 
     let startTime = 0;
     let elapsedTime = 0; // in milliseconds
@@ -112,7 +113,6 @@
         background: 'balance_bg.png',
         beamStart: 'beam_start.png',
         beamMid: 'beam_mid.png',
-        beamEnd: 'beam_end.png',
         beamSpike: 'beam_spike.png'
     };
 
@@ -205,10 +205,11 @@
         fallDirection: null,
         fallTimer: 0,
         balanceTimer: 0,
-        animationTimer: 0,
 
         stepRemaining: 0,
         keyRepeatTimer: 0,
+        jumpStartDist: 0,
+        jumpStartBgY: 0,
 
         jumpChargeTimer: 0,
         jumpCooldown: 0,
@@ -238,9 +239,6 @@
                 }
             }
 
-            if (this.actionState === STATE.WALKING) {
-                this.animationTimer += dt;
-            }
         },
 
         updateJump(dt) {
@@ -259,9 +257,15 @@
                 this.jumpVelocityY = 0;
                 this.jumpCooldown = CONFIG.JUMP.JUMP_COOLDOWN;
 
-                // Reset inputs to prevent auto-move
+                // Snap to exact tile distance — decouples collision from floating point drift in physics
+                const exactDist = this.jumpStartDist + CONFIG.JUMP.DISTANCES[this.jumpLevel];
+                backgroundY = this.jumpStartBgY - (exactDist - this.jumpStartDist);
+                distanceTraveled = exactDist;
+
                 inputState.down = false;
+                inputState.downHeld = false;
                 inputState.up = false;
+                this.keyRepeatTimer = 0;
 
                 const penalty = CONFIG.JUMP.LANDING_PENALTIES[this.jumpLevel];
                 const direction = Math.random() < 0.5 ? -1 : 1;
@@ -281,6 +285,10 @@
                     this.actionState = STATE.JUMP_CHARGING;
                     this.jumpChargeTimer = 0;
                     this.jumpLevel = 0;
+                    inputState.down = false;
+                    inputState.downHeld = false;
+                    this.stepRemaining = 0;
+                    this.keyRepeatTimer = 0;
                 } else {
                     this.jumpChargeTimer += dt;
                     const cycleTime = CONFIG.JUMP.CHARGE_TIME * 3;
@@ -292,6 +300,8 @@
             } else if (this.actionState === STATE.JUMP_CHARGING) {
                 this.actionState = STATE.JUMPING;
                 this.jumpVelocityY = CONFIG.JUMP.VELOCITIES[this.jumpLevel];
+                this.jumpStartDist = distanceTraveled;
+                this.jumpStartBgY = backgroundY;
             }
         },
 
@@ -475,7 +485,7 @@
                 default:
                     anim = ANIMATIONS[this.leanState] ?? ANIMATIONS.balanced;
                     if (this.actionState === STATE.WALKING) {
-                        const seqIdx = Math.floor(this.animationTimer / ANIMATION_FPS_DIVISOR) % walkAnimationSequence.length;
+                        const seqIdx = Math.floor(distanceTraveled / TILE_SIZE) % walkAnimationSequence.length;
                         frameIndex = walkAnimationSequence[seqIdx];
                     }
             }
@@ -542,11 +552,15 @@
 
         ataho.fallTimer = 0;
         ataho.balanceTimer = 0;
-        ataho.x = canvas.width / 2 - (SPRITE_WIDTH) / 2;
-        ataho.y = canvas.height / 2 - (SPRITE_HEIGHT) / 2;
+        ataho.swayTarget = 0;
+        ataho.swayCurrent = 0;
+        ataho.swayTimer = 0;
+        ataho.swayChangeInterval = 120;
         ataho.visualY = 0;
         ataho.stepRemaining = 0;
         ataho.keyRepeatTimer = 0;
+        ataho.jumpStartDist = 0;
+        ataho.jumpStartBgY = 0;
         ataho.jumpVelocityY = 0;
         ataho.jumpLevel = 0;
         distanceTraveled = 0;
@@ -636,8 +650,6 @@
         const clickX = (e.clientX - rect.left) * scaleX;
         const clickY = (e.clientY - rect.top) * scaleY;
 
-
-
         if (isClickInsideButton(clickX, clickY, buttons.continue)) {
             resetGame();
         } else if (isClickInsideButton(clickX, clickY, buttons.exit)) {
@@ -699,8 +711,6 @@
         const touchY = e.touches ? e.touches[0].clientY : e.clientY;
 
         const centerX = window.innerWidth / 2;
-        const centerY = window.innerHeight / 2;
-
         const maxDistX = window.innerWidth / 2;
         let distRatio = clamp((touchX - centerX) / maxDistX, -1, 1);
 
@@ -761,21 +771,14 @@
         const generateHorizon = distanceTraveled + canvas.height * 2;
         while (nextObstacleY < generateHorizon) {
             const pattern = CONFIG.OBSTACLES.PATTERNS[Math.floor(Math.random() * CONFIG.OBSTACLES.PATTERNS.length)];
-            if (pattern.groups) {
-                pattern.groups.forEach((group, index) => {
-                    for (let i = 0; i < group.count; i++) {
-                        obstacles.push({ y: nextObstacleY, height: spikeHeight });
-                        nextObstacleY += spikeHeight + group.gap;
-                    }
-                    if (index < pattern.groups.length - 1) nextObstacleY += pattern.groupGap;
-                });
-            } else {
-                for (let i = 0; i < pattern.count; i++) {
+            pattern.forEach((groupCount, groupIdx) => {
+                for (let i = 0; i < groupCount; i++) {
                     obstacles.push({ y: nextObstacleY, height: spikeHeight });
-                    nextObstacleY += spikeHeight + pattern.gap;
+                    nextObstacleY += spikeHeight;
                 }
-            }
-            nextObstacleY += CONFIG.OBSTACLES.MIN_GAP + (Math.random() * 120);
+                if (groupIdx < pattern.length - 1) nextObstacleY += TILE_SIZE;
+            });
+            nextObstacleY += CONFIG.OBSTACLES.MIN_GAP + Math.floor(Math.random() * 8) * TILE_SIZE;
         }
 
         if (obstacles.length > 0) {
@@ -930,7 +933,7 @@
     //===========================================
 
     function byFrame(timestamp) {
-        currentRAFId = requestAnimationFrame(byFrame);
+        requestAnimationFrame(byFrame);
 
         // Normalize dt to 60fps. Cap at 3 to prevent spiral-of-death after tab focus.
         // Use (> 0) guard because the first manual byFrame() call has timestamp=undefined.
