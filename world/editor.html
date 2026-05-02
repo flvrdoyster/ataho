@@ -1,10 +1,18 @@
 <html>
-
 <head>
     <title>Map Editor</title>
     <style>
-        * {
-            box-sizing: border-box;
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        /* ── 스크롤바 다크 테마 ── */
+        ::-webkit-scrollbar              { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track        { background: #1a1a1a; }
+        ::-webkit-scrollbar-thumb        { background: #3a3a3a; border-radius: 4px; border: 2px solid #1a1a1a; }
+        ::-webkit-scrollbar-thumb:hover  { background: #555; }
+        ::-webkit-scrollbar-corner       { background: #1a1a1a; }
+        html, #left-panel, #editor-container, #trigger-palette, .palette {
+            scrollbar-width: thin;
+            scrollbar-color: #3a3a3a #1a1a1a;
         }
 
         body {
@@ -13,124 +21,393 @@
             flex-direction: column;
             font-family: sans-serif;
             height: 100vh;
-            margin: 0;
             overflow: hidden;
+            color: #ddd;
+            font-size: 12px;
         }
 
-        .top-area {
+        /* ── TOOLBAR ── */
+        #toolbar {
+            height: 42px;
+            min-height: 42px;
+            background: #1a1a1a;
+            border-bottom: 1px solid #3a3a3a;
             display: flex;
+            align-items: center;
+            gap: 2px;
+            padding: 0 8px;
+            z-index: 100;
+            flex-shrink: 0;
+        }
+
+        .tb-logo {
+            font-size: 13px;
+            font-weight: bold;
+            color: #aaa;
+            white-space: nowrap;
+            padding: 0 4px;
+        }
+
+        .tb-badge {
+            background: #333;
+            color: #ddd;
+            font-size: 11px;
+            padding: 2px 7px;
+            border-radius: 10px;
+            border: 1px solid #555;
+            white-space: nowrap;
+        }
+
+        .tb-sep {
+            width: 1px;
+            height: 22px;
+            background: #3a3a3a;
+            margin: 0 5px;
+            flex-shrink: 0;
+        }
+
+        .tb-spacer { flex: 1; }
+
+        .tb-group {
+            display: flex;
+            align-items: center;
+            gap: 3px;
+        }
+
+        .tb-select {
+            padding: 4px 6px;
+            background: #2a2a2a;
+            color: #ddd;
+            border: 1px solid #555;
+            border-radius: 4px;
+            font-size: 12px;
+            cursor: pointer;
+        }
+
+        .tb-btn {
+            padding: 5px 9px;
+            background: #2a2a2a;
+            color: #ccc;
+            border: 1px solid #444;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 11px;
+            white-space: nowrap;
+            line-height: 1;
+        }
+        .tb-btn:hover { background: #3a3a3a; color: #fff; }
+        .tb-btn.active { background: #2e7d32; color: #fff; border-color: #388e3c; }
+        .tb-btn.active-red { background: #c33; color: #fff; border-color: #e33; }
+        .tb-btn.accent { background: #1a3a5c; border-color: #2a5a8c; color: #7ec8e3; }
+        .tb-btn.accent:hover { background: #254a70; }
+
+        /* Mode tabs in toolbar */
+        .tb-mode-group {
+            display: flex;
+            border: 1px solid #444;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        .mode-tab {
+            padding: 5px 10px;
+            background: #2a2a2a;
+            color: #888;
+            border: none;
+            border-right: 1px solid #444;
+            cursor: pointer;
+            font-size: 11px;
+            white-space: nowrap;
+            line-height: 1;
+            transition: background 0.1s, color 0.1s;
+        }
+        .mode-tab:last-child { border-right: none; }
+        .mode-tab:hover:not(.active) { background: #333; color: #bbb; }
+        .mode-tab.active { background: #444; color: #fff; font-weight: bold; }
+        .mode-tab .shortcut {
+            font-size: 9px; opacity: 0.5; margin-left: 3px;
+        }
+
+        .tb-check-label {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 7px;
+            background: #2a2a2a;
+            border: 1px solid #444;
+            border-radius: 4px;
+            cursor: pointer;
+            color: #aaa;
+            font-size: 11px;
+            white-space: nowrap;
+            user-select: none;
+        }
+        .tb-check-label:hover { background: #333; color: #ddd; }
+        .tb-check-label input { cursor: pointer; }
+
+        #zoom-level {
+            min-width: 38px;
+            text-align: center;
+            font-size: 11px;
+            color: #aaa;
+        }
+
+        kbd {
+            background: #333;
+            border: 1px solid #555;
+            border-radius: 3px;
+            padding: 0px 4px;
+            font-size: 9px;
+            color: #999;
+            font-family: monospace;
+        }
+
+        /* ── MAIN AREA ── */
+        #main {
             flex: 1;
+            display: flex;
             min-height: 0;
         }
 
-        .bottom-area {
-            height: 250px;
+        /* ── LEFT PANEL ── */
+        #left-panel {
+            width: 220px;
+            min-width: 220px;
             background: #1a1a1a;
+            border-right: 1px solid #3a3a3a;
             display: flex;
             flex-direction: column;
-            border-top: 1px solid #444;
+            overflow-y: auto;
+            overflow-x: hidden;
         }
 
-        .editor-container {
+        .panel-section {
+            padding: 10px 12px 12px;
+            border-bottom: 1px solid #252525;
+        }
+
+        .panel-label {
+            font-size: 9px;
+            color: #555;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 7px;
+            font-weight: 600;
+        }
+
+        /* Tile mode: selected tile preview */
+        #tile-preview-box {
+            width: 64px;
+            height: 64px;
+            background: #0a0a0a;
+            border: 1px solid #3a3a3a;
+            image-rendering: pixelated;
+            background-repeat: no-repeat;
+            border-radius: 4px;
+            margin-bottom: 8px;
+            box-shadow: inset 0 0 0 1px rgba(255,255,255,0.04);
+        }
+
+        #selected-id {
+            font-size: 12px;
+            color: #aaa;
+            font-family: monospace;
+        }
+
+        #hover-coords {
+            font-size: 12px;
+            color: #ddd;
+            font-family: monospace;
+        }
+
+        /* Map config collapsible */
+        .panel-details {
+            border-bottom: 1px solid #2a2a2a;
+        }
+        .panel-details > summary {
+            padding: 9px 12px;
+            font-size: 11px;
+            color: #888;
+            cursor: pointer;
+            user-select: none;
+            list-style: none;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .panel-details > summary::before {
+            content: '▶';
+            font-size: 8px;
+            transition: transform 0.15s;
+        }
+        .panel-details[open] > summary::before { transform: rotate(90deg); }
+        .panel-details > summary:hover { color: #bbb; background: #222; }
+        .panel-details-content {
+            padding: 6px 12px 10px;
+        }
+
+        .field-row {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 6px;
+            align-items: center;
+        }
+        .field-row label {
+            font-size: 11px;
+            color: #888;
+            flex-shrink: 0;
+        }
+
+        input[type="text"],
+        input[type="number"],
+        select,
+        textarea {
+            background: #222;
+            color: #ddd;
+            border: 1px solid #444;
+            border-radius: 3px;
+            padding: 4px 6px;
+            font-size: 11px;
+            font-family: sans-serif;
+            width: 100%;
+        }
+        input[type="text"]:focus,
+        input[type="number"]:focus,
+        select:focus,
+        textarea:focus {
+            outline: none;
+            border-color: #666;
+        }
+
+        textarea { resize: vertical; min-height: 36px; }
+
+        .panel-btn {
+            width: 100%;
+            padding: 7px 10px;
+            background: #2a2a2a;
+            color: #ccc;
+            border: 1px solid #444;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 11px;
+            margin-bottom: 4px;
+            text-align: left;
+        }
+        .panel-btn:hover { background: #333; color: #fff; }
+        .panel-btn.green  { background: #1b4d1e; border-color: #2e7d32; color: #81c784; }
+        .panel-btn.green:hover { background: #2e7d32; color: #fff; }
+        .panel-btn.blue   { background: #0d2a40; border-color: #01579b; color: #64b5f6; }
+        .panel-btn.blue:hover { background: #01579b; color: #fff; }
+        .panel-btn.red    { background: #3b1212; border-color: #c33; color: #ef9a9a; }
+        .panel-btn.red:hover { background: #c33; color: #fff; }
+        .panel-btn.dimmed { background: #222; border-color: #3a3a3a; color: #666; }
+
+        .panel-hint {
+            font-size: 11px;
+            color: #666;
+            line-height: 1.5;
+            padding: 10px 12px;
+        }
+
+        .editing-badge {
+            font-size: 10px;
+            color: #ffeb3b;
+            padding: 4px 12px;
+            display: none;
+        }
+
+        /* Trigger form specific */
+        #trigger-palette { overflow-y: auto; }
+        .trig-field { margin-bottom: 6px; }
+        .trig-field label { display: block; font-size: 10px; color: #777; margin-bottom: 2px; }
+        .trig-row { display: flex; gap: 5px; margin-bottom: 6px; }
+        .trig-row label { font-size: 10px; color: #777; flex: 1; }
+        .trig-divider { border: none; border-top: 1px dashed #333; margin: 8px 0; }
+        .trig-action-row { display: flex; gap: 4px; }
+
+        /* ── CANVAS ── */
+        #editor-container {
             flex: 1;
             overflow: auto;
-            background: #333;
+            background: #2d2d2d;
             position: relative;
-            display: flex;
-            justify-content: flex-start;
-            align-items: flex-start;
-            padding: 20px;
+        }
+
+        #map-canvas-wrap {
+            padding: 24px;
+            display: inline-block;
+            min-width: 100%;
+            min-height: 100%;
         }
 
         .map-grid {
             position: relative;
             background: #000;
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 0 30px rgba(0,0,0,0.6);
+            display: inline-block;
         }
 
-        .map-grid.show-grid {
+        .map-grid.show-grid::after {
+            content: '';
+            position: absolute;
+            inset: 0;
             background-image:
-                linear-gradient(to right, rgba(255, 255, 255, 0.08) 1px, transparent 1px),
-                linear-gradient(to bottom, rgba(255, 255, 255, 0.08) 1px, transparent 1px);
+                linear-gradient(to right, rgba(255,255,255,0.12) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(255,255,255,0.12) 1px, transparent 1px);
             background-size: 16px 16px;
+            pointer-events: none;
+            z-index: 200;
         }
 
         .tile {
             position: absolute;
             width: 16px;
             height: 16px;
-            cursor: pointer;
+            cursor: crosshair;
             image-rendering: pixelated;
             background-repeat: no-repeat;
             z-index: 1;
         }
+        .tile:hover { z-index: 100; outline: 1px solid rgba(255,255,255,0.6); }
+        .tile.empty { background: none !important; }
 
         .anim-obj {
             position: absolute;
             background-repeat: no-repeat;
             image-rendering: pixelated;
             z-index: 10;
-            border: 1px solid rgba(255, 255, 0, 0.5);
+            border: 1px solid rgba(255,255,0,0.5);
             pointer-events: none;
-            cursor: pointer;
-        }
-
-        .anim-obj:hover {
-            border: 1px solid yellow;
         }
 
         .collision-overlay {
             position: absolute;
-            background: rgba(255, 0, 0, 0.5);
+            background: rgba(255,0,0,0.4);
             z-index: 15;
             pointer-events: none;
-            cursor: pointer;
             width: 16px;
             height: 16px;
         }
-
-        .collision-overlay.interactive {
-            pointer-events: auto !important;
-        }
-
-        .collision-overlay.ghost {
-            background: rgba(255, 0, 0, 0.15);
-            pointer-events: none !important;
-        }
+        .collision-overlay.interactive { pointer-events: auto !important; cursor: pointer; }
+        .collision-overlay.ghost { background: rgba(255,0,0,0.15); pointer-events: none !important; }
 
         .trigger-overlay {
             position: absolute;
-            background: rgba(0, 100, 255, 0.5);
+            background: rgba(0,100,255,0.4);
             z-index: 12;
             pointer-events: none;
-            cursor: pointer;
-            outline: 1px solid rgba(0, 200, 255, 0.8);
+            outline: 1px solid rgba(0,200,255,0.7);
         }
-
-        .trigger-overlay.interactive {
-            pointer-events: auto !important;
-        }
-
+        .trigger-overlay.interactive { pointer-events: auto !important; cursor: pointer; }
         .trigger-overlay.ghost {
-            background: rgba(0, 100, 255, 0.15);
-            outline: 1px solid rgba(0, 200, 255, 0.3);
+            background: rgba(0,100,255,0.12);
+            outline: 1px solid rgba(0,200,255,0.25);
             pointer-events: none !important;
-        }
-
-        .tile:hover {
-            z-index: 100;
-            outline: 1px solid white;
-        }
-
-        .tile.empty {
-            background: none !important;
         }
 
         .spawn-indicator {
             position: absolute;
-            background: rgba(0, 255, 0, 0.4);
+            background: rgba(0,255,0,0.3);
             border: 2px solid lime;
-            box-sizing: border-box;
             z-index: 5;
             pointer-events: none;
             display: flex;
@@ -139,710 +416,1416 @@
             font-size: 10px;
         }
 
-        .sidebar {
-            width: 350px;
-            background: #1a1a1a;
-            color: #eee;
-            padding: 20px;
+        /* ── BOTTOM PALETTE ── */
+        #bottom-area {
+            height: 280px;
+            min-height: 80px;
+            max-height: 70vh;
+            background: #111;
+            border-top: 1px solid #3a3a3a;
             display: flex;
             flex-direction: column;
-            border-right: 1px solid #444;
-            z-index: 200;
-            overflow-y: auto;
+            position: relative;
         }
 
-        .sidebar h2 {
-            margin-top: 0;
-            margin-bottom: 10px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
+        #palette-resize-handle {
+            position: absolute;
+            top: -4px;
+            left: 0;
+            right: 0;
+            height: 8px;
+            cursor: ns-resize;
+            z-index: 50;
+            background: transparent;
         }
-
-        .sidebar h2 .map-badge {
-            font-size: 12px;
+        #palette-resize-handle::after {
+            content: '';
+            position: absolute;
+            top: 3px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 36px;
+            height: 2px;
             background: #444;
-            padding: 2px 8px;
-            border-radius: 4px;
-            font-weight: normal;
+            border-radius: 1px;
+            transition: background 0.15s;
+        }
+        #palette-resize-handle:hover::after,
+        #palette-resize-handle.dragging::after {
+            background: #888;
         }
 
-        /* Palette */
         .palette-wrapper {
-            margin: 0;
-            background: #000;
-            overflow-x: auto;
-            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
             flex: 1;
+            min-height: 0;
+            background: #111;
         }
 
         .palette-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 5px 8px;
-            background: #333;
+            padding: 5px 10px;
+            background: #1a1a1a;
+            border-bottom: 1px solid #2a2a2a;
             cursor: pointer;
-            font-size: 12px;
-            color: #aaa;
+            font-size: 11px;
+            color: #666;
             user-select: none;
+            flex-shrink: 0;
+            letter-spacing: 0.3px;
+        }
+        .palette-header:hover { background: #222; }
+        .reclassify-btn {
+            padding: 2px 8px;
+            background: #2a2a2a;
+            color: #888;
+            border: 1px solid #3a3a3a;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 10px;
+            line-height: 1.5;
+            flex-shrink: 0;
+        }
+        .reclassify-btn:hover { background: #333; color: #bbb; border-color: #555; }
+
+        .palette-filter-bar {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 4px;
+            padding: 6px 8px;
+            background: #1a1a1a;
+            border-bottom: 1px solid #2a2a2a;
+            flex-shrink: 0;
         }
 
-        .palette-header:hover {
-            background: #3a3a3a;
+        .palette-filter-btn {
+            padding: 3px 10px;
+            border: 2px solid #555;
+            border-radius: 4px;
+            background: transparent;
+            color: inherit;
+            cursor: pointer;
+            font-size: 11px;
+            font-family: monospace;
+            line-height: 1.4;
+            opacity: 0.45;
+            transition: opacity 0.1s;
+            width: auto;
+            flex-shrink: 0;
         }
+        .palette-filter-btn.active { opacity: 1; color: #111; }
+        .palette-filter-btn:not(.active):hover { opacity: 0.7; }
+
+        .palette-filter-btn[data-cat="floor"]          { border-color: #00e676; }
+        .palette-filter-btn[data-cat="floor"].active   { background: #00e676; }
+        .palette-filter-btn[data-cat="water"]          { border-color: #2979ff; }
+        .palette-filter-btn[data-cat="water"].active   { background: #2979ff; }
+        .palette-filter-btn[data-cat="waterside_wall"] { border-color: #00e5ff; }
+        .palette-filter-btn[data-cat="waterside_wall"].active { background: #00e5ff; }
+        .palette-filter-btn[data-cat="rock_wall"]      { border-color: #ff6d00; }
+        .palette-filter-btn[data-cat="rock_wall"].active { background: #ff6d00; }
+        .palette-filter-btn[data-cat="outer_wall"]     { border-color: #e040fb; }
+        .palette-filter-btn[data-cat="outer_wall"].active { background: #e040fb; }
+        .palette-filter-btn[data-cat="beam"]           { border-color: #ffd740; }
+        .palette-filter-btn[data-cat="beam"].active    { background: #ffd740; }
+        .palette-filter-btn[data-cat="empty"]          { border-color: #555; }
+        .palette-filter-btn[data-cat="empty"].active   { background: #555; color: #eee; }
 
         .palette {
             display: grid;
-            padding: 5px;
+            padding: 6px;
+            gap: 1px;
+            overflow-y: auto;
+            flex: 1;
+            background: #1a1a1a;
         }
-
-        .palette.collapsed {
-            display: none;
-        }
+        .palette.collapsed { display: none; }
 
         .palette-tile {
             width: 32px;
             height: 32px;
-            margin: 0;
             cursor: pointer;
             border: 2px solid transparent;
-            box-sizing: border-box;
-            background-size: 512px auto;
             background-repeat: no-repeat;
+            image-rendering: pixelated;
             position: relative;
         }
-
-        .palette-tile.selected {
-            border: 2px solid cyan;
-            z-index: 10;
-        }
-
-        .palette-tile:hover {
-            border-color: #888;
-        }
-
+        .palette-tile.cat-floor          { border-color: #00e676; }
+        .palette-tile.cat-water          { border-color: #2979ff; }
+        .palette-tile.cat-waterside_wall { border-color: #00e5ff; }
+        .palette-tile.cat-rock_wall      { border-color: #ff6d00; }
+        .palette-tile.cat-outer_wall     { border-color: #e040fb; }
+        .palette-tile.cat-beam           { border-color: #ffd740; }
+        .palette-tile.cat-empty          { border-color: #333; opacity: 0.35; }
+        .palette-tile.selected           { border-color: cyan !important; outline: 1px solid cyan; z-index: 10; }
+        .palette-tile:hover:not(.selected) { border-color: #fff !important; }
+        .palette-tile.hidden-by-filter   { display: none; }
         .palette-tile:hover::after {
             content: attr(data-coord);
             position: absolute;
-            bottom: -18px;
-            left: 50%;
+            bottom: -18px; left: 50%;
             transform: translateX(-50%);
-            background: rgba(0, 0, 0, 0.85);
-            color: #fff;
-            font-size: 9px;
-            padding: 1px 4px;
-            border-radius: 2px;
-            white-space: nowrap;
-            z-index: 100;
+            background: rgba(0,0,0,0.9);
+            color: #fff; font-size: 9px;
+            padding: 1px 4px; border-radius: 2px;
+            white-space: nowrap; z-index: 100;
             pointer-events: none;
         }
 
-        /* Controls */
-        .controls {
-            margin-top: 10px;
-        }
-
-        .section-label {
-            font-size: 11px;
-            color: #888;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-bottom: 6px;
-            margin-top: 14px;
-        }
-
-        .mode-tabs {
-            display: flex;
-            gap: 0;
-            margin-bottom: 12px;
-            border: 1px solid #555;
-            border-radius: 4px;
-            overflow: hidden;
-        }
-
-        .mode-tab {
-            flex: 1;
-            padding: 8px 4px;
-            background: #333;
-            color: #aaa;
-            border: none;
-            cursor: pointer;
-            font-size: 12px;
-            text-align: center;
-            transition: background 0.15s, color 0.15s;
-            margin: 0;
-        }
-
-        .mode-tab:not(:last-child) {
-            border-right: 1px solid #555;
-        }
-
-        .mode-tab.active {
-            background: #555;
-            color: white;
-            font-weight: bold;
-        }
-
-        .mode-tab:hover:not(.active) {
-            background: #3a3a3a;
-        }
-
-        .mode-tab .shortcut {
-            font-size: 9px;
-            opacity: 0.5;
-            display: block;
-        }
-
-        button {
-            padding: 8px 10px;
-            width: 100%;
-            margin-bottom: 6px;
-            background: #444;
-            color: white;
-            border: none;
-            cursor: pointer;
-            border-radius: 3px;
-            font-size: 12px;
-        }
-
-        button:hover {
-            background: #555;
-        }
-
-        button.active {
-            background: #d32f2f;
-            font-weight: bold;
-        }
-
-        textarea {
-            width: 100%;
-            height: 100px;
-            background: #222;
-            color: #aaa;
-            border: 1px solid #444;
-            margin-top: 10px;
-            font-size: 10px;
-        }
-
-        .info-row {
-            display: flex;
-            justify-content: space-between;
-            font-size: 12px;
-            color: #999;
-            margin-bottom: 8px;
-        }
-
-        .info-row span {
-            color: #ddd;
-        }
-
-        /* Layer Visibility Checkboxes */
-        .layer-options {
-            display: flex;
-            gap: 12px;
-            margin-bottom: 8px;
-            font-size: 11px;
-            color: #aaa;
-        }
-
-        .layer-options label {
-            display: flex;
-            align-items: center;
-            gap: 4px;
-            cursor: pointer;
-        }
-
-        /* Toast */
+        /* ── TOAST ── */
         .toast {
             position: fixed;
-            bottom: 20px;
-            right: 20px;
+            bottom: 24px; right: 20px;
             background: #333;
             color: #eee;
-            padding: 12px 20px;
+            padding: 10px 18px;
             border-radius: 6px;
-            font-size: 13px;
+            font-size: 12px;
             z-index: 9999;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+            box-shadow: 0 4px 16px rgba(0,0,0,0.5);
             opacity: 0;
-            transform: translateY(10px);
-            transition: opacity 0.3s, transform 0.3s;
+            transform: translateY(8px);
+            transition: opacity 0.25s, transform 0.25s;
             pointer-events: none;
         }
+        .toast.show { opacity: 1; transform: translateY(0); }
 
-        .toast.show {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        /* New Map Dialog */
+        /* ── DIALOG ── */
         .dialog-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.6);
+            position: fixed; inset: 0;
+            background: rgba(0,0,0,0.65);
             z-index: 9000;
             display: none;
             justify-content: center;
             align-items: center;
         }
-
-        .dialog-overlay.show {
-            display: flex;
-        }
-
+        .dialog-overlay.show { display: flex; }
         .dialog-box {
-            background: #2a2a2a;
+            background: #252525;
             border: 1px solid #555;
             border-radius: 8px;
             padding: 24px;
-            min-width: 340px;
+            min-width: 320px;
             color: #eee;
         }
-
-        .dialog-box h3 {
-            margin-top: 0;
+        .dialog-box h3 { margin-bottom: 16px; font-size: 15px; }
+        .dialog-box label { display: block; margin-bottom: 10px; font-size: 12px; color: #aaa; }
+        .dialog-box label input { margin-top: 3px; }
+        .dialog-actions { display: flex; gap: 8px; margin-top: 16px; }
+        .dialog-actions button {
+            flex: 1; padding: 8px; background: #444; color: #fff;
+            border: none; border-radius: 4px; cursor: pointer; font-size: 12px;
         }
-
-        .dialog-box label {
-            display: block;
-            margin-bottom: 10px;
-            font-size: 13px;
-        }
-
-        .dialog-box input {
-            width: 100%;
-            padding: 6px;
-            background: #1a1a1a;
-            color: #eee;
-            border: 1px solid #555;
-            border-radius: 3px;
-            margin-top: 3px;
-        }
-
-        .dialog-box .dialog-actions {
-            display: flex;
-            gap: 8px;
-            margin-top: 16px;
-        }
-
-        .dialog-box .dialog-actions button {
-            flex: 1;
-        }
-
-        /* Keyboard shortcut hints */
-        kbd {
-            background: #333;
-            border: 1px solid #555;
-            border-radius: 3px;
-            padding: 1px 5px;
-            font-size: 10px;
-            font-family: monospace;
-            color: #aaa;
-        }
+        .dialog-actions button:hover { background: #555; }
+        .dialog-actions button.primary { background: #2e7d32; }
+        .dialog-actions button.primary:hover { background: #388e3c; }
     </style>
 </head>
 
 <body>
-    <div class="top-area">
-        <div class="sidebar">
-        <h2>Map Editor <span class="map-badge" id="map-badge">cave</span></h2>
 
-        <div style="margin-bottom: 10px; display: flex; gap: 5px;">
-            <select id="map-selector" onchange="changeMap()"
-                style="flex: 1; padding: 5px; background: #333; color: white; border: 1px solid #555; border-radius: 3px;">
-                <option value="cave">Cave</option>
-                <option value="souko">Souko</option>
-            </select>
-            <button onclick="showNewMapDialog()"
-                style="flex: 0 0 auto; width: auto; padding: 8px 12px; background: #2e7d32;">+ New</button>
+<!-- ═══ TOOLBAR ═══ -->
+<div id="toolbar">
+    <span class="tb-logo">Map Editor</span>
+    <span class="tb-badge" id="map-badge">cave</span>
+
+    <div class="tb-sep"></div>
+
+    <div class="tb-group">
+        <select id="map-selector" class="tb-select" onchange="changeMap()">
+            <option value="cave">Cave</option>
+            <option value="souko">Souko</option>
+            <option value="abyss">Abyss</option>
+        </select>
+        <button class="tb-btn" onclick="showNewMapDialog()">+ New</button>
+    </div>
+
+    <div class="tb-sep"></div>
+
+    <!-- Mode Tabs -->
+    <div class="tb-mode-group">
+        <button class="mode-tab active" data-mode="tile" onclick="setMode('tile')">🖌 Tile<span class="shortcut">1</span></button>
+        <button class="mode-tab" data-mode="trigger" onclick="setMode('trigger')">⚡ Trigger<span class="shortcut">2</span></button>
+        <button class="mode-tab" data-mode="collision" onclick="setMode('collision')">🧱 Collision<span class="shortcut">3</span></button>
+        <button class="mode-tab" data-mode="spawn" onclick="setMode('spawn')">🚩 Spawn<span class="shortcut">4</span></button>
+    </div>
+
+    <div class="tb-sep"></div>
+
+    <!-- Tile Tools (shown only in tile mode) -->
+    <div class="tb-group" id="tile-tools">
+        <button id="btn-brush" class="tb-btn active" onclick="setBrush()">🖌 Brush <kbd>B</kbd></button>
+        <button id="btn-eraser" class="tb-btn" onclick="setEraser()">⌫ Eraser <kbd>E</kbd></button>
+        <button id="btn-eyedropper" class="tb-btn" onclick="setEyedropper()">💧 Pick <kbd>P</kbd></button>
+    </div>
+
+    <div class="tb-spacer"></div>
+
+    <!-- Layer Toggles -->
+    <div class="tb-group">
+        <label class="tb-check-label"><input type="checkbox" id="chk-show-grid" checked onchange="toggleGrid()"> Grid <kbd>G</kbd></label>
+        <label class="tb-check-label"><input type="checkbox" id="chk-show-triggers" onchange="renderTriggers()"> Triggers</label>
+        <label class="tb-check-label"><input type="checkbox" id="chk-show-collisions" onchange="renderCollisions()"> Collisions</label>
+    </div>
+
+    <div class="tb-sep"></div>
+
+    <!-- Zoom -->
+    <div class="tb-group">
+        <button class="tb-btn" onclick="changeZoom(-0.25)" style="padding:5px 7px;">−</button>
+        <span id="zoom-level">100%</span>
+        <button class="tb-btn" onclick="changeZoom(0.25)" style="padding:5px 7px;">+</button>
+        <button class="tb-btn" onclick="resetZoom()">Reset</button>
+    </div>
+
+    <div class="tb-sep"></div>
+
+    <!-- Export -->
+    <div class="tb-group">
+        <button class="tb-btn accent" onclick="exportMapData()">📋 Map</button>
+        <button class="tb-btn accent" onclick="exportTriggers()">📋 Triggers</button>
+    </div>
+</div>
+
+<!-- ═══ MAIN ═══ -->
+<div id="main">
+
+    <!-- LEFT PANEL -->
+    <div id="left-panel">
+
+        <!-- ── Tile Mode Panel ── -->
+        <div id="panel-tile">
+            <div class="panel-section">
+                <div class="panel-label">Selected Tile</div>
+                <div id="tile-preview-box"></div>
+                <div id="selected-id" style="font-family:monospace; font-size:12px; color:#aaa;">None</div>
+            </div>
+            <div class="panel-section">
+                <div class="panel-label">Cursor</div>
+                <span id="hover-coords" style="font-family:monospace;">--,--</span>
+            </div>
+            <div class="panel-section" style="font-size:10px; color:#555; line-height:1.8;">
+                <kbd>Ctrl+Z</kbd> Undo &nbsp; <kbd>Ctrl+⇧Z</kbd> Redo
+            </div>
+            <details class="panel-details">
+                <summary>Map Config</summary>
+                <div class="panel-details-content">
+                    <div class="field-row">
+                        <label style="width:14px;">W</label>
+                        <input type="number" id="map-width" value="40" style="width:52px;">
+                        <label style="width:14px; margin-left:4px;">H</label>
+                        <input type="number" id="map-height" value="30" style="width:52px;">
+                    </div>
+                    <div class="field-row">
+                        <label>Anchor</label>
+                        <select id="resize-anchor" style="flex:1;">
+                            <option value="tl" selected>Top-Left</option>
+                            <option value="tr">Top-Right</option>
+                            <option value="bl">Bottom-Left</option>
+                            <option value="br">Bottom-Right</option>
+                            <option value="c">Center</option>
+                        </select>
+                    </div>
+                    <button class="panel-btn" onclick="resizeMap()">Apply Resize</button>
+                </div>
+            </details>
         </div>
 
-        <!-- Palette moved to bottom-area -->
-
-        <div class="controls">
-            <div class="info-row">
-                <span>Selected: <span id="selected-id">None</span></span>
-                <span>Hover: <span id="hover-coords">--,--</span></span>
+        <!-- ── Trigger Mode Panel ── -->
+        <div id="trigger-palette" style="display:none; padding: 10px 12px; overflow-y:auto;">
+            <div class="trig-field">
+                <label>Title</label>
+                <input type="text" id="trigger-title" value="New Trigger">
             </div>
-
-            <!-- Mode Tabs -->
-            <div class="section-label">Mode</div>
-            <div class="mode-tabs">
-                <button class="mode-tab active" data-mode="tile" onclick="setMode('tile')">
-                    🖌️ Tile<span class="shortcut">1</span>
-                </button>
-                <button class="mode-tab" data-mode="trigger" onclick="setMode('trigger')">
-                    ⚡ Trigger<span class="shortcut">2</span>
-                </button>
-                <button class="mode-tab" data-mode="collision" onclick="setMode('collision')">
-                    🧱 Collision<span class="shortcut">3</span>
-                </button>
-                <button class="mode-tab" data-mode="spawn" onclick="setMode('spawn')">
-                    🚩 Spawn<span class="shortcut">4</span>
-                </button>
+            <div class="trig-field">
+                <label>ID</label>
+                <input type="text" id="trigger-id" placeholder="unique-id">
             </div>
-
-            <!-- Layer Visibility -->
-            <div class="layer-options">
-                <label><input type="checkbox" id="chk-show-triggers" onchange="renderTriggers()"> Show Triggers</label>
-                <label><input type="checkbox" id="chk-show-collisions" onchange="renderCollisions()"> Show
-                    Collisions</label>
-                <label><input type="checkbox" id="chk-show-grid" checked onchange="toggleGrid()"> Grid
-                    <kbd>G</kbd></label>
-            </div>
-
-            <!-- Tile Mode Tools -->
-            <div id="tile-tools">
-                <div style="margin-bottom: 10px; display: flex; gap: 5px;">
-                    <button id="btn-brush" onclick="setBrush()" style="flex: 1; background: #2e7d32;">Brush
-                        <kbd>B</kbd></button>
-                    <button id="btn-eraser" onclick="setEraser()" style="flex: 1;">Eraser <kbd>E</kbd></button>
-                </div>
-            </div>
-
-            <!-- Trigger Mode Panel -->
-            <div id="trigger-palette"
-                style="display:none; margin-bottom: 15px; border: 1px solid #444; padding: 10px; background: #222; border-radius: 4px;">
-                <h3 style="margin-top: 0; font-size: 14px;">Trigger Properties</h3>
-                <div style="margin-bottom: 5px;"><label>Title: <input type="text" id="trigger-title" value="New Trigger"
-                            style="width:100%"></label></div>
-                <div style="margin-bottom: 5px;"><label>ID: <input type="text" id="trigger-id" value=""
-                            placeholder="unique-id" style="width:100%"></label></div>
-                <div style="margin-bottom: 5px;"><label>Type:
-                        <select id="trigger-type" style="width:100%">
-                            <option value="menu">Menu</option>
-                            <option value="dialog">Dialog</option>
-                            <option value="warp">Warp</option>
-                        </select>
-                    </label></div>
-                <div style="margin-bottom: 5px;"><label>Sprite Path: <input type="text" id="trigger-sprite" value=""
-                            placeholder="../../object/..." style="width:100%"></label></div>
-                <div style="margin-bottom: 5px; display: flex; gap: 5px;">
-                    <label style="flex:1;">X: <input type="number" id="trigger-x" value="0" style="width:100%"></label>
-                    <label style="flex:1;">Y: <input type="number" id="trigger-y" value="0" style="width:100%"></label>
-                </div>
-                <div style="margin-bottom: 5px; display: flex; gap: 5px;">
-                    <label style="flex:1;">W: <input type="number" id="trigger-w" value="1" style="width:100%"></label>
-                    <label style="flex:1;">H: <input type="number" id="trigger-h" value="1" style="width:100%"></label>
-                </div>
-                <!-- Dialogue & Bubble -->
-                <div style="margin-bottom: 5px;">
-                    <label>Dialog Text (One line or JSON Array):</label>
-                    <textarea id="trigger-text" style="height: 40px; font-family: monospace;"></textarea>
-                </div>
-                <div style="margin-bottom: 5px;">
-                    <label>Bubble Offset Y: <input type="number" id="trigger-bubble-y" value="0"
-                            style="width:60px;"></label>
-                </div>
-                <div style="margin-bottom: 5px;">
-                    <label><input type="checkbox" id="trigger-collision"> Collision Enable</label>
-                </div>
-
-                <!-- Animation Settings -->
-                <div style="margin-top: 10px; border-top: 1px dotted #555; padding-top: 5px;">
-                    <label><input type="checkbox" id="trigger-is-anim"> Use Animation</label>
-                    <div id="anim-settings" style="display:none; margin-top: 5px; font-size: 11px;">
-                        <div style="display: flex; gap: 5px; margin-bottom: 5px;">
-                            <label>AW: <input type="number" id="anim-w" value="64" style="width:40px;"></label>
-                            <label>AH: <input type="number" id="anim-h" value="48" style="width:40px;"></label>
-                            <label>Frames: <input type="number" id="anim-frames" value="5" style="width:40px;"></label>
-                        </div>
-                        <label>Speed (ms/f): <input type="number" id="anim-speed" value="200"
-                                style="width:60px;"></label>
-                    </div>
-                </div>
-
-                <div style="margin-bottom: 10px; margin-top: 10px;">
-                    <label>Menu Items (JSON):</label>
-                    <textarea id="trigger-items"
-                        style="height: 60px; font-family: monospace;">[{"label": "Sample", "href": "#"}]</textarea>
-                </div>
-                <div style="display: flex; gap: 5px; margin-top: 10px;">
-                    <button id="btn-place-trigger" onclick="placeTriggerAction()"
-                        style="flex: 2; background: #2e7d32;">Create Trigger</button>
-                    <button id="btn-update-trigger" onclick="updateTrigger()"
-                        style="flex: 2; background: #01579b; display: none;">Update</button>
-                    <button id="btn-delete-trigger" onclick="deleteEditingTrigger()"
-                        style="flex: 1; background: #c33; display: none;">Delete</button>
-                    <button id="btn-cancel-trigger" onclick="cancelTriggerEdit()"
-                        style="flex: 1; background: #444; display: none;">Cancel</button>
-                </div>
-                <div id="editing-status" style="font-size: 11px; color: #ffeb3b; margin-top: 5px; display: none;">*
-                    Editing existing trigger</div>
-                <div style="font-size: 11px; color: #888; margin-top: 5px;">
-                    * 그리드를 클릭하여 생성하거나 기존 트리거를 클릭하여 편집합니다.
-                </div>
-            </div>
-
-            <!-- Action Buttons -->
-            <div class="section-label">Actions</div>
-            <div style="margin-bottom: 10px; display: flex; gap: 5px;">
-                <button onclick="exportMapData()" style="flex: 1; background: #4527a0;">Export Data 📋</button>
-                <button onclick="exportTriggers()" style="flex: 1; background: #1565c0;">Export Triggers 📋</button>
-            </div>
-
-            <!-- Zoom -->
-            <div class="section-label">Zoom</div>
-            <div style="margin-bottom: 10px; display: flex; gap: 5px; align-items: center;">
-                <button onclick="changeZoom(-0.1)" style="flex: 0 0 36px; width: 36px;">−</button>
-                <span id="zoom-level" style="flex: 1; text-align: center; font-size: 12px;">100%</span>
-                <button onclick="changeZoom(0.1)" style="flex: 0 0 36px; width: 36px;">+</button>
-                <button onclick="resetZoom()" style="flex: 0 0 50px; width: 50px;">Reset</button>
-            </div>
-
-            <hr style="border-color: #555; margin: 12px 0;">
-
-            <!-- Map Config -->
-            <div class="section-label">Map Config</div>
-            <div style="display: flex; gap: 8px; margin-bottom: 8px;">
-                <label style="flex: 1;">W: <input type="number" id="map-width" value="40"
-                        style="width: 100%; padding: 4px;"></label>
-                <label style="flex: 1;">H: <input type="number" id="map-height" value="30"
-                        style="width: 100%; padding: 4px;"></label>
-                <label style="flex: 1;">Anchor:
-                    <select id="resize-anchor" style="width: 100%; padding: 4px;">
-                        <option value="tl" selected>TL</option>
-                        <option value="tr">TR</option>
-                        <option value="bl">BL</option>
-                        <option value="br">BR</option>
-                        <option value="c">Center</option>
+            <div class="trig-row">
+                <label>Type
+                    <select id="trigger-type" style="width:100%; margin-top:2px;">
+                        <option value="menu">Menu</option>
+                        <option value="dialog">Dialog</option>
+                        <option value="warp">Warp</option>
                     </select>
                 </label>
             </div>
-            <button onclick="resizeMap()">Update Size</button>
+            <div class="trig-field">
+                <label>Sprite Path</label>
+                <input type="text" id="trigger-sprite" placeholder="../../object/...">
+            </div>
+            <div class="trig-row">
+                <label>X <input type="number" id="trigger-x" value="0" style="margin-top:2px;"></label>
+                <label>Y <input type="number" id="trigger-y" value="0" style="margin-top:2px;"></label>
+                <label>W <input type="number" id="trigger-w" value="1" style="margin-top:2px;"></label>
+                <label>H <input type="number" id="trigger-h" value="1" style="margin-top:2px;"></label>
+            </div>
 
-            <!-- Undo/Redo info -->
-            <div style="font-size: 10px; color: #666; margin-top: 8px; text-align: center;">
-                <kbd>Ctrl+Z</kbd> Undo &nbsp; <kbd>Ctrl+Shift+Z</kbd> Redo
+            <hr class="trig-divider">
+
+            <div class="trig-field">
+                <label>Dialog Text</label>
+                <textarea id="trigger-text" style="height:48px;"></textarea>
+            </div>
+            <div class="trig-row" style="align-items:center;">
+                <label style="flex:0; white-space:nowrap;">Bubble Y</label>
+                <input type="number" id="trigger-bubble-y" value="0" style="width:54px; margin-left:6px;">
+                <label style="margin-left:8px; white-space:nowrap; font-size:10px; color:#888;">
+                    <input type="checkbox" id="trigger-collision"> Collision
+                </label>
+            </div>
+
+            <hr class="trig-divider">
+
+            <div class="trig-field">
+                <label><input type="checkbox" id="trigger-is-anim"> Use Animation</label>
+                <div id="anim-settings" style="display:none; margin-top:6px;">
+                    <div class="trig-row">
+                        <label>W <input type="number" id="anim-w" value="64" style="margin-top:2px;"></label>
+                        <label>H <input type="number" id="anim-h" value="48" style="margin-top:2px;"></label>
+                        <label>Fr <input type="number" id="anim-frames" value="5" style="margin-top:2px;"></label>
+                    </div>
+                    <label>Speed(ms) <input type="number" id="anim-speed" value="200" style="width:60px; margin-left:4px;"></label>
+                </div>
+            </div>
+
+            <hr class="trig-divider">
+
+            <div class="trig-field">
+                <label>Menu Items (JSON)</label>
+                <textarea id="trigger-items" style="height:54px; font-family:monospace; font-size:10px;">[{"label": "Sample", "href": "#"}]</textarea>
+            </div>
+
+            <div class="editing-badge" id="editing-status">✏ Editing existing trigger</div>
+
+            <div class="trig-action-row">
+                <button id="btn-place-trigger" class="panel-btn green" onclick="placeTriggerAction()">Click map to place</button>
+            </div>
+            <div class="trig-action-row" style="display:none;" id="trig-edit-actions">
+                <button id="btn-update-trigger" class="panel-btn blue" onclick="updateTrigger()">Update</button>
+                <button id="btn-delete-trigger" class="panel-btn red" onclick="deleteEditingTrigger()">Del</button>
+                <button id="btn-cancel-trigger" class="panel-btn dimmed" onclick="cancelTriggerEdit()">✕</button>
+            </div>
+
+            <p style="font-size:10px; color:#555; margin-top:8px; line-height:1.5;">
+                클릭으로 트리거 생성 / 기존 트리거 클릭으로 편집
+            </p>
+        </div>
+
+        <!-- ── Collision Mode Panel ── -->
+        <div id="panel-collision" style="display:none;">
+            <div class="panel-section">
+                <div class="panel-label">Collision Editor</div>
+                <p style="font-size:11px; color:#777; line-height:1.6; margin-bottom:8px;">
+                    드래그로 충돌 영역을 추가/제거합니다.
+                </p>
+                <div style="font-size:11px; color:#999;">
+                    Hover: <span id="hover-coords-col" style="font-family:monospace;">--,--</span>
+                </div>
             </div>
         </div>
-    </div>
-    <div class="editor-container">
-        <div class="map-grid show-grid" id="map"></div>
-    </div>
-    </div>
-    <div class="bottom-area" id="bottom-area">
-        <!-- Tile Palette (always present, visibility managed) -->
-        <div class="palette-wrapper" id="palette-wrapper">
-            <div class="palette-header" onclick="togglePalette()">
-                <span>🎨 Tile Palette</span>
-                <span id="palette-toggle-icon">▼</span>
+
+        <!-- ── Spawn Mode Panel ── -->
+        <div id="panel-spawn" style="display:none;">
+            <div class="panel-section">
+                <div class="panel-label">Spawn Point</div>
+                <p style="font-size:11px; color:#777; line-height:1.6; margin-bottom:8px;">
+                    그리드를 클릭하여 스폰 위치를 지정합니다.
+                </p>
+                <div style="font-size:11px; color:#999;">
+                    Current: <span id="spawn-pos" style="font-family:monospace; color:#aaa;">None</span>
+                </div>
             </div>
-            <div class="palette" id="palette"></div>
+        </div>
+
+    </div><!-- /left-panel -->
+
+    <!-- CANVAS -->
+    <div id="editor-container">
+        <div id="map-canvas-wrap">
+            <div class="map-grid show-grid" id="map"></div>
         </div>
     </div>
 
-    <!-- Toast notification -->
-    <div class="toast" id="toast"></div>
+</div><!-- /main -->
 
-    <!-- New Map Dialog -->
-    <div class="dialog-overlay" id="new-map-dialog">
-        <div class="dialog-box">
-            <h3>New Map</h3>
-            <label>Map Name:
-                <input type="text" id="new-map-name" placeholder="e.g. forest">
-            </label>
-            <label>Tileset Path (relative to map folder):
-                <input type="text" id="new-map-tileset" value="assets/tile.png">
-            </label>
-            <label>Width (tiles):
-                <input type="number" id="new-map-w" value="30">
-            </label>
-            <label>Height (tiles):
-                <input type="number" id="new-map-h" value="20">
-            </label>
-            <div class="dialog-actions">
-                <button onclick="hideNewMapDialog()" style="background: #555;">Cancel</button>
-                <button onclick="createNewMap()" style="background: #2e7d32;">Create</button>
-            </div>
+<!-- ═══ BOTTOM PALETTE ═══ -->
+<div id="bottom-area">
+    <div id="palette-resize-handle"></div>
+    <div class="palette-wrapper" id="palette-wrapper">
+        <div class="palette-header">
+            <span onclick="togglePalette()" style="flex:1; cursor:pointer;">🎨 Tile Palette</span>
+            <button onclick="autoClassifyFromCanvas()" class="reclassify-btn" title="픽셀 분석으로 타일 자동 분류">⚙ Auto-classify</button>
+            <span onclick="togglePalette()" id="palette-toggle-icon" style="cursor:pointer; margin-left:8px;">▼</span>
+        </div>
+        <div class="palette-filter-bar" id="palette-filter-bar" style="display:none"></div>
+        <div class="palette" id="palette"></div>
+    </div>
+</div>
+
+<!-- ═══ OVERLAYS ═══ -->
+<div class="toast" id="toast"></div>
+
+<div class="dialog-overlay" id="new-map-dialog">
+    <div class="dialog-box">
+        <h3>New Map</h3>
+        <label>Map Name:
+            <input type="text" id="new-map-name" placeholder="e.g. forest">
+        </label>
+        <label>Tileset Path (relative to map folder):
+            <input type="text" id="new-map-tileset" value="assets/tile.png">
+        </label>
+        <label>Width (tiles):
+            <input type="number" id="new-map-w" value="30">
+        </label>
+        <label>Height (tiles):
+            <input type="number" id="new-map-h" value="20">
+        </label>
+        <div class="dialog-actions">
+            <button onclick="hideNewMapDialog()">Cancel</button>
+            <button class="primary" onclick="createNewMap()">Create</button>
         </div>
     </div>
+</div>
 
-    <!-- External Data -->
-    <div id="loading" style="color: white; position: absolute; top: 10px; left: 10px; z-index:9999;">Loading Map...
-    </div>
-    <script>
-        // Parse URL parameter for map name
-        const urlParams = new URLSearchParams(window.location.search);
-        const mapName = urlParams.get('map') || 'cave';
+<div id="loading" style="color:#aaa; position:absolute; top:52px; left:230px; padding:12px; z-index:9999; font-size:13px;">
+    Loading Map...
+</div>
 
-        // Set selector value & badge
-        const mapSelector = document.getElementById('map-selector');
-        if (mapSelector) mapSelector.value = mapName;
-        document.getElementById('map-badge').textContent = mapName;
+<!-- ═══ SCRIPTS ═══ -->
+<script>
+    // Parse URL parameter for map name
+    const urlParams = new URLSearchParams(window.location.search);
+    const mapName = urlParams.get('map') || 'cave';
 
-        function changeMap() {
-            const selectedMap = document.getElementById('map-selector').value;
-            window.location.search = `?map=${selectedMap}`;
-        }
+    // Set selector value & badge
+    const mapSelector = document.getElementById('map-selector');
+    if (mapSelector) mapSelector.value = mapName;
+    document.getElementById('map-badge').textContent = mapName;
 
-        window.MAP_BASE = '';
-        function resolveEditorPath(path) {
-            if (!path) return '';
-            if (path.startsWith('http') || path.startsWith('/')) return path;
-            return window.MAP_BASE + path;
-        }
+    function changeMap() {
+        const selectedMap = document.getElementById('map-selector').value;
+        window.location.search = `?map=${selectedMap}`;
+    }
 
-        const script = document.createElement('script');
-        script.src = `maps/${mapName}/data.js`;
-        script.onload = () => {
-            const triggerScript = document.createElement('script');
-            triggerScript.src = `maps/${mapName}/triggers.js`;
-            triggerScript.onload = () => {
-                if (typeof startEditor === 'function') startEditor();
-            };
-            triggerScript.onerror = () => {
-                console.warn("No triggers.js found. Continuing...");
-                if (typeof startEditor === 'function') startEditor();
-            };
-            document.body.appendChild(triggerScript);
+    window.MAP_BASE = '';
+    function resolveEditorPath(path) {
+        if (!path) return '';
+        if (path.startsWith('http') || path.startsWith('/')) return path;
+        return window.MAP_BASE + path;
+    }
+
+    const script = document.createElement('script');
+    const _v = Date.now();
+    script.src = `maps/${mapName}/data.js?v=${_v}`;
+    script.onload = () => {
+        const triggerScript = document.createElement('script');
+        triggerScript.src = `maps/${mapName}/triggers.js?v=${_v}`;
+        triggerScript.onload = () => {
+            if (typeof startEditor === 'function') startEditor();
         };
-        script.onerror = () => {
-            document.getElementById('loading').innerText = `Error: Map '${mapName}' data not found.`;
+        triggerScript.onerror = () => {
+            console.warn("No triggers.js found. Continuing...");
+            if (typeof startEditor === 'function') startEditor();
         };
-        document.body.appendChild(script);
-    </script>
+        document.body.appendChild(triggerScript);
+    };
+    script.onerror = () => {
+        document.getElementById('loading').innerText = `Error: Map '${mapName}' data not found.`;
+    };
+    document.body.appendChild(script);
+</script>
 
-    <script>
-        // ===== Configuration =====
-        const TILE_SIZE = 16;
-        const PALETTE_SCALE = 2;
-        let ASSET_PATH = '';
-        const EMPTY_TILE = { tx: 1, ty: 0 };
+<script>
+    // ===== Configuration =====
+    const TILE_SIZE = 16;
+    const PALETTE_SCALE = 2;
+    let ASSET_PATH = '';
+    const EMPTY_TILE = { tx: 1, ty: 0 };
 
-        let mapWidthTiles = 40;
-        let mapHeightTiles = 30;
-        let mapDataGrid = []; // 2D array [y][x] = {tx, ty}
+    // ===== Tile Category System =====
+    const CAT_COLOR = {
+        floor:          '#00e676',
+        water:          '#2979ff',
+        waterside_wall: '#00e5ff',
+        rock_wall:      '#ff6d00',
+        outer_wall:     '#e040fb',
+        beam:           '#ffd740',
+        empty:          '#555',
+    };
+    const CAT_LABEL = {
+        floor: '바닥', water: '물', waterside_wall: '물가벽',
+        rock_wall: '바위벽', outer_wall: '외벽', beam: '평균대', empty: '빈칸',
+    };
+    let tileCategories = {};
+    let paletteFilters = new Set();
 
-        // ===== State (Refactored) =====
-        let currentMode = 'tile'; // 'tile' | 'trigger' | 'collision' | 'spawn'
+    let mapWidthTiles = 40;
+    let mapHeightTiles = 30;
+    let mapDataGrid = [];
 
-        let startPos = null;
+    // ===== State =====
+    let currentMode = 'tile';
+    let startPos = null;
+    let triggers = [];
+    let editingTriggerIndex = -1;
+    let collisionTiles = new Set();
+    let selectedTx = 0;
+    let selectedTy = 0;
+    let tilesetWidth = 0;
+    let tilesetHeight = 0;
+    let zoomLevel = 1.0;
+    let isEraser = false;
+    let isEyedropper = false;
+    let isPainting = false;
+    let dragCollisionAdd = true;
+    let paletteCollapsed = false;
 
-        let triggers = [];
-        let editingTriggerIndex = -1;
-        let collisionTiles = new Set();
+    // ===== Undo/Redo =====
+    const MAX_HISTORY = 50;
+    let undoStack = [];
+    let redoStack = [];
 
-        let selectedTx = 0;
-        let selectedTy = 0;
-        let tilesetWidth = 0;
-        let tilesetHeight = 0;
-        let zoomLevel = 1.0;
-        let isEraser = false; // Tile-mode only tool state
+    function saveSnapshot() {
+        undoStack.push({
+            grid: mapDataGrid.map(row => row.map(cell => ({ ...cell }))),
+            collisions: new Set(collisionTiles),
+            triggers: JSON.parse(JSON.stringify(triggers)),
+            startPos: startPos ? { ...startPos } : null
+        });
+        if (undoStack.length > MAX_HISTORY) undoStack.shift();
+        redoStack = [];
+    }
 
-        let paletteCollapsed = false;
+    function undo() {
+        if (undoStack.length === 0) return;
+        redoStack.push({
+            grid: mapDataGrid.map(row => row.map(cell => ({ ...cell }))),
+            collisions: new Set(collisionTiles),
+            triggers: JSON.parse(JSON.stringify(triggers)),
+            startPos: startPos ? { ...startPos } : null
+        });
+        const snapshot = undoStack.pop();
+        restoreSnapshot(snapshot);
+        showToast(`Undo (${undoStack.length} left)`);
+    }
 
-        // ===== Undo/Redo =====
-        const MAX_HISTORY = 50;
-        let undoStack = [];
-        let redoStack = [];
+    function redo() {
+        if (redoStack.length === 0) return;
+        undoStack.push({
+            grid: mapDataGrid.map(row => row.map(cell => ({ ...cell }))),
+            collisions: new Set(collisionTiles),
+            triggers: JSON.parse(JSON.stringify(triggers)),
+            startPos: startPos ? { ...startPos } : null
+        });
+        const snapshot = redoStack.pop();
+        restoreSnapshot(snapshot);
+        showToast(`Redo (${redoStack.length} left)`);
+    }
 
-        function saveSnapshot() {
-            undoStack.push({
-                grid: mapDataGrid.map(row => row.map(cell => ({ ...cell }))),
-                collisions: new Set(collisionTiles),
-                triggers: JSON.parse(JSON.stringify(triggers)),
-                startPos: startPos ? { ...startPos } : null
-            });
-            if (undoStack.length > MAX_HISTORY) undoStack.shift();
-            redoStack = []; // Clear redo on new action
+    function restoreSnapshot(snapshot) {
+        mapDataGrid = snapshot.grid;
+        collisionTiles = snapshot.collisions;
+        triggers = snapshot.triggers;
+        startPos = snapshot.startPos ? { ...snapshot.startPos } : null;
+        mapWidthTiles = mapDataGrid[0]?.length || 0;
+        mapHeightTiles = mapDataGrid.length || 0;
+        document.getElementById('map-width').value = mapWidthTiles;
+        document.getElementById('map-height').value = mapHeightTiles;
+        if (editingTriggerIndex !== -1) cancelTriggerEdit();
+        renderMapGrid();
+        renderSpawn();
+        updateSpawnDisplay();
+    }
+
+    // ===== Toast =====
+    let toastTimer = null;
+    function showToast(msg) {
+        const toast = document.getElementById('toast');
+        toast.textContent = msg;
+        toast.classList.add('show');
+        if (toastTimer) clearTimeout(toastTimer);
+        toastTimer = setTimeout(() => toast.classList.remove('show'), 2000);
+    }
+
+    // ===== Start =====
+    function startEditor() {
+        if (!window.MAP_DATA) { alert("Map data not found!"); return; }
+
+        if (window.MAP_DATA.assets?.tileset) {
+            ASSET_PATH = resolveEditorPath(window.MAP_DATA.assets.tileset);
+        } else {
+            ASSET_PATH = resolveEditorPath('assets/cave_tile.png');
         }
 
-        function undo() {
-            if (undoStack.length === 0) return;
-            // Save current as redo
-            redoStack.push({
-                grid: mapDataGrid.map(row => row.map(cell => ({ ...cell }))),
-                collisions: new Set(collisionTiles),
-                triggers: JSON.parse(JSON.stringify(triggers)),
-                startPos: startPos ? { ...startPos } : null
-            });
-            const snapshot = undoStack.pop();
-            restoreSnapshot(snapshot);
-            showToast(`Undo (${undoStack.length} left)`);
+        const img = new Image();
+        img.src = ASSET_PATH;
+        img.onload = function () {
+            tilesetWidth = img.width;
+            tilesetHeight = img.height;
+            initEditor();
+            document.getElementById('loading').style.display = 'none';
+        };
+        img.onerror = function () {
+            alert("Tileset image not found at: " + ASSET_PATH);
+            document.getElementById('loading').innerText = "Failed to load assets.";
+        };
+    }
+
+    function initEditor() {
+        const cols = Math.floor(tilesetWidth / TILE_SIZE);
+        const rows = Math.floor(tilesetHeight / TILE_SIZE);
+        const palette = document.getElementById('palette');
+        const bgWidth = tilesetWidth * PALETTE_SCALE;
+
+        tileCategories = window.MAP_DATA?.assets?.tileCategories || {};
+        // Auto-classify if no existing categories
+        if (Object.keys(tileCategories).length === 0) {
+            autoClassifyFromCanvas(true); // silent=true, palette will update async
+        }
+        buildPaletteFilterBar();
+
+        palette.innerHTML = '';
+        palette.style.gridTemplateColumns = `repeat(${cols}, 32px)`;
+
+        for (let y = 0; y < rows; y++) {
+            for (let x = 0; x < cols; x++) {
+                let d = document.createElement('div');
+                const cat = tileCategories[`${x},${y}`] || '';
+                d.className = 'palette-tile' + (cat ? ` cat-${cat}` : '');
+                d.style.backgroundImage = `url('${ASSET_PATH}')`;
+                d.style.backgroundSize = `${bgWidth}px auto`;
+                d.style.backgroundPosition = `-${x * TILE_SIZE * PALETTE_SCALE}px -${y * TILE_SIZE * PALETTE_SCALE}px`;
+                d.dataset.coord = `${x},${y}`;
+                d.dataset.tx = x;
+                d.dataset.ty = y;
+                d.dataset.cat = cat;
+                if (cat && !paletteFilters.has(cat)) d.classList.add('hidden-by-filter');
+                d.onclick = function () { selectTile(this, x, y); };
+                palette.appendChild(d);
+            }
         }
 
-        function redo() {
-            if (redoStack.length === 0) return;
-            undoStack.push({
-                grid: mapDataGrid.map(row => row.map(cell => ({ ...cell }))),
-                collisions: new Set(collisionTiles),
-                triggers: JSON.parse(JSON.stringify(triggers)),
-                startPos: startPos ? { ...startPos } : null
+        if (window.MAP_DATA) {
+            if (window.MAP_DATA.startPos) startPos = { ...window.MAP_DATA.startPos };
+            if (window.MAP_DATA.assets) ASSET_PATH = resolveEditorPath(window.MAP_DATA.assets.tileset);
+
+            let loadedTiles = Array.isArray(window.MAP_DATA) ? window.MAP_DATA : (window.MAP_DATA.tiles || []);
+            triggers = window.MAP_DATA.triggers || [];
+
+            if (window.MAP_DATA.collisions) {
+                window.MAP_DATA.collisions.forEach(c => collisionTiles.add(`${c.x},${c.y}`));
+            }
+
+            let maxX = 0, maxY = 0;
+            loadedTiles.forEach(t => { if (t.gx > maxX) maxX = t.gx; if (t.gy > maxY) maxY = t.gy; });
+            mapWidthTiles = maxX + 1;
+            mapHeightTiles = maxY + 1;
+
+            mapDataGrid = new Array(mapHeightTiles).fill(0).map(() => new Array(mapWidthTiles).fill(null));
+            loadedTiles.forEach(t => {
+                if (t.gx < mapWidthTiles && t.gy < mapHeightTiles)
+                    mapDataGrid[t.gy][t.gx] = { tx: t.tx, ty: t.ty };
             });
-            const snapshot = redoStack.pop();
-            restoreSnapshot(snapshot);
-            showToast(`Redo (${redoStack.length} left)`);
+
+            for (let y = 0; y < mapHeightTiles; y++)
+                for (let x = 0; x < mapWidthTiles; x++)
+                    if (!mapDataGrid[y][x]) mapDataGrid[y][x] = { ...EMPTY_TILE };
+
+            collisionTiles.forEach(key => {
+                const [x, y] = key.split(',').map(Number);
+                if (x >= mapWidthTiles || y >= mapHeightTiles) collisionTiles.delete(key);
+            });
+        } else {
+            mapDataGrid = new Array(mapHeightTiles).fill(0).map(() =>
+                new Array(mapWidthTiles).fill(null).map(() => ({ ...EMPTY_TILE })));
         }
 
-        function restoreSnapshot(snapshot) {
-            mapDataGrid = snapshot.grid;
-            collisionTiles = snapshot.collisions;
-            triggers = snapshot.triggers;
-            startPos = snapshot.startPos ? { ...snapshot.startPos } : null;
-            mapWidthTiles = mapDataGrid[0]?.length || 0;
-            mapHeightTiles = mapDataGrid.length || 0;
-            document.getElementById('map-width').value = mapWidthTiles;
-            document.getElementById('map-height').value = mapHeightTiles;
-            if (editingTriggerIndex !== -1) cancelTriggerEdit();
-            renderMapGrid();
+        document.getElementById('map-width').value = mapWidthTiles;
+        document.getElementById('map-height').value = mapHeightTiles;
+
+        renderMapGrid();
+        renderSpawn();
+        updateToolUI();
+        updateSpawnDisplay();
+        // Auto-select first non-empty tile for preview
+        updateTilePreview();
+    }
+
+    // ===== Map Resize =====
+    function resizeMap() {
+        const newW = parseInt(document.getElementById('map-width').value);
+        const newH = parseInt(document.getElementById('map-height').value);
+        const anchor = document.getElementById('resize-anchor').value;
+
+        if (newW === mapWidthTiles && newH === mapHeightTiles) return;
+        if (!confirm("Resizing might crop map data. Continue?")) return;
+
+        saveSnapshot();
+
+        const newGrid = new Array(newH).fill(0).map(() => new Array(newW).fill(null));
+        let offX = 0, offY = 0;
+        if (anchor === 'tr' || anchor === 'br') offX = newW - mapWidthTiles;
+        if (anchor === 'bl' || anchor === 'br') offY = newH - mapHeightTiles;
+        if (anchor === 'c') { offX = Math.floor((newW - mapWidthTiles) / 2); offY = Math.floor((newH - mapHeightTiles) / 2); }
+
+        for (let y = 0; y < newH; y++)
+            for (let x = 0; x < newW; x++) {
+                const srcX = x - offX, srcY = y - offY;
+                newGrid[y][x] = (srcX >= 0 && srcX < mapWidthTiles && srcY >= 0 && srcY < mapHeightTiles)
+                    ? mapDataGrid[srcY][srcX] : { ...EMPTY_TILE };
+            }
+
+        mapWidthTiles = newW; mapHeightTiles = newH; mapDataGrid = newGrid;
+        collisionTiles.forEach(key => {
+            const [x, y] = key.split(',').map(Number);
+            if (x >= newW || y >= newH) collisionTiles.delete(key);
+        });
+        renderMapGrid();
+        showToast(`Resized to ${newW}×${newH}`);
+    }
+
+    // ===== Rendering =====
+    function renderMapGrid() {
+        const mapContainer = document.getElementById('map');
+        mapContainer.innerHTML = '';
+        mapContainer.style.width = (mapWidthTiles * TILE_SIZE) + 'px';
+        mapContainer.style.height = (mapHeightTiles * TILE_SIZE) + 'px';
+
+        for (let y = 0; y < mapHeightTiles; y++) {
+            for (let x = 0; x < mapWidthTiles; x++) {
+                let tileData = mapDataGrid[y][x];
+                let div = document.createElement('div');
+                div.className = 'tile';
+                div.id = `cell_${x}_${y}`;
+                div.style.left = (x * TILE_SIZE) + 'px';
+                div.style.top = (y * TILE_SIZE) + 'px';
+                div.style.backgroundImage = `url('${ASSET_PATH}')`;
+
+                if (tileData.tx === EMPTY_TILE.tx && tileData.ty === EMPTY_TILE.ty) {
+                    div.classList.add('empty');
+                } else {
+                    div.style.backgroundPosition = `-${tileData.tx * TILE_SIZE}px -${tileData.ty * TILE_SIZE}px`;
+                }
+
+                div.dataset.tx = tileData.tx;
+                div.dataset.ty = tileData.ty;
+
+                div.onmousedown = function (e) { if (e.button !== 0) return; onGridMouseDown(this, x, y); };
+                div.onmousemove = function () {
+                    document.getElementById('hover-coords').innerText = `${x},${y}`;
+                    if (document.getElementById('hover-coords-col'))
+                        document.getElementById('hover-coords-col').innerText = `${x},${y}`;
+                    if (isPainting) onGridDrag(this, x, y);
+                };
+                mapContainer.appendChild(div);
+            }
+        }
+
+        renderTriggers();
+        renderCollisions();
+    }
+
+    // ===== Mode Management =====
+    function setMode(mode) {
+        if (currentMode === 'trigger' && editingTriggerIndex !== -1) cancelTriggerEdit();
+        currentMode = mode;
+
+        // 툴 상태 리셋
+        if (isEyedropper) { isEyedropper = false; updateToolUI(); }
+
+        document.querySelectorAll('.mode-tab').forEach(tab =>
+            tab.classList.toggle('active', tab.dataset.mode === mode));
+
+        // Left panel sections
+        document.getElementById('panel-tile').style.display = (mode === 'tile') ? 'block' : 'none';
+        document.getElementById('trigger-palette').style.display = (mode === 'trigger') ? 'block' : 'none';
+        document.getElementById('panel-collision').style.display = (mode === 'collision') ? 'block' : 'none';
+        document.getElementById('panel-spawn').style.display = (mode === 'spawn') ? 'block' : 'none';
+
+        // Toolbar tile-tools group
+        document.getElementById('tile-tools').style.display = (mode === 'tile') ? 'flex' : 'none';
+
+        // Bottom palette — tile 모드 외에는 숨겨서 캔버스 공간 확보
+        document.getElementById('bottom-area').style.display = (mode === 'tile') ? 'flex' : 'none';
+
+        renderTriggers();
+        renderCollisions();
+    }
+
+    // ===== Grid Click Handler =====
+    function onGridMouseDown(el, gx, gy) {
+        if (currentMode === 'tile' && isEyedropper) {
+            const td = mapDataGrid[gy][gx];
+            if (td && !(td.tx === EMPTY_TILE.tx && td.ty === EMPTY_TILE.ty)) {
+                selectedTx = td.tx;
+                selectedTy = td.ty;
+                isEyedropper = false;
+                isEraser = false;
+                updateToolUI();
+                // 팔레트에서 해당 타일로 스크롤
+                scrollPaletteToTile(td.tx, td.ty);
+            }
+        } else if (currentMode === 'tile') {
+            saveSnapshot();
+            isPainting = true;
+            paintTile(el, gx, gy);
+        } else if (currentMode === 'collision') {
+            saveSnapshot();
+            isPainting = true;
+            const key = `${gx},${gy}`;
+            dragCollisionAdd = !collisionTiles.has(key);
+            setCollisionAt(gx, gy, dragCollisionAdd);
+        } else if (currentMode === 'trigger') {
+            const existingIndex = triggers.findIndex(t =>
+                gx >= t.x && gx < t.x + (t.w || 1) &&
+                gy >= t.y && gy < t.y + (t.h || 1)
+            );
+            if (existingIndex !== -1) {
+                loadTriggerToUI(existingIndex);
+            } else {
+                if (editingTriggerIndex !== -1) cancelTriggerEdit();
+                saveSnapshot();
+                placeTrigger(gx, gy);
+            }
+        } else if (currentMode === 'spawn') {
+            saveSnapshot();
+            startPos = { x: gx, y: gy };
             renderSpawn();
+            updateSpawnDisplay();
+        }
+    }
+
+    function onGridDrag(el, gx, gy) {
+        if (currentMode === 'tile') paintTile(el, gx, gy);
+        else if (currentMode === 'collision') setCollisionAt(gx, gy, dragCollisionAdd);
+    }
+
+    function renderSpawn() {
+        const existing = document.getElementById('spawn-overlay');
+        if (existing) existing.remove();
+        if (!startPos) return;
+        const el = document.createElement('div');
+        el.id = 'spawn-overlay';
+        el.className = 'spawn-indicator';
+        el.innerHTML = '🚩';
+        el.style.width = TILE_SIZE + 'px';
+        el.style.height = TILE_SIZE + 'px';
+        el.style.left = (startPos.x * TILE_SIZE) + 'px';
+        el.style.top = (startPos.y * TILE_SIZE) + 'px';
+        document.getElementById('map').appendChild(el);
+    }
+
+    function updateSpawnDisplay() {
+        const el = document.getElementById('spawn-pos');
+        if (el) el.textContent = startPos ? `${startPos.x},${startPos.y}` : 'None';
+    }
+
+    // ===== Tile Painting =====
+    function selectTile(el, tx, ty) {
+        if (currentMode !== 'tile') setMode('tile');
+        selectedTx = tx;
+        selectedTy = ty;
+        isEraser = false;
+        updateToolUI();
+    }
+
+    function paintTile(el, gx, gy) {
+        if (isEraser) {
+            el.classList.add('empty');
+            el.style.backgroundPosition = '';
+            el.dataset.tx = EMPTY_TILE.tx;
+            el.dataset.ty = EMPTY_TILE.ty;
+            mapDataGrid[gy][gx] = { ...EMPTY_TILE };
+        } else {
+            el.classList.remove('empty');
+            el.style.backgroundPosition = `-${selectedTx * TILE_SIZE}px -${selectedTy * TILE_SIZE}px`;
+            el.dataset.tx = selectedTx;
+            el.dataset.ty = selectedTy;
+            mapDataGrid[gy][gx] = { tx: selectedTx, ty: selectedTy };
+        }
+    }
+
+    function setBrush()      { isEraser = false; isEyedropper = false; updateToolUI(); }
+    function setEraser()     { isEraser = true;  isEyedropper = false; updateToolUI(); }
+    function setEyedropper() { isEyedropper = true; isEraser = false;  updateToolUI(); }
+
+    function scrollPaletteToTile(tx, ty) {
+        const palette = document.getElementById('palette');
+        if (!palette || palette.classList.contains('collapsed')) return;
+        const el = document.querySelector(`.palette-tile[data-tx="${tx}"][data-ty="${ty}"]`);
+        if (el) el.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+    }
+
+    function updateToolUI() {
+        const eraserBtn = document.getElementById('btn-eraser');
+        const brushBtn = document.getElementById('btn-brush');
+
+        const eyedropperBtn = document.getElementById('btn-eyedropper');
+        brushBtn.classList.remove('active', 'active-red');
+        eraserBtn.classList.remove('active', 'active-red');
+        eyedropperBtn.classList.remove('active', 'active-red');
+
+        if (isEyedropper) {
+            eyedropperBtn.classList.add('active');
+            document.getElementById('selected-id').innerText = "Pick…";
+            document.getElementById('editor-container').style.cursor = 'crosshair';
+            const prev = document.getElementById('tile-preview-box');
+            if (prev) { prev.style.backgroundImage = ''; prev.style.backgroundColor = '#111'; prev.title = 'Eyedropper'; }
+        } else if (isEraser) {
+            eraserBtn.classList.add('active-red');
+            document.getElementById('selected-id').innerText = "Eraser";
+            document.getElementById('editor-container').style.cursor = '';
+            const prev = document.getElementById('tile-preview-box');
+            if (prev) { prev.style.backgroundImage = ''; prev.style.backgroundColor = '#1a1a1a'; prev.title = 'Eraser'; }
+        } else {
+            brushBtn.classList.add('active');
+            document.getElementById('selected-id').innerText = `(${selectedTx},${selectedTy})`;
+            document.getElementById('editor-container').style.cursor = '';
+            updateTilePreview();
         }
 
-        // ===== Toast =====
-        let toastTimer = null;
-        function showToast(msg) {
-            const toast = document.getElementById('toast');
-            toast.textContent = msg;
-            toast.classList.add('show');
-            if (toastTimer) clearTimeout(toastTimer);
-            toastTimer = setTimeout(() => toast.classList.remove('show'), 2000);
+        document.querySelectorAll('.palette-tile').forEach(t => {
+            t.classList.toggle('selected', !isEraser && parseInt(t.dataset.tx) === selectedTx && parseInt(t.dataset.ty) === selectedTy);
+        });
+    }
+
+    function updateTilePreview() {
+        const prev = document.getElementById('tile-preview-box');
+        if (!prev || !ASSET_PATH) return;
+        const bgW = tilesetWidth * 4;
+        prev.style.backgroundImage = `url('${ASSET_PATH}')`;
+        prev.style.backgroundSize = `${bgW}px auto`;
+        prev.style.backgroundPosition = `-${selectedTx * TILE_SIZE * 4}px -${selectedTy * TILE_SIZE * 4}px`;
+        prev.style.backgroundColor = '#000';
+        const cat = tileCategories[`${selectedTx},${selectedTy}`] || '';
+        const catLabel = CAT_LABEL[cat] || cat;
+        prev.title = catLabel ? `(${selectedTx},${selectedTy}) · ${catLabel}` : `(${selectedTx},${selectedTy})`;
+    }
+
+    // ===== Trigger Management =====
+    function loadTriggerToUI(index) {
+        editingTriggerIndex = index;
+        const trig = triggers[index];
+        document.getElementById('trigger-title').value = trig.title || '';
+        document.getElementById('trigger-id').value = trig.id || '';
+        document.getElementById('trigger-type').value = trig.type || 'menu';
+        document.getElementById('trigger-sprite').value = trig.sprite || '';
+        document.getElementById('trigger-x').value = trig.x;
+        document.getElementById('trigger-y').value = trig.y;
+        document.getElementById('trigger-w').value = trig.w || 1;
+        document.getElementById('trigger-h').value = trig.h || 1;
+        document.getElementById('trigger-text').value = Array.isArray(trig.text) ? JSON.stringify(trig.text) : (trig.text || '');
+        document.getElementById('trigger-bubble-y').value = trig.bubbleOffsetY || 0;
+        document.getElementById('trigger-collision').checked = !!trig.collision;
+
+        const isAnim = !!(trig.animW || trig.frames || trig.speed);
+        document.getElementById('trigger-is-anim').checked = isAnim;
+        document.getElementById('anim-settings').style.display = isAnim ? 'block' : 'none';
+        document.getElementById('anim-w').value = trig.animW || 64;
+        document.getElementById('anim-h').value = trig.animH || 48;
+        document.getElementById('anim-frames').value = trig.frames || 5;
+        document.getElementById('anim-speed').value = trig.speed || 200;
+        document.getElementById('trigger-items').value = JSON.stringify(trig.items || [], null, 2);
+
+        document.getElementById('btn-place-trigger').style.display = 'none';
+        document.getElementById('trig-edit-actions').style.display = 'flex';
+        document.getElementById('editing-status').style.display = 'block';
+
+        renderTriggers();
+    }
+
+    document.getElementById('trigger-is-anim').onchange = function () {
+        document.getElementById('anim-settings').style.display = this.checked ? 'block' : 'none';
+    };
+
+    function resetTriggerFields() {
+        document.getElementById('trigger-title').value = 'New Trigger';
+        document.getElementById('trigger-id').value = '';
+        document.getElementById('trigger-type').value = 'menu';
+        document.getElementById('trigger-sprite').value = '';
+        document.getElementById('trigger-x').value = 0;
+        document.getElementById('trigger-y').value = 0;
+        document.getElementById('trigger-w').value = 1;
+        document.getElementById('trigger-h').value = 1;
+        document.getElementById('trigger-text').value = '';
+        document.getElementById('trigger-bubble-y').value = 0;
+        document.getElementById('trigger-collision').checked = false;
+        document.getElementById('trigger-is-anim').checked = false;
+        document.getElementById('anim-settings').style.display = 'none';
+        document.getElementById('trigger-items').value = '[{"label": "Sample", "href": "#"}]';
+    }
+
+    function cancelTriggerEdit() {
+        editingTriggerIndex = -1;
+        document.getElementById('btn-place-trigger').style.display = 'block';
+        document.getElementById('trig-edit-actions').style.display = 'none';
+        document.getElementById('editing-status').style.display = 'none';
+        resetTriggerFields();
+        renderTriggers();
+    }
+
+    function updateTrigger() {
+        if (editingTriggerIndex === -1) return;
+        saveSnapshot();
+        collectTriggerFields(triggers[editingTriggerIndex]);
+        showToast("Trigger updated!");
+        cancelTriggerEdit();
+    }
+
+    function deleteEditingTrigger() {
+        if (editingTriggerIndex === -1) return;
+        if (!confirm(`Delete trigger "${triggers[editingTriggerIndex].title}"?`)) return;
+        saveSnapshot();
+        triggers.splice(editingTriggerIndex, 1);
+        showToast("Trigger deleted.");
+        cancelTriggerEdit();
+    }
+
+    function collectTriggerFields(trig) {
+        trig.title = document.getElementById('trigger-title').value;
+        trig.id = document.getElementById('trigger-id').value || undefined;
+        trig.type = document.getElementById('trigger-type').value;
+        trig.sprite = document.getElementById('trigger-sprite').value || undefined;
+        trig.x = parseInt(document.getElementById('trigger-x').value);
+        trig.y = parseInt(document.getElementById('trigger-y').value);
+        trig.w = parseInt(document.getElementById('trigger-w').value);
+        trig.h = parseInt(document.getElementById('trigger-h').value);
+
+        const rawText = document.getElementById('trigger-text').value;
+        if (rawText.startsWith('[') && rawText.endsWith(']')) {
+            try { trig.text = JSON.parse(rawText); } catch (e) { trig.text = rawText; }
+        } else { trig.text = rawText || undefined; }
+
+        trig.bubbleOffsetY = parseInt(document.getElementById('trigger-bubble-y').value) || 0;
+        trig.collision = document.getElementById('trigger-collision').checked;
+
+        if (document.getElementById('trigger-is-anim').checked) {
+            trig.animW = parseInt(document.getElementById('anim-w').value);
+            trig.animH = parseInt(document.getElementById('anim-h').value);
+            trig.frames = parseInt(document.getElementById('anim-frames').value);
+            trig.speed = parseInt(document.getElementById('anim-speed').value);
+        } else {
+            delete trig.animW; delete trig.animH; delete trig.frames; delete trig.speed;
         }
 
-        // ===== Start =====
-        function startEditor() {
-            if (!window.MAP_DATA) {
-                alert("Map data not found!");
+        try { trig.items = JSON.parse(document.getElementById('trigger-items').value); }
+        catch (e) { alert("Invalid Items JSON!"); }
+    }
+
+    function placeTriggerAction() { showToast("그리드를 클릭하여 새 트리거를 배치하세요."); }
+
+    function placeTrigger(gx, gy) {
+        let trigger = { x: gx, y: gy };
+        collectTriggerFields(trigger);
+        trigger.x = gx; trigger.y = gy;
+        triggers.push(trigger);
+        renderTriggers();
+        loadTriggerToUI(triggers.length - 1);
+    }
+
+    function renderTriggers() {
+        document.querySelectorAll('.trigger-overlay').forEach(e => e.remove());
+        const isActive = (currentMode === 'trigger');
+        const showGhost = document.getElementById('chk-show-triggers').checked;
+        if (!isActive && !showGhost) return;
+
+        const mapContainer = document.getElementById('map');
+        triggers.forEach((trig, index) => {
+            const div = document.createElement('div');
+            div.className = 'trigger-overlay';
+            if (isActive) {
+                div.classList.add('interactive');
+                if (index === editingTriggerIndex) {
+                    div.style.background = 'rgba(255,235,59,0.55)';
+                    div.style.outline = '2px solid #ffeb3b';
+                    div.style.zIndex = '15';
+                }
+            } else { div.classList.add('ghost'); }
+
+            div.style.left = (trig.x * TILE_SIZE) + 'px';
+            div.style.top = ((trig.y - ((trig.h || 1) - 1)) * TILE_SIZE) + 'px';
+            div.style.width = ((trig.w || 1) * TILE_SIZE) + 'px';
+            div.style.height = ((trig.h || 1) * TILE_SIZE) + 'px';
+            div.innerHTML = `<span style="font-size:8px; color:white; text-shadow:0 0 2px black;">${trig.title || ''}</span>`;
+
+            if (isActive) div.onclick = (e) => { e.stopPropagation(); loadTriggerToUI(index); };
+            mapContainer.appendChild(div);
+        });
+    }
+
+    // ===== Collision Management =====
+    function toggleCollisionAt(gx, gy) {
+        const key = `${gx},${gy}`;
+        if (collisionTiles.has(key)) collisionTiles.delete(key); else collisionTiles.add(key);
+        renderCollisions();
+    }
+
+    function setCollisionAt(gx, gy, add) {
+        const key = `${gx},${gy}`;
+        if (add) collisionTiles.add(key); else collisionTiles.delete(key);
+        renderCollisions();
+    }
+
+    function renderCollisions() {
+        document.querySelectorAll('.collision-overlay').forEach(e => e.remove());
+        const isActive = (currentMode === 'collision');
+        const showGhost = document.getElementById('chk-show-collisions').checked;
+        if (!isActive && !showGhost) return;
+
+        const mapContainer = document.getElementById('map');
+        collisionTiles.forEach(key => {
+            const [gx, gy] = key.split(',').map(Number);
+            const div = document.createElement('div');
+            div.className = 'collision-overlay';
+            if (isActive) {
+                div.classList.add('interactive');
+                div.onclick = (e) => { e.stopPropagation(); saveSnapshot(); toggleCollisionAt(gx, gy); };
+            } else { div.classList.add('ghost'); }
+            div.style.left = (gx * TILE_SIZE) + 'px';
+            div.style.top = (gy * TILE_SIZE) + 'px';
+            mapContainer.appendChild(div);
+        });
+    }
+
+    // ===== Grid Overlay =====
+    function toggleGrid() {
+        document.getElementById('map').classList.toggle('show-grid',
+            document.getElementById('chk-show-grid').checked);
+    }
+
+    // ===== Palette =====
+    function togglePalette() {
+        paletteCollapsed = !paletteCollapsed;
+        document.getElementById('palette').classList.toggle('collapsed', paletteCollapsed);
+        document.getElementById('palette-toggle-icon').textContent = paletteCollapsed ? '▶' : '▼';
+    }
+
+    // ===== Auto-classify Tileset =====
+    function classifyTilePixels(imageData) {
+        const data = imageData.data;
+        const total = data.length / 4;
+        let sumAlpha = 0;
+        const visible = [];
+
+        for (let i = 0; i < data.length; i += 4) {
+            const a = data[i + 3];
+            sumAlpha += a;
+            if (a > 80) visible.push([data[i], data[i + 1], data[i + 2]]);
+        }
+
+        if (sumAlpha / total < 80 || visible.length === 0) return 'empty';
+
+        const n = visible.length;
+
+        // black: very dark pixels → outer wall
+        const blackCount = visible.filter(([r, g, b]) => r + g + b < 40).length;
+        if (blackCount / n >= 0.20) return 'outer_wall';
+
+        // blue dominant → water family
+        const blueCount = visible.filter(([r, g, b]) => b > r + 30 && b > 80).length;
+        const blueRatio = blueCount / n;
+        if (blueRatio > 0.40) return 'water';
+        if (blueRatio > 0.05) return 'waterside_wall';
+
+        // warm mid-tone (brownish/sandy) → floor candidate
+        const avgR = visible.reduce((s, [r]) => s + r, 0) / n;
+        const avgG = visible.reduce((s, [, g]) => s + g, 0) / n;
+        const avgB = visible.reduce((s, [,, b]) => s + b, 0) / n;
+        const brightness = (avgR + avgG + avgB) / 3;
+        // warm (red/green dominant over blue) + medium brightness = floor
+        if (avgR > avgB + 20 && avgG > avgB + 5 && brightness > 80 && brightness < 180) return 'floor';
+
+        return 'rock_wall';
+    }
+
+    function applyCategoriesToPalette(newCategories) {
+        tileCategories = newCategories;
+        document.querySelectorAll('.palette-tile').forEach(el => {
+            const key = `${el.dataset.tx},${el.dataset.ty}`;
+            const cat = tileCategories[key] || '';
+            // rebuild class list preserving only non-cat classes
+            el.className = 'palette-tile' + (cat ? ` cat-${cat}` : '');
+            el.dataset.cat = cat;
+        });
+        buildPaletteFilterBar();
+        // re-apply current filter state visibility
+        document.querySelectorAll('.palette-tile').forEach(tile => {
+            const tc = tile.dataset.cat;
+            tile.classList.toggle('hidden-by-filter', !!tc && !paletteFilters.has(tc));
+        });
+    }
+
+    function autoClassifyFromCanvas(silent = false) {
+        if (!ASSET_PATH || !tilesetWidth || !tilesetHeight) {
+            if (!silent) showToast('⚠ 타일셋이 로드되지 않았습니다.');
+            return;
+        }
+
+        const canvas = document.createElement('canvas');
+        canvas.width = tilesetWidth;
+        canvas.height = tilesetHeight;
+        const ctx = canvas.getContext('2d', { willReadFrequently: true });
+
+        const img = new Image();
+        img.onload = function () {
+            ctx.drawImage(img, 0, 0);
+
+            const cols = Math.floor(tilesetWidth / TILE_SIZE);
+            const rows = Math.floor(tilesetHeight / TILE_SIZE);
+            const newCategories = {};
+            const counts = {};
+
+            try {
+                for (let ty = 0; ty < rows; ty++) {
+                    for (let tx = 0; tx < cols; tx++) {
+                        const imageData = ctx.getImageData(tx * TILE_SIZE, ty * TILE_SIZE, TILE_SIZE, TILE_SIZE);
+                        const cat = classifyTilePixels(imageData);
+                        newCategories[`${tx},${ty}`] = cat;
+                        counts[cat] = (counts[cat] || 0) + 1;
+                    }
+                }
+            } catch(e) {
+                if (!silent) showToast('⚠ 픽셀 읽기 실패 (보안 정책): getImageData is blocked.');
                 return;
             }
 
-            if (window.MAP_DATA.assets && window.MAP_DATA.assets.tileset) {
-                ASSET_PATH = resolveEditorPath(window.MAP_DATA.assets.tileset);
-            } else {
-                ASSET_PATH = resolveEditorPath('assets/cave_tile.png');
-            }
+            applyCategoriesToPalette(newCategories);
 
-            const img = new Image();
-            img.src = ASSET_PATH;
-            img.onload = function () {
-                tilesetWidth = img.width;
-                tilesetHeight = img.height;
-                initEditor();
-                document.getElementById('loading').style.display = 'none';
-            };
-            img.onerror = function () {
-                alert("Tileset image not found at: " + ASSET_PATH);
-                document.getElementById('loading').innerText = "Failed to load assets.";
+            if (!silent) {
+                const summary = Object.entries(counts)
+                    .map(([c, n]) => `${CAT_LABEL[c] || c}:${n}`)
+                    .join(' ');
+                showToast(`분류 완료 — ${summary}`);
             }
+        };
+        img.onerror = function () {
+            if (!silent) showToast('⚠ 타일셋 이미지를 불러올 수 없습니다.');
+        };
+        img.src = ASSET_PATH;
+    }
+
+    function buildPaletteFilterBar() {
+        const bar = document.getElementById('palette-filter-bar');
+        const cats = [...new Set(Object.values(tileCategories))].filter(Boolean);
+        if (!cats.length) { bar.style.display = 'none'; return; }
+
+        paletteFilters = new Set(cats);
+        bar.style.display = 'flex';
+        bar.innerHTML = '';
+        cats.forEach(cat => {
+            const btn = document.createElement('button');
+            btn.className = 'palette-filter-btn active';
+            btn.textContent = '● ' + (CAT_LABEL[cat] || cat);
+            btn.dataset.cat = cat;
+            btn.onclick = () => togglePaletteFilter(cat, btn);
+            bar.appendChild(btn);
+        });
+    }
+
+    function togglePaletteFilter(cat, btn) {
+        if (paletteFilters.has(cat)) { paletteFilters.delete(cat); btn.classList.remove('active'); }
+        else { paletteFilters.add(cat); btn.classList.add('active'); }
+        document.querySelectorAll('.palette-tile').forEach(tile => {
+            const tc = tile.dataset.cat;
+            tile.classList.toggle('hidden-by-filter', !!tc && !paletteFilters.has(tc));
+        });
+    }
+
+    // ===== Zoom =====
+    function changeZoom(delta) {
+        zoomLevel = Math.max(0.25, Math.min(5.0, zoomLevel + delta));
+        updateZoom();
+    }
+    function resetZoom() { zoomLevel = 1.0; updateZoom(); }
+    function updateZoom() {
+        document.getElementById('map').style.transformOrigin = "0 0";
+        document.getElementById('map').style.transform = `scale(${zoomLevel})`;
+        document.getElementById('zoom-level').innerText = Math.round(zoomLevel * 100) + "%";
+    }
+
+    // ===== Export =====
+    function exportMapData() {
+        let cells = document.querySelectorAll('.tile');
+        let data = [];
+        cells.forEach(c => {
+            let parts = c.id.split('_');
+            let gx = parseInt(parts[1]), gy = parseInt(parts[2]);
+            let tx = parseInt(c.dataset.tx), ty = parseInt(c.dataset.ty);
+            if (tx !== EMPTY_TILE.tx || ty !== EMPTY_TILE.ty) data.push({ gx, gy, tx, ty });
+        });
+
+        const result = {
+            assets: (window.MAP_DATA?.assets) || {},
+            ...(startPos ? { startPos } : {}),
+            tiles: data,
+            editor: (window.MAP_DATA?.editor) || {},
+            collisions: Array.from(collisionTiles)
+                .map(k => { const [x, y] = k.split(',').map(Number); return { x, y }; })
+                .filter(c => c.x < mapWidthTiles && c.y < mapHeightTiles)
+        };
+
+        copyToClipboard("window.MAP_DATA = " + JSON.stringify(result, null, 2));
+        showToast(`Copied! (${data.length} tiles, ${collisionTiles.size} collisions)`);
+    }
+
+    function exportTriggers() {
+        copyToClipboard("window.MAP_DATA.triggers = " + JSON.stringify(triggers, null, 2));
+        showToast(`Triggers copied! (${triggers.length})`);
+    }
+
+    async function copyToClipboard(text) {
+        try {
+            await navigator.clipboard.writeText(text);
+        } catch (e) {
+            const ta = document.createElement('textarea');
+            ta.value = text;
+            ta.style.cssText = 'position:fixed; opacity:0;';
+            document.body.appendChild(ta);
+            ta.select();
+            document.execCommand('copy');
+            document.body.removeChild(ta);
         }
+    }
 
-        function initEditor() {
-            console.log("Initializing Editor...");
+    // ===== New Map =====
+    function showNewMapDialog() { document.getElementById('new-map-dialog').classList.add('show'); }
+    function hideNewMapDialog() { document.getElementById('new-map-dialog').classList.remove('show'); }
 
-            // Build Palette
+    function createNewMap() {
+        const name = document.getElementById('new-map-name').value.trim();
+        const tileset = document.getElementById('new-map-tileset').value.trim();
+        const w = parseInt(document.getElementById('new-map-w').value) || 30;
+        const h = parseInt(document.getElementById('new-map-h').value) || 20;
+        if (!name) { alert("Map name is required."); return; }
+
+        const opt = document.createElement('option');
+        opt.value = name;
+        opt.textContent = name.charAt(0).toUpperCase() + name.slice(1);
+        document.getElementById('map-selector').appendChild(opt);
+
+        window.MAP_DATA = { assets: { tileset }, tiles: [], collisions: [], triggers: [] };
+        startPos = null; triggers = []; collisionTiles = new Set(); undoStack = []; redoStack = [];
+        mapWidthTiles = w; mapHeightTiles = h;
+        mapDataGrid = new Array(h).fill(0).map(() => new Array(w).fill(null).map(() => ({ ...EMPTY_TILE })));
+        document.getElementById('map-width').value = w;
+        document.getElementById('map-height').value = h;
+        document.getElementById('map-badge').textContent = name;
+
+        ASSET_PATH = `maps/${name}/${tileset}`;
+        const img = new Image();
+        img.src = ASSET_PATH;
+        img.onload = function () {
+            tilesetWidth = img.width; tilesetHeight = img.height;
+            document.getElementById('palette').innerHTML = '';
             const cols = Math.floor(tilesetWidth / TILE_SIZE);
             const rows = Math.floor(tilesetHeight / TILE_SIZE);
-            const palette = document.getElementById('palette');
             const bgWidth = tilesetWidth * PALETTE_SCALE;
-
-            palette.innerHTML = '';
-            palette.style.gridTemplateColumns = `repeat(${cols}, 32px)`;
-
-            for (let y = 0; y < rows; y++) {
+            for (let y = 0; y < rows; y++)
                 for (let x = 0; x < cols; x++) {
                     let d = document.createElement('div');
                     d.className = 'palette-tile';
@@ -850,737 +1833,77 @@
                     d.style.backgroundSize = `${bgWidth}px auto`;
                     d.style.backgroundPosition = `-${x * TILE_SIZE * PALETTE_SCALE}px -${y * TILE_SIZE * PALETTE_SCALE}px`;
                     d.dataset.coord = `${x},${y}`;
-                    d.dataset.tx = x;
-                    d.dataset.ty = y;
+                    d.dataset.tx = x; d.dataset.ty = y;
                     d.onclick = function () { selectTile(this, x, y); };
-                    palette.appendChild(d);
+                    document.getElementById('palette').appendChild(d);
                 }
-            }
-
-            // Load Map Data
-            if (window.MAP_DATA) {
-                if (window.MAP_DATA.startPos) {
-                    startPos = { ...window.MAP_DATA.startPos };
-                } else {
-                    startPos = null;
-                }
-                if (window.MAP_DATA.assets) {
-                    ASSET_PATH = resolveEditorPath(window.MAP_DATA.assets.tileset);
-                }
-
-                let loadedTiles = [];
-                if (Array.isArray(window.MAP_DATA)) {
-                    loadedTiles = window.MAP_DATA;
-                } else {
-                    loadedTiles = window.MAP_DATA.tiles || [];
-                }
-
-                triggers = window.MAP_DATA.triggers || [];
-
-                if (window.MAP_DATA.collisions) {
-                    window.MAP_DATA.collisions.forEach(c => collisionTiles.add(`${c.x},${c.y}`));
-                }
-
-                // Determine Size
-                let maxX = 0, maxY = 0;
-                loadedTiles.forEach(t => {
-                    if (t.gx > maxX) maxX = t.gx;
-                    if (t.gy > maxY) maxY = t.gy;
-                });
-                mapWidthTiles = maxX + 1;
-                mapHeightTiles = maxY + 1;
-
-                // Populate Data Grid
-                mapDataGrid = new Array(mapHeightTiles).fill(0).map(() => new Array(mapWidthTiles).fill(null));
-                loadedTiles.forEach(t => {
-                    if (t.gx < mapWidthTiles && t.gy < mapHeightTiles) {
-                        mapDataGrid[t.gy][t.gx] = { tx: t.tx, ty: t.ty };
-                    }
-                });
-
-                // Fill gaps
-                for (let y = 0; y < mapHeightTiles; y++) {
-                    for (let x = 0; x < mapWidthTiles; x++) {
-                        if (!mapDataGrid[y][x]) mapDataGrid[y][x] = { ...EMPTY_TILE };
-                    }
-                }
-
-                // Prune out-of-bounds collisions
-                collisionTiles.forEach(key => {
-                    const [x, y] = key.split(',').map(Number);
-                    if (x >= mapWidthTiles || y >= mapHeightTiles) {
-                        collisionTiles.delete(key);
-                    }
-                });
-
-            } else {
-                mapDataGrid = new Array(mapHeightTiles).fill(0).map(() =>
-                    new Array(mapWidthTiles).fill(null).map(() => ({ ...EMPTY_TILE })));
-            }
-
-            document.getElementById('map-width').value = mapWidthTiles;
-            document.getElementById('map-height').value = mapHeightTiles;
-
             renderMapGrid();
-            renderSpawn();
-            updateToolUI();
-        }
-
-        // ===== Map Resize =====
-        function resizeMap() {
-            const newW = parseInt(document.getElementById('map-width').value);
-            const newH = parseInt(document.getElementById('map-height').value);
-            const anchor = document.getElementById('resize-anchor').value;
-
-            if (newW === mapWidthTiles && newH === mapHeightTiles) return;
-            if (!confirm("Resizing might crop map data. Continue?")) return;
-
-            saveSnapshot();
-
-            const newGrid = new Array(newH).fill(0).map(() => new Array(newW).fill(null));
-            let offX = 0, offY = 0;
-
-            if (anchor === 'tr' || anchor === 'br') offX = newW - mapWidthTiles;
-            if (anchor === 'bl' || anchor === 'br') offY = newH - mapHeightTiles;
-            if (anchor === 'c') {
-                offX = Math.floor((newW - mapWidthTiles) / 2);
-                offY = Math.floor((newH - mapHeightTiles) / 2);
-            }
-
-            for (let y = 0; y < newH; y++) {
-                for (let x = 0; x < newW; x++) {
-                    const srcX = x - offX;
-                    const srcY = y - offY;
-                    if (srcX >= 0 && srcX < mapWidthTiles && srcY >= 0 && srcY < mapHeightTiles) {
-                        newGrid[y][x] = mapDataGrid[srcY][srcX];
-                    } else {
-                        newGrid[y][x] = { ...EMPTY_TILE };
-                    }
-                }
-            }
-
-            mapWidthTiles = newW;
-            mapHeightTiles = newH;
-            mapDataGrid = newGrid;
-
-            collisionTiles.forEach(key => {
-                const [x, y] = key.split(',').map(Number);
-                if (x >= newW || y >= newH) collisionTiles.delete(key);
-            });
-
-            renderMapGrid();
-        }
-
-        // ===== Rendering =====
-        function renderMapGrid() {
-            const mapContainer = document.getElementById('map');
-            mapContainer.innerHTML = '';
-            mapContainer.style.width = (mapWidthTiles * TILE_SIZE) + 'px';
-            mapContainer.style.height = (mapHeightTiles * TILE_SIZE) + 'px';
-
-            for (let y = 0; y < mapHeightTiles; y++) {
-                for (let x = 0; x < mapWidthTiles; x++) {
-                    let tileData = mapDataGrid[y][x];
-                    let div = document.createElement('div');
-                    div.className = 'tile';
-                    div.id = `cell_${x}_${y}`;
-                    div.style.left = (x * TILE_SIZE) + 'px';
-                    div.style.top = (y * TILE_SIZE) + 'px';
-                    div.style.backgroundImage = `url('${ASSET_PATH}')`;
-
-                    if (tileData.tx === EMPTY_TILE.tx && tileData.ty === EMPTY_TILE.ty) {
-                        div.classList.add('empty');
-                    } else {
-                        div.style.backgroundPosition = `-${tileData.tx * TILE_SIZE}px -${tileData.ty * TILE_SIZE}px`;
-                    }
-
-                    div.dataset.tx = tileData.tx;
-                    div.dataset.ty = tileData.ty;
-
-                    div.onclick = function () { onGridClick(this, x, y); };
-                    div.onmousemove = function () {
-                        document.getElementById('hover-coords').innerText = x + "," + y;
-                    };
-                    mapContainer.appendChild(div);
-                }
-            }
-
-            renderTriggers();
-            renderCollisions();
-        }
-
-        // ===== Mode Management =====
-        function setMode(mode) {
-            // Clean up previous mode
-            if (currentMode === 'trigger' && editingTriggerIndex !== -1) {
-                cancelTriggerEdit();
-            }
-
-            currentMode = mode;
-
-            // Update tab UI
-            document.querySelectorAll('.mode-tab').forEach(tab => {
-                tab.classList.toggle('active', tab.dataset.mode === mode);
-            });
-
-            // Show/hide mode-specific panels
-            document.getElementById('palette-wrapper').style.display = (mode === 'tile') ? 'block' : 'none';
-            document.getElementById('tile-tools').style.display = (mode === 'tile') ? 'block' : 'none';
-            document.getElementById('trigger-palette').style.display = (mode === 'trigger') ? 'block' : 'none';
-
-            renderTriggers();
-            renderCollisions();
-        }
-
-        // ===== Grid Click Handler =====
-        function onGridClick(el, gx, gy) {
-            if (currentMode === 'collision') {
-                saveSnapshot();
-                toggleCollisionAt(gx, gy);
-            } else if (currentMode === 'tile') {
-                saveSnapshot();
-                paintTile(el, gx, gy);
-            } else if (currentMode === 'trigger') {
-                // Check if clicking on existing trigger
-                const existingIndex = triggers.findIndex(t =>
-                    gx >= t.x && gx < t.x + (t.w || 1) &&
-                    gy >= t.y && gy < t.y + (t.h || 1)
-                );
-
-                if (existingIndex !== -1) {
-                    loadTriggerToUI(existingIndex);
-                } else {
-                    // If editing, cancel first
-                    if (editingTriggerIndex !== -1) {
-                        cancelTriggerEdit();
-                    }
-                    saveSnapshot();
-                    placeTrigger(gx, gy);
-                }
-            } else if (currentMode === 'spawn') {
-                saveSnapshot();
-                startPos = { x: gx, y: gy };
-                renderSpawn();
-            }
-        }
-
-        function renderSpawn() {
-            const existing = document.getElementById('spawn-overlay');
-            if (existing) existing.remove();
-
-            if (!startPos) return;
-
-            const el = document.createElement('div');
-            el.id = 'spawn-overlay';
-            el.className = 'spawn-indicator';
-            el.innerHTML = '🚩';
-            el.style.width = TILE_SIZE + 'px';
-            el.style.height = TILE_SIZE + 'px';
-            el.style.left = (startPos.x * TILE_SIZE) + 'px';
-            el.style.top = (startPos.y * TILE_SIZE) + 'px';
-
-            document.getElementById('map').appendChild(el);
-        }
-
-        // ===== Tile Painting =====
-        function selectTile(el, tx, ty) {
-            if (currentMode !== 'tile') setMode('tile');
-            selectedTx = tx;
-            selectedTy = ty;
-            isEraser = false;
-            updateToolUI();
-        }
-
-        function paintTile(el, gx, gy) {
-            if (isEraser) {
-                el.classList.add('empty');
-                el.style.backgroundPosition = '';
-                el.dataset.tx = EMPTY_TILE.tx;
-                el.dataset.ty = EMPTY_TILE.ty;
-                mapDataGrid[gy][gx] = { ...EMPTY_TILE };
-            } else {
-                el.classList.remove('empty');
-                el.style.backgroundPosition = `-${selectedTx * TILE_SIZE}px -${selectedTy * TILE_SIZE}px`;
-                el.dataset.tx = selectedTx;
-                el.dataset.ty = selectedTy;
-                mapDataGrid[gy][gx] = { tx: selectedTx, ty: selectedTy };
-            }
-        }
-
-        function setBrush() {
-            isEraser = false;
-            updateToolUI();
-        }
-
-        function setEraser() {
-            isEraser = true;
-            updateToolUI();
-        }
-
-        function updateToolUI() {
-            const eraserBtn = document.getElementById('btn-eraser');
-            const brushBtn = document.getElementById('btn-brush');
-
-            if (isEraser) {
-                eraserBtn.style.background = '#c33';
-                brushBtn.style.background = '#444';
-                document.getElementById('selected-id').innerText = "Eraser";
-            } else {
-                eraserBtn.style.background = '#444';
-                brushBtn.style.background = '#2e7d32';
-                document.getElementById('selected-id').innerText = selectedTx + "," + selectedTy;
-            }
-
-            // Update palette highlight
-            document.querySelectorAll('.palette-tile').forEach(t => {
-                const ptx = parseInt(t.dataset.tx);
-                const pty = parseInt(t.dataset.ty);
-                t.classList.toggle('selected', !isEraser && ptx === selectedTx && pty === selectedTy);
-            });
-        }
-
-        // ===== Trigger Management =====
-        function loadTriggerToUI(index) {
-            editingTriggerIndex = index;
-            const trig = triggers[index];
-            document.getElementById('trigger-title').value = trig.title || '';
-            document.getElementById('trigger-id').value = trig.id || '';
-            document.getElementById('trigger-type').value = trig.type || 'menu';
-            document.getElementById('trigger-sprite').value = trig.sprite || '';
-            document.getElementById('trigger-x').value = trig.x;
-            document.getElementById('trigger-y').value = trig.y;
-            document.getElementById('trigger-w').value = trig.w || 1;
-            document.getElementById('trigger-h').value = trig.h || 1;
-
-            if (Array.isArray(trig.text)) {
-                document.getElementById('trigger-text').value = JSON.stringify(trig.text);
-            } else {
-                document.getElementById('trigger-text').value = trig.text || '';
-            }
-
-            document.getElementById('trigger-bubble-y').value = trig.bubbleOffsetY || 0;
-            document.getElementById('trigger-collision').checked = !!trig.collision;
-
-            const isAnim = !!(trig.animW || trig.frames || trig.speed);
-            document.getElementById('trigger-is-anim').checked = isAnim;
-            document.getElementById('anim-settings').style.display = isAnim ? 'block' : 'none';
-            document.getElementById('anim-w').value = trig.animW || 64;
-            document.getElementById('anim-h').value = trig.animH || 48;
-            document.getElementById('anim-frames').value = trig.frames || 5;
-            document.getElementById('anim-speed').value = trig.speed || 200;
-
-            document.getElementById('trigger-items').value = JSON.stringify(trig.items || [], null, 2);
-
-            // UI: show edit buttons
-            document.getElementById('btn-place-trigger').style.display = 'none';
-            document.getElementById('btn-update-trigger').style.display = 'block';
-            document.getElementById('btn-delete-trigger').style.display = 'block';
-            document.getElementById('btn-cancel-trigger').style.display = 'block';
-            document.getElementById('editing-status').style.display = 'block';
-
-            renderTriggers();
-        }
-
-        document.getElementById('trigger-is-anim').onchange = function () {
-            document.getElementById('anim-settings').style.display = this.checked ? 'block' : 'none';
         };
+        img.onerror = function () { showToast("⚠️ Tileset not found."); renderMapGrid(); };
 
-        function resetTriggerFields() {
-            document.getElementById('trigger-title').value = 'New Trigger';
-            document.getElementById('trigger-id').value = '';
-            document.getElementById('trigger-type').value = 'menu';
-            document.getElementById('trigger-sprite').value = '';
-            document.getElementById('trigger-x').value = 0;
-            document.getElementById('trigger-y').value = 0;
-            document.getElementById('trigger-w').value = 1;
-            document.getElementById('trigger-h').value = 1;
-            document.getElementById('trigger-text').value = '';
-            document.getElementById('trigger-bubble-y').value = 0;
-            document.getElementById('trigger-collision').checked = false;
-            document.getElementById('trigger-is-anim').checked = false;
-            document.getElementById('anim-settings').style.display = 'none';
-            document.getElementById('trigger-items').value = '[{"label": "Sample", "href": "#"}]';
+        hideNewMapDialog();
+        showToast(`New map "${name}" created (${w}×${h})`);
+    }
+
+    // ===== Keyboard Shortcuts =====
+    document.addEventListener('keydown', (e) => {
+        if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT') return;
+
+        if ((e.ctrlKey || e.metaKey) && e.key === 'z') {
+            e.preventDefault();
+            if (e.shiftKey) redo(); else undo();
+            return;
         }
 
-        function cancelTriggerEdit() {
-            editingTriggerIndex = -1;
-            document.getElementById('btn-place-trigger').style.display = 'block';
-            document.getElementById('btn-update-trigger').style.display = 'none';
-            document.getElementById('btn-delete-trigger').style.display = 'none';
-            document.getElementById('btn-cancel-trigger').style.display = 'none';
-            document.getElementById('editing-status').style.display = 'none';
-            resetTriggerFields();
-            renderTriggers();
-        }
-
-        function updateTrigger() {
-            if (editingTriggerIndex === -1) return;
-            saveSnapshot();
-            const trig = triggers[editingTriggerIndex];
-            collectTriggerFields(trig);
-            showToast("Trigger updated!");
-            cancelTriggerEdit();
-        }
-
-        function deleteEditingTrigger() {
-            if (editingTriggerIndex === -1) return;
-            if (!confirm(`Delete trigger "${triggers[editingTriggerIndex].title}"?`)) return;
-            saveSnapshot();
-            triggers.splice(editingTriggerIndex, 1);
-            showToast("Trigger deleted.");
-            cancelTriggerEdit();
-        }
-
-        function collectTriggerFields(trig) {
-            trig.title = document.getElementById('trigger-title').value;
-            trig.id = document.getElementById('trigger-id').value || undefined;
-            trig.type = document.getElementById('trigger-type').value;
-            trig.sprite = document.getElementById('trigger-sprite').value || undefined;
-            trig.x = parseInt(document.getElementById('trigger-x').value);
-            trig.y = parseInt(document.getElementById('trigger-y').value);
-            trig.w = parseInt(document.getElementById('trigger-w').value);
-            trig.h = parseInt(document.getElementById('trigger-h').value);
-
-            const rawText = document.getElementById('trigger-text').value;
-            if (rawText.startsWith('[') && rawText.endsWith(']')) {
-                try { trig.text = JSON.parse(rawText); } catch (e) { trig.text = rawText; }
-            } else {
-                trig.text = rawText || undefined;
-            }
-
-            trig.bubbleOffsetY = parseInt(document.getElementById('trigger-bubble-y').value) || 0;
-            trig.collision = document.getElementById('trigger-collision').checked;
-
-            if (document.getElementById('trigger-is-anim').checked) {
-                trig.animW = parseInt(document.getElementById('anim-w').value);
-                trig.animH = parseInt(document.getElementById('anim-h').value);
-                trig.frames = parseInt(document.getElementById('anim-frames').value);
-                trig.speed = parseInt(document.getElementById('anim-speed').value);
-            } else {
-                delete trig.animW;
-                delete trig.animH;
-                delete trig.frames;
-                delete trig.speed;
-            }
-
-            try {
-                trig.items = JSON.parse(document.getElementById('trigger-items').value);
-            } catch (e) {
-                alert("Invalid Items JSON!");
-            }
-        }
-
-        function placeTriggerAction() {
-            showToast("그리드를 클릭하여 새 트리거를 배치하세요.");
-        }
-
-        function placeTrigger(gx, gy) {
-            let trigger = { x: gx, y: gy };
-            collectTriggerFields(trigger);
-            trigger.x = gx; // Override with click position
-            trigger.y = gy;
-            triggers.push(trigger);
-            renderTriggers();
-            // Auto-load the new trigger for editing
-            loadTriggerToUI(triggers.length - 1);
-        }
-
-        function renderTriggers() {
-            document.querySelectorAll('.trigger-overlay').forEach(e => e.remove());
-
-            const isActive = (currentMode === 'trigger');
-            const showGhost = document.getElementById('chk-show-triggers').checked;
-
-            // Don't render if not active and ghost not requested
-            if (!isActive && !showGhost) return;
-
-            const mapContainer = document.getElementById('map');
-            triggers.forEach((trig, index) => {
-                const div = document.createElement('div');
-                div.className = 'trigger-overlay';
-
-                if (isActive) {
-                    div.classList.add('interactive');
-                    if (index === editingTriggerIndex) {
-                        div.style.background = 'rgba(255, 235, 59, 0.6)';
-                        div.style.outline = '2px solid #ffeb3b';
-                        div.style.zIndex = '15';
-                    }
-                } else {
-                    div.classList.add('ghost');
-                }
-
-                div.style.left = (trig.x * TILE_SIZE) + 'px';
-                div.style.top = ((trig.y - ((trig.h || 1) - 1)) * TILE_SIZE) + 'px';
-                div.style.width = ((trig.w || 1) * TILE_SIZE) + 'px';
-                div.style.height = ((trig.h || 1) * TILE_SIZE) + 'px';
-                div.innerHTML = `<span style="font-size: 8px; color: white; text-shadow: 0 0 2px black;">${trig.title || ''}</span>`;
-
-                if (isActive) {
-                    div.onclick = (e) => {
-                        e.stopPropagation();
-                        loadTriggerToUI(index);
-                    };
-                }
-
-                mapContainer.appendChild(div);
-            });
-        }
-
-        // ===== Collision Management =====
-        function toggleCollisionAt(gx, gy) {
-            const key = `${gx},${gy}`;
-            if (collisionTiles.has(key)) {
-                collisionTiles.delete(key);
-            } else {
-                collisionTiles.add(key);
-            }
-            renderCollisions();
-        }
-
-        function renderCollisions() {
-            document.querySelectorAll('.collision-overlay').forEach(e => e.remove());
-
-            const isActive = (currentMode === 'collision');
-            const showGhost = document.getElementById('chk-show-collisions').checked;
-
-            if (!isActive && !showGhost) return;
-
-            const mapContainer = document.getElementById('map');
-            collisionTiles.forEach(key => {
-                const [gx, gy] = key.split(',').map(Number);
-                const div = document.createElement('div');
-                div.className = 'collision-overlay';
-
-                if (isActive) {
-                    div.classList.add('interactive');
-                    div.onclick = (e) => {
-                        e.stopPropagation();
-                        saveSnapshot();
-                        toggleCollisionAt(gx, gy);
-                    };
-                } else {
-                    div.classList.add('ghost');
-                }
-
-                div.style.left = (gx * TILE_SIZE) + 'px';
-                div.style.top = (gy * TILE_SIZE) + 'px';
-                mapContainer.appendChild(div);
-            });
-        }
-
-        // ===== Grid Overlay =====
-        function toggleGrid() {
-            const map = document.getElementById('map');
+        if (e.code === 'Digit1') { setMode('tile'); return; }
+        if (e.code === 'Digit2') { setMode('trigger'); return; }
+        if (e.code === 'Digit3') { setMode('collision'); return; }
+        if (e.code === 'Digit4') { setMode('spawn'); return; }
+        if (e.code === 'KeyB') { setBrush(); return; }
+        if (e.code === 'KeyE') { setEraser(); return; }
+        if (e.code === 'KeyP') { setEyedropper(); return; }
+        if (e.code === 'KeyG') {
             const chk = document.getElementById('chk-show-grid');
-            map.classList.toggle('show-grid', chk.checked);
+            chk.checked = !chk.checked;
+            toggleGrid();
+            return;
         }
+        if (e.code === 'Equal' || e.code === 'NumpadAdd') { changeZoom(0.25); return; }
+        if (e.code === 'Minus' || e.code === 'NumpadSubtract') { changeZoom(-0.25); return; }
+        if (e.code === 'Digit0' || e.code === 'Numpad0') { resetZoom(); return; }
+    });
 
-        // ===== Palette =====
-        function togglePalette() {
-            paletteCollapsed = !paletteCollapsed;
-            document.getElementById('palette').classList.toggle('collapsed', paletteCollapsed);
-            document.getElementById('palette-toggle-icon').textContent = paletteCollapsed ? '▶' : '▼';
-        }
+    document.addEventListener('mouseup', () => { isPainting = false; });
 
-        // ===== Zoom =====
-        function changeZoom(delta) {
-            zoomLevel += delta;
-            if (zoomLevel < 0.1) zoomLevel = 0.1;
-            if (zoomLevel > 5.0) zoomLevel = 5.0;
-            updateZoom();
-        }
+    // ===== Palette Resize =====
+    (function () {
+        const handle   = document.getElementById('palette-resize-handle');
+        const bottomEl = document.getElementById('bottom-area');
+        let startY = 0, startH = 0;
 
-        function resetZoom() {
-            zoomLevel = 1.0;
-            updateZoom();
-        }
+        handle.addEventListener('mousedown', e => {
+            e.preventDefault();
+            startY = e.clientY;
+            startH = bottomEl.offsetHeight;
+            handle.classList.add('dragging');
 
-        function updateZoom() {
-            const mapGrid = document.getElementById('map');
-            mapGrid.style.transformOrigin = "0 0";
-            mapGrid.style.transform = `scale(${zoomLevel})`;
-            document.getElementById('zoom-level').innerText = Math.round(zoomLevel * 100) + "%";
-        }
-
-        // ===== Export =====
-        function exportMapData() {
-            let cells = document.querySelectorAll('.tile');
-            let data = [];
-            cells.forEach(c => {
-                let parts = c.id.split('_');
-                let gx = parseInt(parts[1]);
-                let gy = parseInt(parts[2]);
-                let tx = parseInt(c.dataset.tx);
-                let ty = parseInt(c.dataset.ty);
-                if (tx !== EMPTY_TILE.tx || ty !== EMPTY_TILE.ty) {
-                    data.push({ gx, gy, tx, ty });
-                }
-            });
-
-            const result = {
-                assets: (window.MAP_DATA && window.MAP_DATA.assets) ? window.MAP_DATA.assets : {},
-                ...(startPos ? { startPos } : {}),
-                tiles: data,
-                editor: (window.MAP_DATA && window.MAP_DATA.editor) ? window.MAP_DATA.editor : {},
-                collisions: Array.from(collisionTiles)
-                    .map(k => {
-                        const [x, y] = k.split(',').map(Number);
-                        return { x, y };
-                    })
-                    .filter(c => c.x < mapWidthTiles && c.y < mapHeightTiles)
-            };
-
-            const output = "window.MAP_DATA = " + JSON.stringify(result, null, 2);
-            copyToClipboard(output);
-            showToast(`Map Data copied! (${data.length} tiles, ${collisionTiles.size} collisions)`);
-        }
-
-        function exportTriggers() {
-            const output = "window.MAP_DATA.triggers = " + JSON.stringify(triggers, null, 2);
-            copyToClipboard(output);
-            showToast(`Triggers copied! (${triggers.length} triggers)`);
-        }
-
-        async function copyToClipboard(text) {
-            try {
-                await navigator.clipboard.writeText(text);
-            } catch (e) {
-                // Fallback
-                const ta = document.createElement('textarea');
-                ta.value = text;
-                ta.style.position = 'fixed';
-                ta.style.opacity = '0';
-                document.body.appendChild(ta);
-                ta.select();
-                document.execCommand('copy');
-                document.body.removeChild(ta);
-            }
-        }
-
-        // ===== New Map =====
-        function showNewMapDialog() {
-            document.getElementById('new-map-dialog').classList.add('show');
-        }
-
-        function hideNewMapDialog() {
-            document.getElementById('new-map-dialog').classList.remove('show');
-        }
-
-        function createNewMap() {
-            const name = document.getElementById('new-map-name').value.trim();
-            const tileset = document.getElementById('new-map-tileset').value.trim();
-            const w = parseInt(document.getElementById('new-map-w').value) || 30;
-            const h = parseInt(document.getElementById('new-map-h').value) || 20;
-
-            if (!name) {
-                alert("Map name is required.");
-                return;
+            function onMove(e) {
+                const delta = startY - e.clientY;   // 위로 드래그 = 높아짐
+                const minH  = parseInt(getComputedStyle(bottomEl).minHeight) || 80;
+                const maxH  = Math.floor(window.innerHeight * 0.70);
+                bottomEl.style.height = Math.min(maxH, Math.max(minH, startH + delta)) + 'px';
             }
 
-            // Add to selector
-            const opt = document.createElement('option');
-            opt.value = name;
-            opt.textContent = name.charAt(0).toUpperCase() + name.slice(1);
-            document.getElementById('map-selector').appendChild(opt);
-
-            // Create MAP_DATA in memory
-            window.MAP_DATA = {
-                assets: { tileset: tileset },
-                tiles: [],
-                collisions: [],
-                triggers: []
-            };
-
-            // Reset state
-            startPos = null;
-            triggers = [];
-            collisionTiles = new Set();
-            undoStack = [];
-            redoStack = [];
-
-            mapWidthTiles = w;
-            mapHeightTiles = h;
-            mapDataGrid = new Array(h).fill(0).map(() =>
-                new Array(w).fill(null).map(() => ({ ...EMPTY_TILE })));
-
-            document.getElementById('map-width').value = w;
-            document.getElementById('map-height').value = h;
-            document.getElementById('map-badge').textContent = name;
-
-            // Try to load tileset
-            ASSET_PATH = `maps/${name}/${tileset}`;
-            const img = new Image();
-            img.src = ASSET_PATH;
-            img.onload = function () {
-                tilesetWidth = img.width;
-                tilesetHeight = img.height;
-                // Rebuild palette
-                document.getElementById('palette').innerHTML = '';
-                const cols = Math.floor(tilesetWidth / TILE_SIZE);
-                const rows = Math.floor(tilesetHeight / TILE_SIZE);
-                const bgWidth = tilesetWidth * PALETTE_SCALE;
-                for (let y = 0; y < rows; y++) {
-                    for (let x = 0; x < cols; x++) {
-                        let d = document.createElement('div');
-                        d.className = 'palette-tile';
-                        d.style.backgroundImage = `url('${ASSET_PATH}')`;
-                        d.style.backgroundSize = `${bgWidth}px auto`;
-                        d.style.backgroundPosition = `-${x * TILE_SIZE * PALETTE_SCALE}px -${y * TILE_SIZE * PALETTE_SCALE}px`;
-                        d.dataset.coord = `${x},${y}`;
-                        d.dataset.tx = x;
-                        d.dataset.ty = y;
-                        d.onclick = function () { selectTile(this, x, y); };
-                        document.getElementById('palette').appendChild(d);
-                    }
-                }
-                renderMapGrid();
-            };
-            img.onerror = function () {
-                showToast("⚠️ Tileset not found. Create the folder and assets first.");
-                renderMapGrid();
-            };
-
-            hideNewMapDialog();
-            showToast(`New map "${name}" created (${w}x${h})`);
-        }
-
-        // ===== Keyboard Shortcuts =====
-        document.addEventListener('keydown', (e) => {
-            // Don't capture if typing in input/textarea
-            if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT') return;
-
-            // Undo/Redo
-            if ((e.ctrlKey || e.metaKey) && e.key === 'z') {
-                e.preventDefault();
-                if (e.shiftKey) redo();
-                else undo();
-                return;
+            function onUp() {
+                handle.classList.remove('dragging');
+                document.removeEventListener('mousemove', onMove);
+                document.removeEventListener('mouseup', onUp);
             }
 
-            // Mode shortcuts
-            if (e.key === '1') { setMode('tile'); return; }
-            if (e.key === '2') { setMode('trigger'); return; }
-            if (e.key === '3') { setMode('collision'); return; }
-
-            // Tool shortcuts (tile mode)
-            if (e.key === 'b' || e.key === 'B') { setBrush(); return; }
-            if (e.key === 'e' || e.key === 'E') { setEraser(); return; }
-
-            // Grid toggle
-            if (e.key === 'g' || e.key === 'G') {
-                const chk = document.getElementById('chk-show-grid');
-                chk.checked = !chk.checked;
-                toggleGrid();
-                return;
-            }
-
-            // Zoom
-            if (e.key === '=' || e.key === '+') { changeZoom(0.1); return; }
-            if (e.key === '-') { changeZoom(-0.1); return; }
-            if (e.key === '0') { resetZoom(); return; }
+            document.addEventListener('mousemove', onMove);
+            document.addEventListener('mouseup', onUp);
         });
-    </script>
+    })();
+</script>
 </body>
-
 </html>

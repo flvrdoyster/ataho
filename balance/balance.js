@@ -64,7 +64,8 @@
             GAME: 2                      // Global game speed (pixels per frame)
         },
         DEBUG: {
-            SHOW_HITBOX: true           // Toggle to show/hide debug hitboxes
+            SHOW_HITBOX: false,          // Toggle to show/hide debug hitboxes
+            MUTE: false                  // Toggle to mute all audio
         }
     };
 
@@ -95,7 +96,6 @@
     // GAME STATE
     //===========================================
     let distanceTraveled = 0;
-    let backgroundY = 0;
     let isGameOver = false;
 
     let startTime = 0;
@@ -110,11 +110,13 @@
 
     const imagePaths = {
         spriteSheet: 'balance_char.png',
-        background: 'balance_bg.png',
+        tileset: '../world/maps/abyss/assets/abyss_tile.png',
         beamStart: 'beam_start.png',
         beamMid: 'beam_mid.png',
         beamSpike: 'beam_spike.png'
     };
+
+    let mapTileGrid = [];
 
     const images = {};
 
@@ -209,7 +211,6 @@
         stepRemaining: 0,
         keyRepeatTimer: 0,
         jumpStartDist: 0,
-        jumpStartBgY: 0,
 
         jumpChargeTimer: 0,
         jumpCooldown: 0,
@@ -249,7 +250,6 @@
             const currentJumpSpeed = CONFIG.JUMP.DISTANCES[this.jumpLevel] / airTime;
 
             distanceTraveled += currentJumpSpeed * dt;
-            backgroundY -= currentJumpSpeed * dt;
 
             if (this.visualY >= 0) {
                 this.visualY = 0;
@@ -259,7 +259,6 @@
 
                 // Snap to exact tile distance — decouples collision from floating point drift in physics
                 const exactDist = this.jumpStartDist + CONFIG.JUMP.DISTANCES[this.jumpLevel];
-                backgroundY = this.jumpStartBgY - (exactDist - this.jumpStartDist);
                 distanceTraveled = exactDist;
 
                 inputState.down = false;
@@ -301,7 +300,6 @@
                 this.actionState = STATE.JUMPING;
                 this.jumpVelocityY = CONFIG.JUMP.VELOCITIES[this.jumpLevel];
                 this.jumpStartDist = distanceTraveled;
-                this.jumpStartBgY = backgroundY;
             }
         },
 
@@ -393,7 +391,6 @@
                 const nextDist = distanceTraveled + move;
                 if (!this.checkObstacleCollision(nextDist)) {
                     distanceTraveled += move;
-                    backgroundY -= move;
                     this.stepRemaining -= move;
                 } else {
                     this.stepRemaining = 0;
@@ -415,7 +412,7 @@
                 bgm.pause();
                 bgm.currentTime = 0;
             }
-            if (overBgm) {
+            if (overBgm && !CONFIG.DEBUG.MUTE) {
                 overBgm.currentTime = 0;
                 overBgm.play().catch(e => console.log('Over BGM play failed', e));
             }
@@ -537,7 +534,7 @@
             overBgm.pause();
             overBgm.currentTime = 0;
         }
-        if (bgm) {
+        if (bgm && !CONFIG.DEBUG.MUTE) {
             bgm.currentTime = 0;
             bgm.play().catch(e => console.log('BGM play failed', e));
         }
@@ -560,11 +557,9 @@
         ataho.stepRemaining = 0;
         ataho.keyRepeatTimer = 0;
         ataho.jumpStartDist = 0;
-        ataho.jumpStartBgY = 0;
         ataho.jumpVelocityY = 0;
         ataho.jumpLevel = 0;
         distanceTraveled = 0;
-        backgroundY = 0;
 
         obstacles = [];
         nextObstacleY = CONFIG.OBSTACLES.START_DELAY;
@@ -758,11 +753,43 @@
     // RENDER HELPERS
     //===========================================
 
-    function drawBackground() {
-        if (!images.background) return;
-        const bgY = Math.floor(backgroundY);
-        ctx.drawImage(images.background, 0, bgY, canvas.width, canvas.height);
-        ctx.drawImage(images.background, 0, bgY + canvas.height, canvas.width, canvas.height);
+    function buildMapGrid() {
+        if (!window.MAP_DATA || !window.MAP_DATA.tiles) return;
+        mapTileGrid = [];
+        window.MAP_DATA.tiles.forEach(({ gx, gy, tx, ty }) => {
+            if (!mapTileGrid[gy]) mapTileGrid[gy] = [];
+            mapTileGrid[gy][gx] = { tx, ty };
+        });
+    }
+
+    function drawBackgroundTiles() {
+        if (!images.tileset || !mapTileGrid.length) return;
+
+        const mapH = mapTileGrid.length;
+        const mapW = 30;
+        const T = TILE_SIZE;
+        const originX = canvas.width / 4;   // 240 — map left edge in 2x game coords
+        const originY = canvas.height / 2;  // 320 — camera center
+
+        const firstRow = Math.floor((canvas.height / 4 - originY + distanceTraveled) / T);
+        const lastRow  = Math.ceil((3 * canvas.height / 4 - originY + distanceTraveled) / T);
+
+        for (let row = firstRow; row <= lastRow; row++) {
+            const mapRow = ((row % mapH) + mapH) % mapH;
+            const tileRow = mapTileGrid[mapRow];
+            if (!tileRow) continue;
+
+            const drawY = originY - distanceTraveled + row * T;
+            for (let col = 0; col < mapW; col++) {
+                const tile = tileRow[col];
+                if (!tile || (tile.tx === 1 && tile.ty === 0)) continue;
+                ctx.drawImage(
+                    images.tileset,
+                    tile.tx * T, tile.ty * T, T, T,
+                    originX + col * T, drawY, T, T
+                );
+            }
+        }
     }
 
     function generateObstacles() {
@@ -789,8 +816,6 @@
 
     function gameUpdate(dt) {
         ataho.update(dt);
-        if (backgroundY <= -canvas.height) backgroundY += canvas.height;
-        if (backgroundY > 0) backgroundY -= canvas.height;
         generateObstacles();
     }
 
@@ -849,6 +874,7 @@
             ctx.translate(canvas.width / 2, canvas.height / 2);
             ctx.scale(2, 2);
             ctx.translate(-canvas.width / 2, -canvas.height / 2);
+            drawBackgroundTiles();
             drawBeam();
             drawObstacles();
             ataho.draw();
@@ -945,7 +971,6 @@
         ctx.setTransform(1, 0, 0, 1, 0, 0);
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-        drawBackground();
         if (!isGameOver) gameUpdate(dt);
         renderWorld();
 
@@ -1000,6 +1025,8 @@
         jumpBtn.addEventListener('mouseleave', handleJumpEnd);
     }
 
+    buildMapGrid();
+
     Promise.all([loadImages(), loadFonts(), loadAudio()]).then(() => {
         // Pre-render red spike variant into offscreen canvas to avoid per-frame filter cost
         if (images.beamSpike) {
@@ -1021,7 +1048,7 @@
 
         startTime = Date.now();
 
-        if (bgm) {
+        if (bgm && !CONFIG.DEBUG.MUTE) {
             bgm.play().catch(e => {
                 console.log('Autoplay prevented. Waiting for user interaction.', e);
                 const playOnInteraction = () => {
