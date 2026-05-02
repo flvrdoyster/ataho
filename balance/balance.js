@@ -116,6 +116,7 @@
     // AudioContext — created once, unlocked on first user gesture
     let audioContext = null;
     let _audioUnlocked = false;
+    let _bgmPending = false; // 로드 완료 후 제스처 전이면 true → unlock 시 재생
 
     function getAudioContext() {
         if (!audioContext) {
@@ -127,11 +128,19 @@
     function unlockAudio() {
         if (_audioUnlocked) return;
         _audioUnlocked = true;
-        const ctx = getAudioContext();
-        if (ctx.state !== 'running') ctx.resume();
+        const actx = getAudioContext();
+        // iOS: resume() must be called synchronously inside gesture handler
+        const resumePromise = (actx.state !== 'running') ? actx.resume() : Promise.resolve();
         // Pre-warm audio elements so iOS unblocks them
-        [bgm, overBgm, fallenSfx].forEach(el => {
-            if (el) el.play().then(() => el.pause()).catch(() => { });
+        resumePromise.then(() => {
+            [bgm, overBgm, fallenSfx].forEach(el => {
+                if (el) el.play().then(() => el.pause()).catch(() => { });
+            });
+            // 로드 완료 후 제스처를 기다리던 경우 BGM 재생
+            if (_bgmPending) {
+                _bgmPending = false;
+                playMusic(bgm);
+            }
         });
         // 제스처 이후 SFX 디코딩 실행
         _decodePending();
@@ -788,6 +797,9 @@
     const handleTouch = (e) => {
         e.preventDefault();
 
+        // touches 배열이 비어있으면 (touchend/touchcancel 오발) 무시
+        if (!e.touches || e.touches.length === 0) return;
+
         if (isGameOver && e.type === 'touchstart') {
             const rect = canvas.getBoundingClientRect();
             const scaleX = canvas.width / rect.width;
@@ -806,8 +818,8 @@
 
         if (isGameOver) return;
 
-        const touchX = e.touches ? e.touches[0].clientX : e.clientX;
-        const touchY = e.touches ? e.touches[0].clientY : e.clientY;
+        const touchX = e.touches[0].clientX;
+        const touchY = e.touches[0].clientY;
 
         const centerX = window.innerWidth / 2;
         const maxDistX = window.innerWidth / 2;
@@ -1104,11 +1116,14 @@
 
     canvas.addEventListener('touchstart', handleTouch, { passive: false });
     canvas.addEventListener('touchmove', handleTouch, { passive: false });
-    canvas.addEventListener('touchend', handleTouchEnd);
+    canvas.addEventListener('touchend', handleTouchEnd, { passive: false });
+    // touchcancel: 시스템이 강제 취소 (전화, 알림 등) → 입력 상태 초기화
+    canvas.addEventListener('touchcancel', handleTouchEnd, { passive: false });
 
     // AudioContext unlock — iOS/Android requires user gesture
+    // passive: false 필수 — 제스처 핸들러 내에서 AudioContext.resume()을 동기적으로 호출해야 iOS에서 작동
     ['touchstart', 'click', 'keydown'].forEach(evt =>
-        window.addEventListener(evt, unlockAudio, { once: true, passive: true })
+        window.addEventListener(evt, unlockAudio, { once: true, passive: false })
     );
 
     const isTouchDevice = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
@@ -1143,6 +1158,9 @@
 
     buildMapGrid();
 
+    // canvas에 touch-action:none 설정 — 브라우저 기본 스크롤/핀치줌 방지
+    canvas.style.touchAction = 'none';
+
     Promise.all([loadImages(), loadFonts(), loadAudio()]).then(() => {
         // Pre-render red spike variant into offscreen canvas to avoid per-frame filter cost
         if (images.beamSpike) {
@@ -1164,7 +1182,12 @@
 
         startTime = Date.now();
 
-        playMusic(bgm);
+        // 유저 제스처가 이미 있었으면 즉시 재생, 없으면 unlock 시점에 재생
+        if (_audioUnlocked) {
+            playMusic(bgm);
+        } else {
+            _bgmPending = true;
+        }
 
         byFrame();
     }).catch(error => {
