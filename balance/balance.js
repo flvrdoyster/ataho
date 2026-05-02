@@ -97,6 +97,8 @@
     //===========================================
     let distanceTraveled = 0;
     let isGameOver = false;
+    let gameOverScreenTimer = 0;      // isGameOver 후 화면 표시까지의 딜레이 카운터
+    const GAME_OVER_SCREEN_DELAY = 90; // 프레임 수 (60fps 기준 1초)
 
     let startTime = 0;
     let elapsedTime = 0; // in milliseconds
@@ -107,6 +109,33 @@
 
     let bgm = null;
     let overBgm = null;
+    let fallenSfx = null;  // HTMLAudioElement (1회성, file:// 환경 호환)
+    const sfxRaw = {};     // id -> ArrayBuffer (XHR로 받은 원본, 제스처 전)
+    const sfxBuffers = {}; // id -> AudioBuffer  (decode 완료, 재생 가능)
+
+    // AudioContext — created once, unlocked on first user gesture
+    let audioContext = null;
+    let _audioUnlocked = false;
+
+    function getAudioContext() {
+        if (!audioContext) {
+            audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        }
+        return audioContext;
+    }
+
+    function unlockAudio() {
+        if (_audioUnlocked) return;
+        _audioUnlocked = true;
+        const ctx = getAudioContext();
+        if (ctx.state !== 'running') ctx.resume();
+        // Pre-warm audio elements so iOS unblocks them
+        [bgm, overBgm, fallenSfx].forEach(el => {
+            if (el) el.play().then(() => el.pause()).catch(() => { });
+        });
+        // 제스처 이후 SFX 디코딩 실행
+        _decodePending();
+    }
 
     const imagePaths = {
         spriteSheet: 'balance_char.png',
@@ -142,25 +171,107 @@
         });
     }
 
-    // Audio Loading — always resolves; failed tracks become null
+    // Audio Loading — loadeddata + timeout fallback
+    // canplaythrough는 모바일에서 네트워크 상태에 따라 매우 늦게 발화하거나 안 됨
     function loadAudioFile(src, loop, volume) {
         return new Promise((resolve) => {
-            const audio = new Audio(src);
+            const audio = new Audio();
             audio.loop = loop;
             audio.volume = volume;
-            audio.addEventListener('canplaythrough', () => resolve(audio), { once: true });
+            audio.preload = 'auto';
+
+            let resolved = false;
+            const done = () => {
+                if (resolved) return;
+                resolved = true;
+                resolve(audio);
+            };
+
+            audio.addEventListener('loadeddata', done, { once: true });
             audio.addEventListener('error', () => {
                 console.warn(`Audio load failed: ${src}`);
-                resolve(null);
-            });
+                if (!resolved) { resolved = true; resolve(null); }
+            }, { once: true });
+
+            audio.src = src;
             audio.load();
+
+            // Fallback: resolve after 3s regardless (모바일 느린 네트워크 대응)
+            setTimeout(() => {
+                if (!resolved) {
+                    console.warn(`Audio load timeout, continuing: ${src}`);
+                    done();
+                }
+            }, 3000);
         });
     }
 
+    // SFX Loading — XHR로 ArrayBuffer만 받아 저장, decode는 unlock 이후
+    function loadSfxFile(id, src) {
+        return new Promise((resolve) => {
+            const xhr = new XMLHttpRequest();
+            xhr.open('GET', src, true);
+            xhr.responseType = 'arraybuffer';
+            xhr.onload = () => {
+                if ((xhr.status === 200 || xhr.status === 0) && xhr.response) {
+                    sfxRaw[id] = xhr.response;
+                } else {
+                    console.warn(`SFX fetch failed (${xhr.status}): ${src}`);
+                }
+                resolve();
+            };
+            xhr.onerror = () => { console.warn(`SFX network error: ${src}`); resolve(); };
+            xhr.send();
+        });
+    }
+
+    // 유저 제스처 이후 호출 — AudioContext가 running 상태일 때 디코딩
+    function _decodePending() {
+        const ctx = getAudioContext();
+        Object.entries(sfxRaw).forEach(([id, buf]) => {
+            if (sfxBuffers[id]) return;
+            ctx.decodeAudioData(
+                buf.slice(0), // slice: detach 방지
+                (decoded) => { sfxBuffers[id] = decoded; },
+                (e) => { console.warn(`SFX decode failed: ${id}`, e); }
+            );
+        });
+    }
+
+    function playSfx(id) {
+        if (CONFIG.DEBUG.MUTE) return;
+        const buffer = sfxBuffers[id];
+        if (!buffer) return;
+        const ctx = getAudioContext();
+        const play = () => {
+            const source = ctx.createBufferSource();
+            source.buffer = buffer;
+            source.connect(ctx.destination);
+            source.start(0);
+        };
+        if (ctx.state === 'running') play();
+        else ctx.resume().then(play);
+    }
+
+    function playMusic(audio) {
+        if (!audio || CONFIG.DEBUG.MUTE) return;
+        audio.currentTime = 0;
+        getAudioContext().resume().then(() => {
+            audio.play().catch(e => console.log('BGM play failed:', e));
+        });
+    }
+
+    function stopMusic(audio) {
+        if (!audio) return;
+        audio.pause();
+        audio.currentTime = 0;
+    }
+
     async function loadAudio() {
-        [bgm, overBgm] = await Promise.all([
+        [bgm, overBgm, fallenSfx] = await Promise.all([
             loadAudioFile('duel.mp3', true, 0.5),
-            loadAudioFile('over.mp3', true, 0.5)
+            loadAudioFile('over.mp3', true, 0.5),
+            loadAudioFile('fallen.mp3', false, 1.0)
         ]);
     }
 
@@ -408,13 +519,11 @@
         triggerGameOver() {
             this.actionState = STATE.FALLEN;
             isGameOver = true;
-            if (bgm) {
-                bgm.pause();
-                bgm.currentTime = 0;
-            }
-            if (overBgm && !CONFIG.DEBUG.MUTE) {
-                overBgm.currentTime = 0;
-                overBgm.play().catch(e => console.log('Over BGM play failed', e));
+            gameOverScreenTimer = 0;
+            stopMusic(bgm);
+            if (fallenSfx && !CONFIG.DEBUG.MUTE) {
+                fallenSfx.currentTime = 0;
+                getAudioContext().resume().then(() => fallenSfx.play().catch(() => { }));
             }
             const jumpBtn = document.getElementById('mobile-jump-btn');
             if (jumpBtn) jumpBtn.style.display = 'none';
@@ -530,14 +639,9 @@
 
     function resetGame() {
         isGameOver = false;
-        if (overBgm) {
-            overBgm.pause();
-            overBgm.currentTime = 0;
-        }
-        if (bgm && !CONFIG.DEBUG.MUTE) {
-            bgm.currentTime = 0;
-            bgm.play().catch(e => console.log('BGM play failed', e));
-        }
+        gameOverScreenTimer = 0;
+        stopMusic(overBgm);
+        playMusic(bgm);
         startTime = Date.now();
         elapsedTime = 0;
         lastTimestamp = 0;
@@ -772,7 +876,7 @@
         const originY = canvas.height / 2;  // 320 — camera center
 
         const firstRow = Math.floor((canvas.height / 4 - originY + distanceTraveled) / T);
-        const lastRow  = Math.ceil((3 * canvas.height / 4 - originY + distanceTraveled) / T);
+        const lastRow = Math.ceil((3 * canvas.height / 4 - originY + distanceTraveled) / T);
 
         for (let row = firstRow; row <= lastRow; row++) {
             const mapRow = ((row % mapH) + mapH) % mapH;
@@ -975,10 +1079,17 @@
         renderWorld();
 
         if (!isGameOver) elapsedTime = Date.now() - startTime;
+        if (isGameOver) {
+            const wasBelow = gameOverScreenTimer < GAME_OVER_SCREEN_DELAY;
+            gameOverScreenTimer += dt;
+            if (wasBelow && gameOverScreenTimer >= GAME_OVER_SCREEN_DELAY) {
+                playMusic(overBgm);
+            }
+        }
 
         const { timeText, distanceText } = buildStats();
         renderHUD(timeText, distanceText);
-        if (isGameOver) renderGameOver(timeText, distanceText);
+        if (isGameOver && gameOverScreenTimer >= GAME_OVER_SCREEN_DELAY) renderGameOver(timeText, distanceText);
     }
 
     document.addEventListener('keydown', handleKeyDown);
@@ -994,6 +1105,11 @@
     canvas.addEventListener('touchstart', handleTouch, { passive: false });
     canvas.addEventListener('touchmove', handleTouch, { passive: false });
     canvas.addEventListener('touchend', handleTouchEnd);
+
+    // AudioContext unlock — iOS/Android requires user gesture
+    ['touchstart', 'click', 'keydown'].forEach(evt =>
+        window.addEventListener(evt, unlockAudio, { once: true, passive: true })
+    );
 
     const isTouchDevice = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
 
@@ -1048,20 +1164,7 @@
 
         startTime = Date.now();
 
-        if (bgm && !CONFIG.DEBUG.MUTE) {
-            bgm.play().catch(e => {
-                console.log('Autoplay prevented. Waiting for user interaction.', e);
-                const playOnInteraction = () => {
-                    bgm.play();
-                    ['keydown', 'touchstart', 'click'].forEach(evt =>
-                        document.removeEventListener(evt, playOnInteraction)
-                    );
-                };
-                ['keydown', 'touchstart', 'click'].forEach(evt =>
-                    document.addEventListener(evt, playOnInteraction, { once: true })
-                );
-            });
-        }
+        playMusic(bgm);
 
         byFrame();
     }).catch(error => {
