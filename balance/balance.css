@@ -1,16 +1,113 @@
 body {
     display: flex;
-    /* Use Flexbox layout to easily center content */
     justify-content: center;
-    /* Center content horizontally (left-right) */
     margin: 0;
-    /* Remove default browser margin */
     background-color: rgba(240, 240, 240, 1);
 }
 
 canvas {
     border: 0px;
     background-color: rgba(255, 255, 255, 1);
+    display: block;
+}
+
+#game-wrapper {
+    position: relative;
+    display: inline-block;
+}
+
+#ui-overlay {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    font-family: 'Raster Forge', sans-serif;
+}
+
+.frame-box {
+    border-width: 16px;
+    border-style: solid;
+    border-image: url('frame/combined.png') 16 fill / 16px round;
+    background-color: rgba(33, 66, 123, 1);
+}
+
+#hud {
+    position: absolute;
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 25%;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 4px 12px;
+    color: white;
+    font-size: 24px;
+}
+
+#sound-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 50px;
+    height: 50px;
+    font-size: 24px;
+    color: white;
+    background: transparent;
+    cursor: pointer;
+    pointer-events: auto;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#game-over-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: auto;
+}
+
+#game-over-overlay[hidden] {
+    display: none;
+}
+
+#game-over-panel {
+    width: 38%;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    padding: 20px 40px;
+    color: white;
+}
+
+#game-over-title {
+    font-size: 48px;
+    margin: 0;
+}
+
+#game-over-time,
+#game-over-dist {
+    font-size: 30px;
+    color: #FFD700;
+    margin: 0;
+}
+
+#btn-continue,
+#btn-home {
+    font-family: 'Raster Forge', sans-serif;
+    font-size: 24px;
+    color: white;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 10px 20px;
 }
 
 #mobile-jump-btn {
