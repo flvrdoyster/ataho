@@ -1304,6 +1304,14 @@
         toggleMute()   { CONFIG.DEBUG.MUTE = !CONFIG.DEBUG.MUTE; },
     };
 
+    console.log(
+        '%c[디버그 명령어]%c\n' +
+        '  debug.toggleStats()   — 수치 패널 ON/OFF\n' +
+        '  debug.toggleHitbox()  — 히트박스 ON/OFF\n' +
+        '  debug.toggleMute()    — 오디오 ON/OFF',
+        'color:#000;font-weight:bold', 'color:inherit'
+    );
+
     Promise.all([loadImages(), loadFonts(), loadAudio()]).then(() => {
         // Pre-render red spike variant into offscreen canvas to avoid per-frame filter cost
         if (images.beamSpike) {
