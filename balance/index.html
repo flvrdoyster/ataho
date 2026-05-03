@@ -35,7 +35,25 @@
     <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-PR4S897C" height="0" width="0"
             style="display:none;visibility:hidden"></iframe></noscript>
     <!-- End Google Tag Manager (noscript) -->
-    <canvas id="gameCanvas"></canvas>
+    <div id="game-wrapper">
+        <canvas id="gameCanvas"></canvas>
+        <div id="ui-overlay">
+            <div id="hud" class="frame-box">
+                <span id="hud-time">TIME: 00:00</span>
+                <span id="hud-dist">DIST: 0.0M</span>
+            </div>
+            <button id="sound-btn" class="frame-box">🔊</button>
+            <div id="game-over-overlay" hidden>
+                <div id="game-over-panel" class="frame-box">
+                    <p id="game-over-title">GAME OVER</p>
+                    <p id="game-over-time"></p>
+                    <p id="game-over-dist"></p>
+                    <button id="btn-continue">Continue?</button>
+                    <button id="btn-home">Home</button>
+                </div>
+            </div>
+        </div>
+    </div>
     <script src="../world/maps/abyss/data.js"></script>
     <script src="balance.js"></script>
     <script src="../footer.js"></script>

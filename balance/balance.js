@@ -122,9 +122,6 @@
     const TOUCH_DEADZONE = 0.05;
     const TOUCH_UPPER_ZONE = 0.25;
     const TOUCH_LOWER_ZONE = 0.75;
-    const BUTTON_WIDTH = 200;
-    const BUTTON_HEIGHT = 60;
-    const SOUND_BTN_SIZE = 50;
 
     const GAME_OVER_SCREEN_DELAY = 90; // 프레임 수 (60fps 기준 1초)
 
@@ -167,21 +164,9 @@
     // --- 입력 상태 ---
     const inputState = {};
 
-    // --- UI 버튼 ---
-    const buttons = {
-        continue: { x: 0, y: 0, width: BUTTON_WIDTH, height: BUTTON_HEIGHT, text: 'Continue?' },
-        exit: { x: 0, y: 0, width: BUTTON_WIDTH, height: BUTTON_HEIGHT, text: 'Home' },
-        sound: { x: canvas.width - SOUND_BTN_SIZE - 10, y: 10, width: SOUND_BTN_SIZE, height: SOUND_BTN_SIZE }
-    };
-
     // --- 유틸 ---
     function clamp(value, min, max) {
         return Math.max(min, Math.min(max, value));
-    }
-
-    function isClickInsideButton(clickX, clickY, button) {
-        return clickX >= button.x && clickX <= button.x + button.width &&
-            clickY >= button.y && clickY <= button.y + button.height;
     }
 
     // --- 에셋 로딩 ---
@@ -305,16 +290,24 @@
         _decodePending();
     }
 
+    const hudTime = document.getElementById('hud-time');
+    const hudDist = document.getElementById('hud-dist');
+    const gameOverOverlay = document.getElementById('game-over-overlay');
+    const gameOverTime = document.getElementById('game-over-time');
+    const gameOverDist = document.getElementById('game-over-dist');
+    const soundBtn = document.getElementById('sound-btn');
+
     function toggleSound() {
         soundEnabled = !soundEnabled;
         const muted = !soundEnabled;
         if (bgm) bgm.muted = muted;
         if (overBgm) overBgm.muted = muted;
         if (fallenSfx) fallenSfx.muted = muted;
+        soundBtn.textContent = soundEnabled ? '🔊' : '🔇';
     }
 
     function playSfx(id) {
-        if (CONFIG.DEBUG.MUTE || !soundEnabled) return;
+        if (!soundEnabled) return;
         const buffer = sfxBuffers[id];
         if (!buffer) return;
         const ctx = getAudioContext();
@@ -329,7 +322,7 @@
     }
 
     function playMusic(audio) {
-        if (!audio || CONFIG.DEBUG.MUTE || !soundEnabled) return;
+        if (!audio || !soundEnabled) return;
         audio.muted = false;
         audio.currentTime = 0;
         audio._shouldPlay = true;
@@ -606,7 +599,7 @@
             isGameOver = true;
             gameOverScreenTimer = 0;
             stopMusic(bgm);
-            if (fallenSfx && !CONFIG.DEBUG.MUTE && soundEnabled) {
+            if (fallenSfx && soundEnabled) {
                 fallenSfx.muted = false;
                 fallenSfx.currentTime = 0;
                 getAudioContext().resume().then(() => fallenSfx.play().catch(() => { }));
@@ -759,6 +752,8 @@
         // byFrame() is already running continuously, so we don't need to call it here.
         // Calling it would create a duplicate loop (double speed).
 
+        gameOverOverlay.hidden = true;
+
         const jumpBtn = document.getElementById('mobile-jump-btn');
         if (jumpBtn) jumpBtn.style.display = 'block';
     }
@@ -898,85 +893,9 @@
         };
     }
 
-    function renderHUD(timeText, distanceText) {
-        const boxWidth = 220;
-        const boxHeight = 70;
-        const boxX = canvas.width / 2 - boxWidth / 2;
-        const boxY = 10;
-        const padding = 10;
-
-        ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
-        ctx.beginPath();
-        ctx.roundRect(boxX, boxY, boxWidth, boxHeight, 5);
-        ctx.fill();
-
-        ctx.font = '24px "Raster Forge", sans-serif';
-        ctx.fillStyle = 'white';
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'top';
-        ctx.fillText(timeText, canvas.width / 2, boxY + padding);
-        ctx.fillText(distanceText, canvas.width / 2, boxY + padding + 30);
-
-        drawSoundButton();
-    }
-
-    function drawSoundButton() {
-        const btn = buttons.sound;
-        ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
-        ctx.beginPath();
-        ctx.roundRect(btn.x, btn.y, btn.width, btn.height, 5);
-        ctx.fill();
-
-        ctx.strokeStyle = 'white';
-        ctx.lineWidth = 2;
-        ctx.beginPath();
-        ctx.roundRect(btn.x, btn.y, btn.width, btn.height, 5);
-        ctx.stroke();
-
-        ctx.font = '24px sans-serif';
-        ctx.fillStyle = 'white';
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.fillText(soundEnabled ? '🔊' : '🔇', btn.x + btn.width / 2, btn.y + btn.height / 2);
-    }
-
-    function drawButton(btn) {
-        ctx.strokeStyle = 'white';
-        ctx.lineWidth = 2;
-        ctx.strokeRect(btn.x, btn.y, btn.width, btn.height);
-
-        ctx.font = '24px "Raster Forge", sans-serif';
-        ctx.fillStyle = 'white';
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.fillText(btn.text, btn.x + btn.width / 2, btn.y + btn.height / 2);
-    }
-
-    function renderGameOver(timeText, distanceText) {
-        const cx = canvas.width / 2;
-        const cy = canvas.height / 2;
-
-        ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-        ctx.font = '48px "Raster Forge", sans-serif';
-        ctx.fillStyle = 'white';
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.fillText('GAME OVER', cx, cy - 140);
-
-        ctx.font = '36px "Raster Forge", sans-serif';
-        ctx.fillStyle = '#FFD700';
-        ctx.fillText(timeText, cx, cy - 80);
-        ctx.fillText(distanceText, cx, cy - 30);
-
-        buttons.continue.x = cx - buttons.continue.width / 2;
-        buttons.continue.y = cy + 30;
-        buttons.exit.x = cx - buttons.exit.width / 2;
-        buttons.exit.y = cy + 110;
-
-        drawButton(buttons.continue);
-        drawButton(buttons.exit);
+    function updateHUD(timeText, distanceText) {
+        hudTime.textContent = timeText;
+        hudDist.textContent = distanceText;
     }
 
     // --- 디버그 패널 ---
@@ -1104,45 +1023,6 @@
         }
     };
 
-    const handleCanvasClick = (e) => {
-        const rect = canvas.getBoundingClientRect();
-        const scaleX = canvas.width / rect.width;
-        const scaleY = canvas.height / rect.height;
-
-        const clickX = (e.clientX - rect.left) * scaleX;
-        const clickY = (e.clientY - rect.top) * scaleY;
-
-        if (isClickInsideButton(clickX, clickY, buttons.sound)) {
-            toggleSound();
-            return;
-        }
-
-        if (!isGameOver) return;
-
-        if (isClickInsideButton(clickX, clickY, buttons.continue)) {
-            resetGame();
-        } else if (isClickInsideButton(clickX, clickY, buttons.exit)) {
-            window.location.href = '../index.html';
-        }
-    };
-
-    const handleMouseMove = (e) => {
-        const rect = canvas.getBoundingClientRect();
-        const scaleX = canvas.width / rect.width;
-        const scaleY = canvas.height / rect.height;
-
-        const mouseX = (e.clientX - rect.left) * scaleX;
-        const mouseY = (e.clientY - rect.top) * scaleY;
-
-        if (isClickInsideButton(mouseX, mouseY, buttons.sound) ||
-            (isGameOver && (isClickInsideButton(mouseX, mouseY, buttons.continue) ||
-                isClickInsideButton(mouseX, mouseY, buttons.exit)))) {
-            canvas.style.cursor = 'pointer';
-        } else {
-            canvas.style.cursor = 'default';
-        }
-    };
-
     const handleTouchEnd = (e) => {
         e.preventDefault();
         inputState.touchForce = 0;
@@ -1156,29 +1036,6 @@
 
         // touches 배열이 비어있으면 (touchend/touchcancel 오발) 무시
         if (!e.touches || e.touches.length === 0) return;
-
-        if (e.type === 'touchstart') {
-            const rect = canvas.getBoundingClientRect();
-            const scaleX = canvas.width / rect.width;
-            const scaleY = canvas.height / rect.height;
-
-            const touchX = (e.touches[0].clientX - rect.left) * scaleX;
-            const touchY = (e.touches[0].clientY - rect.top) * scaleY;
-
-            if (isClickInsideButton(touchX, touchY, buttons.sound)) {
-                toggleSound();
-                return;
-            }
-
-            if (isGameOver) {
-                if (isClickInsideButton(touchX, touchY, buttons.continue)) {
-                    resetGame();
-                } else if (isClickInsideButton(touchX, touchY, buttons.exit)) {
-                    window.location.href = '../index.html';
-                }
-                return;
-            }
-        }
 
         if (isGameOver) return;
 
@@ -1249,16 +1106,22 @@
         }
 
         const { timeText, distanceText } = buildStats();
-        renderHUD(timeText, distanceText);
-        if (isGameOver && gameOverScreenTimer >= GAME_OVER_SCREEN_DELAY) renderGameOver(timeText, distanceText);
+        updateHUD(timeText, distanceText);
+        if (isGameOver && gameOverScreenTimer >= GAME_OVER_SCREEN_DELAY && gameOverOverlay.hidden) {
+            gameOverTime.textContent = timeText;
+            gameOverDist.textContent = distanceText;
+            gameOverOverlay.hidden = false;
+        }
         if (CONFIG.DEBUG.SHOW_STATS) updateDebugPanel();
     }
 
     // --- 초기화 ---
     document.addEventListener('keydown', handleKeyDown);
     document.addEventListener('keyup', handleKeyUp);
-    canvas.addEventListener('click', handleCanvasClick);
-    canvas.addEventListener('mousemove', handleMouseMove); // For cursor style
+
+    document.getElementById('sound-btn').addEventListener('click', toggleSound);
+    document.getElementById('btn-continue').addEventListener('click', resetGame);
+    document.getElementById('btn-home').addEventListener('click', () => { window.location.href = '../index.html'; });
 
     canvas.addEventListener('mousedown', handleMouseDown);
     canvas.addEventListener('mousemove', handleMouseMoveTouch); // For controls
@@ -1325,7 +1188,7 @@
             }
         },
         toggleHitbox() { CONFIG.DEBUG.SHOW_HITBOX = !CONFIG.DEBUG.SHOW_HITBOX; },
-        toggleMute()   { CONFIG.DEBUG.MUTE = !CONFIG.DEBUG.MUTE; },
+        toggleMute()   { toggleSound(); },
     };
 
     console.log(
