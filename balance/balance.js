@@ -295,6 +295,12 @@
     const gameOverOverlay = document.getElementById('game-over-overlay');
     const gameOverTime = document.getElementById('game-over-time');
     const gameOverDist = document.getElementById('game-over-dist');
+    const gameOverPanel = document.getElementById('game-over-panel');
+    const gameOverCursorEl = document.getElementById('game-over-cursor');
+    const gameOverBtns = [
+        document.getElementById('btn-continue'),
+        document.getElementById('btn-home')
+    ];
     const soundBtn = document.getElementById('sound-btn');
 
     function toggleSound() {
@@ -303,7 +309,7 @@
         if (bgm) bgm.muted = muted;
         if (overBgm) overBgm.muted = muted;
         if (fallenSfx) fallenSfx.muted = muted;
-        soundBtn.textContent = soundEnabled ? '🔊' : '🔇';
+        soundBtn.classList.toggle('muted', muted);
     }
 
     function playSfx(id) {
@@ -325,7 +331,8 @@
         if (!audio || !soundEnabled) return;
         audio.muted = false;
         audio.currentTime = 0;
-        audio._shouldPlay = true;
+        audio._playToken = (audio._playToken || 0) + 1;
+        const token = audio._playToken;
 
         if (audio._playRetry) {
             audio.removeEventListener('canplaythrough', audio._playRetry);
@@ -333,12 +340,12 @@
         }
 
         const attempt = () => {
-            if (!audio._shouldPlay) return;
+            if (audio._playToken !== token) return;
             getAudioContext().resume().then(() => {
-                if (!audio._shouldPlay) return;
+                if (audio._playToken !== token) return;
                 audio.play().catch(() => {
                     // 버퍼 부족으로 play() 실패 — canplaythrough 시 재시도
-                    if (audio._shouldPlay) {
+                    if (audio._playToken === token) {
                         audio._playRetry = attempt;
                         audio.addEventListener('canplaythrough', attempt, { once: true });
                     }
@@ -351,7 +358,7 @@
 
     function stopMusic(audio) {
         if (!audio) return;
-        audio._shouldPlay = false;
+        audio._playToken = (audio._playToken || 0) + 1;
         if (audio._playRetry) {
             audio.removeEventListener('canplaythrough', audio._playRetry);
             audio._playRetry = null;
@@ -602,7 +609,11 @@
             if (fallenSfx && soundEnabled) {
                 fallenSfx.muted = false;
                 fallenSfx.currentTime = 0;
-                getAudioContext().resume().then(() => fallenSfx.play().catch(() => { }));
+                fallenSfx._playToken = (fallenSfx._playToken || 0) + 1;
+                const sfxToken = fallenSfx._playToken;
+                getAudioContext().resume().then(() => {
+                    if (fallenSfx._playToken === sfxToken) fallenSfx.play().catch(() => { });
+                });
             }
             const jumpBtn = document.getElementById('mobile-jump-btn');
             if (jumpBtn) jumpBtn.style.display = 'none';
@@ -720,6 +731,7 @@
         isGameOver = false;
         gameOverScreenTimer = 0;
         stopMusic(overBgm);
+        if (fallenSfx) fallenSfx._playToken = (fallenSfx._playToken || 0) + 1;
         playMusic(bgm);
         startTime = Date.now();
         elapsedTime = 0;
@@ -753,6 +765,8 @@
         // Calling it would create a duplicate loop (double speed).
 
         gameOverOverlay.hidden = true;
+        kbCursorIdx = -1;
+        clearGameOverCursor();
 
         const jumpBtn = document.getElementById('mobile-jump-btn');
         if (jumpBtn) jumpBtn.style.display = 'block';
@@ -1119,7 +1133,56 @@
     document.addEventListener('keydown', handleKeyDown);
     document.addEventListener('keyup', handleKeyUp);
 
-    document.getElementById('sound-btn').addEventListener('click', toggleSound);
+    const soundBtnElement = document.getElementById('sound-btn');
+    soundBtnElement.addEventListener('click', toggleSound);
+    soundBtnElement.addEventListener('keydown', (e) => {
+        if (e.key === ' ' || e.key === 'Spacebar' || e.code === 'Space') {
+            e.preventDefault();
+        }
+    });
+    const CURSOR_W = 12, CURSOR_H = 16, CURSOR_GAP = 4;
+    const PANEL_BORDER = 16;
+    let kbCursorIdx = -1;
+
+    function setGameOverCursor(btn) {
+        const pr = gameOverPanel.getBoundingClientRect();
+        const br = btn.getBoundingClientRect();
+        gameOverCursorEl.style.left = (br.left - pr.left - PANEL_BORDER - CURSOR_GAP - CURSOR_W) + 'px';
+        gameOverCursorEl.style.top = (br.top - pr.top - PANEL_BORDER + (br.height - CURSOR_H) / 2) + 'px';
+        gameOverCursorEl.hidden = false;
+    }
+
+    function clearGameOverCursor() {
+        gameOverCursorEl.hidden = true;
+    }
+
+    gameOverBtns.forEach((btn, i) => {
+        btn.addEventListener('mouseenter', () => {
+            kbCursorIdx = i;
+            setGameOverCursor(btn);
+        });
+        btn.addEventListener('mouseleave', () => {
+            kbCursorIdx = -1;
+            clearGameOverCursor();
+        });
+    });
+
+    document.addEventListener('keydown', (e) => {
+        if (gameOverOverlay.hidden) return;
+        if (e.key === 'ArrowDown' || e.key === 'ArrowRight') {
+            e.preventDefault();
+            kbCursorIdx = kbCursorIdx < 0 ? 0 : (kbCursorIdx + 1) % gameOverBtns.length;
+            setGameOverCursor(gameOverBtns[kbCursorIdx]);
+        } else if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') {
+            e.preventDefault();
+            kbCursorIdx = kbCursorIdx < 0 ? gameOverBtns.length - 1 : (kbCursorIdx - 1 + gameOverBtns.length) % gameOverBtns.length;
+            setGameOverCursor(gameOverBtns[kbCursorIdx]);
+        } else if ((e.key === 'Enter' || e.key === ' ') && kbCursorIdx >= 0) {
+            e.preventDefault();
+            gameOverBtns[kbCursorIdx].click();
+        }
+    });
+
     document.getElementById('btn-continue').addEventListener('click', resetGame);
     document.getElementById('btn-home').addEventListener('click', () => { window.location.href = '../index.html'; });
 

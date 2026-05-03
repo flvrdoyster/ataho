@@ -2,7 +2,8 @@ body {
     display: flex;
     justify-content: center;
     margin: 0;
-    background-color: rgba(240, 240, 240, 1);
+    background-color: rgba(0, 0, 0, 1);
+    overflow-x: hidden;
 }
 
 canvas {
@@ -31,35 +32,57 @@ canvas {
 }
 
 #hud {
-    position: absolute;
-    top: 10px;
+    position: fixed;
+    top: 0;
     left: 50%;
     transform: translateX(-50%);
-    width: 25%;
+    width: 100%;
+    max-width: 960px;
     box-sizing: border-box;
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     align-items: center;
     padding: 4px 12px;
     color: white;
     font-size: 24px;
+    pointer-events: auto;
+}
+
+#hud-stats {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 #sound-btn {
-    position: absolute;
-    top: 10px;
-    right: 10px;
+    flex-shrink: 0;
     width: 50px;
     height: 50px;
-    font-size: 24px;
-    color: white;
     background: transparent;
+    border: none;
     cursor: pointer;
     pointer-events: auto;
     padding: 0;
     display: flex;
     align-items: center;
     justify-content: center;
+    outline: none;
+}
+
+#sound-btn:focus {
+    outline: none;
+    box-shadow: none;
+}
+
+#sound-btn img {
+    width: 28px;
+    height: 28px;
+    display: block;
+}
+
+#sound-btn.muted img {
+    filter: grayscale(100%) opacity(0.6);
 }
 
 #game-over-overlay {
@@ -77,37 +100,57 @@ canvas {
 }
 
 #game-over-panel {
+    position: relative;
+    padding-top: 20px;
     width: 38%;
     box-sizing: border-box;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 16px;
-    padding: 20px 40px;
+    gap: 4px;
     color: white;
 }
 
+#game-over-cursor {
+    position: absolute;
+    width: 12px;
+    height: 16px;
+    image-rendering: pixelated;
+    pointer-events: none;
+}
+
 #game-over-title {
-    font-size: 48px;
+    font-size: 30px;
     margin: 0;
+    padding-bottom: 4px;
 }
 
 #game-over-time,
 #game-over-dist {
-    font-size: 30px;
+    font-size: 24px;
     color: #FFD700;
     margin: 0;
 }
 
+#game-over-actions {
+    display: flex;
+    flex-direction: row;
+    gap: 32px;
+    margin-top: 12px;
+}
+
 #btn-continue,
 #btn-home {
+    flex: 1;
     font-family: 'Raster Forge', sans-serif;
-    font-size: 24px;
+    font-size: 20px;
     color: white;
     background: transparent;
     border: none;
+    border-radius: 0;
+    outline: none;
+    padding: 10px 2px;
     cursor: pointer;
-    padding: 10px 20px;
 }
 
 #mobile-jump-btn {
