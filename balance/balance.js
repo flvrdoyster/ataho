@@ -1,9 +1,8 @@
 (function () {
     if (window.ATAHO_BALANCE_GAME_LOADED) return;
     window.ATAHO_BALANCE_GAME_LOADED = true;
-    //===========================================
-    // CANVAS SETUP
-    //===========================================
+
+    // --- 캔버스 ---
     const canvas = document.getElementById('gameCanvas');
     const ctx = canvas.getContext('2d');
     canvas.width = 960;
@@ -12,64 +11,79 @@
     // Disable smoothing AFTER sizing (sizing resets context)
     ctx.imageSmoothingEnabled = false;
 
-    //===========================================
-    // GAME CONFIGURATION
-    //===========================================
-
+    // --- 상수 ---
     const TILE_SIZE = 16;
     const KEY_REPEAT_DELAY = 18;    // dt frames before auto-repeat begins
     const KEY_REPEAT_INTERVAL = 6;  // dt frames between repeated steps
 
-    // PHYSICS & DIFFICULTY
+    // — CONFIG: 게임 수치 조정은 여기서 —
     const CONFIG = {
-        PHYSICS: {
-            SWAY_INTENSITY_IDLE: 0.02,   // Base intensity of directional sway
-            SWAY_INTENSITY_WALK: 0.01,   // Reduced sway when walking
-            PLAYER_CONTROL_FORCE: 0.8,   // Force applied by player input
-            FRICTION: 0.92,              // Damping factor (higher = more slippery/momentum)
-            MAX_VELOCITY: 3.5,           // Maximum speed the character can tilt
-            INERTIA_CONSTANT: 0.001,     // Force added based on current tilt
-            GRAVITY: 0.4,                // Gravity applied during jumps
-            FATIGUE_RATE: 0.002          // Rate at which instability increases
+        // 밸런스 물리
+        BALANCE: {
+            INPUT_FORCE: 0.8,        // 좌우 입력 시 가해지는 힘
+            DAMPING: 0.92,           // 속도 감쇠율 (낮을수록 빠르게 멈춤 / 높을수록 관성이 강함)
+            MAX_SPEED: 3.5,          // 기울기 속도 상한
+            THRESHOLDS: { SLIGHT: 20, MEDIUM: 55, LARGE: 75, MAX: 100 }
         },
+        // 외력(스웨이)
+        SWAY: {
+            INTENSITY_IDLE: 0.15,    // 정지 시 스웨이 강도
+            INTENSITY_WALK: 0.15,    // 걷는 중 스웨이 강도
+            LERP_SPEED: 0.035,       // 목표 방향 추종 속도 (높을수록 방향 전환이 즉각적)
+            CHANGE_PROB: 0.5,        // 방향 전환 확률 (인터벌 경과 후 매 프레임 시도)
+            INTERVAL_MIN: 40,        // 방향 전환 최소 주기 (프레임)
+            INTERVAL_MAX: 120,       // 방향 전환 최대 주기 (프레임)
+            JITTER: 0.015            // 미세 랜덤 떨림 (매 프레임 ±JITTER/2)
+        },
+        // 거리 기반 난이도 상승
+        DIFFICULTY: {
+            RAMP: 0.001,             // 이동 거리(px)당 스웨이 배율 증가량
+            CAP: 2.5                 // 스웨이 배율 상한 (1.0에서 시작)
+        },
+        // 점프
         JUMP: {
-            CHARGE_TIME: 30,             // Frames required to charge each jump level (hold space)
-            JUMP_COOLDOWN: 20,           // Frames to wait before jumping again
-            DISTANCES: [2 * TILE_SIZE, 3 * TILE_SIZE, 4 * TILE_SIZE], // Forward distance per jump level
-            VELOCITIES: [2, 3, 4],       // Vertical jump velocity (height) for each level
-            LANDING_PENALTIES: [5, 10, 15] // Instability added to balance upon landing
+            GRAVITY: 0.4,            // 중력 가속도
+            CHARGE_TIME: 30,         // 점프 레벨당 차징 시간 (프레임, 길게 누를수록 레벨 상승)
+            COOLDOWN: 20,            // 착지 후 다음 점프까지 대기 시간 (프레임)
+            DISTANCES: [2 * TILE_SIZE, 3 * TILE_SIZE, 4 * TILE_SIZE], // 점프 레벨별 전진 거리 (px)
+            VELOCITIES: [2, 3, 4],   // 점프 레벨별 초기 수직 속도
+            LANDING_PENALTIES: [5, 10, 15] // 착지 시 밸런스 충격 (레벨별)
         },
+        // 장애물 생성
         OBSTACLES: {
-            START_DELAY: 4 * TILE_SIZE,  // Initial distance before the first obstacle appears
-            MIN_GAP: TILE_SIZE,           // Minimum gap between obstacle groups
-            // Each pattern is an array of group sizes. Groups are tight (no intra-gap).
-            // A 1T gap is inserted between groups automatically.
+            START_DELAY: 4 * TILE_SIZE,  // 게임 시작 후 첫 장애물까지의 거리 (px)
+            MIN_GAP: 2 * TILE_SIZE,          // 장애물 그룹 간 최소 간격
             PATTERNS: [
                 [1],
-                [2],
                 [1, 1],
-                [3],
+                [1, 1, 1],
+                [2],
                 [2, 2],
+                [2, 2, 2],
                 [1, 2],
+                [2, 1, 2],
+                [3],
                 [3, 1],
                 [3, 2],
                 [3, 3],
             ]
         },
         HITBOXES: {
-            CHAR: { x: 34, y: 64, w: 12, h: 12 }, // Character hitbox relative to sprite
-            OBS: { x: 26, y: 0, w: 16, h: 16 }    // Obstacle hitbox relative to sprite
+            CHAR: { x: 34, y: 64, w: 12, h: 12 },
+            OBS:  { x: 26, y: 0,  w: 16, h: 16 }
         },
         SPEED: {
-            GAME: 2                      // Global game speed (pixels per frame)
+            GAME: 2                  // 게임 스크롤 속도 (px/프레임)
         },
         DEBUG: {
-            SHOW_HITBOX: false,          // Toggle to show/hide debug hitboxes
-            MUTE: false                  // Toggle to mute all audio
+            SHOW_HITBOX: false,
+            SHOW_STATS: false,
+            MUTE: false
         }
     };
 
-    const BALANCE_THRESHOLD = { SLIGHT: 20, MEDIUM: 55, LARGE: 80, MAX: 100 };
+    // BALANCE_THRESHOLD는 기존 코드 호환용 alias
+    const BALANCE_THRESHOLD = CONFIG.BALANCE.THRESHOLDS;
 
     const STATE = {
         IDLE: 'idle',
@@ -86,27 +100,59 @@
     const FALLING_OFFSET_X = 20;
     const FALLEN_OFFSET_Y = 13;
 
+    // Each animation is an array of {x, y} frame objects (sprite sheet coordinates).
+    // jumping_charge is indexed by jumpLevel [0..2].
+    const ANIMATIONS = {
+        balanced: [{ x: 0, y: 0 }, { x: 80, y: 0 }, { x: 160, y: 0 }],
+        jumping_charge: [[{ x: 240, y: 0 }], [{ x: 480, y: 192 }], [{ x: 480, y: 288 }]],
+        jumping: [{ x: 320, y: 0 }],
+        falling_left: [{ x: 400, y: 0 }],
+        falling_right: [{ x: 480, y: 0 }],
+        fallen: [{ x: 480, y: 96 }],
+        leaning_left_slight: [{ x: 0, y: 96 }, { x: 80, y: 96 }, { x: 160, y: 96 }],
+        leaning_left_medium: [{ x: 0, y: 192 }, { x: 80, y: 192 }, { x: 160, y: 192 }],
+        leaning_left_large: [{ x: 0, y: 288 }, { x: 80, y: 288 }, { x: 160, y: 288 }],
+        leaning_right_slight: [{ x: 240, y: 96 }, { x: 320, y: 96 }, { x: 400, y: 96 }],
+        leaning_right_medium: [{ x: 240, y: 192 }, { x: 320, y: 192 }, { x: 400, y: 192 }],
+        leaning_right_large: [{ x: 240, y: 288 }, { x: 320, y: 288 }, { x: 400, y: 288 }],
+    };
+
+    const walkAnimationSequence = [0, 1, 2, 1];
+
     const TOUCH_DEADZONE = 0.05;
     const TOUCH_UPPER_ZONE = 0.25;
     const TOUCH_LOWER_ZONE = 0.75;
     const BUTTON_WIDTH = 200;
     const BUTTON_HEIGHT = 60;
+    const SOUND_BTN_SIZE = 50;
 
-    //===========================================
-    // GAME STATE
-    //===========================================
-    let distanceTraveled = 0;
-    let isGameOver = false;
-    let gameOverScreenTimer = 0;      // isGameOver 후 화면 표시까지의 딜레이 카운터
     const GAME_OVER_SCREEN_DELAY = 90; // 프레임 수 (60fps 기준 1초)
 
+    // --- 게임 상태 ---
+    let distanceTraveled = 0;
+    let isGameOver = false;
+    let soundEnabled = true;
+    let gameOverScreenTimer = 0;      // isGameOver 후 화면 표시까지의 딜레이 카운터
     let startTime = 0;
     let elapsedTime = 0; // in milliseconds
     let lastTimestamp = 0;
-
     let obstacles = [];
     let nextObstacleY = CONFIG.OBSTACLES.START_DELAY;
+    let isMouseDown = false;
 
+    // --- 에셋 ---
+    const imagePaths = {
+        spriteSheet: 'balance_char.png',
+        tileset: '../world/maps/abyss/assets/abyss_tile.png',
+        beamStart: 'beam_start.png',
+        beamMid: 'beam_mid.png',
+        beamSpike: 'beam_spike.png'
+    };
+
+    const images = {};
+    let mapTileGrid = [];
+
+    // --- 오디오 ---
     let bgm = null;
     let overBgm = null;
     let fallenSfx = null;  // HTMLAudioElement (1회성, file:// 환경 호환)
@@ -118,46 +164,27 @@
     let _audioUnlocked = false;
     let _bgmPending = false; // 로드 완료 후 제스처 전이면 true → unlock 시 재생
 
-    function getAudioContext() {
-        if (!audioContext) {
-            audioContext = new (window.AudioContext || window.webkitAudioContext)();
-        }
-        return audioContext;
-    }
+    // --- 입력 상태 ---
+    const inputState = {};
 
-    function unlockAudio() {
-        if (_audioUnlocked) return;
-        _audioUnlocked = true;
-        const actx = getAudioContext();
-        // iOS: resume() must be called synchronously inside gesture handler
-        const resumePromise = (actx.state !== 'running') ? actx.resume() : Promise.resolve();
-        // Pre-warm audio elements so iOS unblocks them
-        resumePromise.then(() => {
-            [bgm, overBgm, fallenSfx].forEach(el => {
-                if (el) el.play().then(() => el.pause()).catch(() => { });
-            });
-            // 로드 완료 후 제스처를 기다리던 경우 BGM 재생
-            if (_bgmPending) {
-                _bgmPending = false;
-                playMusic(bgm);
-            }
-        });
-        // 제스처 이후 SFX 디코딩 실행
-        _decodePending();
-    }
-
-    const imagePaths = {
-        spriteSheet: 'balance_char.png',
-        tileset: '../world/maps/abyss/assets/abyss_tile.png',
-        beamStart: 'beam_start.png',
-        beamMid: 'beam_mid.png',
-        beamSpike: 'beam_spike.png'
+    // --- UI 버튼 ---
+    const buttons = {
+        continue: { x: 0, y: 0, width: BUTTON_WIDTH, height: BUTTON_HEIGHT, text: 'Continue?' },
+        exit: { x: 0, y: 0, width: BUTTON_WIDTH, height: BUTTON_HEIGHT, text: 'Home' },
+        sound: { x: canvas.width - SOUND_BTN_SIZE - 10, y: 10, width: SOUND_BTN_SIZE, height: SOUND_BTN_SIZE }
     };
 
-    let mapTileGrid = [];
+    // --- 유틸 ---
+    function clamp(value, min, max) {
+        return Math.max(min, Math.min(max, value));
+    }
 
-    const images = {};
+    function isClickInsideButton(clickX, clickY, button) {
+        return clickX >= button.x && clickX <= button.x + button.width &&
+            clickY >= button.y && clickY <= button.y + button.height;
+    }
 
+    // --- 에셋 로딩 ---
     function loadImages() {
         const promises = Object.keys(imagePaths).map(key => {
             return new Promise((resolve, reject) => {
@@ -180,6 +207,14 @@
         });
     }
 
+    // --- 오디오 시스템 ---
+    function getAudioContext() {
+        if (!audioContext) {
+            audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        }
+        return audioContext;
+    }
+
     // Audio Loading — loadeddata + timeout fallback
     // canplaythrough는 모바일에서 네트워크 상태에 따라 매우 늦게 발화하거나 안 됨
     function loadAudioFile(src, loop, volume) {
@@ -187,6 +222,7 @@
             const audio = new Audio();
             audio.loop = loop;
             audio.volume = volume;
+            audio.muted = true;
             audio.preload = 'auto';
 
             let resolved = false;
@@ -247,8 +283,38 @@
         });
     }
 
+    function unlockAudio() {
+        if (_audioUnlocked) return;
+        _audioUnlocked = true;
+        const actx = getAudioContext();
+        // iOS: resume() must be called synchronously inside gesture handler
+        const resumePromise = (actx.state !== 'running') ? actx.resume() : Promise.resolve();
+        // Pre-warm audio elements so iOS unblocks them (bgm 제외: 바로 재생할 경우 pause 콜백과 충돌)
+        resumePromise.then(() => {
+            const toPrewarm = _bgmPending ? [overBgm, fallenSfx] : [bgm, overBgm, fallenSfx];
+            toPrewarm.forEach(el => {
+                if (el) el.play().then(() => el.pause()).catch(() => { });
+            });
+            // 로드 완료 후 제스처를 기다리던 경우 BGM 재생
+            if (_bgmPending) {
+                _bgmPending = false;
+                playMusic(bgm);
+            }
+        });
+        // 제스처 이후 SFX 디코딩 실행
+        _decodePending();
+    }
+
+    function toggleSound() {
+        soundEnabled = !soundEnabled;
+        const muted = !soundEnabled;
+        if (bgm) bgm.muted = muted;
+        if (overBgm) overBgm.muted = muted;
+        if (fallenSfx) fallenSfx.muted = muted;
+    }
+
     function playSfx(id) {
-        if (CONFIG.DEBUG.MUTE) return;
+        if (CONFIG.DEBUG.MUTE || !soundEnabled) return;
         const buffer = sfxBuffers[id];
         if (!buffer) return;
         const ctx = getAudioContext();
@@ -263,7 +329,8 @@
     }
 
     function playMusic(audio) {
-        if (!audio || CONFIG.DEBUG.MUTE) return;
+        if (!audio || CONFIG.DEBUG.MUTE || !soundEnabled) return;
+        audio.muted = false;
         audio.currentTime = 0;
         getAudioContext().resume().then(() => {
             audio.play().catch(e => console.log('BGM play failed:', e));
@@ -284,29 +351,17 @@
         ]);
     }
 
-    //===========================================
-    // SPRITES & GAME DATA
-    //===========================================
-    // Each animation is an array of {x, y} frame objects (sprite sheet coordinates).
-    // jumping_charge is indexed by jumpLevel [0..2].
-    const ANIMATIONS = {
-        balanced: [{ x: 0, y: 0 }, { x: 80, y: 0 }, { x: 160, y: 0 }],
-        jumping_charge: [[{ x: 240, y: 0 }], [{ x: 480, y: 192 }], [{ x: 480, y: 288 }]],
-        jumping: [{ x: 320, y: 0 }],
-        falling_left: [{ x: 400, y: 0 }],
-        falling_right: [{ x: 480, y: 0 }],
-        fallen: [{ x: 480, y: 96 }],
-        leaning_left_slight: [{ x: 0, y: 96 }, { x: 80, y: 96 }, { x: 160, y: 96 }],
-        leaning_left_medium: [{ x: 0, y: 192 }, { x: 80, y: 192 }, { x: 160, y: 192 }],
-        leaning_left_large: [{ x: 0, y: 288 }, { x: 80, y: 288 }, { x: 160, y: 288 }],
-        leaning_right_slight: [{ x: 240, y: 96 }, { x: 320, y: 96 }, { x: 400, y: 96 }],
-        leaning_right_medium: [{ x: 240, y: 192 }, { x: 320, y: 192 }, { x: 400, y: 192 }],
-        leaning_right_large: [{ x: 240, y: 288 }, { x: 320, y: 288 }, { x: 400, y: 288 }],
-    };
+    // --- 맵 ---
+    function buildMapGrid() {
+        if (!window.MAP_DATA || !window.MAP_DATA.tiles) return;
+        mapTileGrid = [];
+        window.MAP_DATA.tiles.forEach(({ gx, gy, tx, ty }) => {
+            if (!mapTileGrid[gy]) mapTileGrid[gy] = [];
+            mapTileGrid[gy][gx] = { tx, ty };
+        });
+    }
 
-    const walkAnimationSequence = [0, 1, 2, 1];
-    const inputState = {};
-
+    // --- 플레이어 ---
     const ataho = {
         x: canvas.width / 2 - (SPRITE_WIDTH) / 2,
         y: canvas.height / 2 - (SPRITE_HEIGHT) / 2,
@@ -322,11 +377,10 @@
         swayCurrent: 0,
         swayTarget: 0,
         swayTimer: 0,
-        swayChangeInterval: 120, // Frames between potential sway direction changes
+        swayChangeInterval: 80, // Frames between potential sway direction changes
 
         fallDirection: null,
         fallTimer: 0,
-        balanceTimer: 0,
 
         stepRemaining: 0,
         keyRepeatTimer: 0,
@@ -364,9 +418,9 @@
 
         updateJump(dt) {
             this.visualY -= this.jumpVelocityY * dt;
-            this.jumpVelocityY -= CONFIG.PHYSICS.GRAVITY * dt;
+            this.jumpVelocityY -= CONFIG.JUMP.GRAVITY * dt;
 
-            const airTime = (2 * CONFIG.JUMP.VELOCITIES[this.jumpLevel]) / CONFIG.PHYSICS.GRAVITY;
+            const airTime = (2 * CONFIG.JUMP.VELOCITIES[this.jumpLevel]) / CONFIG.JUMP.GRAVITY;
             const currentJumpSpeed = CONFIG.JUMP.DISTANCES[this.jumpLevel] / airTime;
 
             distanceTraveled += currentJumpSpeed * dt;
@@ -375,7 +429,7 @@
                 this.visualY = 0;
                 this.actionState = STATE.IDLE;
                 this.jumpVelocityY = 0;
-                this.jumpCooldown = CONFIG.JUMP.JUMP_COOLDOWN;
+                this.jumpCooldown = CONFIG.JUMP.COOLDOWN;
 
                 // Snap to exact tile distance — decouples collision from floating point drift in physics
                 const exactDist = this.jumpStartDist + CONFIG.JUMP.DISTANCES[this.jumpLevel];
@@ -426,42 +480,40 @@
         updatePhysics(dt) {
             let inputForce = 0;
             if (typeof inputState.touchForce === 'number' && inputState.touchForce !== 0) {
-                inputForce = inputState.touchForce * CONFIG.PHYSICS.PLAYER_CONTROL_FORCE * 1.5;
+                inputForce = inputState.touchForce * CONFIG.BALANCE.INPUT_FORCE * 1.5;
             } else if (inputState.left) {
-                inputForce = -CONFIG.PHYSICS.PLAYER_CONTROL_FORCE;
+                inputForce = -CONFIG.BALANCE.INPUT_FORCE;
             } else if (inputState.right) {
-                inputForce = CONFIG.PHYSICS.PLAYER_CONTROL_FORCE;
+                inputForce = CONFIG.BALANCE.INPUT_FORCE;
             }
 
-            if (Math.abs(this.balanceLevel) < BALANCE_THRESHOLD.SLIGHT) {
-                this.balanceTimer += dt;
-            } else {
-                this.balanceTimer = Math.max(0, this.balanceTimer - 2 * dt);
-            }
-
-            const instabilityMultiplier = 1 + (this.balanceTimer * CONFIG.PHYSICS.FATIGUE_RATE);
-            const baseSwayIntensity = (this.actionState === STATE.WALKING) ? CONFIG.PHYSICS.SWAY_INTENSITY_WALK : CONFIG.PHYSICS.SWAY_INTENSITY_IDLE;
+            const instabilityMultiplier = Math.min(
+                1 + (Math.max(0, distanceTraveled) * CONFIG.DIFFICULTY.RAMP),
+                CONFIG.DIFFICULTY.CAP
+            );
+            const baseSwayIntensity = (this.actionState === STATE.WALKING) ? CONFIG.SWAY.INTENSITY_WALK : CONFIG.SWAY.INTENSITY_IDLE;
 
             this.swayTimer += dt;
             if (this.swayTimer > this.swayChangeInterval) {
-                if (Math.random() < 0.3) {
+                if (Math.random() < CONFIG.SWAY.CHANGE_PROB) {
                     this.swayTarget = (Math.random() - 0.5) * 2;
-                    this.swayChangeInterval = 60 + Math.random() * 120;
+                    this.swayChangeInterval = CONFIG.SWAY.INTERVAL_MIN + Math.random() * (CONFIG.SWAY.INTERVAL_MAX - CONFIG.SWAY.INTERVAL_MIN);
                     this.swayTimer = 0;
                 }
             }
-            this.swayCurrent += (this.swayTarget - this.swayCurrent) * 0.02 * dt;
+            this.swayCurrent += (this.swayTarget - this.swayCurrent) * CONFIG.SWAY.LERP_SPEED * dt;
 
             const directionalSway = this.swayCurrent * baseSwayIntensity * instabilityMultiplier;
-            const randomJitter = (Math.random() - 0.5) * 0.005;
+            const randomJitter = (Math.random() - 0.5) * CONFIG.SWAY.JITTER;
 
-            const inertiaForce = this.balanceLevel * CONFIG.PHYSICS.INERTIA_CONSTANT;
+            this._inputForce = inputForce;
+            this._swayForce = directionalSway;
 
             // Apply Forces (scale additive forces by dt; friction uses pow for correct per-dt decay)
-            this.balanceVelocity += (inputForce + directionalSway + randomJitter + inertiaForce) * dt;
-            this.balanceVelocity *= Math.pow(CONFIG.PHYSICS.FRICTION, dt);
+            this.balanceVelocity += (inputForce + directionalSway + randomJitter) * dt;
+            this.balanceVelocity *= Math.pow(CONFIG.BALANCE.DAMPING, dt);
 
-            this.balanceVelocity = Math.max(-CONFIG.PHYSICS.MAX_VELOCITY, Math.min(CONFIG.PHYSICS.MAX_VELOCITY, this.balanceVelocity));
+            this.balanceVelocity = Math.max(-CONFIG.BALANCE.MAX_SPEED, Math.min(CONFIG.BALANCE.MAX_SPEED, this.balanceVelocity));
 
             this.balanceLevel += this.balanceVelocity * dt;
 
@@ -530,7 +582,8 @@
             isGameOver = true;
             gameOverScreenTimer = 0;
             stopMusic(bgm);
-            if (fallenSfx && !CONFIG.DEBUG.MUTE) {
+            if (fallenSfx && !CONFIG.DEBUG.MUTE && soundEnabled) {
+                fallenSfx.muted = false;
                 fallenSfx.currentTime = 0;
                 getAudioContext().resume().then(() => fallenSfx.play().catch(() => { }));
             }
@@ -573,7 +626,6 @@
                 return (playerTop < obsBottom && playerBottom > obsTop);
             });
         },
-
 
         draw() {
             let anim = ANIMATIONS.balanced;
@@ -646,6 +698,7 @@
         }
     };
 
+    // --- 게임 로직 ---
     function resetGame() {
         isGameOver = false;
         gameOverScreenTimer = 0;
@@ -661,11 +714,10 @@
         ataho.leanState = 'balanced';
 
         ataho.fallTimer = 0;
-        ataho.balanceTimer = 0;
         ataho.swayTarget = 0;
         ataho.swayCurrent = 0;
         ataho.swayTimer = 0;
-        ataho.swayChangeInterval = 120;
+        ataho.swayChangeInterval = 80;
         ataho.visualY = 0;
         ataho.stepRemaining = 0;
         ataho.keyRepeatTimer = 0;
@@ -687,197 +739,34 @@
         if (jumpBtn) jumpBtn.style.display = 'block';
     }
 
-    function isClickInsideButton(clickX, clickY, button) {
-        return clickX >= button.x && clickX <= button.x + button.width &&
-            clickY >= button.y && clickY <= button.y + button.height;
+    function generateObstacles() {
+        if (!images.beamSpike) return;
+        const spikeHeight = images.beamSpike.height;
+        const generateHorizon = distanceTraveled + canvas.height * 2;
+        while (nextObstacleY < generateHorizon) {
+            const pattern = CONFIG.OBSTACLES.PATTERNS[Math.floor(Math.random() * CONFIG.OBSTACLES.PATTERNS.length)];
+            pattern.forEach((groupCount, groupIdx) => {
+                for (let i = 0; i < groupCount; i++) {
+                    obstacles.push({ y: nextObstacleY, height: spikeHeight });
+                    nextObstacleY += spikeHeight;
+                }
+                if (groupIdx < pattern.length - 1) nextObstacleY += TILE_SIZE;
+            });
+            nextObstacleY += CONFIG.OBSTACLES.MIN_GAP + Math.floor(Math.random() * 8) * TILE_SIZE;
+        }
+
+        if (obstacles.length > 0) {
+            const firstScreenY = canvas.height / 2 - distanceTraveled + obstacles[0].y;
+            if (firstScreenY + obstacles[0].height < -100) obstacles.shift();
+        }
     }
 
-    function clamp(value, min, max) {
-        return Math.max(min, Math.min(max, value));
+    function gameUpdate(dt) {
+        ataho.update(dt);
+        generateObstacles();
     }
 
-    const handleKeyDown = (e) => {
-        if (e.repeat || isGameOver) return;
-        switch (e.code) {
-            case 'KeyS':
-            case 'ArrowDown':
-                inputState.down = true;
-                inputState.downHeld = true;
-                break;
-            case 'KeyW':
-            case 'ArrowUp':
-                inputState.up = true;
-                break;
-            case 'KeyA':
-            case 'ArrowLeft':
-                inputState.left = true;
-                break;
-            case 'KeyD':
-            case 'ArrowRight':
-                inputState.right = true;
-                break;
-            case 'Space':
-                inputState.space = true;
-                break;
-        }
-    };
-
-    const handleKeyUp = (e) => {
-        if (isGameOver) return;
-        switch (e.code) {
-            case 'KeyS':
-            case 'ArrowDown':
-                inputState.down = false;
-                inputState.downHeld = false;
-                break;
-            case 'KeyW':
-            case 'ArrowUp':
-                inputState.up = false;
-                break;
-            case 'KeyA':
-            case 'ArrowLeft':
-                inputState.left = false;
-                break;
-            case 'KeyD':
-            case 'ArrowRight':
-                inputState.right = false;
-                break;
-            case 'Space':
-                inputState.space = false;
-                break;
-        }
-    };
-
-    const handleCanvasClick = (e) => {
-        if (!isGameOver) return;
-
-        const rect = canvas.getBoundingClientRect();
-        const scaleX = canvas.width / rect.width;
-        const scaleY = canvas.height / rect.height;
-
-        const clickX = (e.clientX - rect.left) * scaleX;
-        const clickY = (e.clientY - rect.top) * scaleY;
-
-        if (isClickInsideButton(clickX, clickY, buttons.continue)) {
-            resetGame();
-        } else if (isClickInsideButton(clickX, clickY, buttons.exit)) {
-            window.location.href = '../index.html';
-        }
-    };
-
-    const handleMouseMove = (e) => {
-        if (!isGameOver) {
-            canvas.style.cursor = 'default';
-            return;
-        }
-
-        const rect = canvas.getBoundingClientRect();
-        const scaleX = canvas.width / rect.width;
-        const scaleY = canvas.height / rect.height;
-
-        const mouseX = (e.clientX - rect.left) * scaleX;
-        const mouseY = (e.clientY - rect.top) * scaleY;
-
-        if (isClickInsideButton(mouseX, mouseY, buttons.continue) ||
-            isClickInsideButton(mouseX, mouseY, buttons.exit)) {
-            canvas.style.cursor = 'pointer';
-        } else {
-            canvas.style.cursor = 'default';
-        }
-    };
-
-    const handleTouchEnd = (e) => {
-        e.preventDefault();
-        inputState.touchForce = 0;
-        inputState.up = false;
-        inputState.down = false;
-        inputState.downHeld = false;
-    };
-
-    const handleTouch = (e) => {
-        e.preventDefault();
-
-        // touches 배열이 비어있으면 (touchend/touchcancel 오발) 무시
-        if (!e.touches || e.touches.length === 0) return;
-
-        if (isGameOver && e.type === 'touchstart') {
-            const rect = canvas.getBoundingClientRect();
-            const scaleX = canvas.width / rect.width;
-            const scaleY = canvas.height / rect.height;
-
-            const touchX = (e.touches[0].clientX - rect.left) * scaleX;
-            const touchY = (e.touches[0].clientY - rect.top) * scaleY;
-
-            if (isClickInsideButton(touchX, touchY, buttons.continue)) {
-                resetGame();
-            } else if (isClickInsideButton(touchX, touchY, buttons.exit)) {
-                window.location.href = '../index.html';
-            }
-            return;
-        }
-
-        if (isGameOver) return;
-
-        const touchX = e.touches[0].clientX;
-        const touchY = e.touches[0].clientY;
-
-        const centerX = window.innerWidth / 2;
-        const maxDistX = window.innerWidth / 2;
-        let distRatio = clamp((touchX - centerX) / maxDistX, -1, 1);
-
-        if (Math.abs(distRatio) < TOUCH_DEADZONE) distRatio = 0;
-
-        inputState.touchForce = distRatio;
-
-        const screenHeight = window.innerHeight;
-
-        inputState.up = false;
-        inputState.down = false;
-        inputState.downHeld = false;
-
-        if (touchY < screenHeight * TOUCH_UPPER_ZONE) {
-            inputState.up = true;
-        } else if (touchY > screenHeight * TOUCH_LOWER_ZONE) {
-            inputState.downHeld = true;
-            if (e.type === 'touchstart') inputState.down = true;
-        }
-    };
-
-    let isMouseDown = false;
-
-    const handleMouseDown = (e) => {
-        isMouseDown = true;
-        handleTouch(e);
-    };
-
-    const handleMouseUp = (e) => {
-        isMouseDown = false;
-        handleTouchEnd(e);
-    };
-
-    const handleMouseMoveTouch = (e) => {
-        if (!isMouseDown) return;
-        handleTouch(e);
-    };
-
-    const buttons = {
-        continue: { x: 0, y: 0, width: BUTTON_WIDTH, height: BUTTON_HEIGHT, text: 'Continue?' },
-        exit: { x: 0, y: 0, width: BUTTON_WIDTH, height: BUTTON_HEIGHT, text: 'Exit' }
-    };
-
-    //===========================================
-    // RENDER HELPERS
-    //===========================================
-
-    function buildMapGrid() {
-        if (!window.MAP_DATA || !window.MAP_DATA.tiles) return;
-        mapTileGrid = [];
-        window.MAP_DATA.tiles.forEach(({ gx, gy, tx, ty }) => {
-            if (!mapTileGrid[gy]) mapTileGrid[gy] = [];
-            mapTileGrid[gy][gx] = { tx, ty };
-        });
-    }
-
+    // --- 렌더링 ---
     function drawBackgroundTiles() {
         if (!images.tileset || !mapTileGrid.length) return;
 
@@ -906,33 +795,6 @@
                 );
             }
         }
-    }
-
-    function generateObstacles() {
-        if (!images.beamSpike) return;
-        const spikeHeight = images.beamSpike.height;
-        const generateHorizon = distanceTraveled + canvas.height * 2;
-        while (nextObstacleY < generateHorizon) {
-            const pattern = CONFIG.OBSTACLES.PATTERNS[Math.floor(Math.random() * CONFIG.OBSTACLES.PATTERNS.length)];
-            pattern.forEach((groupCount, groupIdx) => {
-                for (let i = 0; i < groupCount; i++) {
-                    obstacles.push({ y: nextObstacleY, height: spikeHeight });
-                    nextObstacleY += spikeHeight;
-                }
-                if (groupIdx < pattern.length - 1) nextObstacleY += TILE_SIZE;
-            });
-            nextObstacleY += CONFIG.OBSTACLES.MIN_GAP + Math.floor(Math.random() * 8) * TILE_SIZE;
-        }
-
-        if (obstacles.length > 0) {
-            const firstScreenY = canvas.height / 2 - distanceTraveled + obstacles[0].y;
-            if (firstScreenY + obstacles[0].height < -100) obstacles.shift();
-        }
-    }
-
-    function gameUpdate(dt) {
-        ataho.update(dt);
-        generateObstacles();
     }
 
     function drawBeam() {
@@ -1001,6 +863,7 @@
         }
     }
 
+    // --- HUD / UI ---
     function buildStats() {
         const totalSeconds = Math.floor(elapsedTime / 1000);
         const minutes = Math.floor(totalSeconds / 60);
@@ -1029,6 +892,28 @@
         ctx.textBaseline = 'top';
         ctx.fillText(timeText, canvas.width / 2, boxY + padding);
         ctx.fillText(distanceText, canvas.width / 2, boxY + padding + 30);
+
+        drawSoundButton();
+    }
+
+    function drawSoundButton() {
+        const btn = buttons.sound;
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
+        ctx.beginPath();
+        ctx.roundRect(btn.x, btn.y, btn.width, btn.height, 5);
+        ctx.fill();
+
+        ctx.strokeStyle = 'white';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.roundRect(btn.x, btn.y, btn.width, btn.height, 5);
+        ctx.stroke();
+
+        ctx.font = '24px sans-serif';
+        ctx.fillStyle = 'white';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(soundEnabled ? '🔊' : '🔇', btn.x + btn.width / 2, btn.y + btn.height / 2);
     }
 
     function drawButton(btn) {
@@ -1070,10 +955,250 @@
         drawButton(buttons.exit);
     }
 
-    //===========================================
-    // MAIN LOOP
-    //===========================================
+    // --- 디버그 패널 ---
+    let _debugPanel = null;
 
+    function createDebugPanel() {
+        _debugPanel = document.createElement('pre');
+        _debugPanel.id = 'debug-stats';
+        Object.assign(_debugPanel.style, {
+            position: 'fixed',
+            top: '10px',
+            right: '10px',
+            background: 'rgba(0,0,0,0.75)',
+            color: '#0f0',
+            font: '12px/1.6 monospace',
+            padding: '10px 14px',
+            borderRadius: '6px',
+            pointerEvents: 'none',
+            zIndex: '9999',
+            whiteSpace: 'pre',
+            minWidth: '220px'
+        });
+        document.body.appendChild(_debugPanel);
+    }
+
+    function updateDebugPanel() {
+        if (!_debugPanel) return;
+        const instability = Math.min(
+            1 + (Math.max(0, distanceTraveled) * CONFIG.DIFFICULTY.RAMP),
+            CONFIG.DIFFICULTY.CAP
+        ).toFixed(3);
+
+        const bar = (val, max, width = 20) => {
+            const pct = Math.abs(val) / max;
+            const filled = Math.round(pct * width);
+            const dir = val >= 0 ? '>' : '<';
+            return dir.repeat(filled).padEnd(width, '·');
+        };
+
+        const lines = [
+            `state        ${ataho.actionState}`,
+            `lean         ${ataho.leanState}`,
+            ``,
+            `balance      ${ataho.balanceLevel.toFixed(2).padStart(7)} / ${CONFIG.BALANCE.THRESHOLDS.MAX}`,
+            `             [${bar(ataho.balanceLevel, CONFIG.BALANCE.THRESHOLDS.MAX)}]`,
+            `velocity     ${ataho.balanceVelocity.toFixed(3).padStart(7)}`,
+            ``,
+            `inputForce   ${(ataho._inputForce ?? 0).toFixed(3).padStart(7)}`,
+            `swayForce    ${(ataho._swayForce ?? 0).toFixed(4).padStart(7)}`,
+            `swayCurrent  ${ataho.swayCurrent.toFixed(3).padStart(7)}`,
+            `swayTarget   ${ataho.swayTarget.toFixed(3).padStart(7)}`,
+            `swayNext     ${Math.max(0, ataho.swayChangeInterval - ataho.swayTimer).toFixed(0).padStart(4)}f`,
+            ``,
+            `instability  ${instability}x`,
+            `distance     ${(distanceTraveled / 100).toFixed(1)}m`,
+        ];
+
+        if (ataho.actionState === STATE.FALLING) {
+            lines.push(`fallTimer    ${ataho.fallTimer.toFixed(1).padStart(4)} / 30`);
+        }
+        if (ataho.actionState === STATE.JUMP_CHARGING) {
+            lines.push(`chargeTimer  ${ataho.jumpChargeTimer.toFixed(0).padStart(4)}f  lv${ataho.jumpLevel}`);
+        }
+        if (ataho.actionState === STATE.JUMPING) {
+            lines.push(`jumpVelY     ${ataho.jumpVelocityY.toFixed(3).padStart(7)}`);
+            lines.push(`visualY      ${ataho.visualY.toFixed(1).padStart(7)}`);
+        }
+        if (ataho.jumpCooldown > 0) {
+            lines.push(`jumpCooldown ${ataho.jumpCooldown.toFixed(0).padStart(4)}f`);
+        }
+
+        _debugPanel.textContent = lines.join('\n');
+    }
+
+    // --- 입력 핸들러 ---
+    const handleKeyDown = (e) => {
+        if (e.repeat || isGameOver) return;
+        switch (e.code) {
+            case 'KeyS':
+            case 'ArrowDown':
+                inputState.down = true;
+                inputState.downHeld = true;
+                break;
+            case 'KeyW':
+            case 'ArrowUp':
+                inputState.up = true;
+                break;
+            case 'KeyA':
+            case 'ArrowLeft':
+                inputState.left = true;
+                break;
+            case 'KeyD':
+            case 'ArrowRight':
+                inputState.right = true;
+                break;
+            case 'Space':
+                inputState.space = true;
+                break;
+        }
+    };
+
+    const handleKeyUp = (e) => {
+        if (isGameOver) return;
+        switch (e.code) {
+            case 'KeyS':
+            case 'ArrowDown':
+                inputState.down = false;
+                inputState.downHeld = false;
+                break;
+            case 'KeyW':
+            case 'ArrowUp':
+                inputState.up = false;
+                break;
+            case 'KeyA':
+            case 'ArrowLeft':
+                inputState.left = false;
+                break;
+            case 'KeyD':
+            case 'ArrowRight':
+                inputState.right = false;
+                break;
+            case 'Space':
+                inputState.space = false;
+                break;
+        }
+    };
+
+    const handleCanvasClick = (e) => {
+        const rect = canvas.getBoundingClientRect();
+        const scaleX = canvas.width / rect.width;
+        const scaleY = canvas.height / rect.height;
+
+        const clickX = (e.clientX - rect.left) * scaleX;
+        const clickY = (e.clientY - rect.top) * scaleY;
+
+        if (isClickInsideButton(clickX, clickY, buttons.sound)) {
+            toggleSound();
+            return;
+        }
+
+        if (!isGameOver) return;
+
+        if (isClickInsideButton(clickX, clickY, buttons.continue)) {
+            resetGame();
+        } else if (isClickInsideButton(clickX, clickY, buttons.exit)) {
+            window.location.href = '../index.html';
+        }
+    };
+
+    const handleMouseMove = (e) => {
+        const rect = canvas.getBoundingClientRect();
+        const scaleX = canvas.width / rect.width;
+        const scaleY = canvas.height / rect.height;
+
+        const mouseX = (e.clientX - rect.left) * scaleX;
+        const mouseY = (e.clientY - rect.top) * scaleY;
+
+        if (isClickInsideButton(mouseX, mouseY, buttons.sound) ||
+            (isGameOver && (isClickInsideButton(mouseX, mouseY, buttons.continue) ||
+                isClickInsideButton(mouseX, mouseY, buttons.exit)))) {
+            canvas.style.cursor = 'pointer';
+        } else {
+            canvas.style.cursor = 'default';
+        }
+    };
+
+    const handleTouchEnd = (e) => {
+        e.preventDefault();
+        inputState.touchForce = 0;
+        inputState.up = false;
+        inputState.down = false;
+        inputState.downHeld = false;
+    };
+
+    const handleTouch = (e) => {
+        e.preventDefault();
+
+        // touches 배열이 비어있으면 (touchend/touchcancel 오발) 무시
+        if (!e.touches || e.touches.length === 0) return;
+
+        if (e.type === 'touchstart') {
+            const rect = canvas.getBoundingClientRect();
+            const scaleX = canvas.width / rect.width;
+            const scaleY = canvas.height / rect.height;
+
+            const touchX = (e.touches[0].clientX - rect.left) * scaleX;
+            const touchY = (e.touches[0].clientY - rect.top) * scaleY;
+
+            if (isClickInsideButton(touchX, touchY, buttons.sound)) {
+                toggleSound();
+                return;
+            }
+
+            if (isGameOver) {
+                if (isClickInsideButton(touchX, touchY, buttons.continue)) {
+                    resetGame();
+                } else if (isClickInsideButton(touchX, touchY, buttons.exit)) {
+                    window.location.href = '../index.html';
+                }
+                return;
+            }
+        }
+
+        if (isGameOver) return;
+
+        const touchX = e.touches[0].clientX;
+        const touchY = e.touches[0].clientY;
+
+        const centerX = window.innerWidth / 2;
+        const maxDistX = window.innerWidth / 2;
+        let distRatio = clamp((touchX - centerX) / maxDistX, -1, 1);
+
+        if (Math.abs(distRatio) < TOUCH_DEADZONE) distRatio = 0;
+
+        inputState.touchForce = distRatio;
+
+        const screenHeight = window.innerHeight;
+
+        inputState.up = false;
+        inputState.down = false;
+        inputState.downHeld = false;
+
+        if (touchY < screenHeight * TOUCH_UPPER_ZONE) {
+            inputState.up = true;
+        } else if (touchY > screenHeight * TOUCH_LOWER_ZONE) {
+            inputState.downHeld = true;
+            if (e.type === 'touchstart') inputState.down = true;
+        }
+    };
+
+    const handleMouseDown = (e) => {
+        isMouseDown = true;
+        handleTouch(e);
+    };
+
+    const handleMouseUp = (e) => {
+        isMouseDown = false;
+        handleTouchEnd(e);
+    };
+
+    const handleMouseMoveTouch = (e) => {
+        if (!isMouseDown) return;
+        handleTouch(e);
+    };
+
+    // --- 게임 루프 ---
     function byFrame(timestamp) {
         requestAnimationFrame(byFrame);
 
@@ -1102,8 +1227,10 @@
         const { timeText, distanceText } = buildStats();
         renderHUD(timeText, distanceText);
         if (isGameOver && gameOverScreenTimer >= GAME_OVER_SCREEN_DELAY) renderGameOver(timeText, distanceText);
+        if (CONFIG.DEBUG.SHOW_STATS) updateDebugPanel();
     }
 
+    // --- 초기화 ---
     document.addEventListener('keydown', handleKeyDown);
     document.addEventListener('keyup', handleKeyUp);
     canvas.addEventListener('click', handleCanvasClick);
@@ -1161,6 +1288,30 @@
     // canvas에 touch-action:none 설정 — 브라우저 기본 스크롤/핀치줌 방지
     canvas.style.touchAction = 'none';
 
+    if (CONFIG.DEBUG.SHOW_STATS) createDebugPanel();
+
+    window.debug = {
+        toggleStats() {
+            CONFIG.DEBUG.SHOW_STATS = !CONFIG.DEBUG.SHOW_STATS;
+            if (CONFIG.DEBUG.SHOW_STATS) {
+                if (!_debugPanel) createDebugPanel();
+                else _debugPanel.style.display = 'block';
+            } else if (_debugPanel) {
+                _debugPanel.style.display = 'none';
+            }
+        },
+        toggleHitbox() { CONFIG.DEBUG.SHOW_HITBOX = !CONFIG.DEBUG.SHOW_HITBOX; },
+        toggleMute()   { CONFIG.DEBUG.MUTE = !CONFIG.DEBUG.MUTE; },
+    };
+
+    console.log(
+        '%c[디버그 명령어]%c\n' +
+        '  debug.toggleStats()   — 수치 패널 ON/OFF\n' +
+        '  debug.toggleHitbox()  — 히트박스 ON/OFF\n' +
+        '  debug.toggleMute()    — 오디오 ON/OFF',
+        'color:#000;font-weight:bold', 'color:inherit'
+    );
+
     Promise.all([loadImages(), loadFonts(), loadAudio()]).then(() => {
         // Pre-render red spike variant into offscreen canvas to avoid per-frame filter cost
         if (images.beamSpike) {
@@ -1195,4 +1346,3 @@
     });
 
 })();
-
