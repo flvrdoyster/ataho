@@ -332,13 +332,37 @@
         if (!audio || CONFIG.DEBUG.MUTE || !soundEnabled) return;
         audio.muted = false;
         audio.currentTime = 0;
-        getAudioContext().resume().then(() => {
-            audio.play().catch(e => console.log('BGM play failed:', e));
-        });
+        audio._shouldPlay = true;
+
+        if (audio._playRetry) {
+            audio.removeEventListener('canplaythrough', audio._playRetry);
+            audio._playRetry = null;
+        }
+
+        const attempt = () => {
+            if (!audio._shouldPlay) return;
+            getAudioContext().resume().then(() => {
+                if (!audio._shouldPlay) return;
+                audio.play().catch(() => {
+                    // 버퍼 부족으로 play() 실패 — canplaythrough 시 재시도
+                    if (audio._shouldPlay) {
+                        audio._playRetry = attempt;
+                        audio.addEventListener('canplaythrough', attempt, { once: true });
+                    }
+                });
+            });
+        };
+
+        attempt();
     }
 
     function stopMusic(audio) {
         if (!audio) return;
+        audio._shouldPlay = false;
+        if (audio._playRetry) {
+            audio.removeEventListener('canplaythrough', audio._playRetry);
+            audio._playRetry = null;
+        }
         audio.pause();
         audio.currentTime = 0;
     }
