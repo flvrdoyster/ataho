@@ -23,14 +23,15 @@
     // PHYSICS & DIFFICULTY
     const CONFIG = {
         PHYSICS: {
-            SWAY_INTENSITY_IDLE: 0.02,   // Base intensity of directional sway
-            SWAY_INTENSITY_WALK: 0.01,   // Reduced sway when walking
+            SWAY_INTENSITY_IDLE: 0.15,   // Base intensity of directional sway
+            SWAY_INTENSITY_WALK: 0.15,   // Sway when walking
             PLAYER_CONTROL_FORCE: 0.8,   // Force applied by player input
             FRICTION: 0.92,              // Damping factor (higher = more slippery/momentum)
             MAX_VELOCITY: 3.5,           // Maximum speed the character can tilt
             INERTIA_CONSTANT: 0.001,     // Force added based on current tilt
             GRAVITY: 0.4,                // Gravity applied during jumps
-            FATIGUE_RATE: 0.002          // Rate at which instability increases
+            DIFFICULTY_RAMP: 0.001,      // Instability gain per pixel traveled (caps at DIFFICULTY_CAP)
+            DIFFICULTY_CAP: 2.5          // Maximum instability multiplier
         },
         JUMP: {
             CHARGE_TIME: 30,             // Frames required to charge each jump level (hold space)
@@ -131,9 +132,10 @@
         const actx = getAudioContext();
         // iOS: resume() must be called synchronously inside gesture handler
         const resumePromise = (actx.state !== 'running') ? actx.resume() : Promise.resolve();
-        // Pre-warm audio elements so iOS unblocks them
+        // Pre-warm audio elements so iOS unblocks them (bgm 제외: 바로 재생할 경우 pause 콜백과 충돌)
         resumePromise.then(() => {
-            [bgm, overBgm, fallenSfx].forEach(el => {
+            const toPrewarm = _bgmPending ? [overBgm, fallenSfx] : [bgm, overBgm, fallenSfx];
+            toPrewarm.forEach(el => {
                 if (el) el.play().then(() => el.pause()).catch(() => { });
             });
             // 로드 완료 후 제스처를 기다리던 경우 BGM 재생
@@ -187,6 +189,7 @@
             const audio = new Audio();
             audio.loop = loop;
             audio.volume = volume;
+            audio.muted = true;
             audio.preload = 'auto';
 
             let resolved = false;
@@ -264,6 +267,7 @@
 
     function playMusic(audio) {
         if (!audio || CONFIG.DEBUG.MUTE) return;
+        audio.muted = false;
         audio.currentTime = 0;
         getAudioContext().resume().then(() => {
             audio.play().catch(e => console.log('BGM play failed:', e));
@@ -322,11 +326,10 @@
         swayCurrent: 0,
         swayTarget: 0,
         swayTimer: 0,
-        swayChangeInterval: 120, // Frames between potential sway direction changes
+        swayChangeInterval: 80, // Frames between potential sway direction changes
 
         fallDirection: null,
         fallTimer: 0,
-        balanceTimer: 0,
 
         stepRemaining: 0,
         keyRepeatTimer: 0,
@@ -433,27 +436,24 @@
                 inputForce = CONFIG.PHYSICS.PLAYER_CONTROL_FORCE;
             }
 
-            if (Math.abs(this.balanceLevel) < BALANCE_THRESHOLD.SLIGHT) {
-                this.balanceTimer += dt;
-            } else {
-                this.balanceTimer = Math.max(0, this.balanceTimer - 2 * dt);
-            }
-
-            const instabilityMultiplier = 1 + (this.balanceTimer * CONFIG.PHYSICS.FATIGUE_RATE);
+            const instabilityMultiplier = Math.min(
+                1 + (Math.max(0, distanceTraveled) * CONFIG.PHYSICS.DIFFICULTY_RAMP),
+                CONFIG.PHYSICS.DIFFICULTY_CAP
+            );
             const baseSwayIntensity = (this.actionState === STATE.WALKING) ? CONFIG.PHYSICS.SWAY_INTENSITY_WALK : CONFIG.PHYSICS.SWAY_INTENSITY_IDLE;
 
             this.swayTimer += dt;
             if (this.swayTimer > this.swayChangeInterval) {
-                if (Math.random() < 0.3) {
+                if (Math.random() < 0.5) {
                     this.swayTarget = (Math.random() - 0.5) * 2;
-                    this.swayChangeInterval = 60 + Math.random() * 120;
+                    this.swayChangeInterval = 40 + Math.random() * 80;
                     this.swayTimer = 0;
                 }
             }
-            this.swayCurrent += (this.swayTarget - this.swayCurrent) * 0.02 * dt;
+            this.swayCurrent += (this.swayTarget - this.swayCurrent) * 0.035 * dt;
 
             const directionalSway = this.swayCurrent * baseSwayIntensity * instabilityMultiplier;
-            const randomJitter = (Math.random() - 0.5) * 0.005;
+            const randomJitter = (Math.random() - 0.5) * 0.015;
 
             const inertiaForce = this.balanceLevel * CONFIG.PHYSICS.INERTIA_CONSTANT;
 
@@ -531,6 +531,7 @@
             gameOverScreenTimer = 0;
             stopMusic(bgm);
             if (fallenSfx && !CONFIG.DEBUG.MUTE) {
+                fallenSfx.muted = false;
                 fallenSfx.currentTime = 0;
                 getAudioContext().resume().then(() => fallenSfx.play().catch(() => { }));
             }
@@ -661,11 +662,10 @@
         ataho.leanState = 'balanced';
 
         ataho.fallTimer = 0;
-        ataho.balanceTimer = 0;
         ataho.swayTarget = 0;
         ataho.swayCurrent = 0;
         ataho.swayTimer = 0;
-        ataho.swayChangeInterval = 120;
+        ataho.swayChangeInterval = 80;
         ataho.visualY = 0;
         ataho.stepRemaining = 0;
         ataho.keyRepeatTimer = 0;
@@ -862,7 +862,7 @@
 
     const buttons = {
         continue: { x: 0, y: 0, width: BUTTON_WIDTH, height: BUTTON_HEIGHT, text: 'Continue?' },
-        exit: { x: 0, y: 0, width: BUTTON_WIDTH, height: BUTTON_HEIGHT, text: 'Exit' }
+        exit: { x: 0, y: 0, width: BUTTON_WIDTH, height: BUTTON_HEIGHT, text: 'Home' }
     };
 
     //===========================================
