@@ -1124,8 +1124,9 @@
         const { timeText, distanceText } = buildStats();
         updateHUD(timeText, distanceText);
         if (isGameOver && gameOverScreenTimer >= GAME_OVER_SCREEN_DELAY && gameOverOverlay.hidden) {
-
             gameOverOverlay.hidden = false;
+            kbCursorIdx = 0;
+            setGameOverCursor(gameOverBtns[0]);
         }
         if (CONFIG.DEBUG.SHOW_STATS) updateDebugPanel();
     }
