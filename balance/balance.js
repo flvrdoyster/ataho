@@ -293,8 +293,7 @@
     const hudTime = document.getElementById('hud-time');
     const hudDist = document.getElementById('hud-dist');
     const gameOverOverlay = document.getElementById('game-over-overlay');
-    const gameOverTime = document.getElementById('game-over-time');
-    const gameOverDist = document.getElementById('game-over-dist');
+
     const gameOverPanel = document.getElementById('game-over-panel');
     const gameOverCursorEl = document.getElementById('game-over-cursor');
     const gameOverBtns = [
@@ -309,7 +308,10 @@
         if (bgm) bgm.muted = muted;
         if (overBgm) overBgm.muted = muted;
         if (fallenSfx) fallenSfx.muted = muted;
-        soundBtn.classList.toggle('muted', muted);
+        const soundImg = soundBtn.querySelector('img');
+        if (soundImg) {
+            soundImg.src = muted ? 'sound_mute.png' : 'sound.png';
+        }
     }
 
     function playSfx(id) {
@@ -369,7 +371,7 @@
 
     async function loadAudio() {
         [bgm, overBgm, fallenSfx] = await Promise.all([
-            loadAudioFile('duel.mp3', true, 0.5),
+            loadAudioFile('showdown_cut.mp3', true, 0.5),
             loadAudioFile('over.mp3', true, 0.5),
             loadAudioFile('fallen.mp3', false, 1.0)
         ]);
@@ -1122,8 +1124,7 @@
         const { timeText, distanceText } = buildStats();
         updateHUD(timeText, distanceText);
         if (isGameOver && gameOverScreenTimer >= GAME_OVER_SCREEN_DELAY && gameOverOverlay.hidden) {
-            gameOverTime.textContent = timeText;
-            gameOverDist.textContent = distanceText;
+
             gameOverOverlay.hidden = false;
         }
         if (CONFIG.DEBUG.SHOW_STATS) updateDebugPanel();

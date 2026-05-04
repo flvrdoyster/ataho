@@ -81,9 +81,7 @@ canvas {
     display: block;
 }
 
-#sound-btn.muted img {
-    filter: grayscale(100%) opacity(0.6);
-}
+
 
 #game-over-overlay {
     position: absolute;
@@ -101,8 +99,8 @@ canvas {
 
 #game-over-panel {
     position: relative;
-    padding-top: 20px;
-    width: 38%;
+    padding-top: 10px;
+    width: 32%;
     box-sizing: border-box;
     display: flex;
     flex-direction: column;
@@ -120,17 +118,11 @@ canvas {
 }
 
 #game-over-title {
-    font-size: 30px;
+    font-size: 28px;
     margin: 0;
-    padding-bottom: 4px;
 }
 
-#game-over-time,
-#game-over-dist {
-    font-size: 24px;
-    color: #FFD700;
-    margin: 0;
-}
+
 
 #game-over-actions {
     display: flex;
@@ -149,7 +141,7 @@ canvas {
     border: none;
     border-radius: 0;
     outline: none;
-    padding: 10px 2px;
+    padding: 10px 0px;
     cursor: pointer;
 }
 

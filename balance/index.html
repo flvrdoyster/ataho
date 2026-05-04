@@ -38,26 +38,25 @@
     <div id="game-wrapper">
         <canvas id="gameCanvas"></canvas>
         <div id="ui-overlay">
+            <div id="game-over-overlay" hidden>
+                <div id="game-over-panel" class="frame-box">
+                    <img id="game-over-cursor" src="cursor.png" alt="" hidden>
+                    <p id="game-over-title">GAME OVER</p>
+
+                    <div id="game-over-actions">
+                        <button id="btn-continue">Continue</button>
+                        <button id="btn-home">Home</button>
+                    </div>
+                </div>
+            </div>
             <div id="hud" class="frame-box">
                 <div id="hud-stats">
                     <span id="hud-time">TIME: 00:00</span>
                     <span id="hud-dist">DIST: 0.0M</span>
                 </div>
                 <button id="sound-btn" type="button" aria-label="Toggle sound">
-                    <img src="sound.png" alt="Sound icon">
+                    <img src="sound.png" alt="Sound ON/OFF">
                 </button>
-            </div>
-            <div id="game-over-overlay" hidden>
-                <div id="game-over-panel" class="frame-box">
-                    <img id="game-over-cursor" src="cursor.png" alt="" hidden>
-                    <p id="game-over-title">GAME OVER</p>
-                    <p id="game-over-time"></p>
-                    <p id="game-over-dist"></p>
-                    <div id="game-over-actions">
-                        <button id="btn-continue">Continue</button>
-                        <button id="btn-home">Home</button>
-                    </div>
-                </div>
             </div>
         </div>
     </div>
