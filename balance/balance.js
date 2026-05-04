@@ -150,11 +150,14 @@
     let mapTileGrid = [];
 
     // --- 오디오 ---
-    let bgm = null;
-    let overBgm = null;
     let fallenSfx = null;  // HTMLAudioElement (1회성, file:// 환경 호환)
     const sfxRaw = {};     // id -> ArrayBuffer (XHR로 받은 원본, 제스처 전)
     const sfxBuffers = {}; // id -> AudioBuffer  (decode 완료, 재생 가능)
+
+    // Web Audio API BGM state
+    let activeBgmSource = null;
+    let activeBgmGain = null;
+    let activeBgmId = null;
 
     // AudioContext — created once, unlocked on first user gesture
     let audioContext = null;
@@ -258,14 +261,17 @@
     // 유저 제스처 이후 호출 — AudioContext가 running 상태일 때 디코딩
     function _decodePending() {
         const ctx = getAudioContext();
-        Object.entries(sfxRaw).forEach(([id, buf]) => {
-            if (sfxBuffers[id]) return;
-            ctx.decodeAudioData(
-                buf.slice(0), // slice: detach 방지
-                (decoded) => { sfxBuffers[id] = decoded; },
-                (e) => { console.warn(`SFX decode failed: ${id}`, e); }
-            );
+        const promises = Object.entries(sfxRaw).map(([id, buf]) => {
+            if (sfxBuffers[id]) return Promise.resolve();
+            return new Promise((resolve) => {
+                ctx.decodeAudioData(
+                    buf.slice(0), // slice: detach 방지
+                    (decoded) => { sfxBuffers[id] = decoded; resolve(); },
+                    (e) => { console.warn(`SFX decode failed: ${id}`, e); resolve(); }
+                );
+            });
         });
+        return Promise.all(promises);
     }
 
     function unlockAudio() {
@@ -274,20 +280,19 @@
         const actx = getAudioContext();
         // iOS: resume() must be called synchronously inside gesture handler
         const resumePromise = (actx.state !== 'running') ? actx.resume() : Promise.resolve();
-        // Pre-warm audio elements so iOS unblocks them (bgm 제외: 바로 재생할 경우 pause 콜백과 충돌)
+        // Pre-warm HTMLAudioElements so iOS unblocks them
         resumePromise.then(() => {
-            const toPrewarm = _bgmPending ? [overBgm, fallenSfx] : [bgm, overBgm, fallenSfx];
-            toPrewarm.forEach(el => {
-                if (el) el.play().then(() => el.pause()).catch(() => { });
-            });
+            if (fallenSfx) fallenSfx.play().then(() => fallenSfx.pause()).catch(() => { });
+        });
+        
+        // 제스처 이후 SFX 디코딩 실행
+        _decodePending().then(() => {
             // 로드 완료 후 제스처를 기다리던 경우 BGM 재생
             if (_bgmPending) {
                 _bgmPending = false;
-                playMusic(bgm);
+                playMusic('bgm');
             }
         });
-        // 제스처 이후 SFX 디코딩 실행
-        _decodePending();
     }
 
     const hudTime = document.getElementById('hud-time');
@@ -305,9 +310,10 @@
     function toggleSound() {
         soundEnabled = !soundEnabled;
         const muted = !soundEnabled;
-        if (bgm) bgm.muted = muted;
-        if (overBgm) overBgm.muted = muted;
         if (fallenSfx) fallenSfx.muted = muted;
+        if (activeBgmGain) {
+            activeBgmGain.gain.value = muted ? 0 : 0.5;
+        }
         const soundImg = soundBtn.querySelector('img');
         if (soundImg) {
             soundImg.src = muted ? 'sound_mute.png' : 'sound.png';
@@ -329,52 +335,50 @@
         else ctx.resume().then(play);
     }
 
-    function playMusic(audio) {
-        if (!audio || !soundEnabled) return;
-        audio.muted = false;
-        audio.currentTime = 0;
-        audio._playToken = (audio._playToken || 0) + 1;
-        const token = audio._playToken;
+    function playMusic(id, volume = 0.5) {
+        stopMusic(); // Ensure any previous BGM is stopped
 
-        if (audio._playRetry) {
-            audio.removeEventListener('canplaythrough', audio._playRetry);
-            audio._playRetry = null;
-        }
+        const buffer = sfxBuffers[id];
+        if (!buffer) return;
 
-        const attempt = () => {
-            if (audio._playToken !== token) return;
-            getAudioContext().resume().then(() => {
-                if (audio._playToken !== token) return;
-                audio.play().catch(() => {
-                    // 버퍼 부족으로 play() 실패 — canplaythrough 시 재시도
-                    if (audio._playToken === token) {
-                        audio._playRetry = attempt;
-                        audio.addEventListener('canplaythrough', attempt, { once: true });
-                    }
-                });
-            });
+        activeBgmId = id;
+        const ctx = getAudioContext();
+        activeBgmGain = ctx.createGain();
+        activeBgmGain.gain.value = soundEnabled ? volume : 0;
+        activeBgmGain.connect(ctx.destination);
+
+        activeBgmSource = ctx.createBufferSource();
+        activeBgmSource.buffer = buffer;
+        activeBgmSource.loop = true;
+        activeBgmSource.connect(activeBgmGain);
+
+        const play = () => {
+            activeBgmSource.start(0);
         };
 
-        attempt();
+        if (ctx.state === 'running') play();
+        else ctx.resume().then(play);
     }
 
-    function stopMusic(audio) {
-        if (!audio) return;
-        audio._playToken = (audio._playToken || 0) + 1;
-        if (audio._playRetry) {
-            audio.removeEventListener('canplaythrough', audio._playRetry);
-            audio._playRetry = null;
+    function stopMusic() {
+        if (activeBgmSource) {
+            try { activeBgmSource.stop(); } catch (e) {}
+            activeBgmSource.disconnect();
+            activeBgmSource = null;
         }
-        audio.pause();
-        audio.currentTime = 0;
+        if (activeBgmGain) {
+            activeBgmGain.disconnect();
+            activeBgmGain = null;
+        }
+        activeBgmId = null;
     }
 
     async function loadAudio() {
-        [bgm, overBgm, fallenSfx] = await Promise.all([
-            loadAudioFile('showdown_cut.mp3', true, 0.5),
-            loadAudioFile('over.mp3', true, 0.5),
-            loadAudioFile('fallen.mp3', false, 1.0)
+        await Promise.all([
+            loadSfxFile('bgm', 'showdown_cut.mp3'),
+            loadSfxFile('overBgm', 'over.mp3')
         ]);
+        fallenSfx = await loadAudioFile('fallen.mp3', false, 1.0);
     }
 
     // --- 맵 ---
@@ -607,7 +611,7 @@
             this.actionState = STATE.FALLEN;
             isGameOver = true;
             gameOverScreenTimer = 0;
-            stopMusic(bgm);
+            stopMusic();
             if (fallenSfx && soundEnabled) {
                 fallenSfx.muted = false;
                 fallenSfx.currentTime = 0;
@@ -732,9 +736,9 @@
     function resetGame() {
         isGameOver = false;
         gameOverScreenTimer = 0;
-        stopMusic(overBgm);
+        stopMusic();
         if (fallenSfx) fallenSfx._playToken = (fallenSfx._playToken || 0) + 1;
-        playMusic(bgm);
+        playMusic('bgm');
         startTime = Date.now();
         elapsedTime = 0;
         lastTimestamp = 0;
@@ -1117,7 +1121,7 @@
             const wasBelow = gameOverScreenTimer < GAME_OVER_SCREEN_DELAY;
             gameOverScreenTimer += dt;
             if (wasBelow && gameOverScreenTimer >= GAME_OVER_SCREEN_DELAY) {
-                playMusic(overBgm);
+                if (activeBgmId !== 'overBgm') playMusic('overBgm');
             }
         }
 
@@ -1287,7 +1291,7 @@
 
         // 유저 제스처가 이미 있었으면 즉시 재생, 없으면 unlock 시점에 재생
         if (_audioUnlocked) {
-            playMusic(bgm);
+            playMusic('bgm');
         } else {
             _bgmPending = true;
         }
