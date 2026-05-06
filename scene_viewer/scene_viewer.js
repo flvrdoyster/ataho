@@ -296,22 +296,32 @@ class SceneViewer {
         const video = document.createElement('video');
         const langPath = (this.currentStory.langPaths && this.lang)
             ? this.currentStory.langPaths[this.lang] : '';
-        video.src = langPath + scene.src;
+        const videoSrc = langPath + scene.src;
+        video.src = videoSrc;
         video.className = 'scene-video';
         video.playsInline = true;
         video.loop = scene.loop || false;
 
-        if (scene.subtitles) {
-            const track = document.createElement('track');
-            track.kind = 'subtitles';
-            track.src = scene.subtitles;
-            track.srclang = 'ko';
-            track.default = true;
-            video.appendChild(track);
-        }
-
         this.stage.appendChild(video);
         this.currentVideo = video;
+
+        const subtitleEl = document.createElement('div');
+        subtitleEl.className = 'subtitle-overlay';
+        this.stage.appendChild(subtitleEl);
+
+        const track = document.createElement('track');
+        track.kind = 'subtitles';
+        track.src = videoSrc.replace(/\.[^.]+$/, '.vtt');
+        track.srclang = this.lang || '';
+        video.appendChild(track);
+
+        const tt = video.textTracks[0];
+        if (tt) {
+            tt.mode = 'hidden';
+            tt.addEventListener('cuechange', () => {
+                subtitleEl.textContent = tt.activeCues?.[0]?.text ?? '';
+            });
+        }
 
         const autoAdvance = scene.autoAdvance !== false;
         if (autoAdvance && !scene.loop) {
@@ -555,7 +565,13 @@ class SceneViewer {
         const scene = this.currentStory.scenes[this.currentSceneIndex];
 
         if (scene.type === 'staff_roll' || scene.type === 'choice') return;
-        if (scene.type === 'video' && scene.autoAdvance !== false) return;
+        if (scene.type === 'video' && scene.autoAdvance !== false) {
+            if (this.currentVideo) {
+                if (this.currentVideo.paused) this.currentVideo.play().catch(() => {});
+                else this.currentVideo.pause();
+            }
+            return;
+        }
 
         this.nextScene();
     }
