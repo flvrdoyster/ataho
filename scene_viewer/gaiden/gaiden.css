@@ -1,0 +1,92 @@
+/* Gaiden Story Specific Styles */
+
+:root {
+    --stage-width: 640px;
+    --stage-height: 480px;
+}
+
+/* 320x240 원본을 2배(640x480)로 nearest-neighbor 확대 */
+.stage {
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
+}
+
+.scene-video {
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
+}
+
+/* Title Scene */
+.title-menu {
+    position: absolute;
+    bottom: 0;
+    left: 148px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    z-index: 100;
+}
+
+.title-choice {
+    position: relative;
+    display: block;
+    cursor: pointer;
+    pointer-events: auto;
+}
+
+.title-icon {
+    display: block;
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
+    pointer-events: none;
+}
+
+.title-label {
+    display: none;
+    position: absolute;
+    top: 50%;
+    left: 62%;
+    transform: translate(-50%, -50%);
+    font-size: 20px;
+    color: rgba(0, 0, 0, 1);
+    text-shadow: none;
+    pointer-events: none;
+    white-space: nowrap;
+}
+
+.title-choice.active .title-label {
+    display: block;
+}
+
+/* Overlay */
+.scene-overlay {
+    background-color: rgba(0, 0, 0, 0.7);
+}
+
+/* Choice UI */
+.choice-container {
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    gap: 0;
+    text-align: center;
+}
+
+.choice-btn {
+    background: none;
+    border: none;
+    font-family: inherit;
+    font-weight: bold;
+    color: rgba(255, 255, 255, 1);
+    font-size: 56px;
+    line-height: 1.8;
+    cursor: pointer;
+    padding: 0;
+    transition: color 0.1s, font-size 0.1s;
+    outline: none;
+}
+
+.choice-btn.choice-active {
+    color: rgba(255, 102, 204, 1);
+    font-size: 72px;
+}

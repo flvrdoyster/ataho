@@ -172,18 +172,4 @@ const KaisinEndingStory = {
     ]
 };
 
-/**
- * Kaisin Story Initialization
- * Connects the general SceneViewer to the KaisinEndingStory data.
- */
-window.addEventListener('DOMContentLoaded', () => {
-    const viewer = new SceneViewer('#stage');
-
-    // Check if Global Story is loaded
-    if (typeof KaisinEndingStory !== 'undefined') {
-        viewer.loadStory(KaisinEndingStory);
-    } else {
-        console.error("Story data not found!");
-    }
-
-});
+SceneViewer.register('kaisin', KaisinEndingStory);
