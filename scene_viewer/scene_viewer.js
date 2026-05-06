@@ -1,21 +1,39 @@
 class SceneViewer {
+    static stories = {};
+
+    static register(id, story) {
+        SceneViewer.stories[id] = story;
+    }
+
+    static customRenderers = {};
+
+    static registerRenderer(type, fn) {
+        SceneViewer.customRenderers[type] = fn;
+    }
+
+
     constructor(stageSelector) {
         this.stage = document.querySelector(stageSelector);
         this.currentStory = null;
         this.currentSceneIndex = -1;
 
         this.scrubber = document.getElementById('scene-scrubber');
+        this.controls = document.getElementById('controls');
 
         // Bind input
-        this.stage.addEventListener('click', () => this.handleInput());
+        this.stage.addEventListener('click', () => {
+            if (!this.choiceKeyHandler) this.handleInput();
+        });
         document.addEventListener('keydown', (e) => {
-            if (e.repeat) return; // Prevent key repeat
-            if (e.code === 'Space' || e.code === 'Enter') this.handleInput();
+            if (e.repeat) return;
+            if (e.code === 'Space' || e.code === 'Enter') {
+                if (!this.choiceKeyHandler) this.handleInput();
+            }
         });
 
         if (this.scrubber) {
             this.scrubber.addEventListener('input', (e) => {
-                this.currentSceneIndex = parseInt(e.target.value, 10);
+                this.currentSceneIndex = this.checkpoints[parseInt(e.target.value, 10)];
                 this.renderScene();
             });
         }
@@ -23,6 +41,11 @@ class SceneViewer {
         this.intervalIds = [];
         this.timeoutIds = [];
         this.lastInputTime = 0;
+        this.currentVideo = null;
+        this.choiceKeyHandler = null;
+        this.lang = null;
+        this.checkpoints = [];
+        this.sceneToCheckpoint = new Map();
     }
 
     cleanup() {
@@ -30,14 +53,41 @@ class SceneViewer {
         this.intervalIds = [];
         this.timeoutIds.forEach(id => clearTimeout(id));
         this.timeoutIds = [];
+        if (this.currentVideo) {
+            this.currentVideo.pause();
+            this.currentVideo.removeAttribute('src');
+            this.currentVideo.load();
+            this.currentVideo = null;
+        }
+        if (this.choiceKeyHandler) {
+            document.removeEventListener('keydown', this.choiceKeyHandler);
+            this.choiceKeyHandler = null;
+        }
     }
 
     loadStory(story) {
         this.currentStory = story;
         this.currentSceneIndex = 0;
+        this.lang = story.defaultLang || null;
+
+        this.checkpoints = [];
+        this.sceneToCheckpoint = new Map();
+        const nextToCheckpointIdx = new Map();
+
+        story.scenes.forEach((scene, i) => {
+            const next = scene.next;
+            if (next && nextToCheckpointIdx.has(next)) {
+                this.sceneToCheckpoint.set(i, nextToCheckpointIdx.get(next));
+            } else {
+                const cpIdx = this.checkpoints.length;
+                this.checkpoints.push(i);
+                this.sceneToCheckpoint.set(i, cpIdx);
+                if (next) nextToCheckpointIdx.set(next, cpIdx);
+            }
+        });
 
         if (this.scrubber) {
-            this.scrubber.max = story.scenes.length - 1;
+            this.scrubber.max = this.checkpoints.length - 1;
             this.scrubber.value = 0;
         }
 
@@ -58,8 +108,8 @@ class SceneViewer {
         if (!this.currentStory) return;
 
         // Sync scrubber
-        if (this.scrubber) {
-            this.scrubber.value = this.currentSceneIndex;
+        if (this.scrubber && this.checkpoints.length) {
+            this.scrubber.value = this.sceneToCheckpoint.get(this.currentSceneIndex) ?? 0;
         }
 
         const scene = this.currentStory.scenes[this.currentSceneIndex];
@@ -80,6 +130,14 @@ class SceneViewer {
                 bgImg.className = 'layer background fit-cover';
                 this.stage.appendChild(bgImg);
             }
+        }
+
+        // 1.2 Overlay (on top of background)
+        if (scene.overlay) {
+            const overlayDiv = document.createElement('div');
+            overlayDiv.className = 'layer scene-overlay';
+            overlayDiv.style.zIndex = 5;
+            this.stage.appendChild(overlayDiv);
         }
 
         // 1.5 Visuals (Base Image)
@@ -221,10 +279,125 @@ class SceneViewer {
         }
 
         // 2. Content based on Type
-        if (scene.type === 'text' || scene.type === 'image_text') {
+        if (SceneViewer.customRenderers[scene.type]) {
+            SceneViewer.customRenderers[scene.type].call(this, scene);
+        } else if (scene.type === 'text' || scene.type === 'image_text') {
             this.renderTextScene(scene);
         } else if (scene.type === 'staff_roll') {
             this.renderStaffRoll(scene);
+        } else if (scene.type === 'video') {
+            this.renderVideoScene(scene);
+        } else if (scene.type === 'choice') {
+            this.renderChoiceScene(scene);
+        }
+    }
+
+    renderVideoScene(scene) {
+        const video = document.createElement('video');
+        const langPath = (this.currentStory.langPaths && this.lang)
+            ? this.currentStory.langPaths[this.lang] : '';
+        video.src = langPath + scene.src;
+        video.className = 'scene-video';
+        video.playsInline = true;
+        video.loop = scene.loop || false;
+
+        if (scene.subtitles) {
+            const track = document.createElement('track');
+            track.kind = 'subtitles';
+            track.src = scene.subtitles;
+            track.srclang = 'ko';
+            track.default = true;
+            video.appendChild(track);
+        }
+
+        this.stage.appendChild(video);
+        this.currentVideo = video;
+
+        const autoAdvance = scene.autoAdvance !== false;
+        if (autoAdvance && !scene.loop) {
+            video.addEventListener('ended', () => this.nextScene(), { once: true });
+        }
+
+        video.play().catch(() => {});
+
+        if (scene.text) {
+            this.renderTextScene(scene);
+        }
+    }
+
+    renderChoiceScene(scene) {
+        if (scene.text) {
+            this.renderTextScene(scene);
+        }
+
+        const container = document.createElement('div');
+        container.className = 'choice-container';
+
+        let focusedIndex = 0;
+
+        const buttons = scene.choices.map((choice, i) => {
+            const btn = document.createElement('button');
+            btn.className = 'choice-btn';
+            btn.textContent = choice.label;
+            if (i === 0) btn.classList.add('choice-active');
+
+            btn.addEventListener('mouseenter', () => {
+                focusedIndex = i;
+                updateFocus();
+            });
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                this.goToScene(choice.target);
+            });
+            container.appendChild(btn);
+            return btn;
+        });
+
+        const updateFocus = () => {
+            buttons.forEach((b, i) => b.classList.toggle('choice-active', i === focusedIndex));
+        };
+
+        this.choiceKeyHandler = (e) => {
+            if (e.code === 'ArrowDown') {
+                e.preventDefault();
+                focusedIndex = (focusedIndex + 1) % scene.choices.length;
+                updateFocus();
+            } else if (e.code === 'ArrowUp') {
+                e.preventDefault();
+                focusedIndex = (focusedIndex - 1 + scene.choices.length) % scene.choices.length;
+                updateFocus();
+            } else if (e.code === 'Enter' || e.code === 'Space') {
+                this.goToScene(scene.choices[focusedIndex].target);
+            }
+        };
+        document.addEventListener('keydown', this.choiceKeyHandler);
+
+        this.stage.appendChild(container);
+
+        if (scene.timeout) {
+            const timerBar = document.createElement('div');
+            timerBar.className = 'choice-timer';
+            timerBar.style.width = '100%';
+            this.stage.appendChild(timerBar);
+
+            requestAnimationFrame(() => {
+                timerBar.style.transitionDuration = `${scene.timeout}ms`;
+                timerBar.style.width = '0%';
+            });
+
+            const timeoutId = setTimeout(() => {
+                const target = scene.timeoutTarget || scene.choices[0].target;
+                this.goToScene(target);
+            }, scene.timeout);
+            this.timeoutIds.push(timeoutId);
+        }
+    }
+
+    goToScene(sceneId) {
+        const index = this.currentStory.scenes.findIndex(s => s.id === sceneId);
+        if (index !== -1) {
+            this.currentSceneIndex = index;
+            this.renderScene();
         }
     }
 
@@ -375,27 +548,31 @@ class SceneViewer {
     }
 
     handleInput() {
-        // Cooldown to prevent accidental double-skips
         const now = Date.now();
         if (this.lastInputTime && now - this.lastInputTime < 300) return;
         this.lastInputTime = now;
 
         const scene = this.currentStory.scenes[this.currentSceneIndex];
-        // If staff roll, maybe speed up? For now, just skip or let it finish.
-        // If text scene, advance.
 
-        if (scene.type !== 'staff_roll') {
-            this.nextScene();
-        }
+        if (scene.type === 'staff_roll' || scene.type === 'choice') return;
+        if (scene.type === 'video' && scene.autoAdvance !== false) return;
+
+        this.nextScene();
     }
 
     nextScene() {
+        const scene = this.currentStory.scenes[this.currentSceneIndex];
+
+        if (scene && scene.next) {
+            this.goToScene(scene.next);
+            return;
+        }
+
         if (this.currentSceneIndex < this.currentStory.scenes.length - 1) {
             this.currentSceneIndex++;
             this.renderScene();
         } else {
             console.log("Story Finished");
-            // Optional: Show replay button
         }
     }
 }

@@ -1,6 +1,4 @@
 :root {
-    --stage-width: 800px;
-    --stage-height: 600px;
     --bg-color: rgba(0, 0, 0, 1);
 }
 
@@ -66,11 +64,6 @@ input[type=range] {
     background-color: var(--bg-color);
     position: relative;
     overflow: hidden;
-    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
-    border: 2px solid rgba(51, 51, 51, 1);
-    image-rendering: pixelated;
-    image-rendering: -moz-crisp-edges;
-    image-rendering: crisp-edges;
 }
 
 /* Layer Management */
@@ -105,17 +98,12 @@ img.fit-cover {
     object-fit: cover;
 }
 
-/* Text Styles - Cinematic */
+/* Dialogue Box - Structure & Positioning */
 .dialogue-box {
     position: absolute;
     bottom: 15%;
     left: 0;
     width: 100%;
-    text-align: center;
-    color: rgba(255, 255, 255, 1);
-    font-size: 28px;
-    line-height: 1.5;
-    text-shadow: 2px 2px 0 rgba(0, 0, 0, 1);
     pointer-events: none;
     white-space: pre-wrap;
     z-index: 100;
@@ -129,27 +117,7 @@ img.fit-cover {
     flex-direction: column;
     justify-content: center;
     padding: 20px 0;
-    /* Added spacing from top/bottom edges */
     box-sizing: border-box;
-    /* Ensure padding doesn't exceed 100% height */
-}
-
-.text-lg {
-    font-size: 54px;
-}
-
-.text-left {
-    text-align: left;
-    padding: 0 200px;
-}
-
-.text-right {
-    text-align: right;
-    padding: 0 200px;
-}
-
-.text-center {
-    text-align: center;
 }
 
 /* Vertical Positioning Modifiers */
@@ -184,162 +152,32 @@ img.fit-cover {
     padding-bottom: 15%;
 }
 
-/* Center Stage Area for Sprites */
-.center-stage {
+/* Video Scene */
+.scene-video {
     position: absolute;
-    top: 20%;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 60%;
-    height: 50%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 10;
-}
-
-.clip-sprites {
-    overflow: hidden !important;
-}
-
-.sprite {
-    position: absolute;
-    image-rendering: pixelated;
-}
-
-/* Sprite Sheet Animation (CSS-based) */
-@keyframes sheet-anim-h {
-    from {
-        background-position: 0 0;
-    }
-
-    to {
-        background-position: var(--sheet-end-pos, -100%) 0;
-    }
-}
-
-.sheet-anim {
-    animation-name: sheet-anim-h;
-    animation-duration: var(--sheet-duration, 1s);
-    animation-timing-function: steps(var(--sheet-frames, 1));
-    animation-iteration-count: infinite;
-}
-
-/* Utility Animations */
-.anim-pulse {
-    animation: pulse 2s infinite ease-in-out;
-}
-
-@keyframes pulse {
-
-    0%,
-    100% {
-        transform: scale(1);
-    }
-
-    50% {
-        transform: scale(1.1);
-    }
-}
-
-.anim-bounce {
-    animation: bounce 1s infinite ease-in-out;
-}
-
-@keyframes bounce {
-
-    0%,
-    100% {
-        transform: translateY(0);
-    }
-
-    50% {
-        transform: translateY(var(--bounce-height, -32px));
-    }
-}
-
-.anim-float {
-    animation: float 3s infinite ease-in-out;
-}
-
-@keyframes float {
-
-    0%,
-    100% {
-        transform: translate(0, 0);
-    }
-
-    50% {
-        transform: translate(5px, -5px);
-    }
-}
-
-.anim-move {
-    animation: move var(--move-duration, 1s) var(--move-delay, 0s) var(--move-timing, ease-in-out) forwards;
-}
-
-@keyframes move {
-    from {
-        transform: translate(0, 0);
-    }
-
-    to {
-        transform: translate(var(--move-x, 0), var(--move-y, 0));
-    }
-}
-
-.anim-fall {
-    animation: fall var(--fall-duration, 5s) var(--fall-delay, 0s) var(--fall-timing, linear) forwards;
-}
-
-@keyframes fall {
-    from {
-        transform: translate(var(--fall-x, 0), 0);
-    }
-
-    to {
-        transform: translate(var(--fall-x, 0), var(--fall-y, 600px));
-    }
-}
-
-/* Centered Image (Cutscenes) */
-.center-image {
-    position: absolute;
-    top: 20%;
-    left: 50%;
-    transform: translateX(-50%);
-    width: auto;
-    height: auto;
-    max-width: 80%;
-    max-height: 60%;
-    border: 0px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 1);
-    display: block;
-    object-fit: contain;
-}
-
-/* Staff Roll Animation */
-.staff-roll {
-    position: absolute;
+    top: 0;
+    left: 0;
     width: 100%;
-    text-align: center;
-    color: rgba(255, 255, 255, 1);
-    font-size: 20px;
-    line-height: 2;
-    text-shadow: 2px 2px 0 rgba(0, 0, 0, 1);
+    height: 100%;
+    object-fit: cover;
+    z-index: 0;
 }
 
-.staff-section {
-    margin-bottom: 40px;
+/* Choice UI - structure only, visual styling per story */
+.choice-container {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    z-index: 100;
+    pointer-events: auto;
 }
 
-.staff-title {
-    color: rgba(255, 255, 0, 1);
-    font-weight: bold;
-    font-size: 24px;
-    margin-bottom: 5px;
-}
-
-.staff-name {
-    color: rgba(255, 255, 255, 1);
+.choice-timer {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 4px;
+    background: rgba(255, 255, 255, 0.8);
 }

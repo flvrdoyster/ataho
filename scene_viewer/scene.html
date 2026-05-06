@@ -7,7 +7,6 @@
     <title>장면 뷰어 : atah.io</title>
     <link rel="icon" href="https://atah.io/favicon.ico">
     <link rel="stylesheet" href="scene_viewer.css">
-    <link rel="stylesheet" href="kaisin/kaisin.css">
     <!-- Google Tag Manager -->
     <script>(function (w, d, s, l, i) {
             w[l] = w[l] || []; w[l].push({
@@ -39,7 +38,39 @@
 
     <!-- Scripts -->
     <script src="scene_viewer.js"></script>
-    <script src="kaisin/kaisin.js"></script>
+    <script>
+        const STORY_MAP = {
+            kaisin: { script: 'kaisin/kaisin.js', css: 'kaisin/kaisin.css' },
+            gaiden: { script: 'gaiden/gaiden.js', css: 'gaiden/gaiden.css' },
+        };
+
+        const storyId = new URLSearchParams(location.search).get('story') || 'kaisin';
+        const entry = STORY_MAP[storyId];
+
+        if (!entry) {
+            document.getElementById('loading').textContent = `스토리를 찾을 수 없습니다: ${storyId}`;
+        } else {
+            if (entry.css) {
+                const link = document.createElement('link');
+                link.rel = 'stylesheet';
+                link.href = entry.css;
+                document.head.appendChild(link);
+            }
+
+            const script = document.createElement('script');
+            script.src = entry.script;
+            script.onload = () => {
+                const story = SceneViewer.stories[storyId];
+                if (!story) {
+                    console.error(`Story registered but not found: ${storyId}`);
+                    return;
+                }
+                const viewer = new SceneViewer('#stage');
+                viewer.loadStory(story);
+            };
+            document.head.appendChild(script);
+        }
+    </script>
     <script src="../footer.js"></script>
 </body>
 
