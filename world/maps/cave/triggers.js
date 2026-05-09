@@ -54,9 +54,6 @@ window.MAP_DATA.triggers = [
         "id": "jar-3",
         "sprite": "object/object_jar.png",
         "type": "menu",
-        "text": [
-            "스마슈 녀석은 이런 걸 좋아한단 말이지."
-        ],
         "title": "장면 뷰어",
         "items": [
             {
@@ -103,9 +100,6 @@ window.MAP_DATA.triggers = [
         "animH": 48,
         "frames": 4,
         "speed": 200,
-        "text": [
-            "쓸데 없이 뜨겁구만."
-        ],
         "items": [
             {
                 "label": "웹 버전 (ko)",
