@@ -11,7 +11,7 @@ const GaidenStory = {
         { id: "title", type: "title", background: { image: "gaiden/title-bg.png" },
             idleIcon: "gaiden/title-idle.png",
             choices: [
-                { icon: "gaiden/title-1.png", lang: "ja", subLang: "ko", target: "1-0", label: "일본어랑 자막으로 본다!!" },
+                { icon: "gaiden/title-1.png", lang: "ja", subLang: "ko", target: "1-0", label: "일본어랑 자막으로 본다!" },
                 { icon: "gaiden/title-2.png", lang: "ko", target: "1-0", label: "한국어 더빙으로 볼래" },
             ]
         },
