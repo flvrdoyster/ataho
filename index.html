@@ -48,18 +48,44 @@
 <script src="world/engine.js"></script>
 <script src="world/char/char_free.js"></script>
 <script>window.onload = initGame;</script>
-<script src="resource/mov/subtitles.js"></script>
 
 <div id="lightbox">
     <span class="close">&times;</span>
     <img id="lightbox-img" src="" alt="">
-    <video id="lightbox-video" controls style="display: none;">
-        <track id="lightbox-track" kind="subtitles" srclang="ko" label="Korean" default>
-    </video>
     <div id="lightbox-caption" class="caption"></div>
 </div>
 
-<script src="ui.js"></script>
+<script>
+const lightbox = document.getElementById('lightbox');
+const lightboxImg = document.getElementById('lightbox-img');
+const lightboxCaption = document.getElementById('lightbox-caption');
+const closeBtn = document.querySelector('#lightbox .close');
+
+function updateView() {
+    const hash = window.location.hash.substring(1);
+    if (hash && hash.startsWith('resource/img/') &&
+        (hash.endsWith('.png') || hash.endsWith('.jpg') || hash.endsWith('.gif'))) {
+        const activeLink = document.querySelector(`a[href="#${hash}"]`);
+        lightboxImg.src = hash;
+        lightboxCaption.textContent = activeLink ? activeLink.getAttribute('data-caption') : hash.split('/').pop();
+        lightbox.classList.add('active');
+    } else {
+        lightbox.classList.remove('active');
+    }
+}
+
+function closeLightbox() {
+    history.pushState("", document.title, window.location.pathname + window.location.search);
+    updateView();
+}
+
+if (closeBtn) closeBtn.addEventListener('click', closeLightbox);
+if (lightbox) lightbox.addEventListener('click', (e) => { if (e.target === lightbox) closeLightbox(); });
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeLightbox(); });
+window.addEventListener('hashchange', updateView);
+window.addEventListener('DOMContentLoaded', updateView);
+updateView();
+</script>
 <script src="footer.js"></script>
 
 </html>

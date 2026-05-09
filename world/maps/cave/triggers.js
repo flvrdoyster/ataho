@@ -179,11 +179,9 @@ window.MAP_DATA.triggers = [
         "items": [
             {
                 "label": "환세 시리즈 부분 컷",
-                "href": "#resource/mov/ani_orig.mp4",
-                "data": {
-                    "caption": "그런 계절 / 싱크로 / 본능 / 쿠킹 DE GO / 물가의 사랑",
-                    "subtitle": "ani_caption.vtt"
-                }
+                "href": "scene_viewer/scene.html?story=ani",
+                "target": "_blank"
+            }
             }
         ]
     },
