@@ -54,8 +54,8 @@ SceneViewer.registerRenderer('title', function(scene) {
 
     const setSize = (img) => {
         if (img.naturalWidth) {
-            img.width = img.naturalWidth * 2;
-            img.height = img.naturalHeight * 2;
+            img.style.width = (img.naturalWidth * 2 / 640 * 100) + 'cqw';
+            img.style.height = 'auto';
         }
     };
 
@@ -84,7 +84,7 @@ SceneViewer.registerRenderer('title', function(scene) {
             wrapper.appendChild(label);
         }
 
-        wrapper.addEventListener('mouseenter', () => { focusedIndex = i; updateIcons(); });
+        wrapper.addEventListener('pointerenter', () => { focusedIndex = i; updateIcons(); });
         wrapper.addEventListener('click', (e) => { e.stopPropagation(); focusedIndex = i; confirm(); });
         container.appendChild(wrapper);
         return img;
