@@ -41,7 +41,7 @@
     display: none;
     position: absolute;
     top: 50%;
-    left: 62%;
+    left: 62.5%;
     transform: translate(-50%, -50%);
     font-size: clamp(10px, 3.125cqw, 20px);
     color: rgba(0, 0, 0, 1);

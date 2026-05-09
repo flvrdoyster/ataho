@@ -33,8 +33,15 @@ class SceneViewer {
 
         if (this.scrubber) {
             this.scrubber.addEventListener('input', (e) => {
-                this.currentSceneIndex = this.checkpoints[parseInt(e.target.value, 10)];
-                this.renderScene();
+                const val = parseInt(e.target.value, 10);
+                const scene = this.currentStory?.scenes[this.currentSceneIndex];
+                if (this.currentVideo && scene?.chapters) {
+                    this.currentVideo.currentTime = scene.chapters[val];
+                    this.currentVideo.play().catch(() => {});
+                } else {
+                    this.currentSceneIndex = this.checkpoints[val];
+                    this.renderScene();
+                }
             });
         }
 
@@ -109,8 +116,10 @@ class SceneViewer {
         this.cleanup();
         if (!this.currentStory) return;
 
-        // Sync scrubber
+        // Sync scrubber (checkpoint mode)
         if (this.scrubber && this.checkpoints.length) {
+            this.scrubber.max  = this.checkpoints.length - 1;
+            this.scrubber.step = 1;
             this.scrubber.value = this.sceneToCheckpoint.get(this.currentSceneIndex) ?? 0;
         }
 
@@ -306,6 +315,12 @@ class SceneViewer {
 
         this.stage.appendChild(video);
         this.currentVideo = video;
+
+        if (this.scrubber && scene.chapters?.length) {
+            this.scrubber.max   = scene.chapters.length - 1;
+            this.scrubber.step  = 1;
+            this.scrubber.value = 0;
+        }
 
         const subtitleEl = document.createElement('div');
         subtitleEl.className = 'subtitle-overlay';
@@ -572,7 +587,7 @@ class SceneViewer {
         const scene = this.currentStory.scenes[this.currentSceneIndex];
 
         if (scene.type === 'staff_roll' || scene.type === 'choice') return;
-        if (scene.type === 'video' && scene.autoAdvance !== false) {
+        if (scene.type === 'video') {
             if (this.currentVideo) {
                 if (this.currentVideo.paused) this.currentVideo.play().catch(() => {});
                 else this.currentVideo.pause();

@@ -182,7 +182,6 @@ window.MAP_DATA.triggers = [
                 "href": "scene_viewer/scene.html?story=ani",
                 "target": "_blank"
             }
-            }
         ]
     },
     {
