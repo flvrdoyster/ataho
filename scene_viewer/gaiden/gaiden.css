@@ -1,9 +1,5 @@
 /* Gaiden Story Specific Styles */
 
-:root {
-    --stage-width: 640px;
-    --stage-height: 480px;
-}
 
 /* 320x240 원본을 2배(640x480)로 nearest-neighbor 확대 */
 .stage {
@@ -47,7 +43,7 @@
     top: 50%;
     left: 62%;
     transform: translate(-50%, -50%);
-    font-size: 20px;
+    font-size: clamp(10px, 3.125cqw, 20px);
     color: rgba(0, 0, 0, 1);
     text-shadow: none;
     pointer-events: none;
@@ -78,7 +74,7 @@
     font-family: inherit;
     font-weight: bold;
     color: rgba(255, 255, 255, 1);
-    font-size: 56px;
+    font-size: clamp(28px, 8.75cqw, 56px);
     line-height: 1.8;
     cursor: pointer;
     padding: 0;
@@ -88,5 +84,5 @@
 
 .choice-btn.choice-active {
     color: rgba(255, 102, 204, 1);
-    font-size: 72px;
+    font-size: clamp(36px, 11.25cqw, 72px);
 }
