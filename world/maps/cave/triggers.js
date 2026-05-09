@@ -52,10 +52,18 @@ window.MAP_DATA.triggers = [
         "w": 2,
         "h": 1,
         "id": "jar-3",
-        "type": "dialog",
         "sprite": "object/object_jar.png",
+        "type": "menu",
         "text": [
-            "아무 것도 안 들었어."
+            "스마슈 녀석은 이런 걸 좋아한단 말이지."
+        ],
+        "title": "장면 뷰어",
+        "items": [
+            {
+                "label": "환세희담 외전\n~궁극의 에로문서 전설~",
+                "href": "scene_viewer/scene.html?story=gaiden",
+                "target": "_blank"
+            }
         ]
     },
     {
@@ -128,35 +136,35 @@ window.MAP_DATA.triggers = [
         "h": 2,
         "id": "jar-1",
         "sprite": "object/object_jar.png",
-        "title": "DS 메뉴 화면 일러스트",
+        "title": "일러스트",
         "type": "menu",
         "text": [
             "언제 받았는지도 모를 전단지 투성이야."
         ],
         "items": [
             {
-                "label": "Disc Station 04",
+                "label": "Disc Station 04 메뉴 화면",
                 "href": "#resource/img/ds04.png",
                 "data": {
                     "caption": "Disc Station 04"
                 }
             },
             {
-                "label": "Disc Station 10",
+                "label": "Disc Station 10 메뉴 화면",
                 "href": "#resource/img/ds10.png",
                 "data": {
                     "caption": "Disc Station 10"
                 }
             },
             {
-                "label": "Disc Station 14",
+                "label": "Disc Station 14 메뉴 화면",
                 "href": "#resource/img/ds14.png",
                 "data": {
                     "caption": "Disc Station 14"
                 }
             },
             {
-                "label": "Disc Station 20",
+                "label": "Disc Station 20 메뉴 화면",
                 "href": "#resource/img/ds20.png",
                 "data": {
                     "caption": "Disc Station 20"
@@ -171,14 +179,14 @@ window.MAP_DATA.triggers = [
         "h": 1,
         "id": "jar-4",
         "sprite": "object/object_jar.png",
-        "title": "DS 아니메 총집편 '98",
+        "title": "장면 뷰어",
         "type": "menu",
         "text": [
-            "이건 뭐지?"
+            "이런 것도 있었나?"
         ],
         "items": [
             {
-                "label": "환세 시리즈 부분 컷",
+                "label": "DS 아니메 총집편 '98\n환세 시리즈 부분",
                 "href": "scene_viewer/scene.html?story=ani",
                 "target": "_blank"
             }
@@ -199,7 +207,7 @@ window.MAP_DATA.triggers = [
         "items": [
             {
                 "label": "환세쾌진극 엔딩",
-                "href": "scene_viewer/scene.html",
+                "href": "scene_viewer/scene.html?story=kaisin",
                 "target": "_blank"
             }
         ]
