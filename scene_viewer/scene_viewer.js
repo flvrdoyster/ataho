@@ -44,6 +44,7 @@ class SceneViewer {
         this.currentVideo = null;
         this.choiceKeyHandler = null;
         this.lang = null;
+        this.subLang = null;
         this.checkpoints = [];
         this.sceneToCheckpoint = new Map();
     }
@@ -69,6 +70,7 @@ class SceneViewer {
         this.currentStory = story;
         this.currentSceneIndex = 0;
         this.lang = story.defaultLang || null;
+        this.subLang = story.defaultSubLang || null;
 
         this.checkpoints = [];
         this.sceneToCheckpoint = new Map();
@@ -309,18 +311,23 @@ class SceneViewer {
         subtitleEl.className = 'subtitle-overlay';
         this.stage.appendChild(subtitleEl);
 
-        const track = document.createElement('track');
-        track.kind = 'subtitles';
-        track.src = videoSrc.replace(/\.[^.]+$/, '.vtt');
-        track.srclang = this.lang || '';
-        video.appendChild(track);
+        if (this.subLang) {
+            const vttSrc = videoSrc.replace(/\/([^/]+)\.[^.]+$/, `/${this.subLang}/$1.vtt`);
+            const track = document.createElement('track');
+            track.kind = 'subtitles';
+            track.src = vttSrc;
+            track.srclang = this.subLang;
+            video.appendChild(track);
 
-        const tt = video.textTracks[0];
-        if (tt) {
-            tt.mode = 'hidden';
-            tt.addEventListener('cuechange', () => {
-                subtitleEl.textContent = tt.activeCues?.[0]?.text ?? '';
-            });
+            const tt = video.textTracks[0];
+            if (tt) {
+                tt.mode = 'hidden';
+                tt.addEventListener('cuechange', () => {
+                    const cue = tt.activeCues?.[0];
+                    subtitleEl.innerHTML = '';
+                    if (cue) subtitleEl.appendChild(cue.getCueAsHTML());
+                });
+            }
         }
 
         const autoAdvance = scene.autoAdvance !== false;
