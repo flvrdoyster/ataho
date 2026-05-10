@@ -54,6 +54,7 @@ class SceneViewer {
         this.subLang = null;
         this.checkpoints = [];
         this.sceneToCheckpoint = new Map();
+        this.chapterButtonsEl = null;
     }
 
     cleanup() {
@@ -70,6 +71,10 @@ class SceneViewer {
         if (this.choiceKeyHandler) {
             document.removeEventListener('keydown', this.choiceKeyHandler);
             this.choiceKeyHandler = null;
+        }
+        if (this.chapterButtonsEl) {
+            this.chapterButtonsEl.remove();
+            this.chapterButtonsEl = null;
         }
     }
 
@@ -320,7 +325,21 @@ class SceneViewer {
             this.scrubber.max   = scene.chapters.length - 1;
             this.scrubber.step  = 1;
             this.scrubber.value = 0;
+
+            video.addEventListener('timeupdate', () => {
+                const t = video.currentTime;
+                let activeIdx = 0;
+                for (let i = scene.chapters.length - 1; i >= 0; i--) {
+                    if (t >= scene.chapters[i]) { activeIdx = i; break; }
+                }
+                if (this.scrubber) this.scrubber.value = activeIdx;
+                this.chapterButtonsEl?.querySelectorAll('.chapter-btn').forEach((btn, i) => {
+                    btn.classList.toggle('active', i === activeIdx);
+                });
+            });
         }
+
+        this.renderChapterButtons(scene);
 
         const subtitleEl = document.createElement('div');
         subtitleEl.className = 'subtitle-overlay';
@@ -355,6 +374,54 @@ class SceneViewer {
         if (scene.text) {
             this.renderTextScene(scene);
         }
+    }
+
+    renderChapterButtons(scene) {
+        if (!this.controls || !scene.chapterLabels?.length) return;
+
+        const n = scene.chapterLabels.length;
+        const container = document.createElement('div');
+        container.className = 'chapter-buttons';
+
+        scene.chapterLabels.forEach((label, i) => {
+            const btn = document.createElement('button');
+            btn.className = 'chapter-btn';
+            if (i === 0) btn.classList.add('active');
+
+            if (typeof label === 'string') {
+                btn.textContent = label;
+            } else {
+                if (label.title) {
+                    const t = document.createElement('span');
+                    t.className = 'chapter-title';
+                    t.textContent = label.title;
+                    btn.appendChild(t);
+                }
+                if (label.body) {
+                    const b = document.createElement('span');
+                    b.className = 'chapter-body';
+                    b.textContent = label.body;
+                    btn.appendChild(b);
+                }
+            }
+
+            // Align with actual scrubber thumb center (thumb ≈ 16px wide)
+            const pct = n > 1 ? i / (n - 1) : 0.5;
+            btn.style.left = `calc(${pct.toFixed(4)} * (100% - 16px) + 8px)`;
+            if (i === 0)          btn.classList.add('chapter-btn--left');
+            else if (i === n - 1) btn.classList.add('chapter-btn--right');
+
+            btn.addEventListener('click', () => {
+                if (!this.currentVideo || scene.chapters?.[i] === undefined) return;
+                this.currentVideo.currentTime = scene.chapters[i];
+                if (this.scrubber) this.scrubber.value = i;
+                this.currentVideo.play().catch(() => {});
+            });
+            container.appendChild(btn);
+        });
+
+        this.controls.appendChild(container);
+        this.chapterButtonsEl = container;
     }
 
     renderChoiceScene(scene) {
