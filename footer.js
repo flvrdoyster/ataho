@@ -1,14 +1,15 @@
 (function () {
     const isEmulator = document.querySelector('script[data-emulator]') !== null;
+
+    const credits = [
+        isEmulator ? 'Emulator by <a href="https://github.com/AZO234/NP2kai">NP2kai</a>' : null,
+        '<span class="desktop-only">Code magic by AI</span>',
+        '<span class="desktop-only">Rest by <a href="https://github.com/flvrdoyster">flvrdoyster</a></span>',
+    ].filter(Boolean).join(' · ');
+
     const footerHTML = `
-        <p>
-            <span class="desktop-only">
-                Code magic by AI <span class="footer-sep">|</span>
-                Everything else by <a href="https://github.com/flvrdoyster">flvrdoyster</a> <span class="footer-sep">|</span>
-            </span>
-            Visual and audio assets © original creators.
-        </p>
-        ${isEmulator ? '<p>Emulator by <a href="https://github.com/AZO234/NP2kai">NP2kai</a></p>' : ''}
+        <p>© COMPILE / D4 Enterprise. All rights reserved.</p>
+        <p class="footer-credits">${credits}</p>
     `;
 
     function injectFooter() {
@@ -17,7 +18,6 @@
             footer = document.createElement('div');
             footer.id = 'footer';
 
-            // Try to find a good place to append
             const mainWrapper = document.getElementById('main-wrapper') ||
                 document.querySelector('.container') ||
                 document.getElementById('app');
@@ -31,7 +31,6 @@
         footer.innerHTML = footerHTML;
     }
 
-    // Auto-inject when DOM is ready
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', injectFooter);
     } else {
