@@ -1,4 +1,5 @@
 (function () {
+    const isEmulator = document.querySelector('script[data-emulator]') !== null;
     const footerHTML = `
         <p>
             <span class="desktop-only">
@@ -7,6 +8,7 @@
             </span>
             Visual and audio assets © original creators.
         </p>
+        ${isEmulator ? '<p>Emulator by <a href="https://github.com/AZO234/NP2kai">NP2kai</a></p>' : ''}
     `;
 
     function injectFooter() {
