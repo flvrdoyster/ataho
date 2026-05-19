@@ -1,11 +1,17 @@
 (function () {
     const isEmulator = document.querySelector('script[data-emulator]') !== null;
 
-    const credits = [
+    const items = [
         isEmulator ? 'Emulator by <a href="https://github.com/AZO234/NP2kai">NP2kai</a>' : null,
         '<span class="desktop-only">Code magic by AI</span>',
         '<span class="desktop-only">Rest by <a href="https://github.com/flvrdoyster">flvrdoyster</a></span>',
-    ].filter(Boolean).join(' · ');
+    ].filter(Boolean);
+
+    const credits = items.map((item, i) => {
+        if (i === 0) return item;
+        const sepClass = item.includes('desktop-only') ? ' desktop-only' : '';
+        return `<span class="footer-sep${sepClass}"> · </span>${item}`;
+    }).join('');
 
     const footerHTML = `
         <p>© COMPILE / D4 Enterprise. All rights reserved.</p>
