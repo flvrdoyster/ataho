@@ -224,6 +224,11 @@ window.MAP_DATA.triggers = [
         "label": "환세풍광전",
         "href": "https://pc98.atah.io/hukyou.html",
         "target": "_blank"
+      },
+      {
+        "label": "환세희담 (오프닝부터)",
+        "href": "https://pc98.atah.io/kitan-opening.html",
+        "target": "_blank"
       }
     ]
   }
