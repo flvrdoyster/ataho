@@ -347,21 +347,11 @@ class SceneViewer {
 
         if (this.subLang) {
             const vttSrc = videoSrc.replace(/\/([^/]+)\.[^.]+$/, `/${this.subLang}/$1.vtt`);
-            const track = document.createElement('track');
-            track.kind = 'subtitles';
-            track.src = vttSrc;
-            track.srclang = this.subLang;
-            video.appendChild(track);
-
-            const tt = video.textTracks[0];
-            if (tt) {
-                tt.mode = 'hidden';
-                tt.addEventListener('cuechange', () => {
-                    const cue = tt.activeCues?.[0];
-                    subtitleEl.innerHTML = '';
-                    if (cue) subtitleEl.appendChild(cue.getCueAsHTML());
-                });
-            }
+            // Drive subtitles ourselves instead of relying on a <track>: iOS
+            // Safari never fires `cuechange` for a 'hidden' track, so the native
+            // API leaves the overlay empty on mobile (works on desktop). Parsing
+            // the VTT and syncing on timeupdate behaves the same on every platform.
+            this.loadSubtitles(vttSrc, video, subtitleEl);
         }
 
         const autoAdvance = scene.autoAdvance !== false;
@@ -374,6 +364,49 @@ class SceneViewer {
         if (scene.text) {
             this.renderTextScene(scene);
         }
+    }
+
+    // Fetch + parse a WebVTT file and drive `overlayEl` off the video's
+    // currentTime. Replaces the native <track>/cuechange path so subtitles
+    // work on iOS Safari too (see renderVideoScene).
+    loadSubtitles(vttSrc, video, overlayEl) {
+        fetch(vttSrc)
+            .then(r => (r.ok ? r.text() : Promise.reject(r.status)))
+            .then(text => {
+                const cues = this.parseVtt(text);
+                if (!cues.length) return;
+                let lastIdx = -1;
+                video.addEventListener('timeupdate', () => {
+                    const t = video.currentTime;
+                    let idx = -1;
+                    for (let i = 0; i < cues.length; i++) {
+                        if (t >= cues[i].start && t < cues[i].end) { idx = i; break; }
+                    }
+                    if (idx === lastIdx) return; // only touch the DOM on change
+                    lastIdx = idx;
+                    overlayEl.textContent = idx >= 0 ? cues[idx].text : '';
+                });
+            })
+            .catch(() => { /* no subtitle file for this scene/lang */ });
+    }
+
+    parseVtt(text) {
+        const toSec = (ts) => ts.trim().split(':').reduce((acc, p) => acc * 60 + parseFloat(p), 0);
+        const cues = [];
+        const blocks = text.replace(/\r/g, '').split(/\n\n+/);
+        for (const block of blocks) {
+            const lines = block.split('\n').filter(l => l.length);
+            const tIdx = lines.findIndex(l => l.includes('-->'));
+            if (tIdx === -1) continue; // header / NOTE / empty block
+            const [rawStart, rest] = lines[tIdx].split('-->');
+            if (rest === undefined) continue;
+            const start = toSec(rawStart);
+            const end = toSec(rest.trim().split(/\s/)[0]); // drop cue settings after end ts
+            const textLines = lines.slice(tIdx + 1);
+            if (!textLines.length) continue;
+            cues.push({ start, end, text: textLines.join('\n') });
+        }
+        return cues;
     }
 
     renderChapterButtons(scene) {
