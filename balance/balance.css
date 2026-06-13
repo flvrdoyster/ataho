@@ -1,28 +1,4 @@
 /* Fonts */
-@font-face {
-    font-family: 'KoddiUDOnGothic';
-    src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2105_2@1.0/KoddiUDOnGothic-Regular.woff') format('woff');
-    font-weight: 400;
-    font-style: normal;
-    font-display: swap;
-}
-
-@font-face {
-    font-family: 'KoddiUDOnGothic';
-    src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2105_2@1.0/KoddiUDOnGothic-Bold.woff') format('woff');
-    font-weight: 700;
-    font-style: normal;
-    font-display: swap;
-}
-
-@font-face {
-    font-family: 'Raster Forge';
-    src: url('https://fonts.cdnfonts.com/s/123917/RasterForgeRegular-XGDg9.woff') format('woff');
-    font-weight: normal;
-    font-style: normal;
-    font-display: swap;
-}
-
 body {
     display: flex;
     justify-content: center;
@@ -47,7 +23,7 @@ canvas {
     position: absolute;
     inset: 0;
     pointer-events: none;
-    font-family: 'Raster Forge', sans-serif;
+    font-family: 'RasterForge', sans-serif;
 }
 
 .frame-box {
@@ -107,8 +83,6 @@ canvas {
     display: block;
 }
 
-
-
 #game-over-overlay {
     position: absolute;
     inset: 0;
@@ -148,8 +122,6 @@ canvas {
     margin: 0;
 }
 
-
-
 #game-over-actions {
     display: flex;
     flex-direction: row;
@@ -160,7 +132,7 @@ canvas {
 #btn-continue,
 #btn-home {
     flex: 1;
-    font-family: 'Raster Forge', sans-serif;
+    font-family: 'RasterForge', sans-serif;
     font-size: 20px;
     color: white;
     background: transparent;
@@ -183,7 +155,7 @@ canvas {
     background: rgba(0, 0, 0, 0.2);
     border: 2px solid rgba(0, 0, 0, 0.5);
     color: rgba(255, 255, 255, 1);
-    font-family: 'Raster Forge', sans-serif;
+    font-family: 'RasterForge', sans-serif;
     font-size: 16px;
     touch-action: manipulation;
     user-select: none;
