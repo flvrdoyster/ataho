@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="https://atah.io/favicon_haiyuki.ico">
-    <title>역 판정 테스터 · 환세패유기 해설서 : atah.io</title>
+    <title>환세패유기 역 판정 테스터 : atah.io</title>
     <link rel="stylesheet" href="../fonts.css">
     <style>
         :root {
@@ -170,12 +170,12 @@
     <script src="../haiyuki_web/js/logic/yakuLogic.js"></script>
     <script>
         const YAKU = [
-            { fn: 'isIpEDam', name: '입에 담을 수도 없는 기술', score: 12800, rule: '뭐든지 1종류의 패를 9개 (+ 아무거나 3개씩 1벌)' },
+            { fn: 'isIpEDam', name: '입에 담을 수도 없는 엄청난 기술', score: 12800, rule: '뭐든지 1종류의 패를 9개 (+ 아무거나 3개씩 1벌)' },
             { fn: 'isBiOUi', name: '비오의', score: 12800, rule: '같은 색의 캐릭터 패 8개 + 무기 패 4개' },
             { fn: 'isOUi', name: '오의', score: 9600, rule: '같은 색의 캐릭터패와 무기패를 6장씩' },
-            { fn: 'isJinMayu', name: '진 눈썹개', score: 9600, rule: '빨·노·파의 눈썹개패를 4장씩' },
+            { fn: 'isJinMayu', name: '진 눈썹개', score: 9600, rule: '빨·파·노의 눈썹개패를 4장씩' },
             { fn: 'isCrossCombination', name: '크로스 콤비네이션', score: 9600, rule: '같은 색의 캐릭터패 2종류와 무기패를 4장씩' },
-            { fn: 'isMaGuTtaeRiGi', name: '마구 때리기', score: 9600, rule: '무기패를 4개씩 3벌' },
+            { fn: 'isMaGuTtaeRiGi', name: '일제공격', score: 9600, rule: '무기패를 4개씩 3벌' },
             { fn: 'isPalBoChae', name: '팔보채', score: 8800, rule: '뭐든지 1종류의 패를 8개 (+ 아무거나 4개씩 1벌)' },
             { fn: 'isSpecialCombination', name: '스페셜 콤비네이션', score: 8000, rule: '같은 색으로 4종류를 3개씩' },
             { fn: 'isChoIlSaek', name: '초 일색', score: 8000, rule: '같은 색의 패를 4개씩 (3벌)' },
@@ -190,7 +190,7 @@
             { fn: 'isSunIlSaek', name: '순 일색', score: 6400, rule: '같은 색만으로 2종류를 3개씩, 다른 1종류는 6개' },
             { fn: 'isPilSalGi', name: '필살기', score: 5600, rule: '같은 색의 캐릭터 1종류와 무기를 4개씩 (+ 아무거나 4개씩 1벌)' },
             { fn: 'isYukBeopJeonSeo', name: '육법전서', score: 5600, rule: '2종류의 패를 6개씩' },
-            { fn: 'isMayu', name: '눈썹개', score: 4800, rule: '빨·노·파의 눈썹개패를 3개씩 (+ 아무거나 3개씩 1벌)' },
+            { fn: 'isMayu', name: '눈썹개', score: 4800, rule: '빨·파·노의 눈썹개패를 3개씩 (+ 아무거나 3개씩 1벌)' },
             { fn: 'isIlSaek', name: '일색', score: 4800, rule: '같은 색의 패로 3종류를 3개씩 + 보라 눈썹개 3개' },
             { fn: 'isDoubleCombination', name: '더블 콤비네이션', score: 4800, rule: '캐릭터패와 무기패를 3개씩, 2색' },
             { fn: 'isCombination', name: '콤비네이션', score: 4000, rule: '같은 색의 캐릭터패 2종류와 무기패를 3개씩 (+ 아무거나 3개씩 1벌)' },
