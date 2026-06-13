@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="https://atah.io/favicon_haiyuki.ico">
+    <title>역 판정 테스터 · 환세패유기 해설서 : atah.io</title>
+    <link rel="stylesheet" href="../fonts.css">
+    <style>
+        :root {
+            --bg: #f3f1ea;
+            --panel: #ffffff;
+            --line: #dcd8cf;
+            --text: #2b2925;
+            --dim: #6c665e;
+            --accent: #0a5bb5;
+            --red: #d61f1e;
+            --ok: #0a7a3c;
+            --okbg: #e9f5ed;
+            --gold: #8a6400;
+            --goldbg: #fbf2d4;
+            --no: #b9b4ab;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            padding: 20px 16px 40px;
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'KoddiUDOnGothic', system-ui, sans-serif;
+            line-height: 1.55;
+            word-break: keep-all;
+        }
+
+        .wrap { max-width: 1040px; margin: 0 auto; }
+
+        .head { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+        .head .title { font-size: 22px; font-weight: 800; }
+        .head .back { margin-left: auto; font-size: 13px; }
+        .head .back a { color: var(--accent); text-decoration: none; }
+        .head .back a:hover { text-decoration: underline; }
+        .sub { color: var(--text); font-size: 13.5px; margin: 8px 0 18px; max-width: 760px; }
+        .sub b { font-weight: 700; }
+
+        .layout { display: flex; gap: 18px; flex-wrap: wrap; align-items: flex-start; }
+        .left { flex: 1 1 340px; min-width: 300px; }
+        .right { flex: 1.6 1 460px; min-width: 320px; }
+
+        .card { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 14px; margin-bottom: 16px; }
+        .card > h2 { font-size: 13px; margin: 0 0 10px; color: var(--dim); font-weight: 700; padding-bottom: 8px; border-bottom: 1px solid var(--line); }
+
+        /* Palette */
+        .tiles { display: flex; flex-wrap: wrap; gap: 6px; }
+        .tile-btn {
+            display: flex; align-items: center; justify-content: center;
+            padding: 5px; cursor: pointer;
+            background: var(--panel); border: 1px solid var(--line); border-radius: 6px;
+        }
+        .tile-btn:hover { border-color: var(--accent); background: #f0f6fd; }
+        .tile-btn img { width: 38px; height: 50px; object-fit: contain; }
+        .tile-btn.disabled { opacity: 0.3; pointer-events: none; }
+
+        /* Hand */
+        .hand-meta { display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; }
+        .count-badge { font-size: 13px; font-weight: 700; color: var(--dim); }
+        .count-badge.good { color: var(--ok); }
+        /* 손패: 한 줄에 6개 고정 (12장 = 2줄) */
+        .hand { display: grid; grid-template-columns: repeat(6, 1fr); gap: 5px; min-height: 58px; }
+        .hand .tile-btn { width: auto; }
+        .hand .tile-btn:hover { border-color: var(--red); background: #fdf0f0; }
+        .hand .tile-btn img { width: 34px; height: 45px; }
+        .hand-empty { grid-column: 1 / -1; color: var(--dim); font-size: 13px; padding: 16px 4px; }
+        button.action {
+            background: var(--red); color: #fff; border: none; border-radius: 6px;
+            padding: 6px 12px; cursor: pointer; font-size: 12.5px; font-family: inherit; font-weight: 700;
+        }
+        button.action.sub { background: #7d776e; }
+        .hint { font-size: 12px; color: var(--dim); margin-top: 8px; }
+
+        /* Winner — white card, dark high-contrast text */
+        .winner { background: var(--panel); border: 2px solid var(--ok); border-radius: 8px; padding: 14px 16px; margin-bottom: 16px; }
+        .winner .label { font-size: 12px; font-weight: 700; color: var(--ok); }
+        .winner .yk { font-size: 25px; font-weight: 800; color: var(--text); line-height: 1.2; margin-top: 1px; }
+        .winner .sc { font-size: 14px; color: var(--text); margin-top: 3px; }
+        .winner .penalty { font-size: 12px; color: var(--dim); margin-top: 3px; }
+        .winner.none { border-color: var(--no); }
+        .winner.none .label { color: var(--dim); }
+        .winner.none .yk { font-size: 16px; color: var(--dim); font-weight: 700; }
+
+        /* Yaku list */
+        .yaku-list { display: flex; flex-direction: column; }
+        .yk-item { padding: 8px 8px 8px 10px; border-bottom: 1px solid var(--line); border-left: 3px solid transparent; }
+        .yk-item.match { background: var(--okbg); border-left-color: var(--ok); }
+        .yk-item.win { background: var(--goldbg); border-left-color: var(--gold); }
+        .yk-head { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+        .yk-st { width: 13px; text-align: center; color: var(--no); font-size: 13px; }
+        .yk-item.match .yk-st { color: var(--ok); }
+        .yk-item.win .yk-st { color: var(--gold); }
+        .yk-name { font-weight: 700; font-size: 14px; color: var(--text); }
+        .yk-base { color: var(--dim); font-weight: 400; font-size: 12px; }
+        .yk-tag { font-size: 10px; font-weight: 700; color: #fff; background: var(--gold); padding: 1px 6px; border-radius: 3px; }
+        .score-pill { margin-left: auto; font-size: 12px; font-weight: 700; color: var(--dim); }
+        .yk-item.match .score-pill { color: var(--ok); }
+        .yk-item.win .score-pill { color: var(--gold); }
+        .yk-rule { color: var(--dim); font-size: 12px; margin-top: 2px; padding-left: 21px; }
+        .yk-item.match .yk-rule { color: var(--text); }
+
+        /* 모바일: 손패 + 패 고르기가 한 화면에 들어오도록 컴팩트하게.
+           색 그룹을 가로 배치(라벨 인라인)하고 타일을 줄여 팔레트 높이를 축소. */
+        @media (max-width: 640px) {
+            body { padding: 14px 12px 30px; }
+            .head .title { font-size: 19px; }
+            .sub { font-size: 12px; margin: 6px 0 12px; line-height: 1.45; }
+            .layout { gap: 14px; }
+            .card { padding: 11px; margin-bottom: 12px; }
+            .card > h2 { font-size: 11.5px; margin-bottom: 8px; padding-bottom: 6px; }
+
+            .tiles { gap: 5px; }
+            .tile-btn { padding: 4px; }
+            .tile-btn img { width: 34px; height: 45px; }
+
+            .hand { min-height: 40px; gap: 4px; }
+            .hand .tile-btn img { width: 32px; height: 42px; }
+            .hint { margin-top: 6px; }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="wrap">
+        <div class="head">
+            <div class="title">역 판정 테스터</div>
+            <div class="back"><a href="index.html">← 해설서로 돌아가기</a></div>
+        </div>
+
+        <div class="layout">
+            <div class="left">
+                <div class="card">
+                    <h2>패 고르기 — 클릭해서 손패에 추가</h2>
+                    <div id="palette"></div>
+                </div>
+                <div class="card">
+                    <div class="hand-meta">
+                        <span class="count-badge" id="count">손패 0 / 12</span>
+                        <span>
+                            <button class="action" id="dealRandom">랜덤 12장</button>
+                            <button class="action sub" id="clear">비우기</button>
+                        </span>
+                    </div>
+                    <div class="hand" id="hand"></div>
+                    <div class="hint">손패의 패를 클릭하면 제거됩니다.</div>
+                </div>
+            </div>
+            <div class="right">
+                <div class="winner" id="winner"><div class="yk">손패를 12장 만들어 주세요</div></div>
+                <div class="card">
+                    <h2>전체 역 — 조건 ↔ 판정 (점수 높은 순)</h2>
+                    <div class="yaku-list" id="yakuRows"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 게임 로직 (haiyuki_web과 단일 소스 공유) -->
+    <script src="../haiyuki_web/js/data/paiData.js"></script>
+    <script src="../haiyuki_web/js/data/battleConfig.js"></script>
+    <script src="../haiyuki_web/js/logic/yakuLogic.js"></script>
+    <script>
+        const YAKU = [
+            { fn: 'isIpEDam', name: '입에 담을 수도 없는 기술', score: 12800, rule: '뭐든지 1종류의 패를 9개 (+ 아무거나 3개씩 1벌)' },
+            { fn: 'isBiOUi', name: '비오의', score: 12800, rule: '같은 색의 캐릭터 패 8개 + 무기 패 4개' },
+            { fn: 'isOUi', name: '오의', score: 9600, rule: '같은 색의 캐릭터패와 무기패를 6장씩' },
+            { fn: 'isJinMayu', name: '진 눈썹개', score: 9600, rule: '빨·노·파의 눈썹개패를 4장씩' },
+            { fn: 'isCrossCombination', name: '크로스 콤비네이션', score: 9600, rule: '같은 색의 캐릭터패 2종류와 무기패를 4장씩' },
+            { fn: 'isMaGuTtaeRiGi', name: '마구 때리기', score: 9600, rule: '무기패를 4개씩 3벌' },
+            { fn: 'isPalBoChae', name: '팔보채', score: 8800, rule: '뭐든지 1종류의 패를 8개 (+ 아무거나 4개씩 1벌)' },
+            { fn: 'isSpecialCombination', name: '스페셜 콤비네이션', score: 8000, rule: '같은 색으로 4종류를 3개씩' },
+            { fn: 'isChoIlSaek', name: '초 일색', score: 8000, rule: '같은 색의 패를 4개씩 (3벌)' },
+            { fn: 'isPoMulJang', name: '포물장', score: 7200, rule: '포물장 3인(화린·스마슈·유리)을 4개씩' },
+            { fn: 'isChwiHoJeon', name: '취호전', score: 7200, rule: '취호전 3인(아타호·린샹·스마슈)을 4개씩' },
+            { fn: 'isNamTang', name: '남탕', score: 7200, rule: '남성 캐릭터패 3종류를 4개씩' },
+            { fn: 'isYeoTang', name: '여탕', score: 7200, rule: '여성 캐릭터패 3종류를 4개씩' },
+            { fn: 'isJuHo', name: '주호', score: 7200, rule: '아타호와 페톰을 6개씩' },
+            { fn: 'isChoMayu', name: '초 눈썹개', score: 6400, rule: '눈썹개패를 3장씩 4색' },
+            { fn: 'isByeonTaeGae', name: '변태개', score: 6400, rule: '스마슈와 여성 캐릭터패 3종류를 3개씩' },
+            { fn: 'isJaYuBakAePyeongDeung', name: '자유 박애 평등', score: 6400, rule: '3색(빨·파·노)의 패를 4장씩 (보라 제외)' },
+            { fn: 'isSunIlSaek', name: '순 일색', score: 6400, rule: '같은 색만으로 2종류를 3개씩, 다른 1종류는 6개' },
+            { fn: 'isPilSalGi', name: '필살기', score: 5600, rule: '같은 색의 캐릭터 1종류와 무기를 4개씩 (+ 아무거나 4개씩 1벌)' },
+            { fn: 'isYukBeopJeonSeo', name: '육법전서', score: 5600, rule: '2종류의 패를 6개씩' },
+            { fn: 'isMayu', name: '눈썹개', score: 4800, rule: '빨·노·파의 눈썹개패를 3개씩 (+ 아무거나 3개씩 1벌)' },
+            { fn: 'isIlSaek', name: '일색', score: 4800, rule: '같은 색의 패로 3종류를 3개씩 + 보라 눈썹개 3개' },
+            { fn: 'isDoubleCombination', name: '더블 콤비네이션', score: 4800, rule: '캐릭터패와 무기패를 3개씩, 2색' },
+            { fn: 'isCombination', name: '콤비네이션', score: 4000, rule: '같은 색의 캐릭터패 2종류와 무기패를 3개씩 (+ 아무거나 3개씩 1벌)' },
+            { fn: 'isSaekHanaSsik', name: '색 하나씩', score: 3200, rule: '4색의 패를 각각 3개씩' },
+            { fn: 'isSaCheonYoRi', name: '사천요리', score: 3200, rule: '뭐든지 4개씩 (3벌)' },
+            { fn: 'isJangGi', name: '장기', score: 2800, rule: '같은 색의 캐릭터 1종류와 무기를 3개씩 (+ 아무거나 3개씩 2벌)' },
+            { fn: 'isSamDoRip', name: '삼도립', score: 2400, rule: '뭐든지 3개씩 4벌' },
+            { fn: 'isAllStars', name: '올스타즈', score: 2400, rule: '눈썹개 외 모든 캐릭터패를 2개씩' },
+            { fn: 'isSamYeonGyeok', name: '삼연격', score: 2000, rule: '캐릭터패와 무기패를 2개씩, 3색' },
+        ];
+
+        const KEY_OF = {
+            isIpEDam: 'IP_E_DAM', isBiOUi: 'BI_O_UI', isOUi: 'O_UI', isJinMayu: 'JIN_MAYU',
+            isCrossCombination: 'CROSS_COMBINATION', isMaGuTtaeRiGi: 'MAGU_DDAERIGI', isPalBoChae: 'PAL_BO_CHAE',
+            isSpecialCombination: 'SPECIAL_COMBINATION', isChoIlSaek: 'CHO_IL_SAEK', isPoMulJang: 'PO_MUL_JANG',
+            isChwiHoJeon: 'CHWI_HO_JEON', isNamTang: 'NAM_TANG', isYeoTang: 'YEO_TANG', isJuHo: 'JU_HO',
+            isChoMayu: 'CHO_MAYU', isByeonTaeGae: 'BYEON_TAE_GAE', isJaYuBakAePyeongDeung: 'JAYU_BAKAE_PYEONGDEUNG',
+            isSunIlSaek: 'SUN_IL_SAEK', isPilSalGi: 'PIL_SAL_GI', isYukBeopJeonSeo: 'YUK_BEOP_JEON_SEO',
+            isMayu: 'MAYU', isIlSaek: 'IL_SAEK', isDoubleCombination: 'DOUBLE_COMBINATION', isCombination: 'COMBINATION',
+            isSaekHanaSsik: 'SAEK_HANA_SSIK', isSaCheonYoRi: 'SA_CHEON_YO_RI', isJangGi: 'JANG_GI',
+            isSamDoRip: 'SAM_DO_RIP', isAllStars: 'ALL_STARS', isSamYeonGyeok: 'SAM_YEON_GYEOK'
+        };
+
+        const COLOR_LABEL = { red: '🔴 빨강', blue: '🔵 파랑', yellow: '🟡 노랑', purple: '🟣 보라' };
+        const COLOR_ORDER = ['red', 'blue', 'yellow', 'purple'];
+        const imgPath = (t) => 'img/' + t.img.split('/').pop();
+
+        let hand = [];
+
+        const palette = document.getElementById('palette');
+        const palRow = document.createElement('div');
+        palRow.className = 'tiles';
+        // 색 순서대로(빨→파→노→보) 한 흐름에 이어 배치 — 색별 줄 구분 없이.
+        COLOR_ORDER.flatMap(col => PaiData.TYPES.filter(t => t.color === col)).forEach(t => {
+            const b = document.createElement('div');
+            b.className = 'tile-btn';
+            b.dataset.tid = t.id;
+            b.title = t.name;
+            b.innerHTML = `<img src="${imgPath(t)}" alt="${t.name}">`;
+            b.onclick = () => {
+                const used = hand.filter(x => x === t.id).length;
+                if (hand.length < 12 && used < PaiData.TILE_COUNT_PER_TYPE) { hand.push(t.id); render(); }
+            };
+            palRow.appendChild(b);
+        });
+        palette.appendChild(palRow);
+
+        document.getElementById('clear').onclick = () => { hand = []; render(); };
+        document.getElementById('dealRandom').onclick = () => {
+            hand = [];
+            const ids = PaiData.TYPES.map(t => t.id);
+            const used = {};
+            while (hand.length < 12) {
+                const id = ids[Math.floor(Math.random() * ids.length)];
+                used[id] = (used[id] || 0);
+                if (used[id] < PaiData.TILE_COUNT_PER_TYPE) { used[id]++; hand.push(id); }
+            }
+            render();
+        };
+
+        const tileById = (id) => PaiData.TYPES.find(t => t.id === id);
+        const buildHand = () => hand.map(id => { const t = tileById(id); return { type: t.id, color: t.color, img: t.img }; });
+
+        function render() {
+            const handEl = document.getElementById('hand');
+            handEl.innerHTML = '';
+            if (hand.length === 0) {
+                handEl.innerHTML = '<span class="hand-empty">아직 비어 있습니다. 왼쪽에서 패를 골라 주세요.</span>';
+            } else {
+                const sorted = [...hand].sort((a, b) => {
+                    const ta = tileById(a), tb = tileById(b);
+                    return COLOR_ORDER.indexOf(ta.color) - COLOR_ORDER.indexOf(tb.color) || ta.id.localeCompare(tb.id);
+                });
+                sorted.forEach((id) => {
+                    const t = tileById(id);
+                    const b = document.createElement('div');
+                    b.className = 'tile-btn';
+                    b.title = `${t.name} · 클릭하면 제거`;
+                    b.innerHTML = `<img src="${imgPath(t)}" alt="${t.name}">`;
+                    b.onclick = () => { const i = hand.indexOf(id); if (i >= 0) { hand.splice(i, 1); render(); } };
+                    handEl.appendChild(b);
+                });
+            }
+            const cnt = document.getElementById('count');
+            cnt.textContent = `손패 ${hand.length} / 12`;
+            cnt.className = 'count-badge ' + (hand.length === 12 ? 'good' : '');
+
+            const tiles = buildHand();
+            const a = YakuLogic.analyzeHand(tiles);
+
+            document.querySelectorAll('#palette .tile-btn').forEach(b => {
+                const used = hand.filter(x => x === b.dataset.tid).length;
+                b.classList.toggle('disabled', hand.length >= 12 || used >= PaiData.TILE_COUNT_PER_TYPE);
+            });
+
+            const result = (hand.length === 12) ? YakuLogic.checkYaku(tiles, null) : null;
+            const winnerName = result ? result.yaku[0] : null;
+            let winnerMarked = false;
+
+            const list = document.getElementById('yakuRows');
+            list.innerHTML = '';
+            YAKU.forEach(y => {
+                let res = false, meta = null;
+                try {
+                    const out = YakuLogic[y.fn](a);
+                    if (out === true) res = true;
+                    else if (out && out.match) { res = true; meta = out.meta; }
+                } catch (e) { res = false; }
+
+                let nameHtml = y.name, isWin = false;
+                if (res) {
+                    const resolved = YakuLogic.resolveYakuName(KEY_OF[y.fn], meta, null);
+                    nameHtml = (resolved && resolved !== y.name)
+                        ? `${resolved} <span class="yk-base">(${y.name})</span>`
+                        : (resolved || y.name);
+                    if (!winnerMarked && winnerName && resolved === winnerName) { isWin = true; winnerMarked = true; }
+                }
+                const item = document.createElement('div');
+                item.className = 'yk-item' + (isWin ? ' match win' : (res ? ' match' : ''));
+                item.title = y.fn;
+                item.innerHTML =
+                    `<div class="yk-head">` +
+                    `<span class="yk-st">${isWin ? '★' : (res ? '✔' : '·')}</span>` +
+                    `<span class="yk-name">${nameHtml}</span>` +
+                    (isWin ? `<span class="yk-tag">최종</span>` : '') +
+                    `<span class="score-pill">${y.score}점</span>` +
+                    `</div>` +
+                    `<div class="yk-rule">${y.rule}</div>`;
+                list.appendChild(item);
+            });
+
+            const w = document.getElementById('winner');
+            if (hand.length !== 12) {
+                w.className = 'winner none';
+                w.innerHTML = `<div class="label">완성된 역</div><div class="yk">손패를 12장 만들어 주세요 (${hand.length}/12)</div>`;
+            } else if (!result) {
+                w.className = 'winner none';
+                w.innerHTML = `<div class="label">완성된 역</div><div class="yk">역 없음 — 화료 불가</div>
+                    <div class="penalty">12장이지만 어떤 역도 성립하지 않습니다.</div>`;
+            } else {
+                w.className = 'winner';
+                const open = Math.round(result.score * 0.75);
+                w.innerHTML =
+                    `<div class="label">완성된 역</div>` +
+                    `<div class="yk">${result.yaku[0]}</div>` +
+                    `<div class="sc">기본 ${result.score}점</div>` +
+                    `<div class="penalty">오픈 핸드(펑 후)는 75% → ${open}점</div>`;
+            }
+        }
+
+        render();
+    </script>
+</body>
+
+</html>
