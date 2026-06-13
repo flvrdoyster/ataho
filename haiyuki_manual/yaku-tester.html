@@ -138,7 +138,7 @@
 
         <div class="layout">
             <div class="left">
-                <div class="card">
+                <div class="card" id="paletteCard">
                     <h2>패 고르기 — 클릭해서 손패에 추가</h2>
                     <div id="palette"></div>
                 </div>
@@ -278,6 +278,9 @@
             cnt.textContent = `손패 ${hand.length} / 12`;
             cnt.className = 'count-badge ' + (hand.length === 12 ? 'good' : '');
 
+            // 손패가 가득 차면(12장) 패 고르기 섹션을 숨기고, 12장 미만이면 다시 표시.
+            document.getElementById('paletteCard').style.display = (hand.length === 12) ? 'none' : '';
+
             const tiles = buildHand();
             const a = YakuLogic.analyzeHand(tiles);
 
@@ -328,7 +331,7 @@
                 w.innerHTML = `<div class="label">완성된 역</div><div class="yk">손패를 12장 만들어 주세요 (${hand.length}/12)</div>`;
             } else if (!result) {
                 w.className = 'winner none';
-                w.innerHTML = `<div class="label">완성된 역</div><div class="yk">역 없음 — 화료 불가</div>
+                w.innerHTML = `<div class="label">완성된 역</div><div class="yk">역 없음 — 날 수 없습니다</div>
                     <div class="penalty">12장이지만 어떤 역도 성립하지 않습니다.</div>`;
             } else {
                 w.className = 'winner';
