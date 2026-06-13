@@ -95,6 +95,9 @@ window.MAP_DATA.triggers = [
     "id": "haiyuki",
     "title": "환세패유기",
     "type": "menu",
+    "text": [
+      "여기다 밧줄을 태울 생각을 하다니..."
+    ],
     "sprite": "object/object_irori.png",
     "animW": 64,
     "animH": 48,
@@ -102,25 +105,15 @@ window.MAP_DATA.triggers = [
     "speed": 200,
     "items": [
       {
-        "label": "웹 버전 (ko)",
+        "label": "웹 버전",
         "href": "haiyuki_web/index.html",
         "target": "_blank"
       },
       {
-        "label": "매뉴얼 (ko)",
+        "label": "매뉴얼",
         "href": "haiyuki_manual/index.html",
         "target": "_blank"
       },
-      {
-        "label": "매뉴얼 원본 1 (PDF)",
-        "href": "haiyuki_manual/ref/manual_thebest.pdf",
-        "target": "_blank"
-      },
-      {
-        "label": "매뉴얼 원본 2 (PDF)",
-        "href": "haiyuki_manual/ref/manual_D4.pdf",
-        "target": "_blank"
-      }
     ]
   },
   {
@@ -215,7 +208,7 @@ window.MAP_DATA.triggers = [
     "w": 5,
     "h": 2,
     "text": [
-      "상자를 치웠으니 지나갈 수 있어"
+      "상자를 치웠으니 호수로 갈 수 있어"
     ],
     "bubbleOffsetY": 0,
     "collision": false,
@@ -229,7 +222,12 @@ window.MAP_DATA.triggers = [
         "label": "환세희담 (오프닝부터)",
         "href": "https://pc98.atah.io/kitan-opening.html",
         "target": "_blank"
-      }
+      },
+      {
+        "label": "환세쾌도전",
+        "href": "https://pc98.atah.io/kaitou.html",
+        "target": "_blank"
+      },
     ]
   }
 ]
