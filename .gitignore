@@ -6,3 +6,6 @@
 # Playwright (haiyuki_web/)
 haiyuki_web/node_modules/
 haiyuki_web/tests/results/
+
+# Source/working art files — keep locally, don't ship to the deploy
+*.psd
