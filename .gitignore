@@ -9,3 +9,7 @@ haiyuki_web/tests/results/
 
 # Source/working art files — keep locally, don't ship to the deploy
 *.psd
+
+# Original game files (copyrighted Compile assets) + extractions — local only,
+# never commit/deploy to the public site
+haiyuki_web/originals/
