@@ -4,12 +4,4 @@
 **/.claude/
 
 # Playwright — all test tooling lives under haiyuki_web/tests/
-haiyuki_web/tests/node_modules/
-haiyuki_web/tests/.playwright/
-
-# Source/working art files — keep locally, don't ship to the deploy
-*.psd
-
-# Original game files (copyrighted Compile assets) + extractions — local only,
-# never commit/deploy to the public site
-haiyuki_web/originals/
+haiyuki_web/tests/
