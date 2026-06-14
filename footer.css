@@ -24,6 +24,10 @@
     opacity: 0.5;
 }
 
+#footer .site-version {
+    letter-spacing: 0.05em;
+}
+
 /* Fixed footer style (배경이 강제로 어두워지므로 밝은 텍스트로 명시) */
 .footer-fixed #footer {
     position: fixed;
