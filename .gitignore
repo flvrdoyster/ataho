@@ -3,9 +3,9 @@
 # Claude Code
 **/.claude/
 
-# Playwright (haiyuki_web/)
-haiyuki_web/node_modules/
-haiyuki_web/tests/results/
+# Playwright — all test tooling lives under haiyuki_web/tests/
+haiyuki_web/tests/node_modules/
+haiyuki_web/tests/.playwright/
 
 # Source/working art files — keep locally, don't ship to the deploy
 *.psd
