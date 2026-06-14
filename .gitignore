@@ -3,5 +3,8 @@
 # Claude Code
 **/.claude/
 
-# Playwright — all test tooling lives under haiyuki_web/tests/
+# Playwright
 haiyuki_web/tests/
+
+# Reference
+haiyuki_web/ref.mp4
