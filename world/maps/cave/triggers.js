@@ -105,7 +105,7 @@ window.MAP_DATA.triggers = [
     "speed": 200,
     "items": [
       {
-        "label": "웹 버전",
+        "label": "환세패유기 웹 버전",
         "href": "haiyuki_web/index.html",
         "target": "_blank"
       },
@@ -113,7 +113,7 @@ window.MAP_DATA.triggers = [
         "label": "매뉴얼",
         "href": "haiyuki_manual/index.html",
         "target": "_blank"
-      },
+      }
     ]
   },
   {
@@ -201,12 +201,12 @@ window.MAP_DATA.triggers = [
   },
   {
     "x": 16,
-    "y": 7,
+    "y": 4,
     "title": "PC98 에뮬레이터",
     "id": "pc98",
     "type": "menu",
     "w": 5,
-    "h": 2,
+    "h": 4,
     "text": [
       "상자를 치웠으니 호수로 갈 수 있어"
     ],
@@ -227,7 +227,7 @@ window.MAP_DATA.triggers = [
         "label": "환세쾌도전",
         "href": "https://pc98.atah.io/kaitou.html",
         "target": "_blank"
-      },
+      }
     ]
   }
 ]

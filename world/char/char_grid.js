@@ -133,11 +133,6 @@ function playerUpdate(dt) {
             player.x = player.targetX;
             player.y = player.targetY;
             player.isMoving = false;
-            
-            // Auto close modals if moving
-            if ((isBubbleOpen || isModalOpen) && performance.now() - lastBubbleTime > 500) {
-                closeModal();
-            }
         } else {
             // Interpolate position
             const ratio = player.moveProgress / CONFIG.TILE_SIZE;

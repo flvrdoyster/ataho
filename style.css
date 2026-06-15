@@ -359,3 +359,18 @@ video:fullscreen::cue {
     border-color: rgba(255, 255, 255, 1) transparent transparent transparent;
     z-index: 1;
 }
+
+/* Flipped below the character: tail points up instead of down */
+#speech-bubble.flip-below::after {
+    bottom: auto;
+    top: -10px;
+    border-width: 0 10px 10px;
+    border-color: transparent transparent rgba(0, 0, 0, 1) transparent;
+}
+
+#speech-bubble.flip-below::before {
+    bottom: auto;
+    top: -7px;
+    border-width: 0 8px 8px;
+    border-color: transparent transparent rgba(255, 255, 255, 1) transparent;
+}

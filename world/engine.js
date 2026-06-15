@@ -66,19 +66,21 @@ const touchInput = { active: false, dx: 0, dy: 0 };
 
 let triggers = [];
 let activeTrigger = null;
-let isModalOpen = false;
-let isBubbleOpen = false;
 let lastTime = 0;
 let isTouchDevice = false;
 let focusedLinkIndex = -1;
 let bubbleTimeout = null;
 let lastBubbleTime = 0;
 
-// Interaction state machine (see openModal/enterDialogue/enterMenu/closeModal)
+// Interaction state machine — single source of truth for "a bubble or menu is open".
+// (see openModal/enterDialogue/enterMenu/closeModal). Character modules read only
+// isInteracting(); the engine freezes player input while it is true.
 let interactionState = 'NONE';   // 'NONE' | 'DIALOGUE' | 'MENU'
 let activeMenuTrigger = null;    // trigger whose menu opens when a dialogue advances
 let lastAutoTriggerId = null;    // latch so an auto-firing tile trigger fires once per entry
 const DIALOGUE_AUTO_MS = 2000;   // bubble auto-advances after this delay
+
+function isInteracting() { return interactionState !== 'NONE'; }
 
 // ===== Path Resolution =====
 function resolvePath(path) {
@@ -390,7 +392,6 @@ function enterMenu(trigger) {
     const bubble = document.getElementById('speech-bubble');
     if (bubble) bubble.classList.add('hidden');
     if (bubbleTimeout) { clearTimeout(bubbleTimeout); bubbleTimeout = null; }
-    isBubbleOpen = false;
 
     const titleEl = document.getElementById('modal-title');
     if (titleEl) {
@@ -449,7 +450,6 @@ function enterMenu(trigger) {
     }
 
     modal.classList.remove('hidden');
-    isModalOpen = true;
     interactionState = 'MENU';
     activeMenuTrigger = null; // consumed
     lastBubbleTime = performance.now();
@@ -459,15 +459,13 @@ function enterMenu(trigger) {
 }
 
 // Close the whole interaction. Public dismiss used by Escape, the close button,
-// backdrop clicks, picking an item, and the character modules' walk-away check.
+// backdrop clicks, and picking an item.
 function closeModal() {
     document.querySelectorAll('.modal').forEach(m => m.classList.add('hidden'));
     document.querySelectorAll('.modal a').forEach(a => a.classList.remove('focused'));
     const bubble = document.getElementById('speech-bubble');
     if (bubble) bubble.classList.add('hidden');
     if (bubbleTimeout) { clearTimeout(bubbleTimeout); bubbleTimeout = null; }
-    isModalOpen = false;
-    isBubbleOpen = false;
     interactionState = 'NONE';
     activeMenuTrigger = null;
 }
@@ -477,7 +475,7 @@ function showResultBubble(text, offsetY) {
     enterDialogue(text, offsetY, null, null);
 }
 
-// Pure render of the speech bubble; no state transitions beyond isBubbleOpen.
+// Pure render of the speech bubble; interactionState is set by the caller.
 function renderBubble(text, offsetY = 0, trigger = null) {
     const bubble = document.getElementById('speech-bubble');
     if (!bubble) return;
@@ -496,7 +494,6 @@ function renderBubble(text, offsetY = 0, trigger = null) {
     bubble.textContent = textContent || '';
     bubble.dataset.offsetY = offsetY || 0;
     bubble.classList.remove('hidden');
-    isBubbleOpen = true;
     lastBubbleTime = performance.now();
 }
 
@@ -543,7 +540,7 @@ function resizeCanvas() {
 
 // ===== Input =====
 function onKeyDown(e) {
-    if (isModalOpen) {
+    if (interactionState === 'MENU') {
         if (e.key === 'Escape') closeModal();
         if (e.key === 'ArrowUp') handleModalNav(-1);
         if (e.key === 'ArrowDown') handleModalNav(1);
@@ -552,7 +549,7 @@ function onKeyDown(e) {
     }
     if (keys.hasOwnProperty(e.key)) keys[e.key] = true;
     if (e.code === 'Space' || e.key === 'Enter' || e.key.startsWith('Arrow')) {
-        if (isBubbleOpen) {
+        if (interactionState === 'DIALOGUE') {
             if (performance.now() - lastBubbleTime > 200) advanceInteraction();
         } else if (activeTrigger && e.code === 'Space') {
             openModal(activeTrigger);
@@ -581,7 +578,7 @@ function handleTouchEnd(e) {
     if (e.target !== canvas) return;
     e.preventDefault();
 
-    if (touchInput.active && !isModalOpen) {
+    if (touchInput.active && interactionState !== 'MENU') {
         const touch = e.changedTouches[0];
         const rect = canvas.getBoundingClientRect();
         const scaleX = canvas.width / rect.width;
@@ -627,6 +624,15 @@ function updateTouchInput(touch) {
 
 // ===== Update =====
 function update(dt) {
+    // Freeze player input while a bubble or menu is open. Done once here so every
+    // character module stops uniformly — no per-module interaction handling.
+    if (isInteracting()) {
+        for (const k in keys) keys[k] = false;
+        touchInput.active = false;
+        touchInput.dx = 0;
+        touchInput.dy = 0;
+    }
+
     // Character update
     if (typeof playerUpdate === 'function') playerUpdate(dt);
 
@@ -656,7 +662,7 @@ function update(dt) {
 
 // ===== Triggers =====
 function checkTriggers() {
-    if (isModalOpen) return;
+    if (interactionState === 'MENU') return;
 
     const ps = (typeof playerGetState === 'function') ? playerGetState() : null;
     if (!ps) return;
@@ -815,8 +821,21 @@ function draw() {
             const globalOffset = CONFIG.SPEECH_BUBBLE_OFFSET_Y || -50;
             const customOffset = (target === modal && activeTrigger) ? (activeTrigger.bubbleOffsetY || 0) : (parseInt(target.dataset.offsetY) || 0);
             target.style.left = `${screenX}px`;
-            target.style.top = `${screenY + globalOffset + customOffset}px`;
-            target.style.transform = 'translate(-50%, -100%)';
+
+            // Default: float above the character's head. If that would clip off the top
+            // of the canvas (character near the top of the map, e.g. the PC98 exit zone),
+            // flip below the character so the bubble/modal stays on screen.
+            const aboveVisualTop = (screenY + globalOffset + customOffset) - target.offsetHeight;
+            if (aboveVisualTop < rect.top + 8) {
+                const charBottomY = rect.top + (ps.y + ps.height - camera.y) * scaleY;
+                target.classList.add('flip-below');
+                target.style.top = `${charBottomY + 16 + customOffset}px`;
+                target.style.transform = 'translate(-50%, 0)';
+            } else {
+                target.classList.remove('flip-below');
+                target.style.top = `${screenY + globalOffset + customOffset}px`;
+                target.style.transform = 'translate(-50%, -100%)';
+            }
         }
     }
 

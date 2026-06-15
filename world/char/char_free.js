@@ -208,11 +208,6 @@ function playerUpdate(dt) {
 
     player.isMoving = (dx !== 0 || dy !== 0);
 
-    // Move-to-close modal/bubble
-    if (player.isMoving && (isBubbleOpen || isModalOpen) && performance.now() - lastBubbleTime > 500) {
-        closeModal();
-    }
-
     // --- Idle State Machine ---
     if (player.isMoving) {
         player.idleTimer = 0;
@@ -268,7 +263,7 @@ function playerUpdate(dt) {
             player.isHiccuping = false;
             player.hiccupIntervalTimer = 0;
 
-            if (!isModalOpen && !isBubbleOpen) {
+            if (!isInteracting()) {
                 player.idleTimer += dt;
             } else {
                 player.idleTimer = 0;
