@@ -34,7 +34,7 @@ let CONFIG = {
         MOBILE_BUTTON: {
             LABEL: 'Space',
             WIDTH: '80px', HEIGHT: '34px',
-            BOTTOM: '60px', LEFT: '50%', RIGHT: 'auto',
+            BOTTOM: '20vh', LEFT: '50%', RIGHT: 'auto',
             BG_COLOR: '#f5f5f5', TEXT_COLOR: '#000',
             BORDER: '1px solid #d3d3d3',
             BORDER_BOTTOM: '6px solid #bebebe',
@@ -194,9 +194,9 @@ async function initGame() {
     if (CONFIG.PATHS.TILESET) {
         tilesetImg = new Image();
         tilesetImg.src = CONFIG.PATHS.TILESET;
-        await new Promise((resolve, reject) => {
+        await new Promise((resolve) => {
             tilesetImg.onload = resolve;
-            tilesetImg.onerror = reject;
+            tilesetImg.onerror = () => { console.warn("Tileset load failed:", CONFIG.PATHS.TILESET); resolve(); };
         });
     }
 
@@ -270,7 +270,7 @@ function injectUI() {
     }
     const uiLayer = document.getElementById('ui-layer');
 
-    // Interaction Prompt
+    // Interaction Prompt (desktop hint pill)
     if (!document.getElementById('interaction-prompt')) {
         const prompt = document.createElement('div');
         prompt.id = 'interaction-prompt';
@@ -278,28 +278,45 @@ function injectUI() {
         prompt.textContent = CONFIG.UI.DESKTOP_PROMPT.LABEL;
         uiLayer.appendChild(prompt);
 
-        const mBtn = CONFIG.UI.MOBILE_BUTTON;
-        prompt.style.setProperty('--mobile-btn-width', mBtn.WIDTH);
-        prompt.style.setProperty('--mobile-btn-height', mBtn.HEIGHT);
-        prompt.style.setProperty('--mobile-btn-bottom', mBtn.BOTTOM);
-        prompt.style.setProperty('--mobile-btn-left', mBtn.LEFT);
-        prompt.style.setProperty('--mobile-btn-right', mBtn.RIGHT);
-        prompt.style.setProperty('--mobile-btn-bg', mBtn.BG_COLOR);
-        prompt.style.setProperty('--mobile-btn-color', mBtn.TEXT_COLOR);
-        prompt.style.setProperty('--mobile-btn-border', mBtn.BORDER);
-        prompt.style.setProperty('--mobile-btn-border-bottom', mBtn.BORDER_BOTTOM);
-        prompt.style.setProperty('--mobile-btn-radius', mBtn.RADIUS);
-        prompt.style.setProperty('--mobile-btn-font-size', mBtn.FONT_SIZE);
-        prompt.style.setProperty('--mobile-btn-shadow', mBtn.SHADOW);
-        prompt.style.setProperty('--mobile-btn-transform', mBtn.TRANSFORM);
-        prompt.style.setProperty('--mobile-btn-font-family', mBtn.FONT_FAMILY);
-
         prompt.addEventListener('click', (e) => {
             e.preventDefault();
             e.stopPropagation();
             if (activeTrigger) openModal(activeTrigger);
         });
         prompt.addEventListener('touchstart', (e) => { e.stopPropagation(); });
+    }
+
+    // Mobile Action Button (touch only) — separate element so width changes never
+    // desync styling (CSS) from content (JS), which used to break the prompt on resize.
+    if (!document.getElementById('mobile-action-btn')) {
+        const btn = document.createElement('div');
+        btn.id = 'mobile-action-btn';
+        btn.className = 'hidden';
+        const mBtn = CONFIG.UI.MOBILE_BUTTON;
+        btn.innerHTML = (mBtn.LABEL || '').replace(/\\n/g, '<br>');
+        uiLayer.appendChild(btn);
+
+        btn.style.setProperty('--mobile-btn-width', mBtn.WIDTH);
+        btn.style.setProperty('--mobile-btn-height', mBtn.HEIGHT);
+        btn.style.setProperty('--mobile-btn-bottom', mBtn.BOTTOM);
+        btn.style.setProperty('--mobile-btn-left', mBtn.LEFT);
+        btn.style.setProperty('--mobile-btn-right', mBtn.RIGHT);
+        btn.style.setProperty('--mobile-btn-bg', mBtn.BG_COLOR);
+        btn.style.setProperty('--mobile-btn-color', mBtn.TEXT_COLOR);
+        btn.style.setProperty('--mobile-btn-border', mBtn.BORDER);
+        btn.style.setProperty('--mobile-btn-border-bottom', mBtn.BORDER_BOTTOM);
+        btn.style.setProperty('--mobile-btn-radius', mBtn.RADIUS);
+        btn.style.setProperty('--mobile-btn-font-size', mBtn.FONT_SIZE);
+        btn.style.setProperty('--mobile-btn-shadow', mBtn.SHADOW);
+        btn.style.setProperty('--mobile-btn-transform', mBtn.TRANSFORM);
+        btn.style.setProperty('--mobile-btn-font-family', mBtn.FONT_FAMILY);
+
+        btn.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            if (activeTrigger) openModal(activeTrigger);
+        });
+        btn.addEventListener('touchstart', (e) => { e.stopPropagation(); });
     }
 
     // Dynamic Modal
@@ -639,20 +656,14 @@ function checkTriggers() {
         lastAutoTriggerId = null;
     }
 
-    // Update interaction prompt
+    // Update interaction prompt + mobile action button together.
+    // CSS (viewport width) decides which one is actually visible; JS only toggles
+    // the near-a-trigger visibility, so the two can never desync on resize.
     const prompt = document.getElementById('interaction-prompt');
-    if (activeTrigger && activeTrigger.sprite) {
-        if (prompt) {
-            if (isTouchDevice) {
-                prompt.innerHTML = CONFIG.UI.MOBILE_BUTTON.LABEL.replace(/\\n/g, '<br>');
-            } else {
-                prompt.textContent = CONFIG.UI.DESKTOP_PROMPT.LABEL;
-            }
-            prompt.classList.remove('hidden');
-        }
-    } else {
-        if (prompt) prompt.classList.add('hidden');
-    }
+    const mobileBtn = document.getElementById('mobile-action-btn');
+    const showPrompt = !!(activeTrigger && activeTrigger.sprite);
+    if (prompt) prompt.classList.toggle('hidden', !showPrompt);
+    if (mobileBtn) mobileBtn.classList.toggle('hidden', !showPrompt);
 }
 
 // ===== Rendering =====
@@ -674,6 +685,8 @@ function draw() {
     const startRow = Math.max(0, Math.floor(viewT / CONFIG.TILE_SIZE));
     const endRow = Math.min(gridRows, Math.ceil(viewB / CONFIG.TILE_SIZE));
 
+    // Skip floor tiles if the tileset failed to load (avoids drawImage throwing each frame)
+    if (tilesetImg && tilesetImg.naturalWidth > 0)
     for (let y = startRow; y < endRow; y++) {
         for (let x = startCol; x < endCol; x++) {
             const cell = tileGrid[y][x];

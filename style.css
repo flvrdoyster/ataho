@@ -167,22 +167,41 @@ video:fullscreen::cue {
 
 .prompt {
     position: absolute;
-    bottom: 100px;
+    bottom: 25vh;
     left: 50%;
     transform: translateX(-50%);
-    background: rgba(0, 0, 0, 0.7);
+    background: rgba(0, 0, 0, 0.82);
     color: rgba(255, 255, 255, 1);
-    padding: 10px 20px;
+    padding: 10px 22px;
+    border: 1.5px solid rgba(255, 255, 255, 0.85);
     border-radius: 20px;
     font-size: 1.2rem;
+    font-weight: 600;
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.45);
     pointer-events: auto;
     transition: opacity 0.3s, visibility 0s 0.3s;
+    animation: promptBob 1.4s ease-in-out infinite;
 }
 
 .prompt.hidden {
     opacity: 0;
     visibility: hidden;
     pointer-events: none;
+}
+
+/* Gentle float to draw the eye toward the prompt */
+@keyframes promptBob {
+    0%, 100% { transform: translateX(-50%) translateY(0); }
+    50%      { transform: translateX(-50%) translateY(-6px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .prompt { animation: none; }
+}
+
+/* Mobile action button: hidden on desktop, shown only under the mobile breakpoint */
+#mobile-action-btn {
+    display: none;
 }
 
 /* Modals */
@@ -285,8 +304,13 @@ video:fullscreen::cue {
         font-size: 1rem;
     }
 
+    /* Desktop hint pill is irrelevant on touch widths */
     #interaction-prompt {
-        display: flex !important;
+        display: none !important;
+    }
+
+    #mobile-action-btn {
+        display: flex;
         position: fixed;
         bottom: var(--mobile-btn-bottom, 40px);
         left: var(--mobile-btn-left, 50%);
@@ -314,7 +338,11 @@ video:fullscreen::cue {
         transition: transform 0.05s, border-bottom-width 0.05s, box-shadow 0.05s;
     }
 
-    #interaction-prompt:active {
+    #mobile-action-btn.hidden {
+        display: none;
+    }
+
+    #mobile-action-btn:active {
         /* Push button down and squash the 3D base */
         transform: var(--mobile-btn-transform, translateX(-50%)) translateY(4px);
         border-bottom-width: 2px !important;
