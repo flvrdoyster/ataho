@@ -73,8 +73,11 @@ let isTouchDevice = false;
 let focusedLinkIndex = -1;
 let bubbleTimeout = null;
 let lastBubbleTime = 0;
-let lastAutoTriggerId = null;
-let pendingMenuTrigger = null;
+
+// Interaction state machine (see openModal/enterDialogue/enterMenu/closeModal)
+let interactionState = 'NONE';   // 'NONE' | 'DIALOGUE' | 'MENU'
+let activeMenuTrigger = null;    // trigger whose menu opens when a dialogue advances
+const DIALOGUE_AUTO_MS = 2000;   // bubble auto-advances after this delay
 
 // ===== Path Resolution =====
 function resolvePath(path) {
@@ -281,7 +284,7 @@ function injectUI() {
         prompt.addEventListener('click', (e) => {
             e.preventDefault();
             e.stopPropagation();
-            if (activeTrigger) openModal(activeTrigger);
+            activateOrAdvance();
         });
         prompt.addEventListener('touchstart', (e) => { e.stopPropagation(); });
     }
@@ -314,7 +317,7 @@ function injectUI() {
         btn.addEventListener('click', (e) => {
             e.preventDefault();
             e.stopPropagation();
-            if (activeTrigger) openModal(activeTrigger);
+            activateOrAdvance();
         });
         btn.addEventListener('touchstart', (e) => { e.stopPropagation(); });
     }
@@ -345,19 +348,65 @@ function injectUI() {
     }
 }
 
-function openModal(trigger, skipDialogue = false) {
-    if (!skipDialogue && (trigger.type === 'dialog' || (trigger.type === 'menu' && trigger.text))) {
-        showSpeechBubble(trigger.text, trigger.bubbleOffsetY, trigger);
-        if (trigger.type === 'menu') {
-            pendingMenuTrigger = trigger;
-        } else {
-            pendingMenuTrigger = null;
-        }
-        return;
-    }
+// ===== Interaction State Machine: NONE → DIALOGUE → MENU =====
+// A trigger with text first shows a speech bubble (DIALOGUE); confirming it or
+// letting it time out *advances* to the menu (MENU) when one exists, otherwise
+// it *closes*. "advance" and "close" are kept as distinct actions instead of
+// overloading closeModal(), which is also the public "dismiss everything" call
+// used by the character modules when the player walks away.
 
+// Entry point: begin interacting with a trigger.
+function openModal(trigger, skipDialogue = false) {
+    if (!trigger) return;
+    const hasDialogue = (trigger.type === 'dialog' || (trigger.type === 'menu' && trigger.text));
+    if (!skipDialogue && hasDialogue) {
+        const menuFollows = (trigger.type === 'menu');
+        enterDialogue(trigger.text, trigger.bubbleOffsetY, trigger, menuFollows ? trigger : null);
+    } else {
+        enterMenu(trigger);
+    }
+}
+
+// Pointer entry: a tap/click on the prompt pill or mobile action button. Advances
+// an open dialogue (mirroring the Space key) instead of restarting it; otherwise
+// begins interacting with the reachable trigger.
+function activateOrAdvance() {
+    if (interactionState === 'DIALOGUE') {
+        if (performance.now() - lastBubbleTime > 200) advanceInteraction();
+    } else if (interactionState === 'NONE' && activeTrigger) {
+        openModal(activeTrigger);
+    }
+}
+
+// DIALOGUE: show a speech bubble. If menuTrigger is set, advancing opens its menu.
+function enterDialogue(text, offsetY, dialogTrigger, menuTrigger) {
+    interactionState = 'DIALOGUE';
+    activeMenuTrigger = menuTrigger || null;
+    renderBubble(text, offsetY, dialogTrigger);
+    if (bubbleTimeout) clearTimeout(bubbleTimeout);
+    bubbleTimeout = setTimeout(advanceInteraction, DIALOGUE_AUTO_MS);
+}
+
+// Leave a dialogue: open the pending menu if there is one, else close out.
+function advanceInteraction() {
+    if (bubbleTimeout) { clearTimeout(bubbleTimeout); bubbleTimeout = null; }
+    if (interactionState === 'DIALOGUE' && activeMenuTrigger) {
+        enterMenu(activeMenuTrigger);
+    } else {
+        closeModal();
+    }
+}
+
+// MENU: build and show the choice modal for a trigger.
+function enterMenu(trigger) {
     const modal = document.getElementById('dynamic-modal');
     if (!modal || !trigger) return;
+
+    // The bubble (if any) is replaced by the menu.
+    const bubble = document.getElementById('speech-bubble');
+    if (bubble) bubble.classList.add('hidden');
+    if (bubbleTimeout) { clearTimeout(bubbleTimeout); bubbleTimeout = null; }
+    isBubbleOpen = false;
 
     const titleEl = document.getElementById('modal-title');
     if (titleEl) {
@@ -408,7 +457,7 @@ function openModal(trigger, skipDialogue = false) {
                     a.addEventListener('click', (e) => {
                         e.preventDefault();
                         closeModal();
-                        showSpeechBubble(item.text, trigger.bubbleOffsetY);
+                        showResultBubble(item.text, trigger.bubbleOffsetY);
                     });
                 }
             });
@@ -417,26 +466,35 @@ function openModal(trigger, skipDialogue = false) {
 
     modal.classList.remove('hidden');
     isModalOpen = true;
+    interactionState = 'MENU';
+    activeMenuTrigger = null; // consumed
     lastBubbleTime = performance.now();
 
     Object.keys(keys).forEach(k => keys[k] = false);
     resetModalFocus(modal);
 }
 
+// Close the whole interaction. Public dismiss used by Escape, the close button,
+// backdrop clicks, picking an item, and the character modules' walk-away check.
 function closeModal() {
     document.querySelectorAll('.modal').forEach(m => m.classList.add('hidden'));
     document.querySelectorAll('.modal a').forEach(a => a.classList.remove('focused'));
-    hideSpeechBubble(true);
+    const bubble = document.getElementById('speech-bubble');
+    if (bubble) bubble.classList.add('hidden');
+    if (bubbleTimeout) { clearTimeout(bubbleTimeout); bubbleTimeout = null; }
     isModalOpen = false;
-
-    if (pendingMenuTrigger) {
-        const trig = pendingMenuTrigger;
-        pendingMenuTrigger = null;
-        openModal(trig, true);
-    }
+    isBubbleOpen = false;
+    interactionState = 'NONE';
+    activeMenuTrigger = null;
 }
 
-function showSpeechBubble(text, offsetY = 0, trigger = null) {
+// A one-off result bubble (e.g. choosing "참는다") — no menu follows it.
+function showResultBubble(text, offsetY) {
+    enterDialogue(text, offsetY, null, null);
+}
+
+// Pure render of the speech bubble; no state transitions beyond isBubbleOpen.
+function renderBubble(text, offsetY = 0, trigger = null) {
     const bubble = document.getElementById('speech-bubble');
     if (!bubble) return;
 
@@ -456,17 +514,6 @@ function showSpeechBubble(text, offsetY = 0, trigger = null) {
     bubble.classList.remove('hidden');
     isBubbleOpen = true;
     lastBubbleTime = performance.now();
-
-    if (bubbleTimeout) clearTimeout(bubbleTimeout);
-    bubbleTimeout = setTimeout(hideSpeechBubble, 2000);
-}
-
-function hideSpeechBubble(skipPending = false) {
-    const bubble = document.getElementById('speech-bubble');
-    if (bubble) bubble.classList.add('hidden');
-    if (bubbleTimeout) { clearTimeout(bubbleTimeout); bubbleTimeout = null; }
-    isBubbleOpen = false;
-    if (!skipPending && pendingMenuTrigger) closeModal();
 }
 
 function resetModalFocus(modal) {
@@ -522,7 +569,7 @@ function onKeyDown(e) {
     if (keys.hasOwnProperty(e.key)) keys[e.key] = true;
     if (e.code === 'Space' || e.key === 'Enter' || e.key.startsWith('Arrow')) {
         if (isBubbleOpen) {
-            if (performance.now() - lastBubbleTime > 200) closeModal();
+            if (performance.now() - lastBubbleTime > 200) advanceInteraction();
         } else if (activeTrigger && e.code === 'Space') {
             openModal(activeTrigger);
         }
@@ -561,7 +608,7 @@ function handleTouchEnd(e) {
         if (activeTrigger) {
             if (touchX >= activeTrigger.x && touchX <= activeTrigger.x + activeTrigger.w &&
                 touchY >= activeTrigger.y && touchY <= activeTrigger.y + activeTrigger.h) {
-                openModal(activeTrigger);
+                activateOrAdvance();
             }
         }
     }
@@ -646,22 +693,15 @@ function checkTriggers() {
         targetY >= t.y && targetY <= t.y + t.h
     );
 
-    // Auto-activate for tile-type triggers (no sprite)
-    if (activeTrigger && !activeTrigger.sprite) {
-        if (activeTrigger.id !== lastAutoTriggerId && !isModalOpen && !isBubbleOpen) {
-            lastAutoTriggerId = activeTrigger.id;
-            openModal(activeTrigger);
-        }
-    } else {
-        lastAutoTriggerId = null;
-    }
-
-    // Update interaction prompt + mobile action button together.
-    // CSS (viewport width) decides which one is actually visible; JS only toggles
+    // Show the interaction prompt + mobile action button for ANY reachable trigger
+    // (sprite object or tile-type zone). Every trigger now requires an explicit
+    // press/tap — tile-type triggers no longer auto-open a surprise modal, so the
+    // affordance is consistent across all triggers.
+    // CSS (viewport width) decides which control is actually visible; JS only toggles
     // the near-a-trigger visibility, so the two can never desync on resize.
     const prompt = document.getElementById('interaction-prompt');
     const mobileBtn = document.getElementById('mobile-action-btn');
-    const showPrompt = !!(activeTrigger && activeTrigger.sprite);
+    const showPrompt = !!activeTrigger;
     if (prompt) prompt.classList.toggle('hidden', !showPrompt);
     if (mobileBtn) mobileBtn.classList.toggle('hidden', !showPrompt);
 }
