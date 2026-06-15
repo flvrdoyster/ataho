@@ -268,6 +268,15 @@ video:fullscreen::cue {
 .modal-content li a {
     display: block;
     white-space: pre-wrap;
+    color: rgba(0, 0, 0, 1);
+    /* Reserve the focus box on every item so highlighting one never resizes
+       or realigns the menu (the modal width stays driven by a stable layout) */
+    padding: 4px 10px;
+    border-radius: 4px;
+}
+
+.modal-content li a:hover {
+    color: rgba(0, 0, 0, 1);
 }
 
 .close-modal {
@@ -284,9 +293,6 @@ video:fullscreen::cue {
     /* Gold highlight */
     color: rgba(0, 0, 0, 1);
     text-decoration: none;
-    font-weight: bold;
-    padding: 4px 10px;
-    border-radius: 4px;
     box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.2);
 }
 
