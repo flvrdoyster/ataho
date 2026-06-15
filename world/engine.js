@@ -77,6 +77,7 @@ let lastBubbleTime = 0;
 // Interaction state machine (see openModal/enterDialogue/enterMenu/closeModal)
 let interactionState = 'NONE';   // 'NONE' | 'DIALOGUE' | 'MENU'
 let activeMenuTrigger = null;    // trigger whose menu opens when a dialogue advances
+let lastAutoTriggerId = null;    // latch so an auto-firing tile trigger fires once per entry
 const DIALOGUE_AUTO_MS = 2000;   // bubble auto-advances after this delay
 
 // ===== Path Resolution =====
@@ -676,11 +677,20 @@ function checkTriggers() {
         targetY >= t.y && targetY <= t.y + t.h
     );
 
-    // Show the action button for ANY reachable trigger (sprite object or tile-type
-    // zone). Every trigger requires an explicit press/tap — no surprise auto-modal —
-    // so the affordance is consistent across all triggers and platforms.
+    // Auto-activate tile-type triggers (no sprite): these mark map exits / zones
+    // that fire on entry by design. Latch on id so each fires once per entry.
+    if (activeTrigger && !activeTrigger.sprite) {
+        if (activeTrigger.id !== lastAutoTriggerId && interactionState === 'NONE') {
+            lastAutoTriggerId = activeTrigger.id;
+            openModal(activeTrigger);
+        }
+    } else {
+        lastAutoTriggerId = null;
+    }
+
+    // Action button is only for sprite-object triggers (tile zones auto-fire above).
     const btn = document.getElementById('action-btn');
-    if (btn) btn.classList.toggle('hidden', !activeTrigger);
+    if (btn) btn.classList.toggle('hidden', !(activeTrigger && activeTrigger.sprite));
 }
 
 // ===== Rendering =====
