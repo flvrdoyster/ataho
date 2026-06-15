@@ -30,8 +30,8 @@ let CONFIG = {
     PATHS: {},
     SPEECH_BUBBLE_OFFSET_Y: -100,
     UI: {
-        DESKTOP_PROMPT: { LABEL: 'Space를 누르세요.' },
-        MOBILE_BUTTON: {
+        // Single interaction control shown on all platforms (click or tap).
+        ACTION_BUTTON: {
             LABEL: 'Space',
             WIDTH: '80px', HEIGHT: '34px',
             BOTTOM: '20vh', LEFT: '50%', RIGHT: 'auto',
@@ -41,7 +41,7 @@ let CONFIG = {
             RADIUS: '8px', FONT_SIZE: '18px',
             SHADOW: '0 4px 6px rgba(0,0,0,0.2)',
             TRANSFORM: 'translateX(-50%)',
-            FONT_FAMILY: "'RasterForge', 'KoddiudOngodic', sans-serif"
+            FONT_FAMILY: "'RasterForge', 'KoddiUDOnGothic', sans-serif"
         }
     }
 };
@@ -273,46 +273,29 @@ function injectUI() {
     }
     const uiLayer = document.getElementById('ui-layer');
 
-    // Interaction Prompt (desktop hint pill)
-    if (!document.getElementById('interaction-prompt')) {
-        const prompt = document.createElement('div');
-        prompt.id = 'interaction-prompt';
-        prompt.className = 'prompt hidden';
-        prompt.textContent = CONFIG.UI.DESKTOP_PROMPT.LABEL;
-        uiLayer.appendChild(prompt);
-
-        prompt.addEventListener('click', (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            activateOrAdvance();
-        });
-        prompt.addEventListener('touchstart', (e) => { e.stopPropagation(); });
-    }
-
-    // Mobile Action Button (touch only) — separate element so width changes never
-    // desync styling (CSS) from content (JS), which used to break the prompt on resize.
-    if (!document.getElementById('mobile-action-btn')) {
+    // Action Button — single interaction control for all platforms (click or tap).
+    if (!document.getElementById('action-btn')) {
         const btn = document.createElement('div');
-        btn.id = 'mobile-action-btn';
+        btn.id = 'action-btn';
         btn.className = 'hidden';
-        const mBtn = CONFIG.UI.MOBILE_BUTTON;
-        btn.innerHTML = (mBtn.LABEL || '').replace(/\\n/g, '<br>');
+        const cfg = CONFIG.UI.ACTION_BUTTON;
+        btn.innerHTML = (cfg.LABEL || '').replace(/\\n/g, '<br>');
         uiLayer.appendChild(btn);
 
-        btn.style.setProperty('--mobile-btn-width', mBtn.WIDTH);
-        btn.style.setProperty('--mobile-btn-height', mBtn.HEIGHT);
-        btn.style.setProperty('--mobile-btn-bottom', mBtn.BOTTOM);
-        btn.style.setProperty('--mobile-btn-left', mBtn.LEFT);
-        btn.style.setProperty('--mobile-btn-right', mBtn.RIGHT);
-        btn.style.setProperty('--mobile-btn-bg', mBtn.BG_COLOR);
-        btn.style.setProperty('--mobile-btn-color', mBtn.TEXT_COLOR);
-        btn.style.setProperty('--mobile-btn-border', mBtn.BORDER);
-        btn.style.setProperty('--mobile-btn-border-bottom', mBtn.BORDER_BOTTOM);
-        btn.style.setProperty('--mobile-btn-radius', mBtn.RADIUS);
-        btn.style.setProperty('--mobile-btn-font-size', mBtn.FONT_SIZE);
-        btn.style.setProperty('--mobile-btn-shadow', mBtn.SHADOW);
-        btn.style.setProperty('--mobile-btn-transform', mBtn.TRANSFORM);
-        btn.style.setProperty('--mobile-btn-font-family', mBtn.FONT_FAMILY);
+        btn.style.setProperty('--action-btn-width', cfg.WIDTH);
+        btn.style.setProperty('--action-btn-height', cfg.HEIGHT);
+        btn.style.setProperty('--action-btn-bottom', cfg.BOTTOM);
+        btn.style.setProperty('--action-btn-left', cfg.LEFT);
+        btn.style.setProperty('--action-btn-right', cfg.RIGHT);
+        btn.style.setProperty('--action-btn-bg', cfg.BG_COLOR);
+        btn.style.setProperty('--action-btn-color', cfg.TEXT_COLOR);
+        btn.style.setProperty('--action-btn-border', cfg.BORDER);
+        btn.style.setProperty('--action-btn-border-bottom', cfg.BORDER_BOTTOM);
+        btn.style.setProperty('--action-btn-radius', cfg.RADIUS);
+        btn.style.setProperty('--action-btn-font-size', cfg.FONT_SIZE);
+        btn.style.setProperty('--action-btn-shadow', cfg.SHADOW);
+        btn.style.setProperty('--action-btn-transform', cfg.TRANSFORM);
+        btn.style.setProperty('--action-btn-font-family', cfg.FONT_FAMILY);
 
         btn.addEventListener('click', (e) => {
             e.preventDefault();
@@ -693,17 +676,11 @@ function checkTriggers() {
         targetY >= t.y && targetY <= t.y + t.h
     );
 
-    // Show the interaction prompt + mobile action button for ANY reachable trigger
-    // (sprite object or tile-type zone). Every trigger now requires an explicit
-    // press/tap — tile-type triggers no longer auto-open a surprise modal, so the
-    // affordance is consistent across all triggers.
-    // CSS (viewport width) decides which control is actually visible; JS only toggles
-    // the near-a-trigger visibility, so the two can never desync on resize.
-    const prompt = document.getElementById('interaction-prompt');
-    const mobileBtn = document.getElementById('mobile-action-btn');
-    const showPrompt = !!activeTrigger;
-    if (prompt) prompt.classList.toggle('hidden', !showPrompt);
-    if (mobileBtn) mobileBtn.classList.toggle('hidden', !showPrompt);
+    // Show the action button for ANY reachable trigger (sprite object or tile-type
+    // zone). Every trigger requires an explicit press/tap — no surprise auto-modal —
+    // so the affordance is consistent across all triggers and platforms.
+    const btn = document.getElementById('action-btn');
+    if (btn) btn.classList.toggle('hidden', !activeTrigger);
 }
 
 // ===== Rendering =====
