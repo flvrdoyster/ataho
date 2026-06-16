@@ -54,7 +54,14 @@ hr {
 
 #header h1 {
     margin: 0;
-    font-size: 1.5rem;
+    font-size: 1.25rem;
+    color: rgba(238, 238, 238, 1);
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+}
+
+#header p {
+    margin: 0;
+    font-size: 0.8rem;
     color: rgba(238, 238, 238, 1);
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
 }
@@ -298,9 +305,6 @@ video:fullscreen::cue {
 
 /* Media Queries (Mobile) */
 @media (max-width: 768px) {
-    #header h1 {
-        font-size: 1rem;
-    }
 
     #footer {
         font-size: 0.7rem;
