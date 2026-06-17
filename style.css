@@ -173,7 +173,8 @@ video:fullscreen::cue {
 }
 
 /* Action button — single interaction control on all platforms (click or tap) */
-#action-btn {
+#action-btn,
+#esc-btn {
     display: flex;
     position: fixed;
     bottom: var(--action-btn-bottom, 20vh);
@@ -202,11 +203,13 @@ video:fullscreen::cue {
     transition: transform 0.05s, border-bottom-width 0.05s, box-shadow 0.05s;
 }
 
-#action-btn.hidden {
+#action-btn.hidden,
+#esc-btn.hidden {
     display: none;
 }
 
-#action-btn:active {
+#action-btn:active,
+#esc-btn:active {
     /* Push button down and squash the 3D base */
     transform: var(--action-btn-transform, translateX(-50%)) translateY(4px);
     border-bottom-width: 2px !important;

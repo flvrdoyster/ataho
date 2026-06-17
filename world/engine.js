@@ -308,6 +308,39 @@ function injectUI() {
         btn.addEventListener('touchstart', (e) => { e.stopPropagation(); });
     }
 
+    // ESC Button — closes an open menu modal (mobile has no keyboard). Same look as the
+    // action button; shown only while a menu is open (see enterMenu/closeModal).
+    if (!document.getElementById('esc-btn')) {
+        const escBtn = document.createElement('div');
+        escBtn.id = 'esc-btn';
+        escBtn.className = 'hidden';
+        const cfg = CONFIG.UI.ACTION_BUTTON; // share the action button's look
+        escBtn.innerHTML = 'ESC';
+        uiLayer.appendChild(escBtn);
+
+        escBtn.style.setProperty('--action-btn-width', cfg.WIDTH);
+        escBtn.style.setProperty('--action-btn-height', cfg.HEIGHT);
+        escBtn.style.setProperty('--action-btn-bottom', cfg.BOTTOM);
+        escBtn.style.setProperty('--action-btn-left', cfg.LEFT);
+        escBtn.style.setProperty('--action-btn-right', cfg.RIGHT);
+        escBtn.style.setProperty('--action-btn-bg', cfg.BG_COLOR);
+        escBtn.style.setProperty('--action-btn-color', cfg.TEXT_COLOR);
+        escBtn.style.setProperty('--action-btn-border', cfg.BORDER);
+        escBtn.style.setProperty('--action-btn-border-bottom', cfg.BORDER_BOTTOM);
+        escBtn.style.setProperty('--action-btn-radius', cfg.RADIUS);
+        escBtn.style.setProperty('--action-btn-font-size', cfg.FONT_SIZE);
+        escBtn.style.setProperty('--action-btn-shadow', cfg.SHADOW);
+        escBtn.style.setProperty('--action-btn-transform', cfg.TRANSFORM);
+        escBtn.style.setProperty('--action-btn-font-family', cfg.FONT_FAMILY);
+
+        escBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            closeModal();
+        });
+        escBtn.addEventListener('touchstart', (e) => { e.stopPropagation(); });
+    }
+
     // Dynamic Modal
     if (!document.getElementById('dynamic-modal')) {
         const modal = document.createElement('div');
@@ -451,6 +484,13 @@ function enterMenu(trigger) {
 
     modal.classList.remove('hidden');
     interactionState = 'MENU';
+
+    // Mobile close affordance: surface ESC, hide the action button (Space is inert here).
+    const escBtn = document.getElementById('esc-btn');
+    if (escBtn) escBtn.classList.remove('hidden');
+    const actBtn = document.getElementById('action-btn');
+    if (actBtn) actBtn.classList.add('hidden');
+
     activeMenuTrigger = null; // consumed
     lastBubbleTime = performance.now();
 
@@ -463,6 +503,8 @@ function enterMenu(trigger) {
 function closeModal() {
     document.querySelectorAll('.modal').forEach(m => m.classList.add('hidden'));
     document.querySelectorAll('.modal a').forEach(a => a.classList.remove('focused'));
+    const escBtn = document.getElementById('esc-btn');
+    if (escBtn) escBtn.classList.add('hidden');
     const bubble = document.getElementById('speech-bubble');
     if (bubble) bubble.classList.add('hidden');
     if (bubbleTimeout) { clearTimeout(bubbleTimeout); bubbleTimeout = null; }
