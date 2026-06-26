@@ -219,13 +219,18 @@ window.MAP_DATA.triggers = [
         "target": "_blank"
       },
       {
-        "label": "환세희담 (오프닝부터)",
-        "href": "https://pc98.atah.io/kitan-opening.html",
+        "label": "환세희담",
+        "href": "https://pc98.atah.io/kitan.html",
         "target": "_blank"
       },
       {
         "label": "환세쾌도전",
         "href": "https://pc98.atah.io/kaitou.html",
+        "target": "_blank"
+      },
+      {
+        "label": "환세포물장",
+        "href": "https://pc98.atah.io/torimono.html",
         "target": "_blank"
       }
     ]
