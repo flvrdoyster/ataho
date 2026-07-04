@@ -1,8 +1,15 @@
 (function () {
-    const isEmulator = document.querySelector('script[data-emulator]') !== null;
+    const emulatorScript = document.querySelector('script[data-emulator]');
+    const emulatorType = emulatorScript ? emulatorScript.getAttribute('data-emulator') : null;
+
+    const emulatorCredits = {
+        '': 'Emulator by <a href="https://github.com/AZO234/NP2kai">NP2kai</a>',
+        'pc98': 'Emulator by <a href="https://github.com/AZO234/NP2kai">NP2kai</a>',
+        'dos': 'Emulator by <a href="https://github.com/nbarkhina/DosWasmX">DosWasmX</a>',
+    };
 
     const items = [
-        isEmulator ? 'Emulator by <a href="https://github.com/AZO234/NP2kai">NP2kai</a>' : null,
+        emulatorType !== null ? (emulatorCredits[emulatorType] || null) : null,
         '<span class="desktop-only">Code magic by AI</span>',
         '<span class="desktop-only">Rest by <a href="https://github.com/flvrdoyster">flvrdoyster</a></span>',
     ].filter(Boolean);
