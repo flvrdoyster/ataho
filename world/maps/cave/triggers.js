@@ -202,8 +202,8 @@ window.MAP_DATA.triggers = [
   {
     "x": 16,
     "y": 4,
-    "title": "PC98 에뮬레이터",
-    "id": "pc98",
+    "title": "에뮬레이터",
+    "id": "emulator",
     "type": "menu",
     "w": 5,
     "h": 4,
@@ -214,23 +214,28 @@ window.MAP_DATA.triggers = [
     "collision": false,
     "items": [
       {
-        "label": "환세풍광전",
+        "label": "환세풍광전 (PC-98)",
         "href": "https://pc98.atah.io/hukyou.html",
         "target": "_blank"
       },
       {
-        "label": "환세희담",
+        "label": "환세희담 (PC-98)",
         "href": "https://pc98.atah.io/kitan.html",
         "target": "_blank"
       },
       {
-        "label": "환세쾌도전",
+        "label": "환세쾌도전 (PC-98)",
         "href": "https://pc98.atah.io/kaitou.html",
         "target": "_blank"
       },
       {
-        "label": "환세포물장",
+        "label": "환세포물장 (PC-98)",
         "href": "https://pc98.atah.io/torimono.html",
+        "target": "_blank"
+      },
+      {
+        "label": "환세취호전 (Windows)",
+        "href": "https://suiko.atah.io/kr.html",
         "target": "_blank"
       }
     ]
