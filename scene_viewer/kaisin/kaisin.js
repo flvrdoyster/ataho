@@ -153,7 +153,7 @@ const KaisinEndingStory = {
                 { label: "프로그램", text: "와카" },
                 { label: "그래픽", text: "얀가 하야시\n토마스 미즈노" },
                 { label: "사운드", text: "누마타 이즈호" },
-                { label: "스페셜 땡스", text: "도스고이 K오카\n세뇨르 카와키타\n우에미조\n갓츠 나카마츠\n사와타리 쥬사부로\n사토 대장\n와다 스키미\nYON\n미온\n나미헤이\n토베 요시" },
+                { label: "스페셜 땡스", text: "도스고이 K오카\n세뇨르 카와키타\n우에미조\n갓츠 나카마츠\n사와타리 쥬사부로\n사토 대장\n와다 모토미\nYON\n미온\n나미헤이\n토베 요시" },
                 { label: "디렉터", text: "미야모토 가쓰노리 (빨강)" },
                 { label: "EX 프로듀서", text: "MOO 니이타니" }
             ]
