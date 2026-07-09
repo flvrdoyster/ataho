@@ -5,3 +5,5 @@
 
 # Playwright
 haiyuki_web/tests/
+# 레퍼런스 영상 (용량 큼, 로컬 전용)
+sweep/ref.mov

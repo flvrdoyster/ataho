@@ -1,8 +1,9 @@
 /**
  * char_grid.js — Grid-based Character Controller
- * 
+ *
  * Tile-by-tile movement controller for mini-games.
- * Moves precisely one tile (16x16) at a time, aligning to the grid.
+ * Moves precisely one cell at a time, aligning to the grid.
+ * Cell size is window.GRID_CELL_TILES map tiles (default 1 = 16px).
  *
  * Implements engine.js callbacks:
  *   playerInit, playerUpdate, playerDraw, playerGetState, playerOnAction
@@ -10,9 +11,13 @@
 
 // ===== Character Config =====
 const CHAR_CONFIG = {
-    MOVE_SPEED: 120, // Pixels per second for moving between tiles
+    MOVE_SPEED: 120, // Pixels per second for moving between cells
     ANIM_SPEED: 0.15 // Walk animation speed
 };
+
+function gridCellSize() {
+    return CONFIG.TILE_SIZE * (window.GRID_CELL_TILES || 1);
+}
 
 // ===== Character State =====
 let charImg;
@@ -50,13 +55,17 @@ async function playerInit(assets) {
         });
     }
 
+    // Collision body covers the whole cell
+    player.width = gridCellSize();
+    player.height = gridCellSize();
+
     // Initialize position (center of map by default, snapped to grid)
     if (window.MAP_DATA && window.MAP_DATA.startPos) {
         player.x = window.MAP_DATA.startPos.x * CONFIG.TILE_SIZE;
         player.y = window.MAP_DATA.startPos.y * CONFIG.TILE_SIZE;
     } else {
-        player.x = Math.floor((mapWidth / 2) / CONFIG.TILE_SIZE) * CONFIG.TILE_SIZE;
-        player.y = Math.floor((mapHeight / 2) / CONFIG.TILE_SIZE) * CONFIG.TILE_SIZE;
+        player.x = Math.floor((mapWidth / 2) / gridCellSize()) * gridCellSize();
+        player.y = Math.floor((mapHeight / 2) / gridCellSize()) * gridCellSize();
     }
 }
 
@@ -74,9 +83,9 @@ function attemptMove(dirX, dirY, directionIndex) {
     if (player.isMoving) return;
     
     player.direction = directionIndex;
-    
-    const nextX = player.x + (dirX * CONFIG.TILE_SIZE);
-    const nextY = player.y + (dirY * CONFIG.TILE_SIZE);
+
+    const nextX = player.x + (dirX * gridCellSize());
+    const nextY = player.y + (dirY * gridCellSize());
     
     // Boundary check
     if (nextX < 0 || nextY < 0 || nextX >= mapWidth || nextY >= mapHeight) {
@@ -127,15 +136,15 @@ function playerUpdate(dt) {
         // moveProgress tracks pixels moved
         const moveStep = CHAR_CONFIG.MOVE_SPEED * dt;
         player.moveProgress += moveStep;
-        
-        if (player.moveProgress >= CONFIG.TILE_SIZE) {
+
+        if (player.moveProgress >= gridCellSize()) {
             // Reached destination
             player.x = player.targetX;
             player.y = player.targetY;
             player.isMoving = false;
         } else {
             // Interpolate position
-            const ratio = player.moveProgress / CONFIG.TILE_SIZE;
+            const ratio = player.moveProgress / gridCellSize();
             player.x = player.startX + (player.targetX - player.startX) * ratio;
             player.y = player.startY + (player.targetY - player.startY) * ratio;
         }
@@ -164,9 +173,10 @@ function playerDraw(ctx) {
         
         const srcX = col * spriteW;
         const srcY = row * spriteH;
-        
-        const dstX = Math.floor(player.x + 8 - spriteW / 2);
-        const dstY = Math.floor(player.y + 16 - spriteH);
+
+        // Anchor the sprite to the bottom-center of the occupied cell
+        const dstX = Math.floor(player.x + player.width / 2 - spriteW / 2);
+        const dstY = Math.floor(player.y + player.height - spriteH);
         
         ctx.drawImage(charImg, srcX, srcY, spriteW, spriteH, dstX, dstY, spriteW, spriteH);
     } else {

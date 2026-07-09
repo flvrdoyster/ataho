@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <link rel="icon" href="https://atah.io/favicon.ico">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../fonts.css">
+    <link rel="stylesheet" href="../style.css">
+    <title>술창고 청소 : atah.io</title>
+</head>
+
+<body>
+    <canvas id="gameCanvas"></canvas>
+</body>
+
+<script>
+    window.MAP_NAME = 'souko';
+    window.MAP_BASE = '../world/';
+    window.GRID_CELL_TILES = 3;          // one floor slab = 3x3 map tiles (48px)
+    window.GRID_ORIGIN = { x: 2, y: 2 }; // playfield top-left slab (tile coords)
+</script>
+<!-- Game Data & Logic -->
+<script src="../world/maps/souko/data.js"></script>
+<script src="../world/maps/souko/triggers.js"></script>
+<script src="../world/engine.js"></script>
+<script src="char_sweep.js"></script>
+<script>window.onload = initGame;</script>
+
+</html>
