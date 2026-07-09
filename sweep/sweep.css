@@ -1,0 +1,70 @@
+/* Fonts */
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+    background-color: #0b090a;
+    overflow-x: hidden;
+    font-family: 'KoddiUDOnGothic', sans-serif;
+}
+
+canvas {
+    border: 4px solid #3a3a3a;
+    background-color: #000;
+    display: block;
+    image-rendering: pixelated;
+    width: 100% !important;
+    max-width: 960px !important;
+    height: auto !important;
+    aspect-ratio: 960 / 640 !important;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
+}
+
+#game-wrapper {
+    position: relative;
+    display: inline-block;
+    width: 100%;
+    max-width: 960px;
+}
+
+#ui-overlay {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    font-family: 'RasterForge', sans-serif;
+}
+
+.frame-box {
+    border-width: 16px;
+    border-style: solid;
+    border-image: url('../balance/frame/combined.png') 16 fill / 16px round;
+    background-color: rgba(33, 66, 123, 1);
+}
+
+#hud {
+    position: absolute;
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: calc(100% - 40px);
+    max-width: 920px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding: 6px 16px;
+    color: white;
+    font-size: 20px;
+    pointer-events: auto;
+}
+
+#hud-stats {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    letter-spacing: 2px;
+    text-shadow: 2px 2px 0px #000;
+}

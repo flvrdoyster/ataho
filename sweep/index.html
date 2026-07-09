@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <link rel="icon" href="https://atah.io/favicon.ico">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>창고 청소 : atah.io</title>
+    <link rel="stylesheet" href="../fonts.css">
+    <link rel="stylesheet" href="sweep.css">
+    <link rel="preload" href="https://fonts.cdnfonts.com/s/123917/RasterForgeRegular-XGDg9.woff" as="font" type="font/woff" crossorigin>
+    <link rel="stylesheet" href="../footer.css">
+</head>
+<body class="footer-fixed">
+    <div id="game-wrapper">
+        <canvas id="gameCanvas"></canvas>
+        <div id="ui-overlay">
+            <div id="hud" class="frame-box">
+                <div id="hud-stats">
+                    <span id="hud-title">TAVERN WAREHOUSE</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 전역 설정 -->
+    <script>
+        window.MAP_NAME = 'souko';
+        window.MAP_BASE = '../world/';
+    </script>
+    <!-- 맵 데이터 로드 -->
+    <script src="../world/maps/souko/data.js"></script>
+    <!-- 기존 엔진 및 캐릭터 스크립트 로드 -->
+    <script src="../world/engine.js"></script>
+    <script src="../world/char/char_free.js"></script>
+    <!-- 게임 메인 스크립트 -->
+    <script src="sweep.js"></script>
+    <script src="../footer.js"></script>
+</body>
+</html>
