@@ -72,7 +72,7 @@ window.MAP_DATA.triggers = [
     "title": "미니게임",
     "type": "menu",
     "text": [
-      "해변 마을에나 가볼까?"
+      "해변 마을에 쇼핑이나 가볼까?"
     ],
     "items": [
       {
@@ -83,6 +83,11 @@ window.MAP_DATA.triggers = [
       {
         "label": "평균대 동작수련",
         "href": "balance/index.html",
+        "target": "_blank"
+      },
+      {
+        "label": "술창고 청소",
+        "href": "sweep/index.html",
         "target": "_blank"
       }
     ]
@@ -126,7 +131,7 @@ window.MAP_DATA.triggers = [
     "title": "일러스트",
     "type": "menu",
     "text": [
-      "언제 받았는지도 모를 전단지 투성이야."
+      "종이 쓰레기는 모아서 버려야겠다."
     ],
     "items": [
       {
@@ -208,7 +213,7 @@ window.MAP_DATA.triggers = [
     "w": 5,
     "h": 4,
     "text": [
-      "상자를 치웠으니 호수로 갈 수 있어"
+      "상자를 치웠으니 호수로 갈 수 있어."
     ],
     "bubbleOffsetY": 0,
     "collision": false,
