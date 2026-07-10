@@ -206,12 +206,12 @@ window.MAP_DATA.triggers = [
   },
   {
     "x": 16,
-    "y": 4,
+    "y": 2,
     "title": "에뮬레이터",
     "id": "emulator",
     "type": "menu",
     "w": 5,
-    "h": 4,
+    "h": 2,
     "text": [
       "상자를 치웠으니 호수로 갈 수 있어."
     ],
