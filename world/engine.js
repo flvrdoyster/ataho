@@ -767,9 +767,16 @@ function draw() {
             const cell = tileGrid[y][x];
             for (let i = 0; i < cell.length; i++) {
                 const tile = cell[i];
+                let tx = tile.tx, ty = tile.ty;
+                // Optional per-tile override hook (e.g. sweep 미니게임의 먼지 레이어).
+                // 미정의 시 기존 동작과 완전히 동일.
+                if (typeof window.getFloorTileOverride === 'function') {
+                    const o = window.getFloorTileOverride(tile.gx, tile.gy, tx, ty);
+                    if (o) { tx = o.tx; ty = o.ty; }
+                }
                 ctx.drawImage(
                     tilesetImg,
-                    tile.tx * CONFIG.TILE_SIZE, tile.ty * CONFIG.TILE_SIZE,
+                    tx * CONFIG.TILE_SIZE, ty * CONFIG.TILE_SIZE,
                     CONFIG.TILE_SIZE, CONFIG.TILE_SIZE,
                     tile.gx * CONFIG.TILE_SIZE, tile.gy * CONFIG.TILE_SIZE,
                     CONFIG.TILE_SIZE, CONFIG.TILE_SIZE

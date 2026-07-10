@@ -96,6 +96,13 @@ async function playerInit(assets) {
     }
     if (free(sx, sy)) { player.x = sx; player.y = sy; }
     else console.warn('startPos를 격자에 스냅하지 못했습니다:', player.x, player.y);
+
+    // 먼지 레이어 초기화 (collision·mapWidth/Height가 이미 준비된 시점)
+    if (typeof window.initDust === 'function') window.initDust();
+    // 시작 칸은 밟고 시작하는 것으로 간주해 바로 깨끗한 상태로 시작
+    if (typeof window.onCellSwept === 'function') {
+        window.onCellSwept(player.x / CONFIG.TILE_SIZE, player.y / CONFIG.TILE_SIZE);
+    }
 }
 
 function playerGetState() {
