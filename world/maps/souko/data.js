@@ -5,250 +5,250 @@ window.MAP_DATA = {
       "0,0": "empty",
       "1,0": "outer_wall",
       "2,0": "outer_wall",
-      "3,0": "floor",
-      "4,0": "rock_wall",
-      "5,0": "rock_wall",
-      "6,0": "rock_wall",
-      "7,0": "rock_wall",
-      "8,0": "rock_wall",
-      "9,0": "rock_wall",
-      "10,0": "rock_wall",
-      "11,0": "rock_wall",
-      "12,0": "rock_wall",
-      "13,0": "rock_wall",
-      "14,0": "rock_wall",
-      "15,0": "rock_wall",
-      "16,0": "rock_wall",
-      "17,0": "floor",
-      "18,0": "floor",
-      "19,0": "floor",
-      "20,0": "rock_wall",
-      "21,0": "rock_wall",
-      "22,0": "rock_wall",
-      "23,0": "floor",
-      "24,0": "floor",
-      "25,0": "rock_wall",
-      "26,0": "rock_wall",
-      "27,0": "rock_wall",
-      "28,0": "floor",
-      "29,0": "floor",
-      "30,0": "floor",
-      "31,0": "rock_wall",
-      "32,0": "rock_wall",
-      "33,0": "rock_wall",
-      "34,0": "floor",
-      "35,0": "floor",
-      "36,0": "rock_wall",
-      "37,0": "rock_wall",
-      "38,0": "rock_wall",
-      "39,0": "floor",
-      "0,1": "rock_wall",
-      "1,1": "rock_wall",
-      "2,1": "floor",
-      "3,1": "floor",
-      "4,1": "rock_wall",
-      "5,1": "rock_wall",
-      "6,1": "rock_wall",
-      "7,1": "floor",
-      "8,1": "floor",
-      "9,1": "rock_wall",
-      "10,1": "rock_wall",
-      "11,1": "floor",
-      "12,1": "rock_wall",
-      "13,1": "rock_wall",
-      "14,1": "rock_wall",
-      "15,1": "rock_wall",
-      "16,1": "rock_wall",
-      "17,1": "rock_wall",
-      "18,1": "floor",
-      "19,1": "rock_wall",
-      "20,1": "rock_wall",
+      "3,0": "wall",
+      "4,0": "wall",
+      "5,0": "wall",
+      "6,0": "wall",
+      "7,0": "wall",
+      "8,0": "wall",
+      "9,0": "wall",
+      "10,0": "wall",
+      "11,0": "wall",
+      "12,0": "wall",
+      "13,0": "wall",
+      "14,0": "outer_wall",
+      "15,0": "outer_wall",
+      "16,0": "outer_wall",
+      "17,0": "wall",
+      "18,0": "wall",
+      "19,0": "wall",
+      "20,0": "wall",
+      "21,0": "wall",
+      "22,0": "wall",
+      "23,0": "wall",
+      "24,0": "wall",
+      "25,0": "wall",
+      "26,0": "wall",
+      "27,0": "wall",
+      "28,0": "wall",
+      "29,0": "wall",
+      "30,0": "wall",
+      "31,0": "wall",
+      "32,0": "wall",
+      "33,0": "wall",
+      "34,0": "wall",
+      "35,0": "wall",
+      "36,0": "wall",
+      "37,0": "wall",
+      "38,0": "wall",
+      "39,0": "wall",
+      "0,1": "outer_wall",
+      "1,1": "outer_wall",
+      "2,1": "outer_wall",
+      "3,1": "outer_wall",
+      "4,1": "wall",
+      "5,1": "wall",
+      "6,1": "wall",
+      "7,1": "wall",
+      "8,1": "wall",
+      "9,1": "wall",
+      "10,1": "wall",
+      "11,1": "wall",
+      "12,1": "outer_wall",
+      "13,1": "outer_wall",
+      "14,1": "outer_wall",
+      "15,1": "floor",
+      "16,1": "floor",
+      "17,1": "floor",
+      "18,1": "wall",
+      "19,1": "wall",
+      "20,1": "wall",
       "21,1": "outer_wall",
       "22,1": "outer_wall",
       "23,1": "outer_wall",
-      "24,1": "rock_wall",
-      "25,1": "rock_wall",
-      "26,1": "rock_wall",
-      "27,1": "rock_wall",
-      "28,1": "rock_wall",
-      "29,1": "rock_wall",
-      "30,1": "rock_wall",
-      "31,1": "rock_wall",
-      "32,1": "rock_wall",
-      "33,1": "floor",
-      "34,1": "floor",
-      "35,1": "floor",
-      "36,1": "floor",
-      "37,1": "floor",
-      "38,1": "floor",
-      "39,1": "rock_wall",
-      "0,2": "floor",
-      "1,2": "floor",
-      "2,2": "floor",
-      "3,2": "rock_wall",
-      "4,2": "rock_wall",
-      "5,2": "rock_wall",
-      "6,2": "rock_wall",
-      "7,2": "rock_wall",
-      "8,2": "rock_wall",
-      "9,2": "rock_wall",
-      "10,2": "rock_wall",
-      "11,2": "rock_wall",
-      "12,2": "floor",
-      "13,2": "floor",
-      "14,2": "floor",
-      "15,2": "floor",
-      "16,2": "rock_wall",
-      "17,2": "floor",
-      "18,2": "floor",
-      "19,2": "floor",
-      "20,2": "floor",
-      "21,2": "rock_wall",
-      "22,2": "rock_wall",
-      "23,2": "rock_wall",
-      "24,2": "rock_wall",
-      "25,2": "rock_wall",
-      "26,2": "rock_wall",
-      "27,2": "rock_wall",
-      "28,2": "rock_wall",
-      "29,2": "rock_wall",
-      "30,2": "floor",
-      "31,2": "rock_wall",
-      "32,2": "rock_wall",
-      "33,2": "floor",
-      "34,2": "floor",
-      "35,2": "floor",
-      "36,2": "rock_wall",
-      "37,2": "rock_wall",
-      "38,2": "rock_wall",
-      "39,2": "rock_wall",
-      "0,3": "rock_wall",
-      "1,3": "rock_wall",
-      "2,3": "rock_wall",
-      "3,3": "rock_wall",
-      "4,3": "rock_wall",
-      "5,3": "floor",
-      "6,3": "floor",
-      "7,3": "floor",
-      "8,3": "floor",
-      "9,3": "rock_wall",
-      "10,3": "rock_wall",
-      "11,3": "rock_wall",
-      "12,3": "rock_wall",
-      "13,3": "rock_wall",
-      "14,3": "rock_wall",
-      "15,3": "floor",
-      "16,3": "floor",
-      "17,3": "floor",
-      "18,3": "rock_wall",
-      "19,3": "rock_wall",
-      "20,3": "rock_wall",
-      "21,3": "rock_wall",
-      "22,3": "rock_wall",
-      "23,3": "rock_wall",
-      "24,3": "floor",
-      "25,3": "rock_wall",
-      "26,3": "floor",
-      "27,3": "floor",
-      "28,3": "floor",
+      "24,1": "floor",
+      "25,1": "floor",
+      "26,1": "floor",
+      "27,1": "floor",
+      "28,1": "floor",
+      "29,1": "floor",
+      "30,1": "floor",
+      "31,1": "floor",
+      "32,1": "floor",
+      "33,1": "obstacle",
+      "34,1": "obstacle",
+      "35,1": "obstacle",
+      "36,1": "obstacle",
+      "37,1": "obstacle",
+      "38,1": "obstacle",
+      "39,1": "wall",
+      "0,2": "outer_wall",
+      "1,2": "outer_wall",
+      "2,2": "outer_wall",
+      "3,2": "floor",
+      "4,2": "floor",
+      "5,2": "floor",
+      "6,2": "floor",
+      "7,2": "floor",
+      "8,2": "floor",
+      "9,2": "floor",
+      "10,2": "floor",
+      "11,2": "floor",
+      "12,2": "obstacle",
+      "13,2": "obstacle",
+      "14,2": "obstacle",
+      "15,2": "obstacle",
+      "16,2": "obstacle",
+      "17,2": "obstacle",
+      "18,2": "outer_wall",
+      "19,2": "outer_wall",
+      "20,2": "outer_wall",
+      "21,2": "floor",
+      "22,2": "floor",
+      "23,2": "floor",
+      "24,2": "floor",
+      "25,2": "floor",
+      "26,2": "floor",
+      "27,2": "floor",
+      "28,2": "floor",
+      "29,2": "floor",
+      "30,2": "obstacle",
+      "31,2": "obstacle",
+      "32,2": "obstacle",
+      "33,2": "obstacle",
+      "34,2": "obstacle",
+      "35,2": "obstacle",
+      "36,2": "floor",
+      "37,2": "floor",
+      "38,2": "floor",
+      "39,2": "floor",
+      "0,3": "floor",
+      "1,3": "floor",
+      "2,3": "floor",
+      "3,3": "floor",
+      "4,3": "floor",
+      "5,3": "obstacle",
+      "6,3": "obstacle",
+      "7,3": "obstacle",
+      "8,3": "wall",
+      "9,3": "floor",
+      "10,3": "floor",
+      "11,3": "floor",
+      "12,3": "floor",
+      "13,3": "floor",
+      "14,3": "floor",
+      "15,3": "obstacle",
+      "16,3": "obstacle",
+      "17,3": "obstacle",
+      "18,3": "outer_wall",
+      "19,3": "floor",
+      "20,3": "floor",
+      "21,3": "floor",
+      "22,3": "obstacle",
+      "23,3": "obstacle",
+      "24,3": "obstacle",
+      "25,3": "outer_wall",
+      "26,3": "outer_wall",
+      "27,3": "outer_wall",
+      "28,3": "outer_wall",
       "29,3": "outer_wall",
       "30,3": "outer_wall",
       "31,3": "outer_wall",
-      "32,3": "outer_wall",
-      "33,3": "outer_wall",
-      "34,3": "rock_wall",
-      "35,3": "floor",
-      "36,3": "floor",
-      "37,3": "outer_wall",
-      "38,3": "floor",
-      "39,3": "floor",
+      "32,3": "wall",
+      "33,3": "wall",
+      "34,3": "outer_wall",
+      "35,3": "wall",
+      "36,3": "wall",
+      "37,3": "wall",
+      "38,3": "outer_wall",
+      "39,3": "wall",
       "0,4": "outer_wall",
-      "1,4": "floor",
+      "1,4": "outer_wall",
       "2,4": "outer_wall",
-      "3,4": "floor",
-      "4,4": "rock_wall",
-      "5,4": "floor",
-      "6,4": "floor",
-      "7,4": "rock_wall",
-      "8,4": "floor",
-      "9,4": "rock_wall",
-      "10,4": "floor",
-      "11,4": "rock_wall",
-      "12,4": "rock_wall",
-      "13,4": "rock_wall",
-      "14,4": "rock_wall",
-      "15,4": "floor",
-      "16,4": "rock_wall",
-      "17,4": "floor",
-      "18,4": "rock_wall",
-      "19,4": "rock_wall",
-      "20,4": "rock_wall",
-      "21,4": "floor",
-      "22,4": "rock_wall",
-      "23,4": "floor",
-      "24,4": "rock_wall",
-      "25,4": "rock_wall",
-      "26,4": "rock_wall",
-      "27,4": "rock_wall",
-      "28,4": "rock_wall",
-      "29,4": "outer_wall",
-      "30,4": "outer_wall",
-      "31,4": "outer_wall",
-      "32,4": "floor",
-      "33,4": "floor",
-      "34,4": "floor",
+      "3,4": "wall",
+      "4,4": "wall",
+      "5,4": "wall",
+      "6,4": "wall",
+      "7,4": "wall",
+      "8,4": "wall",
+      "9,4": "wall",
+      "10,4": "wall",
+      "11,4": "wall",
+      "12,4": "wall",
+      "13,4": "wall",
+      "14,4": "outer_wall",
+      "15,4": "obstacle",
+      "16,4": "obstacle",
+      "17,4": "obstacle",
+      "18,4": "wall",
+      "19,4": "wall",
+      "20,4": "wall",
+      "21,4": "wall",
+      "22,4": "wall",
+      "23,4": "wall",
+      "24,4": "wall",
+      "25,4": "wall",
+      "26,4": "wall",
+      "27,4": "wall",
+      "28,4": "outer_wall",
+      "29,4": "floor",
+      "30,4": "floor",
+      "31,4": "floor",
+      "32,4": "outer_wall",
+      "33,4": "outer_wall",
+      "34,4": "outer_wall",
       "35,4": "outer_wall",
       "36,4": "outer_wall",
       "37,4": "outer_wall",
       "38,4": "empty",
       "39,4": "empty",
-      "0,5": "rock_wall",
-      "1,5": "rock_wall",
-      "2,5": "rock_wall",
-      "3,5": "rock_wall",
-      "4,5": "rock_wall",
-      "5,5": "rock_wall",
-      "6,5": "rock_wall",
-      "7,5": "rock_wall",
-      "8,5": "rock_wall",
-      "9,5": "rock_wall",
-      "10,5": "rock_wall",
-      "11,5": "rock_wall",
-      "12,5": "rock_wall",
-      "13,5": "rock_wall",
-      "14,5": "rock_wall",
-      "15,5": "rock_wall",
-      "16,5": "rock_wall",
-      "17,5": "rock_wall",
-      "18,5": "floor",
-      "19,5": "floor",
-      "20,5": "floor",
-      "21,5": "floor",
-      "22,5": "floor",
-      "23,5": "floor",
-      "24,5": "floor",
-      "25,5": "floor",
-      "26,5": "floor",
-      "27,5": "floor",
-      "28,5": "floor",
-      "29,5": "floor",
-      "30,5": "floor",
-      "31,5": "floor",
-      "32,5": "floor",
-      "33,5": "floor",
-      "34,5": "floor",
-      "35,5": "floor",
+      "0,5": "floor",
+      "1,5": "floor",
+      "2,5": "floor",
+      "3,5": "floor",
+      "4,5": "floor",
+      "5,5": "floor",
+      "6,5": "floor",
+      "7,5": "floor",
+      "8,5": "floor",
+      "9,5": "floor",
+      "10,5": "floor",
+      "11,5": "floor",
+      "12,5": "floor",
+      "13,5": "floor",
+      "14,5": "floor",
+      "15,5": "floor",
+      "16,5": "floor",
+      "17,5": "floor",
+      "18,5": "obstacle",
+      "19,5": "obstacle",
+      "20,5": "obstacle",
+      "21,5": "obstacle",
+      "22,5": "obstacle",
+      "23,5": "obstacle",
+      "24,5": "obstacle",
+      "25,5": "obstacle",
+      "26,5": "obstacle",
+      "27,5": "obstacle",
+      "28,5": "obstacle",
+      "29,5": "obstacle",
+      "30,5": "obstacle",
+      "31,5": "obstacle",
+      "32,5": "obstacle",
+      "33,5": "obstacle",
+      "34,5": "obstacle",
+      "35,5": "obstacle",
       "36,5": "empty",
       "37,5": "empty",
       "38,5": "empty",
       "39,5": "empty",
-      "0,6": "outer_wall",
-      "1,6": "outer_wall",
-      "2,6": "floor",
+      "0,6": "wall",
+      "1,6": "wall",
+      "2,6": "wall",
       "3,6": "outer_wall",
       "4,6": "outer_wall",
       "5,6": "outer_wall",
-      "6,6": "floor",
+      "6,6": "wall",
       "7,6": "empty",
       "8,6": "empty",
       "9,6": "empty",
@@ -490,6 +490,12 @@ window.MAP_DATA = {
   },
   "tiles": [
     {
+      "gx": 0,
+      "gy": 0,
+      "tx": 2,
+      "ty": 0
+    },
+    {
       "gx": 1,
       "gy": 0,
       "tx": 0,
@@ -700,6 +706,18 @@ window.MAP_DATA = {
       "ty": 1
     },
     {
+      "gx": 36,
+      "gy": 0,
+      "tx": 2,
+      "ty": 0
+    },
+    {
+      "gx": 0,
+      "gy": 1,
+      "tx": 2,
+      "ty": 0
+    },
+    {
       "gx": 1,
       "gy": 1,
       "tx": 0,
@@ -910,6 +928,18 @@ window.MAP_DATA = {
       "ty": 1
     },
     {
+      "gx": 36,
+      "gy": 1,
+      "tx": 2,
+      "ty": 0
+    },
+    {
+      "gx": 0,
+      "gy": 2,
+      "tx": 2,
+      "ty": 0
+    },
+    {
       "gx": 1,
       "gy": 2,
       "tx": 0,
@@ -1120,6 +1150,18 @@ window.MAP_DATA = {
       "ty": 1
     },
     {
+      "gx": 36,
+      "gy": 2,
+      "tx": 2,
+      "ty": 0
+    },
+    {
+      "gx": 0,
+      "gy": 3,
+      "tx": 2,
+      "ty": 0
+    },
+    {
       "gx": 1,
       "gy": 3,
       "tx": 0,
@@ -1330,6 +1372,18 @@ window.MAP_DATA = {
       "ty": 1
     },
     {
+      "gx": 36,
+      "gy": 3,
+      "tx": 2,
+      "ty": 0
+    },
+    {
+      "gx": 0,
+      "gy": 4,
+      "tx": 2,
+      "ty": 0
+    },
+    {
       "gx": 1,
       "gy": 4,
       "tx": 0,
@@ -1540,6 +1594,18 @@ window.MAP_DATA = {
       "ty": 1
     },
     {
+      "gx": 36,
+      "gy": 4,
+      "tx": 2,
+      "ty": 0
+    },
+    {
+      "gx": 0,
+      "gy": 5,
+      "tx": 2,
+      "ty": 0
+    },
+    {
       "gx": 1,
       "gy": 5,
       "tx": 0,
@@ -1750,6 +1816,18 @@ window.MAP_DATA = {
       "ty": 1
     },
     {
+      "gx": 36,
+      "gy": 5,
+      "tx": 2,
+      "ty": 0
+    },
+    {
+      "gx": 0,
+      "gy": 6,
+      "tx": 2,
+      "ty": 0
+    },
+    {
       "gx": 1,
       "gy": 6,
       "tx": 0,
@@ -1960,6 +2038,18 @@ window.MAP_DATA = {
       "ty": 1
     },
     {
+      "gx": 36,
+      "gy": 6,
+      "tx": 2,
+      "ty": 0
+    },
+    {
+      "gx": 0,
+      "gy": 7,
+      "tx": 2,
+      "ty": 0
+    },
+    {
       "gx": 1,
       "gy": 7,
       "tx": 0,
@@ -2170,6 +2260,18 @@ window.MAP_DATA = {
       "ty": 1
     },
     {
+      "gx": 36,
+      "gy": 7,
+      "tx": 2,
+      "ty": 0
+    },
+    {
+      "gx": 0,
+      "gy": 8,
+      "tx": 2,
+      "ty": 0
+    },
+    {
       "gx": 1,
       "gy": 8,
       "tx": 0,
@@ -2380,6 +2482,18 @@ window.MAP_DATA = {
       "ty": 1
     },
     {
+      "gx": 36,
+      "gy": 8,
+      "tx": 2,
+      "ty": 0
+    },
+    {
+      "gx": 0,
+      "gy": 9,
+      "tx": 2,
+      "ty": 0
+    },
+    {
       "gx": 1,
       "gy": 9,
       "tx": 0,
@@ -2590,6 +2704,18 @@ window.MAP_DATA = {
       "ty": 1
     },
     {
+      "gx": 36,
+      "gy": 9,
+      "tx": 2,
+      "ty": 0
+    },
+    {
+      "gx": 0,
+      "gy": 10,
+      "tx": 2,
+      "ty": 0
+    },
+    {
       "gx": 1,
       "gy": 10,
       "tx": 0,
@@ -2800,6 +2926,18 @@ window.MAP_DATA = {
       "ty": 1
     },
     {
+      "gx": 36,
+      "gy": 10,
+      "tx": 2,
+      "ty": 0
+    },
+    {
+      "gx": 0,
+      "gy": 11,
+      "tx": 2,
+      "ty": 0
+    },
+    {
       "gx": 1,
       "gy": 11,
       "tx": 0,
@@ -3010,6 +3148,18 @@ window.MAP_DATA = {
       "ty": 1
     },
     {
+      "gx": 36,
+      "gy": 11,
+      "tx": 2,
+      "ty": 0
+    },
+    {
+      "gx": 0,
+      "gy": 12,
+      "tx": 2,
+      "ty": 0
+    },
+    {
       "gx": 1,
       "gy": 12,
       "tx": 0,
@@ -3220,6 +3370,18 @@ window.MAP_DATA = {
       "ty": 1
     },
     {
+      "gx": 36,
+      "gy": 12,
+      "tx": 2,
+      "ty": 0
+    },
+    {
+      "gx": 0,
+      "gy": 13,
+      "tx": 2,
+      "ty": 0
+    },
+    {
       "gx": 1,
       "gy": 13,
       "tx": 0,
@@ -3430,6 +3592,18 @@ window.MAP_DATA = {
       "ty": 1
     },
     {
+      "gx": 36,
+      "gy": 13,
+      "tx": 2,
+      "ty": 0
+    },
+    {
+      "gx": 0,
+      "gy": 14,
+      "tx": 2,
+      "ty": 0
+    },
+    {
       "gx": 1,
       "gy": 14,
       "tx": 0,
@@ -3640,6 +3814,18 @@ window.MAP_DATA = {
       "ty": 1
     },
     {
+      "gx": 36,
+      "gy": 14,
+      "tx": 2,
+      "ty": 0
+    },
+    {
+      "gx": 0,
+      "gy": 15,
+      "tx": 2,
+      "ty": 0
+    },
+    {
       "gx": 1,
       "gy": 15,
       "tx": 0,
@@ -3850,6 +4036,18 @@ window.MAP_DATA = {
       "ty": 1
     },
     {
+      "gx": 36,
+      "gy": 15,
+      "tx": 2,
+      "ty": 0
+    },
+    {
+      "gx": 0,
+      "gy": 16,
+      "tx": 2,
+      "ty": 0
+    },
+    {
       "gx": 1,
       "gy": 16,
       "tx": 0,
@@ -4060,6 +4258,18 @@ window.MAP_DATA = {
       "ty": 1
     },
     {
+      "gx": 36,
+      "gy": 16,
+      "tx": 2,
+      "ty": 0
+    },
+    {
+      "gx": 0,
+      "gy": 17,
+      "tx": 2,
+      "ty": 0
+    },
+    {
       "gx": 1,
       "gy": 17,
       "tx": 0,
@@ -4270,6 +4480,18 @@ window.MAP_DATA = {
       "ty": 1
     },
     {
+      "gx": 36,
+      "gy": 17,
+      "tx": 2,
+      "ty": 0
+    },
+    {
+      "gx": 0,
+      "gy": 18,
+      "tx": 2,
+      "ty": 0
+    },
+    {
       "gx": 1,
       "gy": 18,
       "tx": 0,
@@ -4480,6 +4702,18 @@ window.MAP_DATA = {
       "ty": 1
     },
     {
+      "gx": 36,
+      "gy": 18,
+      "tx": 2,
+      "ty": 0
+    },
+    {
+      "gx": 0,
+      "gy": 19,
+      "tx": 2,
+      "ty": 0
+    },
+    {
       "gx": 1,
       "gy": 19,
       "tx": 0,
@@ -4688,6 +4922,18 @@ window.MAP_DATA = {
       "gy": 19,
       "tx": 1,
       "ty": 1
+    },
+    {
+      "gx": 36,
+      "gy": 19,
+      "tx": 2,
+      "ty": 0
+    },
+    {
+      "gx": 0,
+      "gy": 20,
+      "tx": 2,
+      "ty": 0
     },
     {
       "gx": 1,
@@ -4898,6 +5144,12 @@ window.MAP_DATA = {
       "gy": 20,
       "tx": 14,
       "ty": 4
+    },
+    {
+      "gx": 36,
+      "gy": 20,
+      "tx": 2,
+      "ty": 0
     }
   ],
   "editor": {},
@@ -5295,14 +5547,6 @@ window.MAP_DATA = {
       "y": 1
     },
     {
-      "x": 36,
-      "y": 1
-    },
-    {
-      "x": 36,
-      "y": 0
-    },
-    {
       "x": 1,
       "y": 15
     },
@@ -5560,7 +5804,11 @@ window.MAP_DATA = {
     },
     {
       "x": 36,
-      "y": 20
+      "y": 0
+    },
+    {
+      "x": 36,
+      "y": 1
     },
     {
       "x": 36,
@@ -5576,11 +5824,11 @@ window.MAP_DATA = {
     },
     {
       "x": 36,
-      "y": 6
+      "y": 5
     },
     {
       "x": 36,
-      "y": 5
+      "y": 6
     },
     {
       "x": 36,
@@ -5592,19 +5840,19 @@ window.MAP_DATA = {
     },
     {
       "x": 36,
-      "y": 10
-    },
-    {
-      "x": 36,
       "y": 9
     },
     {
       "x": 36,
-      "y": 12
+      "y": 10
     },
     {
       "x": 36,
       "y": 11
+    },
+    {
+      "x": 36,
+      "y": 12
     },
     {
       "x": 36,
@@ -5616,11 +5864,11 @@ window.MAP_DATA = {
     },
     {
       "x": 36,
-      "y": 16
+      "y": 15
     },
     {
       "x": 36,
-      "y": 15
+      "y": 16
     },
     {
       "x": 36,
@@ -5628,11 +5876,15 @@ window.MAP_DATA = {
     },
     {
       "x": 36,
+      "y": 18
+    },
+    {
+      "x": 36,
       "y": 19
     },
     {
       "x": 36,
-      "y": 18
+      "y": 20
     }
   ]
 }

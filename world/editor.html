@@ -534,6 +534,10 @@
         .palette-filter-btn[data-cat="beam"].active    { background: #ffd740; }
         .palette-filter-btn[data-cat="empty"]          { border-color: #555; }
         .palette-filter-btn[data-cat="empty"].active   { background: #555; color: #eee; }
+        .palette-filter-btn[data-cat="wall"]           { border-color: #90a4ae; }
+        .palette-filter-btn[data-cat="wall"].active    { background: #90a4ae; }
+        .palette-filter-btn[data-cat="obstacle"]       { border-color: #ff5252; }
+        .palette-filter-btn[data-cat="obstacle"].active { background: #ff5252; }
 
         .palette {
             display: grid;
@@ -560,6 +564,8 @@
         .palette-tile.cat-rock_wall      { border-color: #ff6d00; }
         .palette-tile.cat-outer_wall     { border-color: #e040fb; }
         .palette-tile.cat-beam           { border-color: #ffd740; }
+        .palette-tile.cat-wall           { border-color: #90a4ae; }
+        .palette-tile.cat-obstacle       { border-color: #ff5252; }
         .palette-tile.cat-empty          { border-color: #333; opacity: 0.35; }
         .palette-tile.selected           { border-color: cyan !important; outline: 1px solid cyan; z-index: 10; }
         .palette-tile:hover:not(.selected) { border-color: #fff !important; }
@@ -574,6 +580,35 @@
             padding: 1px 4px; border-radius: 2px;
             white-space: nowrap; z-index: 100;
             pointer-events: none;
+        }
+
+        /* ── CATEGORY CONTEXT MENU ── */
+        #cat-menu {
+            position: fixed;
+            background: #252525;
+            border: 1px solid #555;
+            border-radius: 6px;
+            padding: 4px;
+            z-index: 9500;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.5);
+            min-width: 110px;
+        }
+        #cat-menu .cat-menu-title {
+            font-size: 10px; color: #777;
+            padding: 3px 10px 5px; border-bottom: 1px solid #333; margin-bottom: 3px;
+            font-family: monospace;
+        }
+        #cat-menu button {
+            display: flex; align-items: center; gap: 7px;
+            width: 100%; padding: 5px 10px;
+            background: none; border: none;
+            color: #ccc; font-size: 11px; cursor: pointer;
+            border-radius: 3px; text-align: left;
+        }
+        #cat-menu button:hover { background: #3a3a3a; color: #fff; }
+        #cat-menu .cat-dot {
+            width: 8px; height: 8px; border-radius: 50%;
+            display: inline-block; flex-shrink: 0;
         }
 
         /* ── TOAST ── */
@@ -858,7 +893,8 @@
     <div id="palette-resize-handle"></div>
     <div class="palette-wrapper" id="palette-wrapper">
         <div class="palette-header">
-            <span onclick="togglePalette()" style="flex:1; cursor:pointer;">🎨 Tile Palette</span>
+            <span onclick="togglePalette()" style="flex:1; cursor:pointer;">🎨 Tile Palette
+                <span style="color:#555; font-size:10px; margin-left:8px;">우클릭: 카테고리 지정</span></span>
             <button onclick="autoClassifyFromCanvas()" class="reclassify-btn" title="픽셀 분석으로 타일 자동 분류">⚙ Auto-classify</button>
             <span onclick="togglePalette()" id="palette-toggle-icon" style="cursor:pointer; margin-left:8px;">▼</span>
         </div>
@@ -950,16 +986,19 @@
     // ===== Tile Category System =====
     const CAT_COLOR = {
         floor:          '#00e676',
+        wall:           '#90a4ae',
+        obstacle:       '#ff5252',
+        outer_wall:     '#e040fb',
         water:          '#2979ff',
         waterside_wall: '#00e5ff',
         rock_wall:      '#ff6d00',
-        outer_wall:     '#e040fb',
         beam:           '#ffd740',
         empty:          '#555',
     };
     const CAT_LABEL = {
-        floor: '바닥', water: '물', waterside_wall: '물가벽',
-        rock_wall: '바위벽', outer_wall: '외벽', beam: '평균대', empty: '빈칸',
+        floor: '바닥', wall: '벽', obstacle: '장애물', outer_wall: '외벽',
+        water: '물', waterside_wall: '물가벽', rock_wall: '바위벽',
+        beam: '평균대', empty: '빈칸',
     };
     let tileCategories = {};
     let paletteFilters = new Set();
@@ -1106,6 +1145,7 @@
                 d.dataset.cat = cat;
                 if (cat && !paletteFilters.has(cat)) d.classList.add('hidden-by-filter');
                 d.onclick = function () { selectTile(this, x, y); };
+                d.oncontextmenu = function (e) { e.preventDefault(); openCategoryMenu(e, x, y); };
                 palette.appendChild(d);
             }
         }
@@ -1643,8 +1683,16 @@
         return 'rock_wall';
     }
 
+    // tileCategories는 export 시 window.MAP_DATA.assets에서 읽히므로 항상 동기화한다
+    function syncCategoriesToMapData() {
+        if (!window.MAP_DATA) window.MAP_DATA = {};
+        if (!window.MAP_DATA.assets) window.MAP_DATA.assets = {};
+        window.MAP_DATA.assets.tileCategories = tileCategories;
+    }
+
     function applyCategoriesToPalette(newCategories) {
         tileCategories = newCategories;
+        syncCategoriesToMapData();
         document.querySelectorAll('.palette-tile').forEach(el => {
             const key = `${el.dataset.tx},${el.dataset.ty}`;
             const cat = tileCategories[key] || '';
@@ -1734,6 +1782,67 @@
             const tc = tile.dataset.cat;
             tile.classList.toggle('hidden-by-filter', !!tc && !paletteFilters.has(tc));
         });
+    }
+
+    // ===== Palette Category Editing (우클릭) =====
+    function openCategoryMenu(e, tx, ty) {
+        closeCategoryMenu();
+        const key = `${tx},${ty}`;
+        const current = tileCategories[key] || '';
+
+        const menu = document.createElement('div');
+        menu.id = 'cat-menu';
+        menu.innerHTML = `<div class="cat-menu-title">(${tx},${ty})</div>`;
+        Object.keys(CAT_LABEL).forEach(cat => {
+            const btn = document.createElement('button');
+            btn.innerHTML =
+                `<span class="cat-dot" style="background:${CAT_COLOR[cat] || '#888'}"></span>` +
+                `${CAT_LABEL[cat]}${cat === current ? ' ✓' : ''}`;
+            btn.onclick = (ev) => { ev.stopPropagation(); setTileCategory(tx, ty, cat); closeCategoryMenu(); };
+            menu.appendChild(btn);
+        });
+        document.body.appendChild(menu);
+
+        // 팔레트가 화면 하단에 있으므로 기본은 커서 위쪽에 표시
+        const mw = menu.offsetWidth, mh = menu.offsetHeight;
+        let left = Math.min(e.clientX, window.innerWidth - mw - 8);
+        let top = e.clientY - mh - 8;
+        if (top < 8) top = Math.min(e.clientY + 8, window.innerHeight - mh - 8);
+        menu.style.left = left + 'px';
+        menu.style.top = top + 'px';
+    }
+
+    function closeCategoryMenu() {
+        const m = document.getElementById('cat-menu');
+        if (m) m.remove();
+    }
+    document.addEventListener('click', closeCategoryMenu);
+    document.addEventListener('contextmenu', (e) => {
+        if (!e.target.closest('.palette-tile')) closeCategoryMenu();
+    });
+
+    function setTileCategory(tx, ty, cat) {
+        const key = `${tx},${ty}`;
+        tileCategories[key] = cat;
+        syncCategoriesToMapData();
+
+        const el = document.querySelector(`.palette-tile[data-tx="${tx}"][data-ty="${ty}"]`);
+        if (el) {
+            const wasSelected = el.classList.contains('selected');
+            el.className = 'palette-tile' + (cat ? ` cat-${cat}` : '') + (wasSelected ? ' selected' : '');
+            el.dataset.cat = cat;
+            el.classList.toggle('hidden-by-filter', !!cat && !paletteFilters.has(cat));
+        }
+        // 필터 바에 없는 카테고리가 새로 등장하면 바를 다시 구성하고 가시성 재적용
+        if (cat && !document.querySelector(`.palette-filter-btn[data-cat="${cat}"]`)) {
+            buildPaletteFilterBar();
+            document.querySelectorAll('.palette-tile').forEach(tile => {
+                const tc = tile.dataset.cat;
+                tile.classList.toggle('hidden-by-filter', !!tc && !paletteFilters.has(tc));
+            });
+        }
+        if (!isEraser && tx === selectedTx && ty === selectedTy) updateTilePreview();
+        showToast(`(${tx},${ty}) → ${CAT_LABEL[cat] || cat}`);
     }
 
     // ===== Zoom =====
@@ -1835,6 +1944,7 @@
                     d.dataset.coord = `${x},${y}`;
                     d.dataset.tx = x; d.dataset.ty = y;
                     d.onclick = function () { selectTile(this, x, y); };
+                    d.oncontextmenu = function (e) { e.preventDefault(); openCategoryMenu(e, x, y); };
                     document.getElementById('palette').appendChild(d);
                 }
             renderMapGrid();
