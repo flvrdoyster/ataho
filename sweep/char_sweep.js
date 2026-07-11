@@ -21,7 +21,8 @@ const CHAR_CONFIG = {
     SFX_SRC: 'sweep.mp3',   // 페이지(sweep/) 기준 상대 경로
     SFX_VOLUME: 0.9,
     SFX_POOL: 3,            // 연속 재생용 오디오 풀 크기
-    SPRITE_OFFSET_Y: -16    // 스프라이트를 판석보다 한 타일 위로 (발 위치 보정)
+    SPRITE_OFFSET_Y: -16,   // 스프라이트를 판석보다 한 타일 위로 (발 위치 보정)
+    STAGE_CLEAR_DELAY: 0.8  // 방 클리어 후 다음 방으로 넘어가기까지 대기(s)
 };
 
 // ===== State =====
@@ -32,11 +33,12 @@ const player = {
     x: 0, y: 0,
     width: 32, height: 32,     // playerInit에서 셀 크기로 재설정
     direction: 0,              // 0: Down, 1: Left, 2: Up, 3: Right
-    state: 'idle',             // 'idle' | 'moving' | 'sweeping'
+    state: 'idle',             // 'idle' | 'moving' | 'sweeping' | 'cleared'
     startX: 0, startY: 0,
     targetX: 0, targetY: 0,
     moveT: 0,                  // 이동 경과 시간
     sweepT: 0,                 // 빗자루질 경과 시간
+    clearT: 0,                 // 스테이지 클리어 후 경과 시간
     animFrame: 0,
     animTimer: 0
 };
@@ -73,31 +75,45 @@ async function playerInit(assets) {
     player.width = cellPx();
     player.height = cellPx();
 
-    if (window.MAP_DATA && window.MAP_DATA.startPos) {
+    // 스테이지(장애물 조합) 적용 후 그 위에서 먼지/스폰을 세팅
+    if (window.sweepStage) window.sweepStage.applyFromURL();
+    loadStage();
+}
+
+// 현재 스테이지 기준으로 스폰 배치 + 먼지 초기화. 스테이지 전환 시에도 재사용.
+function loadStage() {
+    const org = window.GRID_ORIGIN || { x: 0, y: 0 };
+    const cell = cellPx();
+    const cellTiles = window.GRID_CELL_TILES || 1;
+
+    // 스폰: 스테이지 데이터(셀 좌표) 우선, 없으면 MAP_DATA.startPos
+    if (window.sweepStage && window.sweepStage.count > 0) {
+        const c = window.sweepStage.getSpawnCell();
+        player.x = (org.x + c.cx * cellTiles) * CONFIG.TILE_SIZE;
+        player.y = (org.y + c.cy * cellTiles) * CONFIG.TILE_SIZE;
+    } else if (window.MAP_DATA && window.MAP_DATA.startPos) {
         player.x = window.MAP_DATA.startPos.x * CONFIG.TILE_SIZE;
         player.y = window.MAP_DATA.startPos.y * CONFIG.TILE_SIZE;
     } else {
-        player.x = Math.floor((mapWidth / 2) / cellPx()) * cellPx();
-        player.y = Math.floor((mapHeight / 2) / cellPx()) * cellPx();
+        player.x = Math.floor((mapWidth / 2) / cell) * cell;
+        player.y = Math.floor((mapHeight / 2) / cell) * cell;
     }
 
-    // startPos가 슬래브 격자에서 어긋나 있어도 가장 가까운 빈 칸에 스냅
-    // (격자 기준점: GRID_ORIGIN = 플레이필드 좌상단 슬래브의 타일 좌표)
-    const org = window.GRID_ORIGIN || { x: 0, y: 0 };
-    const cell = cellPx();
+    // 격자에서 어긋나 있으면 가장 가까운 빈 칸에 스냅
     const orgX = org.x * CONFIG.TILE_SIZE, orgY = org.y * CONFIG.TILE_SIZE;
     const snap = (v, o) => o + Math.round((v - o) / cell) * cell;
     const free = (x, y) => !checkCollision(x + 1, y + 1, cell - 2, cell - 2);
     let sx = snap(player.x, orgX), sy = snap(player.y, orgY);
     if (!free(sx, sy)) {
-        // round 스냅이 벽이면 내림 스냅으로 재시도
         sx = orgX + Math.floor((player.x - orgX) / cell) * cell;
         sy = orgY + Math.floor((player.y - orgY) / cell) * cell;
     }
     if (free(sx, sy)) { player.x = sx; player.y = sy; }
-    else console.warn('startPos를 격자에 스냅하지 못했습니다:', player.x, player.y);
+    else console.warn('스폰을 격자에 스냅하지 못했습니다:', player.x, player.y);
 
-    // 먼지 레이어 초기화 (collision·mapWidth/Height가 이미 준비된 시점)
+    player.state = 'idle';
+
+    // 먼지 레이어 초기화 (장애물 충돌이 이미 반영된 시점)
     if (typeof window.initDust === 'function') window.initDust();
     // 시작 칸은 밟고 시작하는 것으로 간주해 바로 깨끗한 상태로 시작
     if (typeof window.onCellSwept === 'function') {
@@ -200,10 +216,31 @@ function playerUpdate(dt) {
     if (player.state === 'sweeping') {
         player.sweepT += dt;
         if (player.sweepT >= CHAR_CONFIG.SWEEP_DURATION) {
+            // 먼지를 전부 지웠으면 스테이지 클리어
+            const cleared = (typeof window.sweepGetDustRemaining === 'function') &&
+                window.sweepGetDustRemaining() === 0 &&
+                window.sweepStage && window.sweepStage.count > 0;
+            if (cleared) {
+                player.state = 'cleared';
+                player.clearT = 0;
+                return;
+            }
             player.state = 'idle';
             // 키를 계속 누르고 있으면 다음 칸으로 바로 이어간다
             const input = readInput();
             if (input && !isInteracting()) tryStep(input);
+        }
+        return;
+    }
+
+    if (player.state === 'cleared') {
+        // 다음 방으로 (연출·문 열림은 Step 6). 마지막 방이면 처음으로 순환.
+        player.clearT += dt;
+        if (player.clearT >= CHAR_CONFIG.STAGE_CLEAR_DELAY) {
+            const st = window.sweepStage;
+            const next = (st.index + 1 < st.count) ? st.index + 1 : 0;
+            st.applyStage(next);
+            loadStage();
         }
     }
 }

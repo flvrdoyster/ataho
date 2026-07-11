@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Sweep Stage Editor</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            background: #222; color: #ddd; font-family: sans-serif; font-size: 12px;
+            height: 100vh; display: flex; flex-direction: column; overflow: hidden;
+        }
+        #toolbar {
+            display: flex; align-items: center; gap: 6px; flex-wrap: wrap;
+            padding: 6px 10px; background: #1a1a1a; border-bottom: 1px solid #3a3a3a;
+        }
+        .logo { font-weight: bold; color: #aaa; margin-right: 4px; }
+        .sep { width: 1px; height: 22px; background: #3a3a3a; margin: 0 4px; }
+        button {
+            padding: 5px 9px; background: #2a2a2a; color: #ccc; border: 1px solid #444;
+            border-radius: 4px; cursor: pointer; font-size: 11px;
+        }
+        button:hover { background: #3a3a3a; color: #fff; }
+        button.active { background: #2e7d32; color: #fff; border-color: #388e3c; }
+        button.danger { background: #3b1212; border-color: #c33; color: #ef9a9a; }
+        button.danger:hover { background: #c33; color: #fff; }
+        button.accent { background: #1a3a5c; border-color: #2a5a8c; color: #7ec8e3; }
+        #stage-tabs { display: flex; align-items: center; gap: 3px; }
+        #stage-label { min-width: 88px; text-align: center; color: #eee; }
+        #main { flex: 1; display: flex; min-height: 0; }
+        #canvas-wrap {
+            flex: 1; overflow: auto; background: #2d2d2d; display: flex;
+            align-items: flex-start; justify-content: center; padding: 16px;
+        }
+        #map-canvas { image-rendering: pixelated; background: #000; cursor: crosshair; box-shadow: 0 0 20px rgba(0,0,0,.6); }
+        #side {
+            width: 200px; min-width: 200px; background: #1a1a1a; border-left: 1px solid #3a3a3a;
+            display: flex; flex-direction: column; overflow-y: auto;
+        }
+        .side-h { padding: 8px 10px; font-size: 10px; color: #666; text-transform: uppercase; letter-spacing: 1px; border-bottom: 1px solid #252525; }
+        #stamp-list { display: flex; flex-wrap: wrap; gap: 6px; padding: 10px; }
+        .stamp {
+            width: 56px; display: flex; flex-direction: column; align-items: center; gap: 2px;
+            cursor: pointer; border: 2px solid transparent; border-radius: 4px; padding: 3px;
+        }
+        .stamp.selected { border-color: cyan; background: #0d2a40; }
+        .stamp:hover:not(.selected) { border-color: #555; }
+        .stamp { position: relative; }
+        .stamp canvas { image-rendering: pixelated; background: #111; border: 1px solid #333; }
+        .stamp span { font-size: 9px; color: #aaa; max-width: 52px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .stamp .del {
+            position: absolute; top: -6px; right: -6px; width: 16px; height: 16px; line-height: 14px;
+            text-align: center; font-size: 12px; border-radius: 50%; background: #c33; color: #fff;
+            border: 1px solid #900; cursor: pointer; display: none;
+        }
+        .stamp:hover .del { display: block; }
+        .stamp .del:hover { background: #e44; }
+        #bottom {
+            background: #111; border-top: 1px solid #3a3a3a; padding: 10px;
+            display: none; gap: 14px; align-items: flex-start; max-height: 40vh;
+        }
+        #bottom.show { display: flex; }
+        #builder { display: flex; flex-direction: column; gap: 6px; }
+        #slot-grid { display: grid; grid-template-columns: repeat(3, 40px); grid-template-rows: repeat(3, 40px); gap: 2px; }
+        .slot { width: 40px; height: 40px; background: #222; border: 1px solid #444; image-rendering: pixelated; cursor: pointer; }
+        .slot.active { border-color: cyan; box-shadow: 0 0 0 1px cyan inset; }
+        #tileset-palette { flex: 1; overflow: auto; max-height: 34vh; border: 1px solid #333; background: #1a1a1a; padding: 4px; }
+        #tileset-palette canvas { image-rendering: pixelated; cursor: pointer; display: block; }
+        .builder-row { display: flex; gap: 6px; align-items: center; }
+        input[type=text] { background: #222; color: #ddd; border: 1px solid #444; border-radius: 3px; padding: 4px 6px; font-size: 11px; }
+        .hint { color: #666; font-size: 10px; line-height: 1.6; }
+        #toast {
+            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+            background: #333; color: #eee; padding: 9px 16px; border-radius: 6px; font-size: 12px;
+            opacity: 0; transition: opacity .25s; pointer-events: none; z-index: 100;
+        }
+        #toast.show { opacity: 1; }
+    </style>
+</head>
+
+<body>
+    <div id="toolbar">
+        <span class="logo">🧹 Sweep Stage Editor</span>
+        <div class="sep"></div>
+        <div id="stage-tabs">
+            <button id="prev-stage">◀</button>
+            <span id="stage-label">Stage 1 / 5</span>
+            <button id="next-stage">▶</button>
+            <button id="add-stage">+ 방</button>
+            <button id="del-stage" class="danger">🗑</button>
+        </div>
+        <div class="sep"></div>
+        <button id="mode-place" class="active" data-mode="place">🪵 배치</button>
+        <button id="mode-erase" data-mode="erase">⌫ 지우개</button>
+        <button id="mode-spawn" data-mode="spawn">🚩 스폰</button>
+        <button id="mode-stamp" data-mode="stamp">✏ 스탬프 정의</button>
+        <div class="sep"></div>
+        <button id="test-stage" class="accent">▶ 이 방 테스트</button>
+        <button id="save" class="accent">💾 저장</button>
+        <button id="export">📋 복사</button>
+        <span class="hint" id="cursor-info" style="margin-left:8px;"></span>
+    </div>
+
+    <div id="main">
+        <div id="canvas-wrap"><canvas id="map-canvas"></canvas></div>
+        <div id="side">
+            <div class="side-h">장애물 스탬프</div>
+            <div id="stamp-list"></div>
+            <div class="hint" style="padding: 0 10px 10px;">배치 모드에서 스탬프 선택 후 칸을 클릭</div>
+        </div>
+    </div>
+
+    <div id="bottom">
+        <div id="builder">
+            <div class="side-h" style="padding:0 0 4px;">3×3 스탬프 만들기</div>
+            <div id="slot-grid"></div>
+            <div class="builder-row">
+                <input type="text" id="stamp-name" placeholder="이름 (예: barrel)" style="width:120px;">
+                <button id="save-stamp" class="accent">저장</button>
+            </div>
+            <div class="builder-row">
+                <label class="hint"><input type="checkbox" id="stamp-block" checked> 통행 불가</label>
+            </div>
+            <div class="hint">슬롯 클릭 → 아래 타일 클릭으로 채움<br>슬롯 우클릭 = 비우기(투명)</div>
+        </div>
+        <div style="flex:1; display:flex; flex-direction:column; gap:4px;">
+            <div class="side-h" style="padding:0 0 4px;">타일셋</div>
+            <div id="tileset-palette"></div>
+        </div>
+    </div>
+
+    <div id="toast"></div>
+
+    <!-- 데이터 로드 -->
+    <script src="../world/maps/souko/data.js"></script>
+    <script src="stages.js"></script>
+    <script>
+        const TILE = 16;
+        const CELL = 3;            // 셀당 타일 수
+        const ORG = { x: 2, y: 2 };
+        const GW = 11, GH = 6;     // 플레이필드 셀 수
+        const SCALE = 2;
+
+        // ── 편집 상태 (stages.js 전역을 깊은 복사) ──
+        let obstacles = JSON.parse(JSON.stringify(window.SWEEP_OBSTACLES || {}));
+        let stages = JSON.parse(JSON.stringify(window.SWEEP_STAGES || []));
+        if (!stages.length) stages = [{ spawn: { cx: 5, cy: 5 }, obstacles: [] }];
+
+        let curStage = 0;
+        let mode = 'place';
+        let selectedStamp = Object.keys(obstacles)[0] || null;
+
+        // 스탬프 빌더 상태
+        let builderTiles = new Array(9).fill(null);
+        let activeSlot = 0;
+
+        const canvas = document.getElementById('map-canvas');
+        const ctx = canvas.getContext('2d');
+        ctx.imageSmoothingEnabled = false;
+
+        const tileset = new Image();
+        tileset.src = '../world/' + (window.MAP_DATA.assets.tileset || 'maps/souko/assets/souko_tile.png');
+
+        // 맵 크기
+        let mapCols = 0, mapRows = 0;
+        window.MAP_DATA.tiles.forEach(t => { mapCols = Math.max(mapCols, t.gx + 1); mapRows = Math.max(mapRows, t.gy + 1); });
+        const tileAt = {};
+        window.MAP_DATA.tiles.forEach(t => { tileAt[t.gx + ',' + t.gy] = [t.tx, t.ty]; });
+
+        tileset.onload = () => {
+            canvas.width = mapCols * TILE * SCALE;
+            canvas.height = mapRows * TILE * SCALE;
+            ctx.imageSmoothingEnabled = false;
+            buildStampList();
+            buildBuilder();
+            buildTilesetPalette();
+            render();
+        };
+
+        // ── 좌표 헬퍼 ──
+        function cellOriginTile(cx, cy) { return { gx: ORG.x + cx * CELL, gy: ORG.y + cy * CELL }; }
+        function stageObstacleAt(cx, cy) {
+            return stages[curStage].obstacles.find(o => o.cx === cx && o.cy === cy);
+        }
+
+        // ── 렌더 ──
+        function drawTile(tx, ty, gx, gy) {
+            ctx.drawImage(tileset, tx * TILE, ty * TILE, TILE, TILE,
+                gx * TILE * SCALE, gy * TILE * SCALE, TILE * SCALE, TILE * SCALE);
+        }
+
+        function render() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            // 베이스 맵
+            window.MAP_DATA.tiles.forEach(t => drawTile(t.tx, t.ty, t.gx, t.gy));
+
+            // 장애물
+            stages[curStage].obstacles.forEach(o => {
+                const def = obstacles[o.stamp];
+                if (!def) return;
+                const { gx, gy } = cellOriginTile(o.cx, o.cy);
+                for (let dy = 0; dy < CELL; dy++) for (let dx = 0; dx < CELL; dx++) {
+                    const t = def.tiles[dy * CELL + dx];
+                    if (t) drawTile(t[0], t[1], gx + dx, gy + dy);
+                }
+            });
+
+            // 셀 그리드
+            ctx.strokeStyle = 'rgba(0,200,255,0.35)';
+            ctx.lineWidth = 1;
+            for (let cx = 0; cx <= GW; cx++) {
+                const x = (ORG.x + cx * CELL) * TILE * SCALE;
+                ctx.beginPath(); ctx.moveTo(x, ORG.y * TILE * SCALE);
+                ctx.lineTo(x, (ORG.y + GH * CELL) * TILE * SCALE); ctx.stroke();
+            }
+            for (let cy = 0; cy <= GH; cy++) {
+                const y = (ORG.y + cy * CELL) * TILE * SCALE;
+                ctx.beginPath(); ctx.moveTo(ORG.x * TILE * SCALE, y);
+                ctx.lineTo((ORG.x + GW * CELL) * TILE * SCALE, y); ctx.stroke();
+            }
+
+            // 스폰 마커
+            const sp = stages[curStage].spawn;
+            if (sp) {
+                const { gx, gy } = cellOriginTile(sp.cx, sp.cy);
+                ctx.fillStyle = 'rgba(0,255,80,0.25)';
+                ctx.fillRect(gx * TILE * SCALE, gy * TILE * SCALE, CELL * TILE * SCALE, CELL * TILE * SCALE);
+                ctx.strokeStyle = 'lime'; ctx.lineWidth = 2;
+                ctx.strokeRect(gx * TILE * SCALE + 1, gy * TILE * SCALE + 1, CELL * TILE * SCALE - 2, CELL * TILE * SCALE - 2);
+                ctx.fillStyle = 'lime'; ctx.font = 'bold 14px sans-serif';
+                ctx.fillText('🚩', gx * TILE * SCALE + 6, gy * TILE * SCALE + 20);
+            }
+        }
+
+        // ── 마우스 → 셀 ──
+        function eventCell(e) {
+            const rect = canvas.getBoundingClientRect();
+            const px = (e.clientX - rect.left) * (canvas.width / rect.width) / SCALE;
+            const py = (e.clientY - rect.top) * (canvas.height / rect.height) / SCALE;
+            const gx = Math.floor(px / TILE), gy = Math.floor(py / TILE);
+            const cx = Math.floor((gx - ORG.x) / CELL), cy = Math.floor((gy - ORG.y) / CELL);
+            if (cx < 0 || cx >= GW || cy < 0 || cy >= GH) return null;
+            return { cx, cy };
+        }
+
+        canvas.addEventListener('mousemove', e => {
+            const c = eventCell(e);
+            document.getElementById('cursor-info').textContent = c ? `cell ${c.cx},${c.cy}` : '';
+        });
+
+        canvas.addEventListener('click', e => {
+            const c = eventCell(e);
+            if (!c) return;
+            const st = stages[curStage];
+            if (mode === 'place') {
+                if (!selectedStamp) { toast('스탬프를 먼저 선택하세요'); return; }
+                st.obstacles = st.obstacles.filter(o => !(o.cx === c.cx && o.cy === c.cy));
+                st.obstacles.push({ cx: c.cx, cy: c.cy, stamp: selectedStamp });
+            } else if (mode === 'erase') {
+                st.obstacles = st.obstacles.filter(o => !(o.cx === c.cx && o.cy === c.cy));
+            } else if (mode === 'spawn') {
+                st.spawn = { cx: c.cx, cy: c.cy };
+            }
+            render();
+        });
+
+        // ── 스탬프 팔레트 ──
+        function buildStampList() {
+            const list = document.getElementById('stamp-list');
+            list.innerHTML = '';
+            Object.keys(obstacles).forEach(key => {
+                const el = document.createElement('div');
+                el.className = 'stamp' + (key === selectedStamp ? ' selected' : '');
+                const c = document.createElement('canvas');
+                c.width = CELL * TILE; c.height = CELL * TILE;
+                const cc = c.getContext('2d'); cc.imageSmoothingEnabled = false;
+                const def = obstacles[key];
+                for (let dy = 0; dy < CELL; dy++) for (let dx = 0; dx < CELL; dx++) {
+                    const t = def.tiles[dy * CELL + dx];
+                    if (t) cc.drawImage(tileset, t[0] * TILE, t[1] * TILE, TILE, TILE, dx * TILE, dy * TILE, TILE, TILE);
+                }
+                const span = document.createElement('span'); span.textContent = key;
+                const del = document.createElement('div');
+                del.className = 'del'; del.textContent = '×'; del.title = '스탬프 삭제';
+                del.onclick = (e) => { e.stopPropagation(); deleteStamp(key); };
+                el.appendChild(c); el.appendChild(span); el.appendChild(del);
+                el.onclick = () => { selectedStamp = key; setMode('place'); buildStampList(); };
+                list.appendChild(el);
+            });
+        }
+
+        function deleteStamp(key) {
+            // 이 스탬프를 쓰는 배치가 몇 곳인지 세어서 경고
+            let uses = 0;
+            stages.forEach(s => uses += s.obstacles.filter(o => o.stamp === key).length);
+            const msg = uses > 0
+                ? `스탬프 "${key}" 삭제? 이 스탬프로 배치된 장애물 ${uses}개도 함께 제거됩니다.`
+                : `스탬프 "${key}" 삭제?`;
+            if (!confirm(msg)) return;
+            delete obstacles[key];
+            stages.forEach(s => { s.obstacles = s.obstacles.filter(o => o.stamp !== key); });
+            if (selectedStamp === key) selectedStamp = Object.keys(obstacles)[0] || null;
+            buildStampList();
+            render();
+            toast(`스탬프 "${key}" 삭제됨`);
+        }
+
+        // ── 스탬프 빌더 ──
+        function buildBuilder() {
+            const grid = document.getElementById('slot-grid');
+            grid.innerHTML = '';
+            for (let i = 0; i < 9; i++) {
+                const s = document.createElement('canvas');
+                s.width = 40; s.height = 40; s.className = 'slot' + (i === activeSlot ? ' active' : '');
+                const sc = s.getContext('2d'); sc.imageSmoothingEnabled = false;
+                sc.clearRect(0, 0, 40, 40);
+                const t = builderTiles[i];
+                if (t) sc.drawImage(tileset, t[0] * TILE, t[1] * TILE, TILE, TILE, 0, 0, 40, 40);
+                s.onclick = () => { activeSlot = i; buildBuilder(); };
+                s.oncontextmenu = (e) => { e.preventDefault(); builderTiles[i] = null; buildBuilder(); };
+                grid.appendChild(s);
+            }
+        }
+
+        function buildTilesetPalette() {
+            const pal = document.getElementById('tileset-palette');
+            const cols = Math.floor(tileset.width / TILE), rows = Math.floor(tileset.height / TILE);
+            const c = document.createElement('canvas');
+            c.width = tileset.width * 2; c.height = tileset.height * 2;
+            const cc = c.getContext('2d'); cc.imageSmoothingEnabled = false;
+            cc.drawImage(tileset, 0, 0, c.width, c.height);
+            c.onclick = (e) => {
+                const rect = c.getBoundingClientRect();
+                const tx = Math.floor((e.clientX - rect.left) * (c.width / rect.width) / (TILE * 2));
+                const ty = Math.floor((e.clientY - rect.top) * (c.height / rect.height) / (TILE * 2));
+                builderTiles[activeSlot] = [tx, ty];
+                if (activeSlot < 8) activeSlot++;
+                buildBuilder();
+            };
+            pal.innerHTML = ''; pal.appendChild(c);
+        }
+
+        document.getElementById('save-stamp').onclick = () => {
+            const name = document.getElementById('stamp-name').value.trim();
+            if (!name) { toast('스탬프 이름을 입력하세요'); return; }
+            if (builderTiles.every(t => !t)) { toast('타일을 하나 이상 채우세요'); return; }
+            obstacles[name] = {
+                tiles: builderTiles.map(t => t ? [t[0], t[1]] : null),
+                block: document.getElementById('stamp-block').checked
+            };
+            selectedStamp = name;
+            buildStampList();
+            toast(`스탬프 "${name}" 저장`);
+        };
+
+        // ── 모드 ──
+        function setMode(m) {
+            mode = m;
+            document.querySelectorAll('#toolbar [data-mode]').forEach(b => b.classList.toggle('active', b.dataset.mode === m));
+            document.getElementById('bottom').classList.toggle('show', m === 'stamp');
+        }
+        document.querySelectorAll('#toolbar [data-mode]').forEach(b => b.onclick = () => setMode(b.dataset.mode));
+
+        // ── 스테이지 탭 ──
+        function updateStageLabel() { document.getElementById('stage-label').textContent = `Stage ${curStage + 1} / ${stages.length}`; }
+        document.getElementById('prev-stage').onclick = () => { curStage = (curStage - 1 + stages.length) % stages.length; updateStageLabel(); render(); };
+        document.getElementById('next-stage').onclick = () => { curStage = (curStage + 1) % stages.length; updateStageLabel(); render(); };
+        document.getElementById('add-stage').onclick = () => { stages.push({ spawn: { cx: 5, cy: 5 }, obstacles: [] }); curStage = stages.length - 1; updateStageLabel(); render(); };
+        document.getElementById('del-stage').onclick = () => {
+            if (stages.length <= 1) { toast('최소 1개 방은 있어야 합니다'); return; }
+            if (!confirm(`Stage ${curStage + 1} 삭제?`)) return;
+            stages.splice(curStage, 1); curStage = Math.min(curStage, stages.length - 1); updateStageLabel(); render();
+        };
+
+        document.getElementById('test-stage').onclick = () => {
+            window.open('index.html?stage=' + (curStage + 1), '_blank');
+        };
+
+        // ── Export ──
+        function serialize() {
+            const obLines = Object.entries(obstacles).map(([k, def]) => {
+                const rows = [];
+                for (let r = 0; r < CELL; r++) {
+                    const row = def.tiles.slice(r * CELL, r * CELL + CELL)
+                        .map(t => t ? `[${t[0]}, ${t[1]}]` : 'null').join(', ');
+                    rows.push('            ' + row);
+                }
+                const block = def.block === false ? ', block: false' : '';
+                return `    ${JSON.stringify(k)}: {\n        tiles: [\n${rows.join(',\n')}\n        ]${block ? ',\n        block: false' : ''}\n    }`;
+            }).join(',\n');
+
+            const stLines = stages.map(s => {
+                const obs = s.obstacles.map(o => `{ cx: ${o.cx}, cy: ${o.cy}, stamp: ${JSON.stringify(o.stamp)} }`);
+                const obsStr = obs.length ? `[\n            ${obs.join(',\n            ')}\n        ]` : '[]';
+                return `    { spawn: { cx: ${s.spawn.cx}, cy: ${s.spawn.cy} }, obstacles: ${obsStr} }`;
+            }).join(',\n');
+
+            return `/**
+ * stages.js — 술창고 청소 스테이지 데이터
+ * (sweep/stage_editor.html 에서 생성)
+ *
+ * 좌표는 셀 좌표(cx 0~${GW - 1}, cy 0~${GH - 1}) — 이동 격자 한 칸 단위.
+ * 장애물 스탬프: 3×3 타일(row-major 9칸) 묶음. null은 투명. block=false는 통행 가능.
+ */
+
+window.SWEEP_OBSTACLES = {
+${obLines}
+};
+
+window.SWEEP_STAGES = [
+${stLines}
+];
+`;
+        }
+
+        function copyToClipboard(text) {
+            try { return navigator.clipboard.writeText(text); }
+            catch (e) {
+                const ta = document.createElement('textarea'); ta.value = text;
+                ta.style.cssText = 'position:fixed;opacity:0'; document.body.appendChild(ta);
+                ta.select(); document.execCommand('copy'); document.body.removeChild(ta);
+            }
+        }
+
+        document.getElementById('export').onclick = async () => {
+            await copyToClipboard(serialize());
+            toast(`복사됨 — stages.js 전체를 붙여넣으세요 (${stages.length}개 방)`);
+        };
+
+        // ── 직접 저장 (File System Access API, localhost/https 에서만) ──
+        // 첫 저장 때 stages.js를 한 번 지정하면 이후엔 같은 파일에 바로 덮어쓴다.
+        let fileHandle = null;
+        document.getElementById('save').onclick = async () => {
+            const text = serialize();
+            if (!window.showSaveFilePicker) {
+                await copyToClipboard(text);
+                toast('이 환경에선 직접 저장 불가(파일 열기). 복사로 폴백 — 붙여넣으세요');
+                return;
+            }
+            try {
+                if (!fileHandle) {
+                    fileHandle = await window.showSaveFilePicker({
+                        suggestedName: 'stages.js',
+                        types: [{ description: 'JavaScript', accept: { 'text/javascript': ['.js'] } }]
+                    });
+                }
+                let perm = await fileHandle.queryPermission({ mode: 'readwrite' });
+                if (perm !== 'granted') perm = await fileHandle.requestPermission({ mode: 'readwrite' });
+                if (perm !== 'granted') { toast('쓰기 권한이 거부됨'); return; }
+                const w = await fileHandle.createWritable();
+                await w.write(text);
+                await w.close();
+                toast(`저장됨 → ${fileHandle.name} (${stages.length}개 방)`);
+            } catch (e) {
+                if (e.name === 'AbortError') return;   // 사용자가 파일 선택 취소
+                console.warn(e);
+                await copyToClipboard(text);
+                toast('직접 저장 실패 — 복사로 폴백했습니다');
+            }
+        };
+
+        // ── Toast ──
+        let toastTimer = null;
+        function toast(msg) {
+            const t = document.getElementById('toast');
+            t.textContent = msg; t.classList.add('show');
+            clearTimeout(toastTimer); toastTimer = setTimeout(() => t.classList.remove('show'), 2200);
+        }
+
+        updateStageLabel();
+    </script>
+</body>
+
+</html>
