@@ -20,14 +20,6 @@
     font-display: swap;
 }
 
-@font-face {
-    font-family: 'RasterForge';
-    src: url('https://fonts.cdnfonts.com/s/123917/RasterForgeRegular-XGDg9.woff') format('woff');
-    font-weight: normal;
-    font-style: normal;
-    font-display: swap;
-}
-
 /* 도트(픽셀) 한글 폰트 — world/ui.css(--ui-font)의 픽셀 UI 텍스트 전용.
    KoddiUDOnGothic은 매끈한 곡선이라 픽셀 UI에는 안 맞음.
    CDN 대신 자체 서빙(world/ui/DungGeunMo.*) — url()은 이 파일(fonts.css, 루트) 기준 상대경로. */

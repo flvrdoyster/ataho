@@ -206,7 +206,7 @@
             ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-            ctx.font = '48px "Raster Forge", sans-serif';
+            ctx.font = '48px "DungGeunMo", sans-serif';
             ctx.fillStyle = 'white';
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
@@ -350,10 +350,10 @@
         setRandomWhirlpoolPosition();
     }
 
-    // 폰트 로딩 함수
+    // 폰트 로딩 함수 (캔버스 fillText는 CSS @font-face 선언만으로는 로드가 보장 안 돼서
+    // 게임 시작 전에 명시적으로 fetch+등록해야 함 — world/ui/DungGeunMo.woff2 자체 서빙)
     function loadFonts() {
-        // FontFace 객체 생성
-        const font = new FontFace('Raster Forge', 'url(https://fonts.cdnfonts.com/s/123917/RasterForgeRegular-XGDg9.woff)');
+        const font = new FontFace('DungGeunMo', 'url(../world/ui/DungGeunMo.woff2)');
         return font.load().then(loadedFont => {
             document.fonts.add(loadedFont);
         });

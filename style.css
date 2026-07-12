@@ -194,13 +194,18 @@ video:fullscreen::cue {
     justify-content: center;
     z-index: 1001;
     pointer-events: auto;
-    text-align: center;
-    line-height: 1.2;
-    font-family: var(--action-btn-font-family, inherit);
-    text-transform: uppercase;
     user-select: none;
     -webkit-tap-highlight-color: transparent;
     transition: transform 0.05s, border-bottom-width 0.05s, box-shadow 0.05s;
+}
+
+/* 아이콘(인라인 SVG)은 버튼 너비 기준으로 맞춘다 — Space(261x45)·ESC(148.75x43.75) 둘 다
+   가로로 넓은 글리프라 세로 기준(height:%)이면 폭이 버튼 밖으로 넘친다 */
+#action-btn svg,
+#esc-btn svg {
+    width: 70%;
+    height: auto;
+    pointer-events: none;
 }
 
 #action-btn.hidden,

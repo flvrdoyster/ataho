@@ -31,6 +31,7 @@ let CONFIG = {
     SPEECH_BUBBLE_OFFSET_Y: -100,
     UI: {
         // Single interaction control shown on all platforms (click or tap).
+        // 라벨은 텍스트(웹폰트) 대신 인라인 SVG 아이콘으로 그린다 — ACTION_ICONS 참고.
         ACTION_BUTTON: {
             LABEL: 'Space',
             WIDTH: '80px', HEIGHT: '34px',
@@ -40,10 +41,26 @@ let CONFIG = {
             BORDER_BOTTOM: '6px solid #bebebe',
             RADIUS: '8px', FONT_SIZE: '18px',
             SHADOW: '0 4px 6px rgba(0,0,0,0.2)',
-            TRANSFORM: 'translateX(-50%)',
-            FONT_FAMILY: "'RasterForge', 'KoddiUDOnGothic', sans-serif"
+            TRANSFORM: 'translateX(-50%)'
         }
     }
+};
+
+// action-btn/esc-btn 아이콘 — 웹폰트(RasterForge) 텍스트 대신 인라인 SVG.
+// fill="currentColor"로 버튼의 --action-btn-color를 그대로 상속한다.
+const ACTION_ICONS = {
+    space: '<svg viewBox="0 0 261 45" fill="currentColor" aria-hidden="true">'
+        + '<path d="M0,36h27v-9H0V9h9V0h36v9h-27v9h27v18h-9v9H0v-9Z"/>'
+        + '<path d="M54,36V0h36v9h9v18h-9v9h-18v9h-18v-9ZM81,27V9h-9v18h9Z"/>'
+        + '<path d="M108,36V9h9V0h27v9h9v36h-18v-9h-9v9h-18v-9ZM135,27V9h-9v18h9Z"/>'
+        + '<path d="M162,27V9h9V0h27v9h9v9h-18v-9h-9v27h9v-9h18v9h-9v9h-27v-9h-9v-9Z"/>'
+        + '<path d="M216,36V0h45v9h-27v9h18v9h-18v9h27v9h-45v-9Z"/>'
+        + '</svg>',
+    esc: '<svg viewBox="0 0 148.75 43.75" fill="currentColor" aria-hidden="true">'
+        + '<path d="M0,35V0h43.75v8.75h-26.25v8.75h17.5v8.75h-17.5v8.75h26.25v8.75H0v-8.75Z"/>'
+        + '<path d="M52.5,35h26.25v-8.75h-26.25V8.75h8.75V0h35v8.75h-26.25v8.75h26.25v17.5h-8.75v8.75h-35v-8.75Z"/>'
+        + '<path d="M105,26.25V8.75h8.75V0h26.25v8.75h8.75v8.75h-17.5v-8.75h-8.75v26.25h8.75v-8.75h17.5v8.75h-8.75v8.75h-26.25v-8.75h-8.75v-8.75Z"/>'
+        + '</svg>'
 };
 
 // ===== State =====
@@ -282,7 +299,8 @@ function injectUI() {
         btn.id = 'action-btn';
         btn.className = 'hidden';
         const cfg = CONFIG.UI.ACTION_BUTTON;
-        btn.innerHTML = (cfg.LABEL || '').replace(/\\n/g, '<br>');
+        btn.innerHTML = ACTION_ICONS.space;
+        btn.setAttribute('aria-label', cfg.LABEL || '');
         uiLayer.appendChild(btn);
 
         btn.style.setProperty('--action-btn-width', cfg.WIDTH);
@@ -298,7 +316,6 @@ function injectUI() {
         btn.style.setProperty('--action-btn-font-size', cfg.FONT_SIZE);
         btn.style.setProperty('--action-btn-shadow', cfg.SHADOW);
         btn.style.setProperty('--action-btn-transform', cfg.TRANSFORM);
-        btn.style.setProperty('--action-btn-font-family', cfg.FONT_FAMILY);
 
         btn.addEventListener('click', (e) => {
             e.preventDefault();
@@ -315,7 +332,8 @@ function injectUI() {
         escBtn.id = 'esc-btn';
         escBtn.className = 'hidden';
         const cfg = CONFIG.UI.ACTION_BUTTON; // share the action button's look
-        escBtn.innerHTML = 'ESC';
+        escBtn.innerHTML = ACTION_ICONS.esc;
+        escBtn.setAttribute('aria-label', 'ESC');
         uiLayer.appendChild(escBtn);
 
         escBtn.style.setProperty('--action-btn-width', cfg.WIDTH);
@@ -331,7 +349,6 @@ function injectUI() {
         escBtn.style.setProperty('--action-btn-font-size', cfg.FONT_SIZE);
         escBtn.style.setProperty('--action-btn-shadow', cfg.SHADOW);
         escBtn.style.setProperty('--action-btn-transform', cfg.TRANSFORM);
-        escBtn.style.setProperty('--action-btn-font-family', cfg.FONT_FAMILY);
 
         escBtn.addEventListener('click', (e) => {
             e.preventDefault();
