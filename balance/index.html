@@ -7,9 +7,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>평균대 동작수련 : atah.io</title>
     <link rel="stylesheet" href="../fonts.css">
+    <link rel="stylesheet" href="../world/ui.css">
     <link rel="stylesheet" href="balance.css">
-    <link rel="preload" href="https://fonts.cdnfonts.com/s/123917/RasterForgeRegular-XGDg9.woff" as="font"
-        type="font/woff" crossorigin>
     <!-- Google Tag Manager -->
     <script>(function (w, d, s, l, i) {
             w[l] = w[l] || []; w[l].push({
@@ -31,29 +30,28 @@
     <div id="game-wrapper">
         <canvas id="gameCanvas"></canvas>
         <div id="ui-overlay">
-            <div id="game-over-overlay" hidden>
-                <div id="game-over-panel" class="frame-box">
-                    <img id="game-over-cursor" src="cursor.png" alt="" hidden>
-                    <p id="game-over-title">GAME OVER</p>
+            <div id="game-over-overlay" class="ui-panel-overlay" hidden>
+                <div id="game-over-panel" class="frame-box ui-panel">
+                    <div id="game-over-cursor" class="ui-cursor" hidden></div>
+                    <p id="game-over-title" class="ui-panel-title">더 수련하고 오게...</p>
 
-                    <div id="game-over-actions">
-                        <button id="btn-continue">Continue</button>
-                        <button id="btn-home">Home</button>
+                    <div id="game-over-actions" class="ui-panel-actions">
+                        <button id="btn-continue">한 번 더</button>
+                        <button id="btn-home">그만할래</button>
                     </div>
                 </div>
             </div>
-            <div id="hud" class="frame-box">
-                <div id="hud-stats">
-                    <span id="hud-time">TIME: 00:00</span>
-                    <span id="hud-dist">DIST: 0.0M</span>
-                </div>
-                <button id="sound-btn" type="button" aria-label="Toggle sound">
+            <div id="hud" class="frame-box ui-hud">
+                <div id="hud-stats" class="ui-hud-stats"></div>
+                <button id="sound-btn" class="ui-icon-btn" type="button" aria-label="Toggle sound">
                     <img src="sound.png" alt="Sound ON/OFF">
                 </button>
             </div>
         </div>
     </div>
+    <script>window.WORLD_BASE = '../world/';</script>
     <script src="../world/maps/abyss/data.js"></script>
+    <script src="../world/ui.js"></script>
     <script src="balance.js"></script>
     <script src="../footer.js"></script>
 </body>

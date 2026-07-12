@@ -8,7 +8,7 @@ body {
     font-family: 'KoddiUDOnGothic', sans-serif;
 }
 
-canvas {
+#gameCanvas {
     border: 0px;
     background-color: rgba(255, 255, 255, 1);
     display: block;
@@ -23,147 +23,8 @@ canvas {
     position: absolute;
     inset: 0;
     pointer-events: none;
-    font-family: 'RasterForge', sans-serif;
 }
 
-.frame-box {
-    border-width: 16px;
-    border-style: solid;
-    border-image: url('frame/combined.png') 16 fill / 16px round;
-    background-color: rgba(33, 66, 123, 1);
-}
-
-#hud {
-    position: fixed;
-    top: 0;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 100%;
-    max-width: 960px;
-    box-sizing: border-box;
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    padding: 4px 12px;
-    color: white;
-    font-size: 24px;
-    pointer-events: auto;
-}
-
-#hud-stats {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-
-#sound-btn {
-    flex-shrink: 0;
-    width: 50px;
-    height: 50px;
-    background: transparent;
-    border: none;
-    cursor: pointer;
-    pointer-events: auto;
-    padding: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    outline: none;
-}
-
-#sound-btn:focus {
-    outline: none;
-    box-shadow: none;
-}
-
-#sound-btn img {
-    width: 28px;
-    height: 28px;
-    display: block;
-}
-
-#game-over-overlay {
-    position: absolute;
-    inset: 0;
-    background: rgba(0, 0, 0, 0.6);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    pointer-events: auto;
-}
-
-#game-over-overlay[hidden] {
-    display: none;
-}
-
-#game-over-panel {
-    position: relative;
-    padding-top: 10px;
-    width: 32%;
-    box-sizing: border-box;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 4px;
-    color: white;
-}
-
-#game-over-cursor {
-    position: absolute;
-    width: 12px;
-    height: 16px;
-    image-rendering: pixelated;
-    pointer-events: none;
-}
-
-#game-over-title {
-    font-size: 28px;
-    margin: 0;
-}
-
-#game-over-actions {
-    display: flex;
-    flex-direction: row;
-    gap: 32px;
-    margin-top: 12px;
-}
-
-#btn-continue,
-#btn-home {
-    flex: 1;
-    font-family: 'RasterForge', sans-serif;
-    font-size: 20px;
-    color: white;
-    background: transparent;
-    border: none;
-    border-radius: 0;
-    outline: none;
-    padding: 10px 0px;
-    cursor: pointer;
-}
-
-#mobile-jump-btn {
-    display: none;
-    position: fixed;
-    bottom: 40px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 80px;
-    height: 80px;
-    border-radius: 50%;
-    background: rgba(0, 0, 0, 0.2);
-    border: 2px solid rgba(0, 0, 0, 0.5);
-    color: rgba(255, 255, 255, 1);
-    font-family: 'RasterForge', sans-serif;
-    font-size: 16px;
-    touch-action: manipulation;
-    user-select: none;
-    -webkit-user-select: none;
-    z-index: 1000;
-}
-
-#mobile-jump-btn:active {
-    background: rgba(0, 0, 0, 0.4);
-    transform: translateX(-50%) scale(0.95);
-}
+/* 모든 UI(frame-box·HUD·게임오버 패널·모바일 터치 버튼 등)는 world/ui.css 공용 정의를
+   사용한다 (.ui-hud, .ui-panel, .ui-icon-btn, .ui-cursor, .ui-touch-btn 등).
+   balance는 게임 캔버스/레이아웃(위)만 담당하고 UI 전용 규칙은 두지 않는다. */

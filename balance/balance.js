@@ -129,6 +129,7 @@
     let distanceTraveled = 0;
     let isGameOver = false;
     let soundEnabled = true;
+    let jumpTouchBtn = null;          // 모바일 터치 점프 버튼(UITouchButton), 터치기기에서만 생성
     let gameOverScreenTimer = 0;      // isGameOver 후 화면 표시까지의 딜레이 카운터
     let startTime = 0;
     let elapsedTime = 0; // in milliseconds
@@ -186,13 +187,6 @@
             });
         });
         return Promise.all(promises);
-    }
-
-    function loadFonts() {
-        const font = new FontFace('Raster Forge', 'url(https://fonts.cdnfonts.com/s/123917/RasterForgeRegular-XGDg9.woff)');
-        return font.load().then(loadedFont => {
-            document.fonts.add(loadedFont);
-        });
     }
 
     // --- 오디오 시스템 ---
@@ -295,8 +289,13 @@
         });
     }
 
-    const hudTime = document.getElementById('hud-time');
-    const hudDist = document.getElementById('hud-dist');
+    // HUD 조립은 world/ui.js의 UIStat이 담당 (라벨/구분자 텍스트 + 숫자는 이미지 폰트).
+    const hudTime = new UIStat(['시간 ', { num: true }, ':', { num: true }]);
+    const hudDist = new UIStat(['거리 ', { num: true }, '.', { num: true }, 'M']);
+    const hudStatsEl = document.getElementById('hud-stats');
+    hudStatsEl.appendChild(hudTime.el);
+    hudStatsEl.appendChild(hudDist.el);
+
     const gameOverOverlay = document.getElementById('game-over-overlay');
 
     const gameOverPanel = document.getElementById('game-over-panel');
@@ -305,6 +304,8 @@
         document.getElementById('btn-continue'),
         document.getElementById('btn-home')
     ];
+    const gameOverMenu = new UIKeyboardMenu(gameOverPanel, gameOverCursorEl, gameOverBtns);
+
     const soundBtn = document.getElementById('sound-btn');
 
     function toggleSound() {
@@ -621,8 +622,7 @@
                     if (fallenSfx._playToken === sfxToken) fallenSfx.play().catch(() => { });
                 });
             }
-            const jumpBtn = document.getElementById('mobile-jump-btn');
-            if (jumpBtn) jumpBtn.style.display = 'none';
+            if (jumpTouchBtn) jumpTouchBtn.hide();
         },
 
         checkLandingCollision() {
@@ -771,11 +771,9 @@
         // Calling it would create a duplicate loop (double speed).
 
         gameOverOverlay.hidden = true;
-        kbCursorIdx = -1;
-        clearGameOverCursor();
+        gameOverMenu.disable();
 
-        const jumpBtn = document.getElementById('mobile-jump-btn');
-        if (jumpBtn) jumpBtn.style.display = 'block';
+        if (jumpTouchBtn) jumpTouchBtn.show();
     }
 
     function generateObstacles() {
@@ -907,15 +905,18 @@
         const totalSeconds = Math.floor(elapsedTime / 1000);
         const minutes = Math.floor(totalSeconds / 60);
         const seconds = totalSeconds % 60;
+        const [distInt, distDec] = (distanceTraveled / 100).toFixed(1).split('.');
         return {
-            timeText: `Time: ${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`,
-            distanceText: `Dist: ${(distanceTraveled / 100).toFixed(1)}m`
+            minutes: String(minutes).padStart(2, '0'),
+            seconds: String(seconds).padStart(2, '0'),
+            distInt,
+            distDec
         };
     }
 
-    function updateHUD(timeText, distanceText) {
-        hudTime.textContent = timeText;
-        hudDist.textContent = distanceText;
+    function updateHUD(stats) {
+        hudTime.setNums(stats.minutes, stats.seconds);
+        hudDist.setNums(stats.distInt, stats.distDec);
     }
 
     // --- 디버그 패널 ---
@@ -1125,12 +1126,11 @@
             }
         }
 
-        const { timeText, distanceText } = buildStats();
-        updateHUD(timeText, distanceText);
+        updateHUD(buildStats());
         if (isGameOver && gameOverScreenTimer >= GAME_OVER_SCREEN_DELAY && gameOverOverlay.hidden) {
             gameOverOverlay.hidden = false;
-            kbCursorIdx = 0;
-            setGameOverCursor(gameOverBtns[0]);
+            gameOverMenu.enable();
+            gameOverMenu.selectFirst();
         }
         if (CONFIG.DEBUG.SHOW_STATS) updateDebugPanel();
     }
@@ -1146,49 +1146,6 @@
             e.preventDefault();
         }
     });
-    const CURSOR_W = 12, CURSOR_H = 16, CURSOR_GAP = 4;
-    const PANEL_BORDER = 16;
-    let kbCursorIdx = -1;
-
-    function setGameOverCursor(btn) {
-        const pr = gameOverPanel.getBoundingClientRect();
-        const br = btn.getBoundingClientRect();
-        gameOverCursorEl.style.left = (br.left - pr.left - PANEL_BORDER - CURSOR_GAP - CURSOR_W) + 'px';
-        gameOverCursorEl.style.top = (br.top - pr.top - PANEL_BORDER + (br.height - CURSOR_H) / 2) + 'px';
-        gameOverCursorEl.hidden = false;
-    }
-
-    function clearGameOverCursor() {
-        gameOverCursorEl.hidden = true;
-    }
-
-    gameOverBtns.forEach((btn, i) => {
-        btn.addEventListener('mouseenter', () => {
-            kbCursorIdx = i;
-            setGameOverCursor(btn);
-        });
-        btn.addEventListener('mouseleave', () => {
-            kbCursorIdx = -1;
-            clearGameOverCursor();
-        });
-    });
-
-    document.addEventListener('keydown', (e) => {
-        if (gameOverOverlay.hidden) return;
-        if (e.key === 'ArrowDown' || e.key === 'ArrowRight') {
-            e.preventDefault();
-            kbCursorIdx = kbCursorIdx < 0 ? 0 : (kbCursorIdx + 1) % gameOverBtns.length;
-            setGameOverCursor(gameOverBtns[kbCursorIdx]);
-        } else if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') {
-            e.preventDefault();
-            kbCursorIdx = kbCursorIdx < 0 ? gameOverBtns.length - 1 : (kbCursorIdx - 1 + gameOverBtns.length) % gameOverBtns.length;
-            setGameOverCursor(gameOverBtns[kbCursorIdx]);
-        } else if ((e.key === 'Enter' || e.key === ' ') && kbCursorIdx >= 0) {
-            e.preventDefault();
-            gameOverBtns[kbCursorIdx].click();
-        }
-    });
-
     document.getElementById('btn-continue').addEventListener('click', resetGame);
     document.getElementById('btn-home').addEventListener('click', () => { window.location.href = '../index.html'; });
 
@@ -1209,34 +1166,13 @@
         window.addEventListener(evt, unlockAudio, { once: true, passive: false })
     );
 
-    const isTouchDevice = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
-
-    if (isTouchDevice) {
-        const jumpBtn = document.createElement('button');
-        jumpBtn.id = 'mobile-jump-btn';
-        jumpBtn.innerText = 'JUMP';
-        jumpBtn.style.display = 'block';
-        document.body.appendChild(jumpBtn);
-
-        const handleJumpStart = (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            inputState.space = true;
-        };
-
-        const handleJumpEnd = (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            inputState.space = false;
-        };
-
-        jumpBtn.addEventListener('touchstart', handleJumpStart, { passive: false });
-        jumpBtn.addEventListener('touchend', handleJumpEnd, { passive: false });
-
-        // Mouse events for hybrid devices
-        jumpBtn.addEventListener('mousedown', handleJumpStart);
-        jumpBtn.addEventListener('mouseup', handleJumpEnd);
-        jumpBtn.addEventListener('mouseleave', handleJumpEnd);
+    if (UITouchButton.supported) {
+        jumpTouchBtn = new UITouchButton({
+            icon: UITouchButton.ICONS.space,
+            label: 'Space',
+            onPress: () => { inputState.space = true; },
+            onRelease: () => { inputState.space = false; }
+        });
     }
 
     buildMapGrid();
@@ -1268,7 +1204,7 @@
         'color:#000;font-weight:bold', 'color:inherit'
     );
 
-    Promise.all([loadImages(), loadFonts(), loadAudio()]).then(() => {
+    Promise.all([loadImages(), loadAudio()]).then(() => {
         // Pre-render red spike variant into offscreen canvas to avoid per-frame filter cost
         if (images.beamSpike) {
             const offCanvas = document.createElement('canvas');

@@ -1,0 +1,207 @@
+/**
+ * ui.css — 공용 픽셀 RPG UI (balance/ 의 frame-box·HUD·모달 시스템을 일반화)
+ *
+ * 사용하는 페이지는 이 파일을 로드하고 world/ui/frame.png, world/ui/cursor.png
+ * 를 상대 경로로 참조할 수 있는 위치(=world/ 기준 상대 경로가 통하는 곳)에 있어야 한다.
+ * 경로를 바꿔야 하면 --ui-frame-src 로 override:
+ *   :root { --ui-frame-src: url('../world/ui/frame.png'); }
+ *
+ * 폰트는 도트 한글 폰트 DungGeunMo (fonts.css, 자체 서빙) 사용 — 별도 로드 필요.
+ * KoddiUDOnGothic(사이트 공통 본문 서체)은 곡선이 매끈해 픽셀 UI에는 안 맞아 폴백으로만 둠.
+ */
+
+:root {
+    --ui-frame-src: url('ui/frame.png');
+    --ui-cursor-src: url('ui/cursor.png');
+    --ui-bg: rgba(33, 66, 123, 1);
+    --ui-font: 'DungGeunMo', 'KoddiUDOnGothic', sans-serif;
+}
+
+/* ── 프레임 박스: 9-슬라이스 픽셀 테두리 + 남색 배경 ── */
+.frame-box {
+    border-width: 16px;
+    border-style: solid;
+    border-image: var(--ui-frame-src) 16 fill / 16px round;
+    background-color: var(--ui-bg);
+    image-rendering: pixelated;
+}
+
+/* ── 상단 HUD 바 ── */
+.ui-hud {
+    position: fixed;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    max-width: 960px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding: 4px 12px;
+    color: white;
+    font-family: var(--ui-font);
+    font-size: 16px;
+    pointer-events: auto;
+    z-index: 10;
+}
+
+.ui-hud-stats {
+    flex: 1;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    gap: 24px;
+    align-items: center;
+}
+
+/* 라벨 + 숫자(이미지 폰트) + 구분자 조합 (예: "TIME" 05 : 23) */
+.ui-stat {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.ui-icon-btn {
+    flex-shrink: 0;
+    width: 50px;
+    height: 50px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    pointer-events: auto;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    outline: none;
+}
+
+.ui-icon-btn:focus { outline: none; box-shadow: none; }
+
+.ui-icon-btn img {
+    width: 28px;
+    height: 28px;
+    display: block;
+}
+
+/* ── 모바일 터치 액션 버튼 (화면 하단 원형 고정, 프로스티드 글래스 키캡) ── */
+.ui-touch-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: fixed;
+    bottom: 40px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: rgba(30, 30, 30, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: rgba(230, 230, 230, 0.95);   /* 아이콘 currentColor 소스 */
+    font-family: var(--ui-font);
+    font-size: 16px;
+    touch-action: manipulation;
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-tap-highlight-color: transparent;
+    box-shadow: inset 0 -4px 0 rgba(0, 0, 0, 0.25), 0 3px 8px rgba(0, 0, 0, 0.35);
+    -webkit-backdrop-filter: blur(2px);
+    backdrop-filter: blur(2px);
+    transition: transform 0.05s, box-shadow 0.05s;
+    z-index: 1000;
+}
+
+.ui-touch-btn svg {
+    /* 아이콘마다 종횡비가 다르므로(세로로 긴 화살표 vs 가로로 긴 워드마크) width/height auto +
+       max-width/max-height로 둘 중 걸리는 쪽 기준으로 맞춘다 */
+    width: auto;
+    height: auto;
+    max-width: 60%;
+    max-height: 40%;
+    pointer-events: none;
+}
+
+/* 눌림 상태 — JS(UITouchButton)가 press/release에서 토글 */
+.ui-touch-btn.active {
+    transform: translateX(-50%) translateY(3px);
+    box-shadow: inset 0 -1px 0 rgba(0, 0, 0, 0.25), 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+/* ── 중앙 패널(모달) ── */
+.ui-panel-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: auto;
+    z-index: 20;
+}
+
+.ui-panel-overlay[hidden] { display: none; }
+
+.ui-panel {
+    position: relative;
+    padding-top: 10px;
+    min-width: 260px;
+    max-width: 32%;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    color: white;
+    font-family: var(--ui-font);
+}
+
+.ui-panel-title {
+    font-size: 16px;
+    margin: 0;
+}
+
+.ui-panel-actions {
+    display: flex;
+    flex-direction: row;
+    gap: 32px;
+    margin-top: 12px;
+}
+
+.ui-panel-actions button {
+    flex: 1;
+    font-family: var(--ui-font);
+    font-size: 16px;
+    color: white;
+    background: transparent;
+    border: none;
+    border-radius: 0;
+    outline: none;
+    padding: 10px 0px;
+    cursor: pointer;
+}
+
+/* ── 키보드 네비게이션 커서 (버튼 옆에 뜨는 화살표) ── */
+.ui-cursor {
+    position: absolute;
+    width: 12px;
+    height: 16px;
+    background: var(--ui-cursor-src) no-repeat center / contain;
+    image-rendering: pixelated;
+    pointer-events: none;
+}
+
+.ui-cursor[hidden] { display: none; }
+
+/* ── SpriteNumberFont 캔버스: 작은 스프라이트를 정수배 확대 (world/ui.js 참고) ── */
+/* background 명시: 호스트 페이지에 흔한 전역 `canvas { background: ... }` 규칙에
+   깔려서 글자가 안 보이는 사고를 방지 (balance.css에서 실제로 겪은 문제) */
+.ui-pixel-text {
+    display: inline-block;
+    vertical-align: middle;
+    background: transparent;
+    image-rendering: pixelated;
+    image-rendering: -moz-crisp-edges;
+    image-rendering: crisp-edges;
+}
