@@ -758,6 +758,21 @@ function checkTriggers() {
     if (btn) btn.classList.toggle('hidden', !(activeTrigger && activeTrigger.sprite));
 }
 
+// 화면에 떠 있는 조작 버튼(esc/action) 중 가장 위 모서리의 뷰포트 Y를 반환.
+// 말풍선/모달이 이 선 아래로 내려가지 않게 클램프하는 데 쓴다(둘 다 하단 중앙 고정이라
+// 캐릭터를 따라다니는 모달과 겹칠 수 있음). 표시된 버튼이 없으면 Infinity.
+function uiButtonsSafeTop() {
+    let top = Infinity;
+    ['esc-btn', 'action-btn'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el && !el.classList.contains('hidden')) {
+            const r = el.getBoundingClientRect();
+            if (r.height > 0) top = Math.min(top, r.top);
+        }
+    });
+    return top;
+}
+
 // ===== Rendering =====
 function draw() {
     if (!ctx) return;
@@ -886,22 +901,30 @@ function draw() {
             const screenY = rect.top + pViewY * scaleY;
             const globalOffset = CONFIG.SPEECH_BUBBLE_OFFSET_Y || -50;
             const customOffset = (target === modal && activeTrigger) ? (activeTrigger.bubbleOffsetY || 0) : (parseInt(target.dataset.offsetY) || 0);
+            const h = target.offsetHeight;
             target.style.left = `${screenX}px`;
+            target.style.transform = 'translateX(-50%)';   // 세로 위치는 top(=topEdge)으로만 제어
 
-            // Default: float above the character's head. If that would clip off the top
-            // of the canvas (character near the top of the map, e.g. the PC98 exit zone),
-            // flip below the character so the bubble/modal stays on screen.
-            const aboveVisualTop = (screenY + globalOffset + customOffset) - target.offsetHeight;
-            if (aboveVisualTop < rect.top + 8) {
+            // 기본: 캐릭터 머리 위로 띄운다(말풍선 하단이 bottomAnchor). 위로 띄우면 캔버스
+            // 상단을 벗어나는 경우(캐릭터가 맵 최상단) 캐릭터 아래로 뒤집는다.
+            const bottomAnchor = screenY + globalOffset + customOffset;
+            let topEdge;
+            if (bottomAnchor - h < rect.top + 8) {
                 const charBottomY = rect.top + (ps.y + ps.height - camera.y) * scaleY;
                 target.classList.add('flip-below');
-                target.style.top = `${charBottomY + 16 + customOffset}px`;
-                target.style.transform = 'translate(-50%, 0)';
+                topEdge = charBottomY + 16 + customOffset;
             } else {
                 target.classList.remove('flip-below');
-                target.style.top = `${screenY + globalOffset + customOffset}px`;
-                target.style.transform = 'translate(-50%, -100%)';
+                topEdge = bottomAnchor - h;
             }
+
+            // 하단 조작 버튼(esc/action) 위로 밀어 올려 겹침 방지. 버튼과 8px 간격 확보.
+            const safeTop = uiButtonsSafeTop();
+            if (isFinite(safeTop) && topEdge + h > safeTop - 8) topEdge = safeTop - 8 - h;
+            // 위로 밀다가 캔버스 상단을 벗어나면 상단에 고정
+            if (topEdge < rect.top + 8) topEdge = rect.top + 8;
+
+            target.style.top = `${topEdge}px`;
         }
     }
 

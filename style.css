@@ -199,12 +199,14 @@ video:fullscreen::cue {
     transition: transform 0.05s, border-bottom-width 0.05s, box-shadow 0.05s;
 }
 
-/* 아이콘(인라인 SVG)은 버튼 너비 기준으로 맞춘다 — Space(261x45)·ESC(148.75x43.75) 둘 다
-   가로로 넓은 글리프라 세로 기준(height:%)이면 폭이 버튼 밖으로 넘친다 */
+/* 아이콘(인라인 SVG)은 세로(height) 기준으로 맞춘다 — Space(261x45)·ESC(148.75x43.75)는
+   종횡비가 서로 달라서(5.8:1 vs 3.4:1) 너비 기준으로 맞추면 둘의 실제 높이가 달라져
+   크기가 제각각으로 보인다. height:35%가 버튼 높이(34px)에서 더 넓은 Space 기준으로도
+   버튼 폭(80px) 안에 들어가는 상한선. */
 #action-btn svg,
 #esc-btn svg {
-    width: 70%;
-    height: auto;
+    height: 35%;
+    width: auto;
     pointer-events: none;
 }
 

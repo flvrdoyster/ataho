@@ -32,6 +32,7 @@ const CHAR_CONFIG = {
 
 // ===== Character State =====
 let charImg, idleImg, eatImg, drunkImg;
+let gulpSfx;   // 마시기(drink) 효과음
 
 const player = {
     x: 100, y: 100,
@@ -120,6 +121,10 @@ async function playerInit(assets) {
         drunkImg.onload = resolve;
         drunkImg.onerror = () => { console.warn("Drunk load failed"); resolve(); };
     });
+
+    // 마시기 효과음 (drink 액션 시 재생). 메뉴 클릭이 사용자 제스처라 자동재생 정책 통과.
+    gulpSfx = new Audio(resolvePath('char/gulp.mp3'));
+    gulpSfx.preload = 'auto';
 
     // Set initial position
     if (window.MAP_DATA && window.MAP_DATA.startPos) {
@@ -429,6 +434,7 @@ function playerOnAction(actionType, count = Infinity) {
         player.isDrinking = true;
         player.idleTimer = 0;
         player.drinkCount++;
+        if (gulpSfx) { gulpSfx.currentTime = 0; gulpSfx.play().catch(() => { }); }
     } else if (actionType === 'sit') {
         player.isIdle = true;
         player.idleTimer = CHAR_CONFIG.IDLE_START_TIME;
