@@ -15,12 +15,20 @@
     --ui-cursor-src: url('ui/cursor.png');
     --ui-bg: rgba(33, 66, 123, 1);
     --ui-font: 'DungGeunMo', 'KoddiUDOnGothic', sans-serif;
+    /* 아래 세 값은 폴백 기본값 — world/ui.js의 UI_CONFIG(FONT_SIZE/CURSOR_WIDTH/
+       CURSOR_HEIGHT/PANEL_BORDER)가 로드 시 덮어씀. 실제 조정은 거기서. */
+    --ui-font-size: 16px;
+    --ui-cursor-width: 12px;
+    --ui-cursor-height: 16px;
+    --ui-panel-border: 16px;
 }
 
 /* ── 프레임 박스: 9-슬라이스 픽셀 테두리 + 남색 배경 ── */
 .frame-box {
-    border-width: 16px;
+    border-width: var(--ui-panel-border);
     border-style: solid;
+    /* 9-슬라이스 조각 크기(16)는 frame.png 타일이 실제로 16px이라 고정 — PANEL_BORDER를
+       바꿔도 여긴 그대로 둬야 함(타일 크기와 안 맞으면 테두리 이미지가 늘어나 보임) */
     border-image: var(--ui-frame-src) 16 fill / 16px round;
     background-color: var(--ui-bg);
     image-rendering: pixelated;
@@ -41,7 +49,7 @@
     padding: 4px 12px;
     color: white;
     font-family: var(--ui-font);
-    font-size: 16px;
+    font-size: var(--ui-font-size);
     pointer-events: auto;
     z-index: 10;
 }
@@ -60,6 +68,13 @@
     display: inline-flex;
     align-items: center;
     gap: 4px;
+}
+
+/* 라벨/구분자 텍스트의 line-height를 좁혀서 실제 글자 높이에 맞춘다 — 기본 line-height는
+   폰트 여백(ascent/descent)까지 포함해 캔버스(숫자)보다 박스가 커서, align-items:center로도
+   눈에는 살짝 어긋나 보임 */
+.ui-stat > span {
+    line-height: 1;
 }
 
 .ui-icon-btn {
@@ -85,7 +100,7 @@
     display: block;
 }
 
-/* ── 모바일 터치 액션 버튼 (화면 하단 원형 고정, 프로스티드 글래스 키캡) ── */
+/* ── 모바일 터치 액션 버튼 (화면 하단 고정, gensei-pc98 가상 게임패드 키캡 스타일) ── */
 .ui-touch-btn {
     display: flex;
     align-items: center;
@@ -94,15 +109,18 @@
     bottom: 40px;
     left: 50%;
     transform: translateX(-50%);
-    width: 80px;
-    height: 80px;
-    border-radius: 50%;
+    width: 72px;      /* 고정폭 필요 — min-width만 있으면 너비가 불확정이라 자식 svg의
+                          width:% 기준(.ui-touch-btn--wide-icon)이 엉뚱하게 해석됨 */
+    height: 48px;
+    box-sizing: border-box;
+    padding: 0 10px;
+    border-radius: 8px;
     background: rgba(30, 30, 30, 0.1);
     border: 1px solid rgba(255, 255, 255, 0.2);
     color: rgba(230, 230, 230, 0.95);   /* 아이콘 currentColor 소스 */
     font-family: var(--ui-font);
-    font-size: 16px;
-    touch-action: manipulation;
+    font-size: var(--ui-font-size);
+    touch-action: none;
     user-select: none;
     -webkit-user-select: none;
     -webkit-tap-highlight-color: transparent;
@@ -114,13 +132,16 @@
 }
 
 .ui-touch-btn svg {
-    /* 아이콘마다 종횡비가 다르므로(세로로 긴 화살표 vs 가로로 긴 워드마크) width/height auto +
-       max-width/max-height로 둘 중 걸리는 쪽 기준으로 맞춘다 */
+    height: 30%;
     width: auto;
-    height: auto;
-    max-width: 60%;
-    max-height: 40%;
     pointer-events: none;
+}
+
+/* 가로로 넓은 글리프(스페이스바 등)는 세로 기준(height:%)으로 맞추면 비율상 폭이 과하게
+   커진다 — 이런 아이콘은 가로 기준으로 맞춘다 (UITouchButton opts.wideIcon: true) */
+.ui-touch-btn--wide-icon svg {
+    width: 60%;
+    height: auto;
 }
 
 /* 눌림 상태 — JS(UITouchButton)가 press/release에서 토글 */
@@ -158,7 +179,7 @@
 }
 
 .ui-panel-title {
-    font-size: 16px;
+    font-size: var(--ui-font-size);
     margin: 0;
 }
 
@@ -172,7 +193,7 @@
 .ui-panel-actions button {
     flex: 1;
     font-family: var(--ui-font);
-    font-size: 16px;
+    font-size: var(--ui-font-size);
     color: white;
     background: transparent;
     border: none;
@@ -185,8 +206,8 @@
 /* ── 키보드 네비게이션 커서 (버튼 옆에 뜨는 화살표) ── */
 .ui-cursor {
     position: absolute;
-    width: 12px;
-    height: 16px;
+    width: var(--ui-cursor-width);
+    height: var(--ui-cursor-height);
     background: var(--ui-cursor-src) no-repeat center / contain;
     image-rendering: pixelated;
     pointer-events: none;

@@ -1169,6 +1169,7 @@
     if (UITouchButton.supported) {
         jumpTouchBtn = new UITouchButton({
             icon: UITouchButton.ICONS.space,
+            wideIcon: true,
             label: 'Space',
             onPress: () => { inputState.space = true; },
             onRelease: () => { inputState.space = false; }

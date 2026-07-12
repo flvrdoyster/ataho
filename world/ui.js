@@ -10,6 +10,35 @@
  *   menu.disable();  // 오버레이 닫을 때
  */
 
+// ===== Config — 직접 보면서 조정하는 값은 여기 모아둠 =====
+const UI_CONFIG = {
+    // 기본 텍스트 크기 — world/ui.css의 --ui-font-size로 내려가서 .ui-hud, .ui-touch-btn,
+    // .ui-panel-title, .ui-panel-actions button 등 전부 이 값 하나로 통일된다.
+    FONT_SIZE: 20,
+
+    // UIStat이 만드는 숫자(이미지 폰트, SpriteNumberFont) 슬롯 기본값
+    NUM_PRESET: 'BIG',      // 'SMALL'(8px, num_small.png) | 'BIG'(16px, num_big.png)
+    NUM_SCALE: 1,           // 원본 글리프 배율 (정수배 권장 — 픽셀 확대가 고르게 나옴)
+    NUM_COLOR: 'white',     // 'white' | 'green' | 'yellow' | 'red' (num_small/big.png 4색 행)
+
+    // UIKeyboardMenu 커서(.ui-cursor) 위치 계산용 — world/ui.css 값과 맞춰야 함
+    CURSOR_WIDTH: 12,       // .ui-cursor { width }
+    CURSOR_HEIGHT: 16,      // .ui-cursor { height }
+    CURSOR_GAP: 4,          // 커서와 버튼 사이 간격(px)
+    PANEL_BORDER: 16        // .frame-box { border-width } — 패널 안쪽 좌표 보정용
+};
+
+// UI_CONFIG 값을 world/ui.css의 CSS 변수로 반영 (CSS 쪽엔 폴백값만 두고, 실제 값은
+// 여기 하나에서 관리 — 스크립트가 이 시점에 이미 <head>/<body>에 걸려 있어야 함).
+// CURSOR_WIDTH/HEIGHT·PANEL_BORDER는 JS(커서 위치 계산)와 CSS(테두리 두께·커서 크기)
+// 양쪽에서 같은 값을 써야 어긋나지 않는다 — 이 연결이 빠지면 숫자만 바꿔서는 시각적으로
+// 반영이 안 되는 버그가 남는다.
+const root = document.documentElement.style;
+root.setProperty('--ui-font-size', UI_CONFIG.FONT_SIZE + 'px');
+root.setProperty('--ui-cursor-width', UI_CONFIG.CURSOR_WIDTH + 'px');
+root.setProperty('--ui-cursor-height', UI_CONFIG.CURSOR_HEIGHT + 'px');
+root.setProperty('--ui-panel-border', UI_CONFIG.PANEL_BORDER + 'px');
+
 // world/ui.js를 로드하는 페이지마다 상대 경로 깊이가 다르므로(../world/ui.js 등),
 // engine.js의 window.MAP_BASE와 같은 방식으로 호스트 페이지가 지정한 접두사를 쓴다.
 //   <script>window.WORLD_BASE = '../world/';</script>  (world/ 로드 위치 기준, sweep도 동일)
@@ -22,10 +51,10 @@ class UIKeyboardMenu {
         this.panel = panelEl;
         this.cursor = cursorEl;
         this.buttons = buttons;
-        this.gap = opts.gap ?? 4;
-        this.cursorW = opts.cursorW ?? 12;
-        this.cursorH = opts.cursorH ?? 16;
-        this.border = opts.border ?? 16;
+        this.gap = opts.gap ?? UI_CONFIG.CURSOR_GAP;
+        this.cursorW = opts.cursorW ?? UI_CONFIG.CURSOR_WIDTH;
+        this.cursorH = opts.cursorH ?? UI_CONFIG.CURSOR_HEIGHT;
+        this.border = opts.border ?? UI_CONFIG.PANEL_BORDER;
         this.idx = -1;
         this.active = false;
 
@@ -85,18 +114,22 @@ class UIKeyboardMenu {
 }
 
 /**
- * UITouchButton — 모바일 터치 액션 버튼(화면 하단 원형 고정 버튼).
- * 터치 기기에서만 붙인다(UITouchButton.supported로 판별). press/release 콜백을
- * 게임 입력에 연결하고, show()/hide()로 게임 상태에 따라 표시를 제어한다.
+ * UITouchButton — 모바일 터치 액션 버튼(화면 하단 고정, gensei-pc98 가상 게임패드 키캡 스타일).
+ * 터치 기기에서만 붙인다(UITouchButton.supported로 판별. URL에 ?gamepad가 있으면
+ * 데스크톱에서도 강제 표시). press/release 콜백을 게임 입력에 연결하고, show()/hide()로
+ * 게임 상태에 따라 표시를 제어한다.
  *
  * 아이콘은 인라인 SVG 한 덩어리를 fill="currentColor"로 그려서 버튼의 CSS color를
  * 상속한다 — 크기는 SVG에 박지 않고 CSS(.ui-touch-btn svg { height: N%; width: auto })로
  * 조절하므로 버튼 크기가 바뀌어도 자동으로 맞는다. icon 생략 시 label 텍스트로 폴백.
+ * 가로로 넓은 글리프(스페이스바 등)는 opts.wideIcon: true로 가로 기준 스케일로 전환한다
+ * (세로 기준으로 맞추면 폭이 비율대로 과하게 커짐).
  *
  * 사용 예:
  *   if (UITouchButton.supported) {
  *       const jump = new UITouchButton({
  *           icon: UITouchButton.ICONS.space,
+ *           wideIcon: true,
  *           label: 'Space',   // aria-label (+ icon 없을 때 텍스트 폴백)
  *           onPress:   () => { inputState.space = true;  },
  *           onRelease: () => { inputState.space = false; }
@@ -106,7 +139,7 @@ class UIKeyboardMenu {
 class UITouchButton {
     constructor(opts = {}) {
         const btn = document.createElement('button');
-        btn.className = 'ui-touch-btn';
+        btn.className = 'ui-touch-btn' + (opts.wideIcon ? ' ui-touch-btn--wide-icon' : '');
         if (opts.label) btn.setAttribute('aria-label', opts.label);
         if (opts.icon) btn.innerHTML = opts.icon;
         else btn.textContent = opts.label ?? '';
@@ -136,19 +169,17 @@ class UITouchButton {
     hide() { this.el.style.display = 'none'; }
 
     static get supported() {
+        // ?gamepad 로 데스크톱에서도 강제 표시 (다른 웹 에뮬레이터들과 동일한 관례)
+        if (new URLSearchParams(location.search).has('gamepad')) return true;
         return ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
     }
 }
 
-// "SPACE" 워드마크 (261x45, 가로로 긴 픽셀 글리프). aria-hidden — 접근성 라벨은
-// UITouchButton 생성자가 opts.label로 버튼 자체에 붙인다(중복 안내 방지).
+// 스페이스바 글리프 (38.33x10.95) — ESC/Enter/화살표와 같은 5.48 그리드.
+// aria-hidden — 접근성 라벨은 UITouchButton 생성자가 opts.label로 버튼 자체에 붙인다(중복 안내 방지).
 UITouchButton.ICONS = {
-    space: '<svg viewBox="0 0 261 45" fill="currentColor" aria-hidden="true">'
-        + '<path d="M0,36h27v-9H0V9h9V0h36v9h-27v9h27v18h-9v9H0v-9Z"/>'
-        + '<path d="M54,36V0h36v9h9v18h-9v9h-18v9h-18v-9ZM81,27V9h-9v18h9Z"/>'
-        + '<path d="M108,36V9h9V0h27v9h9v36h-18v-9h-9v9h-18v-9ZM135,27V9h-9v18h9Z"/>'
-        + '<path d="M162,27V9h9V0h27v9h9v9h-18v-9h-9v27h9v-9h18v9h-9v9h-27v-9h-9v-9Z"/>'
-        + '<path d="M216,36V0h45v9h-27v9h18v9h-18v9h27v9h-45v-9Z"/>'
+    space: '<svg viewBox="0 0 38.33 10.95" fill="currentColor" aria-hidden="true">'
+        + '<polygon points="32.86 0 32.86 5.48 27.38 5.48 21.9 5.48 16.43 5.48 10.95 5.48 5.48 5.48 5.48 0 0 0 0 5.48 0 10.95 5.48 10.95 10.95 10.95 16.43 10.95 21.9 10.95 27.38 10.95 32.86 10.95 38.33 10.95 38.33 5.48 38.33 0 32.86 0"/>'
         + '</svg>'
 };
 
@@ -239,10 +270,16 @@ SpriteNumberFont.BIG = { src: resolveUiAsset('ui/num_big.png'), glyphW: 16, glyp
  * 통째로 조립하는 헬퍼. 문자열 조각은 고정 라벨/구분자 텍스트로, {num:true} 조각은
  * SpriteNumberFont 슬롯으로 만든다. 슬롯 값 갱신은 setNums()로 순서대로.
  *
+ * 숫자 프리셋(SMALL 8px / BIG 16px)은 기본으로 UI_CONFIG.NUM_PRESET을 따르고,
+ * 필요하면 인스턴스별로 opts.numOpts에서 SpriteNumberFont.SMALL/BIG을 직접 펼쳐 덮어쓴다.
+ *
  * 사용 예:
  *   const hudTime = new UIStat(['TIME', {num:true}, ':', {num:true}]);
  *   hudStatsEl.appendChild(hudTime.el);
  *   hudTime.setNums('05', '23');
+ *
+ *   // 이 줄만 SMALL로 강제
+ *   const small = new UIStat(['MONEY', {num:true}], { numOpts: { ...SpriteNumberFont.SMALL } });
  */
 class UIStat {
     constructor(parts, opts = {}) {
@@ -250,7 +287,8 @@ class UIStat {
         this.el.className = 'ui-stat';
         this.nums = [];
 
-        const numOpts = { ...SpriteNumberFont.SMALL, color: 'white', scale: 1, ...opts.numOpts };
+        const basePreset = SpriteNumberFont[UI_CONFIG.NUM_PRESET] || SpriteNumberFont.SMALL;
+        const numOpts = { ...basePreset, color: UI_CONFIG.NUM_COLOR, scale: UI_CONFIG.NUM_SCALE, ...opts.numOpts };
         parts.forEach(part => {
             if (typeof part === 'string') {
                 const span = document.createElement('span');
