@@ -88,7 +88,7 @@ window.MAP_DATA.triggers = [
       {
         "label": "평균대 동작수련",
         "href": "balance/index.html",
-        "target": "_blank"
+        "target": ""
       },
       {
         "label": "술창고 청소",

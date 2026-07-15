@@ -290,11 +290,14 @@
     }
 
     // HUD 조립은 world/ui.js의 UIStat이 담당 (라벨/구분자 텍스트 + 숫자는 이미지 폰트).
+    // #hud는 index.html에서 visibility:hidden으로 시작 — ui.js/balance.js 로드 사이에
+    // 빈 껍데기(숫자 없는 프레임 바)가 잠깐 보이는 걸 막고, 여기서 다 채운 뒤 드러낸다.
     const hudTime = new UIStat(['시간 ', { num: true }, ':', { num: true }]);
     const hudDist = new UIStat(['거리 ', { num: true }, '.', { num: true }, 'M']);
     const hudStatsEl = document.getElementById('hud-stats');
     hudStatsEl.appendChild(hudTime.el);
     hudStatsEl.appendChild(hudDist.el);
+    document.getElementById('hud').style.visibility = 'visible';
 
     const gameOverOverlay = document.getElementById('game-over-overlay');
 
