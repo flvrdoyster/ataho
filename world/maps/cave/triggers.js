@@ -16,6 +16,11 @@
  * - count: 실행할 횟수
  * - text: 선택 시 출력될 캐릭터 대사 (말풍선)
  * - href: 링크 이동 주소 (action/text가 없을 때 사용)
+ *
+ * [트리거 items 속성 대안]
+ * - itemsFrom: items를 직접 나열하는 대신, 이 이름의 전역 변수(예: window.RESOURCE_IMG_MANIFEST,
+ *   resource/img/manifest.js가 정의하는 { 파일명 -> { caption, source, modified } } 객체)에서
+ *   resource/img/ 안의 항목들을 읽어와 메뉴 항목으로 변환한다.
  */
 
 if (!window.MAP_DATA.triggers) window.MAP_DATA.triggers = [];
@@ -128,41 +133,12 @@ window.MAP_DATA.triggers = [
     "h": 2,
     "id": "jar-1",
     "sprite": "object/object_jar.png",
-    "title": "일러스트",
+    "title": "공식 일러스트",
     "type": "menu",
     "text": [
       "종이 쓰레기는 모아서 버려야겠다."
     ],
-    "items": [
-      {
-        "label": "Disc Station 04 메뉴 화면",
-        "href": "#resource/img/ds04.png",
-        "data": {
-          "caption": "Disc Station 04"
-        }
-      },
-      {
-        "label": "Disc Station 10 메뉴 화면",
-        "href": "#resource/img/ds10.png",
-        "data": {
-          "caption": "Disc Station 10"
-        }
-      },
-      {
-        "label": "Disc Station 14 메뉴 화면",
-        "href": "#resource/img/ds14.png",
-        "data": {
-          "caption": "Disc Station 14"
-        }
-      },
-      {
-        "label": "Disc Station 20 메뉴 화면",
-        "href": "#resource/img/ds20.png",
-        "data": {
-          "caption": "Disc Station 20"
-        }
-      }
-    ]
+    "itemsFrom": "RESOURCE_IMG_MANIFEST"
   },
   {
     "x": 31,

@@ -1,0 +1,20 @@
+#!/bin/sh
+# resource/img/ 안에 새/삭제된 이미지 파일이 스테이지되면 manifest.js에 빈 자리
+# 항목을 자동으로 추가해서 같은 커밋에 포함시킨다. manifest.js를 직접 손으로
+# 고친 경우(캡션/출처/수정여부 편집)는 이미 최종본이라 다시 돌릴 필요 없음.
+# (설치: cp scripts/hooks/pre-commit .git/hooks/ && chmod +x .git/hooks/pre-commit)
+#
+# GitHub Desktop 등 GUI git 클라이언트는 셸의 PATH를 물려받지 않아 node를
+# 못 찾을 수 있으므로, PATH에 흔한 설치 경로를 보강하고 못 찾으면 훅을
+# 실패시키지 않고 경고만 남긴다 (커밋을 막지 않음, manifest는 나중에
+# 터미널에서 다시 생성하면 됨).
+PATH="/opt/homebrew/bin:/usr/local/bin:$PATH"
+
+if git diff --cached --name-only --diff-filter=ACMR | grep -qi '^resource/img/.*\.\(png\|jpg\|jpeg\|gif\)$'; then
+    if command -v node >/dev/null 2>&1; then
+        node scripts/gen-img-manifest.js
+        git add resource/img/manifest.js
+    else
+        echo "warning: node를 찾지 못해 resource/img/manifest.js를 갱신하지 못했습니다. 터미널에서 'node scripts/gen-img-manifest.js'를 직접 실행해주세요." >&2
+    fi
+fi

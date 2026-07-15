@@ -134,6 +134,37 @@ video::-webkit-media-controls-toggle-closed-captions-button {
     cursor: pointer;
 }
 
+#lightbox .lightbox-nav {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 3rem;
+    line-height: 1;
+    color: rgba(255, 255, 255, 1);
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 10px 15px;
+    z-index: 1001;
+    user-select: none;
+}
+
+#lightbox .lightbox-nav.prev {
+    left: 10px;
+}
+
+#lightbox .lightbox-nav.next {
+    right: 10px;
+}
+
+#lightbox .lightbox-nav:hover {
+    color: rgba(255, 215, 0, 1);
+}
+
+#lightbox .lightbox-nav.hidden {
+    display: none;
+}
+
 #lightbox .caption {
     position: absolute;
     bottom: 20px;
@@ -142,6 +173,17 @@ video::-webkit-media-controls-toggle-closed-captions-button {
     text-align: center;
     color: rgba(221, 221, 221, 1);
     font-size: 1rem;
+    z-index: 1001;
+}
+
+#lightbox .meta {
+    position: absolute;
+    bottom: 2px;
+    left: 0;
+    width: 100%;
+    text-align: center;
+    color: rgba(153, 153, 153, 1);
+    font-size: 0.8rem;
     z-index: 1001;
 }
 
@@ -276,6 +318,9 @@ video:fullscreen::cue {
     padding-left: 0;
     list-style: none;
     /* Removed disc for cleaner centered look */
+    max-height: 40vh;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
 }
 
 .modal-content li {
@@ -324,6 +369,15 @@ video:fullscreen::cue {
         max-width: 80%;
         padding: 10px 15px;
         font-size: 1rem;
+    }
+
+    .modal-content ul {
+        max-height: 30vh;
+    }
+
+    #lightbox .lightbox-nav {
+        font-size: 2rem;
+        padding: 8px 10px;
     }
 
     .desktop-only {

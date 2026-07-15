@@ -135,6 +135,37 @@ async function initGame() {
         });
     }
 
+    // Triggers with itemsFrom: load menu items from a generated image manifest
+    // (global set by a <script> tag, e.g. window.RESOURCE_IMG_MANIFEST — an object
+    // keyed by filename under resource/img/, see scripts/gen-img-manifest.js)
+    // instead of hardcoding them in triggers.js. Read from window[...] rather
+    // than fetch() so this still works when the page is opened directly via
+    // file:// (no server).
+    const IMG_MODIFIED_LABELS = ['원본', '업스케일', '재구성', '기타'];
+    if (window.MAP_DATA.triggers) {
+        for (const t of window.MAP_DATA.triggers) {
+            if (t.itemsFrom) {
+                const manifest = window[t.itemsFrom];
+                if (manifest && typeof manifest === 'object' && !Array.isArray(manifest)) {
+                    t.items = Object.keys(manifest).map(file => {
+                        const meta = manifest[file] || {};
+                        return {
+                            label: meta.caption || file,
+                            href: '#resource/img/' + file,
+                            data: {
+                                caption: meta.caption || file,
+                                source: meta.source || '',
+                                modified: IMG_MODIFIED_LABELS[meta.modified] || IMG_MODIFIED_LABELS[0]
+                            }
+                        };
+                    });
+                } else {
+                    console.error(`itemsFrom global '${t.itemsFrom}' not found or not an object`);
+                }
+            }
+        }
+    }
+
     // Triggers (convert tile coords → pixel coords)
     if (window.MAP_DATA.triggers) {
         triggers = window.MAP_DATA.triggers.map(t => {
