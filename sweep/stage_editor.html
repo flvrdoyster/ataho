@@ -392,7 +392,9 @@
             const stLines = stages.map(s => {
                 const obs = s.obstacles.map(o => `{ cx: ${o.cx}, cy: ${o.cy}, stamp: ${JSON.stringify(o.stamp)} }`);
                 const obsStr = obs.length ? `[\n            ${obs.join(',\n            ')}\n        ]` : '[]';
-                return `    { spawn: { cx: ${s.spawn.cx}, cy: ${s.spawn.cy} }, obstacles: ${obsStr} }`;
+                const idPart = s.id != null ? `id: ${JSON.stringify(s.id)}, ` : '';
+                const minStepsPart = s.minSteps != null ? `minSteps: ${s.minSteps}, ` : '';
+                return `    { ${idPart}spawn: { cx: ${s.spawn.cx}, cy: ${s.spawn.cy} }, ${minStepsPart}obstacles: ${obsStr} }`;
             }).join(',\n');
 
             return `/**

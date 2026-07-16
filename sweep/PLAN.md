@@ -87,10 +87,9 @@
     - **TODO**: a_3~a_5는 minSteps 미계산 — `calc_minsteps.js`가 a_3에서 3분 넘게 안 끝나
       중단함(중앙 섬 배치가 예상보다 어려운 듯). 값 없는 동안은 `loader.js`가 관대하게
       (항상 완벽 취급) 처리하니 게임은 굴러가지만, 정확한 채점을 위해 언젠가 완료해야 함
-    - **TODO**: `stage_editor.html`은 아직 `stages = JSON.parse(JSON.stringify(...))`로
-      불러온 `id`/`minSteps`를 내부적으로 들고는 있지만, `serialize()`(복사/저장 export)가
-      `spawn`/`obstacles`만 재구성해서 써서 **에디터로 한 번이라도 저장/복사하면 모든 방의
-      `id`와 `minSteps`가 통째로 날아간다.** 에디터를 실제로 쓰기 전에 고쳐야 함
+    - ~~**TODO**: `stage_editor.html`의 `serialize()`가 `id`/`minSteps`를 안 챙겨서
+      저장/복사하면 날아감~~ → `serialize()`가 두 필드 모두(있으면) 다시 써넣도록 수정
+      완료 (2026-07-16), 실제 `stages.js` 데이터로 라운드트립 검증 ✔
 - [x] **Step 5 — 걸음 수 채점 & 보수**
   - 걸음 수 카운트 (`char_sweep.js` — `player.stepCount`, 성공 이동마다 +1, 스테이지 로드 시 리셋,
     `window.sweepGetStepCount()`로 조회) ✔
