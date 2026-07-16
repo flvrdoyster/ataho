@@ -267,11 +267,15 @@ function playerUpdate(dt) {
     }
 
     if (player.state === 'cleared') {
-        // 다음 방으로 (연출·문 열림은 Step 6). 마지막 방이면 처음으로 순환.
+        // 다음 방으로 (연출·문 열림은 Step 6). 방 사이에 난이도·순서가 없어 무작위로 고르되,
+        // 같은 방이 연달아 나오는 건 어색해서 방금 클리어한 방은 후보에서 제외한다.
         player.clearT += dt;
         if (player.clearT >= CHAR_CONFIG.STAGE_CLEAR_DELAY) {
             const st = window.sweepStage;
-            const next = (st.index + 1 < st.count) ? st.index + 1 : 0;
+            let next = st.index;
+            if (st.count > 1) {
+                while (next === st.index) next = Math.floor(Math.random() * st.count);
+            }
             st.applyStage(next);
             loadStage();
         }
