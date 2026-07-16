@@ -1,0 +1,6 @@
+/* 모든 UI는 world/ui.css 공용 정의를 사용한다. HUD 너비만 게임마다 달라 공용 기본값이
+   없으므로(world/ui.css 참고) 여기서 지정 — sweep은 뷰포트 풀와이드 캔버스라 balance의
+   고정폭(960px)을 그대로 쓰면 화면 양옆에 어색한 여백이 남아, 내용에 딱 맞는 폭으로. */
+#hud {
+    width: fit-content;
+}

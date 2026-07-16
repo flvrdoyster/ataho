@@ -35,13 +35,14 @@
 }
 
 /* ── 상단 HUD 바 ── */
+/* width/max-width는 여기서 기본값을 두지 않는다 — 미니게임마다 캔버스 폭/HUD 내용량이
+   달라 공용 기본값 하나가 안 맞았음(balance는 고정폭 960px, sweep은 뷰포트 풀와이드라
+   960px 캡이 화면 양옆에 어색한 여백을 남김). 각 게임의 CSS에서 #hud에 직접 지정할 것. */
 .ui-hud {
     position: fixed;
     top: 0;
     left: 50%;
     transform: translateX(-50%);
-    width: 100%;
-    max-width: 960px;
     box-sizing: border-box;
     display: flex;
     flex-direction: row;

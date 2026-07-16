@@ -103,6 +103,7 @@ function applyStage(index) {
     obstacleCollisionKeys.forEach(k => mapCollisions.delete(k));
     obstacleCollisionKeys = [];
     obstacleTiles = {};
+    minStepsCache = null;   // 장애물이 바뀌므로 최단 걸음 수도 다시 계산해야 함
 
     const cell = cellSize();
     (stage.obstacles || []).forEach(ob => {
@@ -136,6 +137,73 @@ window.sweepStage = {
     get index() { return sweepStageIndex; },
     get count() { return (window.SWEEP_STAGES || []).length; }
 };
+
+// ===== 최단 걸음 수 (스테이지 클리어 채점용) =====
+// 걸을 수 있는 칸 그래프에서 스폰부터 모든 칸을 한 번씩 방문하는 최소 걸음 수.
+// 트리 형태 그래프의 정확한 공식: 2*(칸 수-1) - (스폰에서 가장 먼 칸까지의 거리)
+// — 그 가장 먼 칸에서 여정을 끝내면 그쪽 왕복 한 번을 아낄 수 있어서다. 사이클이
+// 많은 방(순환 경로가 있는 방)에서는 실제 최적보다 살짝 큰 근사치가 나올 수 있지만,
+// 채점 기준으로는 충분히 좋은 값. 장애물 배치가 바뀌면(스테이지 전환) 다시 계산한다.
+let minStepsCache = null;
+
+function walkableNeighbors(gx, gy, cell) {
+    const deltas = [[cell, 0], [-cell, 0], [0, cell], [0, -cell]];
+    const out = [];
+    deltas.forEach(([dx, dy]) => {
+        const nx = gx + dx, ny = gy + dy;
+        if (isCellWalkable(nx, ny, cell)) out.push(nx + ',' + ny);
+    });
+    return out;
+}
+
+function computeMinSteps() {
+    const cell = cellSize();
+    const sp = getSpawnCell();
+    const { gx: sgx, gy: sgy } = stageCellToTile(sp.cx, sp.cy);
+    const spawnKey = sgx + ',' + sgy;
+
+    const dist = new Map([[spawnKey, 0]]);
+    const queue = [spawnKey];
+    let qi = 0, farthest = 0;
+    while (qi < queue.length) {
+        const cur = queue[qi++];
+        const [gx, gy] = cur.split(',').map(Number);
+        const d = dist.get(cur);
+        if (d > farthest) farthest = d;
+        walkableNeighbors(gx, gy, cell).forEach(nk => {
+            if (!dist.has(nk)) { dist.set(nk, d + 1); queue.push(nk); }
+        });
+    }
+    return 2 * (dist.size - 1) - farthest;
+}
+
+window.sweepGetMinSteps = function () {
+    if (minStepsCache == null) minStepsCache = computeMinSteps();
+    return minStepsCache;
+};
+
+// ===== 보수 (스테이지 클리어 등급 → 번 돈) =====
+// 등급은 비율이 아니라 최단 걸음 수 대비 절대 걸음 수 차이로 가른다 (레퍼런스 기준):
+//   완벽: 최단 걸음 수 그대로 / 성공: 최단 걸음 수 +3 이내 / 절반 성공: 그 초과
+// 완벽·성공 100G, 절반 성공 75G.
+const STAGE_REWARD = { perfect: 100, success: 100, half: 75 };
+const SUCCESS_STEP_MARGIN = 3;
+
+function computeStageGrade(steps) {
+    const minSteps = window.sweepGetMinSteps();
+    if (steps <= minSteps) return 'perfect';
+    if (steps <= minSteps + SUCCESS_STEP_MARGIN) return 'success';
+    return 'half';
+}
+
+window.sweepGetStageResult = function (steps) {
+    const grade = computeStageGrade(steps);
+    return { grade, money: STAGE_REWARD[grade] };
+};
+
+let totalMoney = 0;
+window.sweepAddMoney = function (amount) { totalMoney += amount; };
+window.sweepGetTotalMoney = function () { return totalMoney; };
 
 // ===== 바닥 타일 합성 훅 =====
 // 장애물 먼저(그 칸은 스탬프 타일), 없으면 먼지, 없으면 원본 바닥.

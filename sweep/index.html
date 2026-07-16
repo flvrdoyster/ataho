@@ -8,6 +8,8 @@
     <title>술창고 청소 : atah.io</title>
     <link rel="stylesheet" href="../fonts.css">
     <link rel="stylesheet" href="../style.css">
+    <link rel="stylesheet" href="../world/ui.css">
+    <link rel="stylesheet" href="sweep.css">
     <!-- Google Tag Manager -->
     <script>(function (w, d, s, l, i) {
             w[l] = w[l] || []; w[l].push({
@@ -23,12 +25,16 @@
 
 <body class="footer-fixed">
     <canvas id="gameCanvas"></canvas>
+    <div id="hud" class="frame-box ui-hud" style="visibility: hidden">
+        <div id="hud-stats" class="ui-hud-stats"></div>
+    </div>
     <script src="../footer.js"></script>
 </body>
 
 <script>
     window.MAP_NAME = 'souko';
     window.MAP_BASE = '../world/';
+    window.WORLD_BASE = '../world/';
     window.GRID_CELL_TILES = 3;          // one floor slab = 3x3 map tiles (48px)
     window.GRID_ORIGIN = { x: 2, y: 2 }; // playfield top-left slab (tile coords)
 </script>
@@ -37,6 +43,7 @@
 <script src="../world/maps/souko/triggers.js"></script>
 <script src="stages.js"></script>
 <script src="../world/engine.js"></script>
+<script src="../world/ui.js"></script>
 <script src="loader.js"></script>
 <script src="char_sweep.js"></script>
 <script>window.onload = initGame;</script>

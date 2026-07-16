@@ -28,6 +28,7 @@ const CHAR_CONFIG = {
 // ===== State =====
 let walkImg, sweepImg;
 let sfxPool = [], sfxIndex = 0;
+let hudMoney, hudSteps;
 
 const player = {
     x: 0, y: 0,
@@ -39,6 +40,7 @@ const player = {
     moveT: 0,                  // 이동 경과 시간
     sweepT: 0,                 // 빗자루질 경과 시간
     clearT: 0,                 // 스테이지 클리어 후 경과 시간
+    stepCount: 0,              // 이번 스테이지에서 실제로 이동한 걸음 수 (채점용)
     animFrame: 0,
     animTimer: 0
 };
@@ -75,9 +77,30 @@ async function playerInit(assets) {
     player.width = cellPx();
     player.height = cellPx();
 
+    setupHUD();
+
     // 스테이지(장애물 조합) 적용 후 그 위에서 먼지/스폰을 세팅
     if (window.sweepStage) window.sweepStage.applyFromURL();
     loadStage();
+}
+
+// HUD 조립은 world/ui.js의 UIStat이 담당 (balance와 동일한 패턴).
+// #hud는 index.html에서 visibility:hidden으로 시작 — 빈 껍데기가 잠깐 보이는 걸 막는다.
+function setupHUD() {
+    const statsEl = document.getElementById('hud-stats');
+    if (!statsEl || typeof UIStat === 'undefined') return;
+    hudMoney = new UIStat(['번 돈 ', { num: true }, 'G']);
+    hudSteps = new UIStat(['걸음 수 ', { num: true }]);
+    statsEl.appendChild(hudMoney.el);
+    statsEl.appendChild(hudSteps.el);
+    document.getElementById('hud').style.visibility = 'visible';
+}
+
+function updateHUD() {
+    if (!hudMoney || !hudSteps) return;
+    const money = (typeof window.sweepGetTotalMoney === 'function') ? window.sweepGetTotalMoney() : 0;
+    hudMoney.setNums(String(money));
+    hudSteps.setNums(String(player.stepCount));
 }
 
 // 현재 스테이지 기준으로 스폰 배치 + 먼지 초기화. 스테이지 전환 시에도 재사용.
@@ -112,6 +135,7 @@ function loadStage() {
     else console.warn('스폰을 격자에 스냅하지 못했습니다:', player.x, player.y);
 
     player.state = 'idle';
+    player.stepCount = 0;
 
     // 먼지 레이어 초기화 (장애물 충돌이 이미 반영된 시점)
     if (typeof window.initDust === 'function') window.initDust();
@@ -171,9 +195,12 @@ function tryStep(input) {
     player.moveT = 0;
     player.animFrame = 0;
     player.animTimer = 0;
+    player.stepCount++;
 }
 
 function playerUpdate(dt) {
+    updateHUD();
+
     if (player.state === 'idle') {
         const input = readInput();
         if (input && !isInteracting()) tryStep(input);
@@ -223,6 +250,12 @@ function playerUpdate(dt) {
             if (cleared) {
                 player.state = 'cleared';
                 player.clearT = 0;
+                if (typeof window.sweepGetStageResult === 'function') {
+                    player.lastResult = window.sweepGetStageResult(player.stepCount);
+                    if (typeof window.sweepAddMoney === 'function') {
+                        window.sweepAddMoney(player.lastResult.money);
+                    }
+                }
                 return;
             }
             player.state = 'idle';
@@ -277,3 +310,5 @@ function playerOnAction(actionType, count = Infinity) {
     player.state = 'idle';
     Object.keys(keys).forEach(k => keys[k] = false);
 }
+
+window.sweepGetStepCount = function () { return player.stepCount; };
