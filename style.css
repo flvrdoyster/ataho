@@ -394,7 +394,8 @@ video:fullscreen::cue {
     padding: 10px 15px;
     color: rgba(0, 0, 0, 1);
     font-size: 1rem;
-    max-width: 250px;
+    /* 한 줄 최대 한글 20자(1자≈1em) 기준. 좁은 화면에서는 85vw로 캡. */
+    max-width: min(20em, 85vw);
     z-index: 2000;
     pointer-events: none;
     /* Let clicks pass through if needed, though usually blocking */
@@ -409,12 +410,14 @@ video:fullscreen::cue {
     display: none;
 }
 
+/* --bubble-tail-x: engine.js가 매 프레임 화자의 화면 X(말풍선 내부 좌표)로 갱신 —
+   말풍선이 화면 가장자리에 클램프돼도 꼬리는 화자를 가리킨다. 미설정 시 중앙. */
 #speech-bubble::after {
     content: '';
     position: absolute;
     bottom: -10px;
     /* Adjust based on border width */
-    left: 50%;
+    left: var(--bubble-tail-x, 50%);
     transform: translateX(-50%);
     border-width: 10px 10px 0;
     border-style: solid;
@@ -426,7 +429,7 @@ video:fullscreen::cue {
     content: '';
     position: absolute;
     bottom: -7px;
-    left: 50%;
+    left: var(--bubble-tail-x, 50%);
     transform: translateX(-50%);
     border-width: 8px 8px 0;
     border-style: solid;

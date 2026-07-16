@@ -401,7 +401,8 @@
                 const obsStr = obs.length ? `[\n            ${obs.join(',\n            ')}\n        ]` : '[]';
                 const idPart = s.id != null ? `id: ${JSON.stringify(s.id)}, ` : '';
                 const minStepsPart = s.minSteps != null ? `minSteps: ${s.minSteps}, ` : '';
-                return `    { ${idPart}spawn: { cx: ${s.spawn.cx}, cy: ${s.spawn.cy} }, ${minStepsPart}obstacles: ${obsStr} }`;
+                const hamiltonianPart = s.hamiltonian != null ? `hamiltonian: ${s.hamiltonian}, ` : '';
+                return `    { ${idPart}spawn: { cx: ${s.spawn.cx}, cy: ${s.spawn.cy} }, ${minStepsPart}${hamiltonianPart}obstacles: ${obsStr} }`;
             }).join(',\n');
 
             return `/**
@@ -410,6 +411,10 @@
  *
  * 좌표는 셀 좌표(cx 0~${GW - 1}, cy 0~${GH - 1}) — 이동 격자 한 칸 단위.
  * 장애물 스탬프: 3×3 타일(row-major 9칸) 묶음. null은 투명. block=false는 통행 가능.
+ *
+ * minSteps/hamiltonian: \`node calc_minsteps.js\`가 완전 탐색으로 계산한 확정값 —
+ * 방 배치(장애물·스폰)를 고치면 반드시 다시 돌려서 갱신할 것. hamiltonian=false면
+ * 모든 칸을 한 번씩만 밟는 경로가 없어 최소 1칸은 되밟아야 완주 가능하다는 뜻.
  */
 
 window.SWEEP_OBSTACLES = {

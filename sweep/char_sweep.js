@@ -1,7 +1,7 @@
 /**
  * char_sweep.js — 술창고 청소 캐릭터 컨트롤러
  *
- * 한 칸(GRID_CELL_TILES 맵타일 = 32px) 단위 이동.
+ * 한 칸(GRID_CELL_TILES=3 맵타일 = 48px) 단위 이동.
  * 한 칸 이동을 마칠 때마다 빗자루질 모션을 1회 재생하고 효과음을 낸다
  * (먼지 유무와 무관 — 이동해 왔으면 무조건 1회).
  *
@@ -21,8 +21,26 @@ const CHAR_CONFIG = {
     SFX_SRC: 'sweep.mp3',   // 페이지(sweep/) 기준 상대 경로
     SFX_VOLUME: 0.9,
     SFX_POOL: 3,            // 연속 재생용 오디오 풀 크기
+    CLEAR_SFX: {            // 방 클리어 시 등급별 효과음
+        perfect: 'success.mp3',
+        success: 'success.mp3',
+        half: 'failure.mp3'
+    },
+    BGM_SRC: 'bgm.mp3',     // 배경음악 (계속 루프)
+    BGM_VOLUME: 0.5,
     SPRITE_OFFSET_Y: -16,   // 스프라이트를 판석보다 한 타일 위로 (발 위치 보정)
-    STAGE_CLEAR_DELAY: 0.8  // 방 클리어 후 다음 방으로 넘어가기까지 대기(s)
+    STAGE_CLEAR_DELAY: 0.8, // 방 클리어 후 다음 방으로 넘어가기까지 대기(s)
+    MONEY_GOAL: 1000,       // 외상 술값 — 전환 대사(DIALOGUE.next) 분기 기준.
+                            // 정식 클리어 조건/선택지는 Step 7에서 확정 예정
+    MASTER_SRC: 'master_all.png',  // 페이지(sweep/) 기준 상대 경로, 32x64 2프레임(정면/뒷모습) 가로 배치
+    MASTER_LEAVE_DELAY: 0.6,       // 뒷모습으로 돌아선 뒤 사라지기까지 대기(s)
+    DOOR_SFX: 'door.mp3',          // 술집주인 등장/퇴장 공용 효과음
+
+    // 대사 타이밍 — 그 방의 최단 걸음 수(minSteps) 기준 상대 걸음(±)에 도달하면 발동
+    MASTER_OVERSHOOT_STEPS: 2,     // 술집주인 등장 + 재촉(overshoot) 대사: 최단 +2걸음
+    HALF_WARNING_STEPS: 4          // 절반 성공 경고(halfWarning) 대사: 최단 +4걸음
+                                   // = 등급이 half로 떨어지는 지점(최단+SUCCESS_STEP_MARGIN 초과).
+                                   // loader.js의 SUCCESS_STEP_MARGIN(3)을 바꾸면 여기도 맞출 것
 };
 
 // 미니맵 — 카메라가 플레이어를 따라다녀 방 전체가 화면 밖으로 나갈 수 있어(특히 모바일
@@ -40,11 +58,67 @@ const MINIMAP_CONFIG = {
     }
 };
 
+// ===== 대사 데이터 =====
+// 원작 번역(suiko-web-v2 kr-patch) 기준. speaker: 'master'(문 앞 술집주인) | 'ataho'(플레이어)
+const DIALOGUE = {
+    intro: [
+        { text: '마루바닥에 먼지가 잔뜩 묻어있지? 그걸 전부 치워야 해', speaker: 'master' },
+        { text: '방 하나에 100G씩 주지! 대신 빨리빨리 해야 해', speaker: 'master' },
+        { text: '하지만 멍청하게 같은 곳을 여러 번 치우면 방 하나에 75G로 줄이겠어', speaker: 'master' },
+        { text: '같은 곳을 여러 번 지나치지 않고 모든 방을 청소하면 되는 거잖아!', speaker: 'ataho' },
+        { text: '…쳇, 별 거 아니구만', speaker: 'ataho' }
+    ],
+    overshoot: [
+        { text: '뭐야? 아직 못 끝냈어? 빨리 안 끝내면 75G야!', speaker: 'master' },
+        { text: '알았어, 알았다구', speaker: 'ataho' }
+    ],
+    halfWarning: [
+        { text: '이봐 아직 멀었어? 요령이 좋아야지!!', speaker: 'master' },
+        { text: '…제길, 왜 내가 이런 일을 해야만 하지?', speaker: 'ataho' }
+    ],
+    // 각 줄의 sfx: 그 줄이 뜨는 시점에 재생할 효과음('door' | CLEAR_SFX 등급명). 생략 가능.
+    clear: {
+        perfect: [
+            { text: '호오… 벌써 끝냈나? 꽤 잘하는구만', speaker: 'master', sfx: 'perfect' },
+            { text: '이런 거야 식은 죽 먹기지', speaker: 'ataho' }
+        ],
+        success: [
+            { text: '겨우 끝냈군, 어쨌든 합격일세!', speaker: 'master', sfx: 'success' },
+            { text: '조금만 분발했으면 최단 루트로도 가능했는데', speaker: 'ataho' }
+        ],
+        half: [
+            { text: '겨우 끝냈군', speaker: 'master' },
+            { text: '시간을 초과했으니 유감이네만 청소비는 75G네!', speaker: 'master', sfx: 'half' },
+            { text: '뭐라구!?', speaker: 'ataho' }
+        ]
+    },
+    // 클리어 대사가 끝난 뒤, 다음 방으로 넘어가기 직전 — 누적 번 돈 기준 분기
+    next: {
+        under: [   // 아직 외상 술값(MONEY_GOAL) 미달
+            { text: '외상 술값만큼 일하려면 멀었어, 다른 방으로 가세!', speaker: 'master' },
+            { text: '휴우… 아직도 멀었군', speaker: 'ataho' }
+        ],
+        over: [    // 목표 달성 — 선택지("계속할텐가?")는 Step 7에서, 지금은 대사만 하고 무한 계속
+            { text: '이제 외상 술값만큼의 일은 끝났네!', speaker: 'master' },
+            { text: '자, 청소도 끝났으니 돌아가세', speaker: 'master' },
+            { text: '계속할텐가? 좋을 대로 하게', speaker: 'master' }
+        ]
+    }
+};
+
 // ===== State =====
-let walkImg, sweepImg;
+let walkImg, sweepImg, masterImg;
 let sfxPool = [], sfxIndex = 0;
+let clearSfx = {};           // 등급명 -> Audio (CLEAR_SFX 기준, playerInit에서 로드)
+let doorSfx;
+let bgm = null;
 let hudMoney, hudSteps;
 let minimapCanvas, minimapCtx, minimapWrap;
+let masterVisible = false;   // 술집주인이 이번 방 문 앞에 나타났는지
+let masterFrame = 0;         // 0: 정면, 1: 뒷모습(퇴장 중) — master_all.png의 가로 프레임 인덱스
+let masterLeaveT = null;     // null이면 퇴장 시퀀스 아님, 숫자면 뒷모습 전환 후 경과 시간(s)
+let introPending = false;    // true면 playerUpdate 첫 프레임에 인트로 대사 시작
+let transitionSaid = false;  // 이번 클리어의 전환 대사(DIALOGUE.next)를 이미 띄웠는지
 
 const player = {
     x: 0, y: 0,
@@ -69,6 +143,105 @@ function cellPx() {
     return CONFIG.TILE_SIZE * (window.GRID_CELL_TILES || 1);
 }
 
+// 문(스폰 칸 바로 아래) 월드 픽셀 좌표 — 술집주인이 서는 자리.
+function doorWorldPos() {
+    const org = window.GRID_ORIGIN || { x: 0, y: 0 };
+    const cellTiles = window.GRID_CELL_TILES || 1;
+    const cell = cellPx();
+    const spawn = (window.sweepStage && window.sweepStage.getSpawnCell) ? window.sweepStage.getSpawnCell() : { cx: 5, cy: 5 };
+    return {
+        x: (org.x + spawn.cx * cellTiles) * CONFIG.TILE_SIZE + cell / 2,
+        y: (org.y + (spawn.cy + 1) * cellTiles) * CONFIG.TILE_SIZE
+    };
+}
+
+// 술집주인 스프라이트의 월드 사각형 — 그리기(drawMaster)와 말풍선 앵커(getBubbleAnchor)가
+// 같은 값을 써야 말풍선이 스프라이트 위에 정확히 붙는다.
+// 그리기용 — 실제 스프라이트가 찍히는 픽셀 사각형(발 위치 보정 포함).
+function masterRect() {
+    const w = 32, h = 64;
+    const door = doorWorldPos();
+    return {
+        x: door.x - w / 2,
+        y: door.y + cellPx() - h + CHAR_CONFIG.SPRITE_OFFSET_Y,
+        width: w,
+        height: h
+    };
+}
+
+// 말풍선 앵커용 — playerGetState()와 같은 "칸(cell)" 의미의 사각형(칸 상단 y, 칸 높이).
+// 엔진의 말풍선 위치 계산(SPEECH_BUBBLE_OFFSET_Y)은 이 칸 기준으로 튜닝돼 있어서,
+// masterRect()(스프라이트 보정이 이미 들어간 좌표)를 그대로 쓰면 오프셋이 이중으로
+// 적용돼 말풍선이 머리 위로 너무 멀리 뜬다.
+function masterAnchorRect() {
+    const door = doorWorldPos();
+    const cell = cellPx();
+    return { x: door.x - cell / 2, y: door.y, width: cell, height: cell };
+}
+
+// 술집주인 등장 판정 — 최단 걸음 수를 넘기면 그 뒤로 MASTER_OVERSHOOT_STEPS만큼 더
+// 걸었을 때 문 앞에 등장(그 뒤로는 방을 마칠 때까지 계속 그 자리). 넘기지 않고
+// 클리어하면(완벽/거의 완벽) 클리어 시점에 등장 — playerUpdate의 cleared 분기에서 처리.
+function checkMasterTrigger() {
+    if (masterVisible) return;
+    const minSteps = (typeof window.sweepGetMinSteps === 'function') ? window.sweepGetMinSteps() : null;
+    if (minSteps == null) return;
+    if (player.stepCount >= minSteps + CHAR_CONFIG.MASTER_OVERSHOOT_STEPS) {
+        masterVisible = true;
+        playDoorSfx();
+        queueSay(DIALOGUE.overshoot);
+    }
+}
+
+// 절반 성공 경고 — HALF_WARNING_STEPS 지점에 도달한 첫 순간(딱 한 번) 재촉 대사.
+// checkMasterTrigger로 이미 등장한 뒤라야 자연스러워서 masterVisible을 전제로 한다
+// (MASTER_OVERSHOOT_STEPS < HALF_WARNING_STEPS라 항상 성립).
+let halfWarningShown = false;
+
+function checkHalfWarning() {
+    if (halfWarningShown || !masterVisible) return;
+    const minSteps = (typeof window.sweepGetMinSteps === 'function') ? window.sweepGetMinSteps() : null;
+    if (minSteps == null) return;
+    if (player.stepCount < minSteps + CHAR_CONFIG.HALF_WARNING_STEPS) return;
+    halfWarningShown = true;
+    queueSay(DIALOGUE.halfWarning);
+}
+
+// ===== 대사 큐 =====
+// 말풍선 하나가 닫혀야(자동 닫힘 또는 수동 스킵) 다음 줄이 뜨는 순차 재생.
+// queueSay([{text, speaker}, ...], onComplete?) — 첫 줄은 즉시, 나머지는 playerUpdate에서
+// 자동 진행. onComplete는 마지막 줄까지 닫히고 나면 한 번 호출된다.
+let dialogueQueue = [];
+let dialogueOnComplete = null;
+
+function queueSay(lines, onComplete) {
+    if (!lines || !lines.length) return;
+    dialogueQueue = lines.slice(1);
+    dialogueOnComplete = onComplete || null;
+    playLineSfx(lines[0].sfx);
+    window.sweepSay(lines[0].text, lines[0].speaker);
+}
+
+function advanceDialogueQueue() {
+    if (isInteracting()) return;
+    if (dialogueQueue.length > 0) {
+        const next = dialogueQueue.shift();
+        playLineSfx(next.sfx);
+        window.sweepSay(next.text, next.speaker);
+    } else if (dialogueOnComplete) {
+        const cb = dialogueOnComplete;
+        dialogueOnComplete = null;
+        cb();
+    }
+}
+
+// 인트로 대사가 끝난 뒤 술집주인이 뒤돌아서 퇴장하는 연출 시작
+function startMasterLeave() {
+    masterFrame = 1;
+    masterLeaveT = 0;
+    playDoorSfx();
+}
+
 // ===== Engine Callbacks =====
 
 async function playerInit(assets) {
@@ -81,6 +254,7 @@ async function playerInit(assets) {
 
     walkImg = await loadImg(resolvePath('char/ataho-walk.png'));
     sweepImg = await loadImg(resolvePath('char/ataho-sweep.png'));
+    masterImg = await loadImg(CHAR_CONFIG.MASTER_SRC);
 
     // 효과음 풀 (빠른 연속 재생 대응)
     for (let i = 0; i < CHAR_CONFIG.SFX_POOL; i++) {
@@ -89,6 +263,23 @@ async function playerInit(assets) {
         a.preload = 'auto';
         sfxPool.push(a);
     }
+
+    // 클리어 등급별 효과음 (같은 파일은 Audio 하나 공유)
+    const srcCache = {};
+    for (const [grade, src] of Object.entries(CHAR_CONFIG.CLEAR_SFX)) {
+        if (!srcCache[src]) {
+            srcCache[src] = new Audio(src);
+            srcCache[src].volume = CHAR_CONFIG.SFX_VOLUME;
+            srcCache[src].preload = 'auto';
+        }
+        clearSfx[grade] = srcCache[src];
+    }
+
+    doorSfx = new Audio(CHAR_CONFIG.DOOR_SFX);
+    doorSfx.volume = CHAR_CONFIG.SFX_VOLUME;
+    doorSfx.preload = 'auto';
+
+    setupBgm();
 
     player.width = cellPx();
     player.height = cellPx();
@@ -99,6 +290,12 @@ async function playerInit(assets) {
     // 스테이지(장애물 조합) 적용 후 그 위에서 먼지/스폰을 세팅
     if (window.sweepStage) window.sweepStage.applyFromURL();
     loadStage();
+
+    // 술집주인 첫 등장(인트로) 시작은 playerUpdate 첫 프레임으로 미룬다 — 지금(playerInit
+    // 도중)은 engine.js가 아직 injectUI()를 안 돌려서 #speech-bubble이 DOM에 없다.
+    // 여기서 바로 queueSay하면 첫 줄이 조용히 씹히고(대사 상태만 잡혀 자동 타임아웃),
+    // 두 번째 줄부터 보이는 버그가 났었다.
+    introPending = true;
 }
 
 // HUD 조립은 world/ui.js의 UIStat이 담당 (balance와 동일한 패턴).
@@ -218,6 +415,11 @@ function loadStage() {
 
     player.state = 'idle';
     player.stepCount = 0;
+    masterVisible = false;
+    masterFrame = 0;
+    masterLeaveT = null;
+    halfWarningShown = false;
+    transitionSaid = false;
 
     // 먼지 레이어 초기화 (장애물 충돌이 이미 반영된 시점)
     if (typeof window.initDust === 'function') window.initDust();
@@ -243,6 +445,53 @@ function playSweepSfx() {
     sfxIndex = (sfxIndex + 1) % sfxPool.length;
     a.currentTime = 0;
     a.play().catch(() => { /* 자동재생 정책으로 첫 재생이 막히면 무시 */ });
+}
+
+function playClearSfx(grade) {
+    const a = clearSfx[grade];
+    if (!a) return;
+    a.currentTime = 0;
+    a.play().catch(() => { });
+}
+
+function playDoorSfx() {
+    if (!doorSfx) return;
+    doorSfx.currentTime = 0;
+    doorSfx.play().catch(() => { });
+}
+
+// 대사 줄의 sfx 속성 처리 — DIALOGUE 테이블에서 어느 줄이 뜰 때 효과음이 나올지 지정.
+// 'door' 또는 CLEAR_SFX 등급명('perfect'/'success'/'half')을 받는다.
+function playLineSfx(name) {
+    if (!name) return;
+    if (name === 'door') { playDoorSfx(); return; }
+    if (clearSfx[name]) playClearSfx(name);
+}
+
+// ===== BGM =====
+// 계속 루프 재생. 오디오가 죽는 상황 방어는 haiyuki(assets.js)와 같은 전략:
+//   - 자동재생 정책: 첫 play()가 거부되면 이후 사용자 제스처마다 재시도
+//   - iOS 화면 잠금/앱 전환: 복귀 신호(visibilitychange/focus/pageshow)에서 재개
+//   - 핸들러는 once 없이 유지 — iOS는 언제든 오디오를 끊을 수 있어 일회성으론 부족
+function setupBgm() {
+    bgm = new Audio(CHAR_CONFIG.BGM_SRC);
+    bgm.loop = true;
+    bgm.volume = CHAR_CONFIG.BGM_VOLUME;
+    bgm.preload = 'auto';
+
+    const resume = () => {
+        if (bgm && bgm.paused) bgm.play().catch(() => { });
+    };
+    document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible') resume();
+    });
+    window.addEventListener('focus', resume);
+    window.addEventListener('pageshow', resume);   // bfcache 복원 (iOS Safari)
+    window.addEventListener('pointerdown', resume, { passive: true });
+    window.addEventListener('touchstart', resume, { passive: true });
+    window.addEventListener('keydown', resume);
+
+    resume();   // 제스처 전이라 대부분 거부되지만, 정책상 허용된 환경이면 바로 시작
 }
 
 function readInput() {
@@ -278,11 +527,30 @@ function tryStep(input) {
     player.animFrame = 0;
     player.animTimer = 0;
     player.stepCount++;
+    checkMasterTrigger();
+    checkHalfWarning();
 }
 
 function playerUpdate(dt) {
+    if (introPending) {
+        introPending = false;
+        masterVisible = true;
+        playDoorSfx();
+        queueSay(DIALOGUE.intro, startMasterLeave);
+    }
+
     updateHUD();
     updateMinimap();
+    advanceDialogueQueue();
+
+    if (masterLeaveT !== null) {
+        masterLeaveT += dt;
+        if (masterLeaveT >= CHAR_CONFIG.MASTER_LEAVE_DELAY) {
+            masterVisible = false;
+            masterFrame = 0;
+            masterLeaveT = null;
+        }
+    }
 
     if (player.state === 'idle') {
         const input = readInput();
@@ -297,7 +565,6 @@ function playerUpdate(dt) {
     if (player.state === 'moving') {
         player.moveT += dt;
 
-        // 걷기 애니메이션
         player.animTimer += dt;
         if (player.animTimer >= CHAR_CONFIG.WALK_ANIM_SPEED) {
             player.animTimer = 0;
@@ -311,7 +578,6 @@ function playerUpdate(dt) {
             player.state = 'sweeping';
             player.sweepT = 0;
             playSweepSfx();
-            // 먼지 시스템(Step 3) 연결 지점: 도착한 칸의 맵타일 좌표 전달
             if (typeof window.onCellSwept === 'function') {
                 window.onCellSwept(player.x / CONFIG.TILE_SIZE, player.y / CONFIG.TILE_SIZE);
             }
@@ -333,11 +599,14 @@ function playerUpdate(dt) {
             if (cleared) {
                 player.state = 'cleared';
                 player.clearT = 0;
+                if (!masterVisible) playDoorSfx();   // 이미 등장해 있었으면(넘긴 경우) 다시 들어오는 게 아님
+                masterVisible = true;   // 넘기지 않고 클리어했으면 이 시점에 등장
                 if (typeof window.sweepGetStageResult === 'function') {
                     player.lastResult = window.sweepGetStageResult(player.stepCount);
                     if (typeof window.sweepAddMoney === 'function') {
                         window.sweepAddMoney(player.lastResult.money);
                     }
+                    queueSay(DIALOGUE.clear[player.lastResult.grade] || DIALOGUE.clear.half);
                 }
                 return;
             }
@@ -350,8 +619,17 @@ function playerUpdate(dt) {
     }
 
     if (player.state === 'cleared') {
-        // 다음 방으로 (연출·문 열림은 Step 6). 방 사이에 난이도·순서가 없어 무작위로 고르되,
-        // 같은 방이 연달아 나오는 건 어색해서 방금 클리어한 방은 후보에서 제외한다.
+        // 말풍선(평가 대사)이 떠 있는 동안은 대기 — 닫힌 뒤부터 전환 딜레이를 센다
+        if (isInteracting()) { player.clearT = 0; return; }
+        // 평가 대사가 끝나면 전환 대사(누적 번 돈 기준 분기)를 한 번 띄우고,
+        // 그것까지 닫힌 뒤에야 아래 전환 딜레이로 넘어간다
+        if (!transitionSaid) {
+            transitionSaid = true;
+            const money = (typeof window.sweepGetTotalMoney === 'function') ? window.sweepGetTotalMoney() : 0;
+            queueSay(money >= CHAR_CONFIG.MONEY_GOAL ? DIALOGUE.next.over : DIALOGUE.next.under);
+            return;
+        }
+        // 다음 방은 무작위 — 방 사이에 난이도·순서가 없고, 직전 방만 후보에서 제외
         player.clearT += dt;
         if (player.clearT >= CHAR_CONFIG.STAGE_CLEAR_DELAY) {
             const st = window.sweepStage;
@@ -374,10 +652,7 @@ function playerDraw(ctx) {
         const idx = Math.min(SWEEP_FRAMES - 1,
             Math.floor(player.sweepT / (CHAR_CONFIG.SWEEP_DURATION / SWEEP_FRAMES)));
         ctx.drawImage(sweepImg, idx * spriteW, 0, spriteW, spriteH, dstX, dstY, spriteW, spriteH);
-        return;
-    }
-
-    if (walkImg && walkImg.naturalWidth > 0) {
+    } else if (walkImg && walkImg.naturalWidth > 0) {
         const seqIndex = (player.state === 'moving') ? WALK_SEQUENCE[player.animFrame] : 0;
         const framesPerDir = 5;
         const totalFrameIndex = (player.direction * framesPerDir) + seqIndex;
@@ -390,6 +665,18 @@ function playerDraw(ctx) {
         ctx.fillStyle = 'blue';
         ctx.fillRect(player.x, player.y, player.width, player.height);
     }
+
+    // 술집주인은 플레이어보다 아래(남쪽) 칸이라 톱다운 원근상 플레이어를 가리는 쪽이
+    // 맞다 — 항상 플레이어 다음에 그린다. 매 프레임 그려야 하므로 위 분기들은
+    // early return 없이 여기로 흘러와야 한다 (return으로 빠지면 깜빡임).
+    drawMaster(ctx);
+}
+
+function drawMaster(ctx) {
+    if (!masterVisible || !masterImg || !masterImg.naturalWidth) return;
+    const r = masterRect();
+    ctx.drawImage(masterImg, masterFrame * r.width, 0, r.width, r.height,
+        Math.floor(r.x), Math.floor(r.y), r.width, r.height);
 }
 
 function playerOnAction(actionType, count = Infinity) {
@@ -399,3 +686,18 @@ function playerOnAction(actionType, count = Infinity) {
 }
 
 window.sweepGetStepCount = function () { return player.stepCount; };
+
+// ===== 대사 (엔진 말풍선 재활용) =====
+// window.sweepSay(text, speaker): index와 같은 말풍선을 띄운다.
+//   speaker: 'master'면 문 앞 술집주인 머리 위에, 생략/그 외엔 아타호 머리 위에.
+let bubbleAnchorMaster = false;
+
+window.getBubbleAnchor = function () {
+    if (!bubbleAnchorMaster || !masterVisible) return null;   // null이면 엔진이 플레이어에 붙임
+    return masterAnchorRect();
+};
+
+window.sweepSay = function (text, speaker) {
+    bubbleAnchorMaster = (speaker === 'master');
+    showResultBubble(text);
+};

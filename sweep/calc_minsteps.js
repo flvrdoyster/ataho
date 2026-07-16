@@ -132,7 +132,9 @@ function solveStage(st) {
         visited[start] = 1;
         nodes = 0;
         try {
-            if (dfs(start, (n - 1) + alpha, n - 1)) return { n, minSteps: (n - 1) + alpha, alpha };
+            if (dfs(start, (n - 1) + alpha, n - 1)) {
+                return { n, minSteps: (n - 1) + alpha, alpha, hamiltonian: alpha === 0 };
+            }
         } catch (e) {
             return { n, error: `α=${alpha}에서 탐색 한도 초과` };
         }
@@ -147,6 +149,7 @@ window.SWEEP_STAGES.forEach((st, i) => {
         console.log(`${label}: 오류 — ${r.error}`);
         return;
     }
-    const stale = st.minSteps !== r.minSteps ? `  ← stages.js의 ${st.minSteps ?? '(없음)'} 갱신 필요!` : '';
-    console.log(`${label}: 칸수 ${r.n}, minSteps: ${r.minSteps} (되밟기 ${r.alpha}회, ${Date.now() - t0}ms)${stale}`);
+    const stepsStale = st.minSteps !== r.minSteps ? `  ← stages.js의 minSteps(${st.minSteps ?? '없음'}) 갱신 필요!` : '';
+    const hamStale = st.hamiltonian !== r.hamiltonian ? `  ← stages.js의 hamiltonian(${st.hamiltonian ?? '없음'}) 갱신 필요!` : '';
+    console.log(`${label}: 칸수 ${r.n}, minSteps: ${r.minSteps} (되밟기 ${r.alpha}회, 해밀턴 경로: ${r.hamiltonian}, ${Date.now() - t0}ms)${stepsStale}${hamStale}`);
 });

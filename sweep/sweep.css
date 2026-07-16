@@ -16,6 +16,11 @@
     z-index: 10;
     padding: 4px;
     pointer-events: none;
+    /* 반투명 프레임: 공용 frame.png(속이 꽉 찬 남색) 대신 속이 비치는 frame_t.png 사용,
+       배경은 검정을 투명도로 낮춰 뒤의 게임 화면이 비치게 한다.
+       (url()은 이 파일(sweep/) 기준으로 해석됨) */
+    --ui-frame-src: url('../world/ui/frame_t.png');
+    background-color: rgba(0, 0, 0, 0.7);
 }
 
 #minimap {

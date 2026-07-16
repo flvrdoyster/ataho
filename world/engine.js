@@ -95,7 +95,7 @@ let lastBubbleTime = 0;
 let interactionState = 'NONE';   // 'NONE' | 'DIALOGUE' | 'MENU'
 let activeMenuTrigger = null;    // trigger whose menu opens when a dialogue advances
 let lastAutoTriggerId = null;    // latch so an auto-firing tile trigger fires once per entry
-const DIALOGUE_AUTO_MS = 2000;   // bubble auto-advances after this delay
+const DIALOGUE_AUTO_MS = 3000;   // bubble auto-advances after this delay
 
 function isInteracting() { return interactionState !== 'NONE'; }
 
@@ -640,7 +640,10 @@ function onKeyDown(e) {
     if (keys.hasOwnProperty(e.key)) keys[e.key] = true;
     if (e.code === 'Space' || e.key === 'Enter' || e.key.startsWith('Arrow')) {
         if (interactionState === 'DIALOGUE') {
-            if (performance.now() - lastBubbleTime > 200) advanceInteraction();
+            // e.repeat 무시: 키를 누르고 있는 중(OS 키 리핏)에 뜬 대사가 다음 리핏
+            // 이벤트에 바로 넘어가버리는 사고 방지 (sweep처럼 이동 중 자동으로 대사가
+            // 뜨는 경우). 새로 누르는 키로는 여전히 수동으로 넘길 수 있다.
+            if (!e.repeat && performance.now() - lastBubbleTime > 200) advanceInteraction();
         } else if (activeTrigger && e.code === 'Space') {
             openModal(activeTrigger);
         }
@@ -918,30 +921,47 @@ function draw() {
     }
 
     // Update Speech Bubble / Modal position
+    // window.getBubbleAnchor 훅: 말풍선을 플레이어가 아닌 다른 대상(NPC 등)에 붙일 때
+    // {x, y, width, height}(월드 좌표)를 반환하면 그쪽을 앵커로 쓴다 (sweep 술집주인 대사용).
     const bubble = document.getElementById('speech-bubble');
     const modal = document.getElementById('dynamic-modal');
     if ((bubble && !bubble.classList.contains('hidden')) || (modal && !modal.classList.contains('hidden'))) {
         const target = (modal && !modal.classList.contains('hidden')) ? modal : bubble;
-        if (ps) {
+        const anchor = (typeof window.getBubbleAnchor === 'function' && window.getBubbleAnchor()) || ps;
+        if (anchor) {
             const rect = canvas.getBoundingClientRect();
             const scaleX = rect.width / canvas.width;
             const scaleY = rect.height / canvas.height;
-            const pViewX = ps.x + ps.width / 2 - camera.x;
-            const pViewY = ps.y - camera.y;
+            const pViewX = anchor.x + anchor.width / 2 - camera.x;
+            const pViewY = anchor.y - camera.y;
             const screenX = rect.left + pViewX * scaleX;
             const screenY = rect.top + pViewY * scaleY;
             const globalOffset = CONFIG.SPEECH_BUBBLE_OFFSET_Y || -50;
             const customOffset = (target === modal && activeTrigger) ? (activeTrigger.bubbleOffsetY || 0) : (parseInt(target.dataset.offsetY) || 0);
             const h = target.offsetHeight;
-            target.style.left = `${screenX}px`;
+
+            // 가로: 화자 중심에 붙이되, 뷰포트(브라우저 화면)를 벗어나면 안으로 클램프 —
+            // 모바일 세로 화면은 캔버스 좌우가 잘려 있어 화자(문 앞 술집주인 등)가 화면
+            // 밖일 수 있는데, 말풍선만큼은 잘리지 않고 보여야 한다.
+            const halfW = target.offsetWidth / 2;
+            const viewLeft = Math.max(rect.left, 0) + 8;
+            const viewRight = Math.min(rect.right, window.innerWidth) - 8;
+            const clampedX = Math.max(viewLeft + halfW, Math.min(viewRight - halfW, screenX));
+            target.style.left = `${clampedX}px`;
             target.style.transform = 'translateX(-50%)';   // 세로 위치는 top(=topEdge)으로만 제어
+
+            // 꼬리(▼)는 말풍선이 클램프돼도 화자를 가리키게 — 화자 화면 X를 말풍선 내부
+            // 좌표로 환산해 CSS 변수로 전달 (style.css의 ::before/::after가 사용).
+            // 둥근 모서리를 침범하지 않도록 양끝 14px 안쪽으로 제한.
+            const tailX = Math.max(14, Math.min(halfW * 2 - 14, halfW + (screenX - clampedX)));
+            target.style.setProperty('--bubble-tail-x', `${tailX}px`);
 
             // 기본: 캐릭터 머리 위로 띄운다(말풍선 하단이 bottomAnchor). 위로 띄우면 캔버스
             // 상단을 벗어나는 경우(캐릭터가 맵 최상단) 캐릭터 아래로 뒤집는다.
             const bottomAnchor = screenY + globalOffset + customOffset;
             let topEdge;
             if (bottomAnchor - h < rect.top + 8) {
-                const charBottomY = rect.top + (ps.y + ps.height - camera.y) * scaleY;
+                const charBottomY = rect.top + (anchor.y + anchor.height - camera.y) * scaleY;
                 target.classList.add('flip-below');
                 topEdge = charBottomY + 16 + customOffset;
             } else {
