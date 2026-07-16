@@ -90,6 +90,9 @@
     - ~~**TODO**: `stage_editor.html`의 `serialize()`가 `id`/`minSteps`를 안 챙겨서
       저장/복사하면 날아감~~ → `serialize()`가 두 필드 모두(있으면) 다시 써넣도록 수정
       완료 (2026-07-16), 실제 `stages.js` 데이터로 라운드트립 검증 ✔
+    - "+ 방"으로 새로 추가하는 방은 `id`가 아예 없었던 것도 수정 — `o_`/`a_` 접두사는
+      각각 원작 재현/AI 생성이라는 의미가 있어 그대로 못 붙이므로, 중복 없는 `new_N`
+      태그를 자동 부여하도록 함 (2026-07-16) ✔
 - [x] **Step 5 — 걸음 수 채점 & 보수**
   - 걸음 수 카운트 (`char_sweep.js` — `player.stepCount`, 성공 이동마다 +1, 스테이지 로드 시 리셋,
     `window.sweepGetStepCount()`로 조회) ✔
