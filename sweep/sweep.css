@@ -4,3 +4,21 @@
 #hud {
     width: fit-content;
 }
+
+/* 미니맵 — 카메라가 플레이어를 따라다녀 방 전체가 안 보일 때(특히 모바일 세로 화면)
+   먼지·장애물·플레이어 위치를 한눈에 보여준다. */
+#minimap-wrap {
+    position: fixed;
+    top: 90px;
+    right: 12px;
+    z-index: 10;
+    padding: 4px;
+    pointer-events: none;
+}
+
+#minimap {
+    display: block;
+    image-rendering: pixelated;
+    image-rendering: -moz-crisp-edges;
+    image-rendering: crisp-edges;
+}

@@ -205,6 +205,30 @@ let totalMoney = 0;
 window.sweepAddMoney = function (amount) { totalMoney += amount; };
 window.sweepGetTotalMoney = function () { return totalMoney; };
 
+// ===== 미니맵용 셀 상태 그리드 =====
+// 플레이필드 셀 수(11×6)는 stage_editor.html의 GW/GH와 동일 — 방마다 크기가 같다는
+// 전제(베이스 맵 1장 공유)라 여기서도 고정값으로 둔다.
+const PLAYFIELD_COLS = 11, PLAYFIELD_ROWS = 6;
+
+// 미니맵(char_sweep.js)이 매 프레임 읽어 그리는 용도 — 상태를 따로 들고 있지 않고
+// obstacleTiles/dustyCells를 그대로 읽어 매번 계산한다.
+window.sweepGetCellGrid = function () {
+    const cell = cellSize();
+    const grid = [];
+    for (let cy = 0; cy < PLAYFIELD_ROWS; cy++) {
+        const row = [];
+        for (let cx = 0; cx < PLAYFIELD_COLS; cx++) {
+            const { gx, gy } = stageCellToTile(cx, cy);
+            if (obstacleTiles[gx + ',' + gy] !== undefined) row.push('obstacle');
+            else if (dustyCells.has(cellKey(gx, gy))) row.push('dusty');
+            else if (isCellWalkable(gx, gy, cell)) row.push('clean');
+            else row.push('wall');
+        }
+        grid.push(row);
+    }
+    return grid;
+};
+
 // ===== 바닥 타일 합성 훅 =====
 // 장애물 먼저(그 칸은 스탬프 타일), 없으면 먼지, 없으면 원본 바닥.
 window.getFloorTileOverride = function (gx, gy, tx, ty) {

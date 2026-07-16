@@ -25,10 +25,26 @@ const CHAR_CONFIG = {
     STAGE_CLEAR_DELAY: 0.8  // 방 클리어 후 다음 방으로 넘어가기까지 대기(s)
 };
 
+// 미니맵 — 카메라가 플레이어를 따라다녀 방 전체가 화면 밖으로 나갈 수 있어(특히 모바일
+// 세로 화면) 우측 상단에 작은 격자로 먼지·장애물·플레이어 위치를 보여준다.
+const MINIMAP_CONFIG = {
+    CELL_PX: 5,   // 미니맵 내부 캔버스에서 한 칸이 차지하는 raw 픽셀 크기(칸 4px + 여백 1px)
+    GAP: 1,
+    SCALE: 3,     // CSS 표시 배율 (image-rendering: pixelated로 또렷하게)
+    COLORS: {
+        obstacle: '#4a3a2a',
+        wall: '#4a3a2a',
+        dusty: '#8a7a4a',
+        clean: '#d8cfa8',
+        player: '#e0503a'
+    }
+};
+
 // ===== State =====
 let walkImg, sweepImg;
 let sfxPool = [], sfxIndex = 0;
 let hudMoney, hudSteps;
+let minimapCanvas, minimapCtx;
 
 const player = {
     x: 0, y: 0,
@@ -78,6 +94,7 @@ async function playerInit(assets) {
     player.height = cellPx();
 
     setupHUD();
+    setupMinimap();
 
     // 스테이지(장애물 조합) 적용 후 그 위에서 먼지/스폰을 세팅
     if (window.sweepStage) window.sweepStage.applyFromURL();
@@ -101,6 +118,46 @@ function updateHUD() {
     const money = (typeof window.sweepGetTotalMoney === 'function') ? window.sweepGetTotalMoney() : 0;
     hudMoney.setNums(String(money));
     hudSteps.setNums(String(player.stepCount));
+}
+
+// 미니맵 캔버스는 실제 표시 크기보다 작게 그리고 CSS로 확대한다(SpriteNumberFont와 같은
+// 픽셀아트 확대 관례) — #minimap-wrap은 index.html에서 visibility:hidden으로 시작.
+function setupMinimap() {
+    minimapCanvas = document.getElementById('minimap');
+    if (!minimapCanvas) return;
+    minimapCtx = minimapCanvas.getContext('2d');
+    minimapCtx.imageSmoothingEnabled = false;
+
+    const c = MINIMAP_CONFIG;
+    const cols = 11, rows = 6; // loader.js sweepGetCellGrid()와 동일한 플레이필드 크기
+    minimapCanvas.width = cols * (c.CELL_PX + c.GAP) - c.GAP;
+    minimapCanvas.height = rows * (c.CELL_PX + c.GAP) - c.GAP;
+    minimapCanvas.style.width = (minimapCanvas.width * c.SCALE) + 'px';
+    minimapCanvas.style.height = (minimapCanvas.height * c.SCALE) + 'px';
+
+    document.getElementById('minimap-wrap').style.visibility = 'visible';
+}
+
+function updateMinimap() {
+    if (!minimapCtx || typeof window.sweepGetCellGrid !== 'function') return;
+    const c = MINIMAP_CONFIG;
+    const step = c.CELL_PX + c.GAP;
+    const grid = window.sweepGetCellGrid();
+
+    minimapCtx.clearRect(0, 0, minimapCanvas.width, minimapCanvas.height);
+    for (let cy = 0; cy < grid.length; cy++) {
+        for (let cx = 0; cx < grid[cy].length; cx++) {
+            minimapCtx.fillStyle = c.COLORS[grid[cy][cx]] || c.COLORS.wall;
+            minimapCtx.fillRect(cx * step, cy * step, c.CELL_PX, c.CELL_PX);
+        }
+    }
+
+    const org = window.GRID_ORIGIN || { x: 0, y: 0 };
+    const cellTiles = window.GRID_CELL_TILES || 1;
+    const pcx = Math.round((player.x / CONFIG.TILE_SIZE - org.x) / cellTiles);
+    const pcy = Math.round((player.y / CONFIG.TILE_SIZE - org.y) / cellTiles);
+    minimapCtx.fillStyle = c.COLORS.player;
+    minimapCtx.fillRect(pcx * step, pcy * step, c.CELL_PX, c.CELL_PX);
 }
 
 // 현재 스테이지 기준으로 스폰 배치 + 먼지 초기화. 스테이지 전환 시에도 재사용.
@@ -200,6 +257,7 @@ function tryStep(input) {
 
 function playerUpdate(dt) {
     updateHUD();
+    updateMinimap();
 
     if (player.state === 'idle') {
         const input = readInput();
