@@ -87,10 +87,14 @@ function stageCellToTile(cx, cy) {
     return { gx: org.x + cx * cell, gy: org.y + cy * cell };
 }
 
-// URL ?stage=N (1-based) → 0-based 인덱스. 없으면 0.
+// URL ?stage=N (1-based) → 0-based 인덱스. stage_editor.html의 "이 방 테스트"가 쓰는
+// 파라미터라 명시되면 그대로 존중하고, 없을 때만 무작위로 시작 방을 고른다(클리어 후
+// 다음 방 선택과 동일하게 방 사이 순서·난이도 설계가 없어서).
 function stageIndexFromURL() {
     const n = parseInt(new URLSearchParams(location.search).get('stage'), 10);
-    return (Number.isFinite(n) && n >= 1) ? n - 1 : 0;
+    if (Number.isFinite(n) && n >= 1) return n - 1;
+    const count = (window.SWEEP_STAGES || []).length;
+    return count > 0 ? Math.floor(Math.random() * count) : 0;
 }
 
 function applyStage(index) {

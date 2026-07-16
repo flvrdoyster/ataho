@@ -50,6 +50,8 @@
     color: white;
     font-family: var(--ui-font);
     font-size: var(--ui-font-size);
+    white-space: nowrap;   /* 좁은 화면에서 width:fit-content가 줄어들 때 라벨 텍스트가
+                               중간에서 줄바꿈되는 것 방지 — 대신 필요하면 화면 밖으로 넘침 */
     pointer-events: auto;
     z-index: 10;
 }

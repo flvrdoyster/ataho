@@ -44,7 +44,7 @@ const MINIMAP_CONFIG = {
 let walkImg, sweepImg;
 let sfxPool = [], sfxIndex = 0;
 let hudMoney, hudSteps;
-let minimapCanvas, minimapCtx;
+let minimapCanvas, minimapCtx, minimapWrap;
 
 const player = {
     x: 0, y: 0,
@@ -124,7 +124,8 @@ function updateHUD() {
 // 픽셀아트 확대 관례) — #minimap-wrap은 index.html에서 visibility:hidden으로 시작.
 function setupMinimap() {
     minimapCanvas = document.getElementById('minimap');
-    if (!minimapCanvas) return;
+    minimapWrap = document.getElementById('minimap-wrap');
+    if (!minimapCanvas || !minimapWrap) return;
     minimapCtx = minimapCanvas.getContext('2d');
     minimapCtx.imageSmoothingEnabled = false;
 
@@ -135,11 +136,35 @@ function setupMinimap() {
     minimapCanvas.style.width = (minimapCanvas.width * c.SCALE) + 'px';
     minimapCanvas.style.height = (minimapCanvas.height * c.SCALE) + 'px';
 
-    document.getElementById('minimap-wrap').style.visibility = 'visible';
+    minimapWrap.style.visibility = 'visible';
+
+    // #hud 실제 높이 아래로 붙인다 — 좁은 화면에서 "걸음 수"가 줄바꿈되는 등
+    // HUD 높이가 화면폭에 따라 달라져서 sweep.css의 고정 top 값만으로는 못 맞춘다.
+    positionMinimap();
+    window.addEventListener('resize', positionMinimap);
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(positionMinimap);
+}
+
+function positionMinimap() {
+    const hud = document.getElementById('hud');
+    if (!hud || !minimapWrap) return;
+    minimapWrap.style.top = (hud.getBoundingClientRect().bottom + 12) + 'px';
+}
+
+// 화면(canvas)이 맵 전체를 담을 만큼 크면 카메라가 스크롤할 일이 없어 미니맵이
+// 불필요하다 — canvas.width/height는 이미 브라우저 뷰포트 크기 기준(resizeCanvas)이라
+// mapWidth/mapHeight와 그대로 비교하면 된다.
+function minimapNeeded() {
+    return canvas.width < mapWidth || canvas.height < mapHeight;
 }
 
 function updateMinimap() {
-    if (!minimapCtx || typeof window.sweepGetCellGrid !== 'function') return;
+    if (!minimapCtx) return;
+
+    const needed = minimapNeeded();
+    minimapWrap.style.display = needed ? '' : 'none';
+    if (!needed) return;
+
     const c = MINIMAP_CONFIG;
     const step = c.CELL_PX + c.GAP;
     const grid = window.sweepGetCellGrid();
