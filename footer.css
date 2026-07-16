@@ -56,8 +56,6 @@
     display: block;
     width: 100%;
     padding: 20px 0;
-    /* 밝은/어두운 테마 모두에서 자연스럽게 어우러지는 반투명 경계선 */
-    border-top: 1px solid rgba(128, 128, 128, 0.3);
     margin-top: 20px;
     text-align: center;
     
