@@ -188,10 +188,10 @@ window.sweepGetMinSteps = function () {
 
 // ===== 보수 (스테이지 클리어 등급 → 번 돈) =====
 // 등급은 비율이 아니라 최단 걸음 수 대비 절대 걸음 수 차이로 가른다 (레퍼런스 기준):
-//   완벽: 최단 걸음 수 그대로 / 성공: 최단 걸음 수 +3 이내 / 절반 성공: 그 초과
+//   완벽: 최단 걸음 수 그대로 / 성공: 최단 걸음 수 +2 이내 / 절반 성공: 그 초과
 // 완벽·성공 100G, 절반 성공 75G.
 const STAGE_REWARD = { perfect: 100, success: 100, half: 75 };
-const SUCCESS_STEP_MARGIN = 3;
+const SUCCESS_STEP_MARGIN = 2;
 
 function computeStageGrade(steps) {
     const minSteps = window.sweepGetMinSteps();
