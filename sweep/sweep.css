@@ -29,3 +29,14 @@
     image-rendering: -moz-crisp-edges;
     image-rendering: crisp-edges;
 }
+
+/* 스테이지 전환 화면 페이드 — opacity는 char_sweep.js가 매 프레임 직접 계산해서 쓴다
+   (CSS transition을 쓰면 게임 dt와 별개로 타이밍이 어긋나므로 여기선 안 건다). */
+#stage-fade {
+    position: fixed;
+    inset: 0;
+    background: black;
+    opacity: 0;
+    pointer-events: none;
+    z-index: 2000;
+}

@@ -309,20 +309,15 @@
     ];
     const gameOverMenu = new UIKeyboardMenu(gameOverPanel, gameOverCursorEl, gameOverBtns);
 
-    const soundBtn = document.getElementById('sound-btn');
-
-    function toggleSound() {
-        soundEnabled = !soundEnabled;
-        const muted = !soundEnabled;
-        if (fallenSfx) fallenSfx.muted = muted;
-        if (activeBgmGain) {
-            activeBgmGain.gain.value = muted ? 0 : 0.5;
+    const muteBtn = new UIMuteButton({
+        parent: document.getElementById('hud'),
+        onToggle: (muted) => {
+            soundEnabled = !muted;
+            if (fallenSfx) fallenSfx.muted = muted;
+            if (activeBgmGain) activeBgmGain.gain.value = muted ? 0 : 0.5;
         }
-        const soundImg = soundBtn.querySelector('img');
-        if (soundImg) {
-            soundImg.src = muted ? 'sound_mute.png' : 'sound.png';
-        }
-    }
+    });
+    function toggleSound() { muteBtn.toggle(); }
 
     function playSfx(id) {
         if (!soundEnabled) return;
@@ -1142,13 +1137,6 @@
     document.addEventListener('keydown', handleKeyDown);
     document.addEventListener('keyup', handleKeyUp);
 
-    const soundBtnElement = document.getElementById('sound-btn');
-    soundBtnElement.addEventListener('click', toggleSound);
-    soundBtnElement.addEventListener('keydown', (e) => {
-        if (e.key === ' ' || e.key === 'Spacebar' || e.code === 'Space') {
-            e.preventDefault();
-        }
-    });
     document.getElementById('btn-continue').addEventListener('click', resetGame);
     document.getElementById('btn-home').addEventListener('click', () => { window.location.href = '../index.html'; });
 

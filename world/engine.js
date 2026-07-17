@@ -411,6 +411,15 @@ function injectUI() {
         const bubble = document.createElement('div');
         bubble.id = 'speech-bubble';
         bubble.className = 'hidden';
+        // 모바일: 말풍선을 직접 탭해도 넘어가게 — action-btn(트리거 있는 화면에서만 보임)에
+        // 기대지 않는 공통 경로. 대사 중엔 입력이 이미 잠겨(update()의 isInteracting())
+        // 있어 탭이 다른 동작과 겹칠 일이 없다.
+        bubble.addEventListener('click', (e) => { e.stopPropagation(); activateOrAdvance(); });
+        bubble.addEventListener('touchend', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            activateOrAdvance();
+        });
         document.body.appendChild(bubble);
     }
 }

@@ -184,6 +184,58 @@ UITouchButton.ICONS = {
 };
 
 /**
+ * UIMuteButton — 공용 음소거 토글 버튼. 아이콘(켜짐: 음표 / 꺼짐: 음표+사선)은
+ * gensei-pc98·suiko-web 에뮬레이터의 #btn-mute와 동일한 SVG를 그대로 가져다 씀
+ * (오디오 켜짐/꺼짐을 표시하는 관례를 이 사이트 미니게임군에도 통일).
+ *
+ * 실제 음소거 동작(WebAudio 게인, AudioContext suspend, HTMLAudio pause 등)은
+ * 게임마다 오디오 구조가 달라 여기서 다루지 않고 onToggle(muted) 콜백에 위임한다.
+ *
+ * 사용 예:
+ *   const muteBtn = new UIMuteButton({
+ *       parent: document.getElementById('hud'),
+ *       onToggle: (muted) => { ... }
+ *   });
+ */
+class UIMuteButton {
+    constructor(opts = {}) {
+        const btn = document.createElement('button');
+        btn.className = 'ui-icon-btn';
+        btn.type = 'button';
+        btn.setAttribute('aria-label', 'Toggle sound');
+        this.el = btn;
+        this.onToggle = opts.onToggle || null;
+        this.muted = !!opts.initialMuted;
+        this._render();
+
+        btn.addEventListener('click', () => this.toggle());
+
+        (opts.parent || document.body).appendChild(btn);
+    }
+
+    _render() {
+        this.el.innerHTML = this.muted ? UIMuteButton.ICON_OFF : UIMuteButton.ICON_ON;
+    }
+
+    toggle() {
+        this.muted = !this.muted;
+        this._render();
+        if (this.onToggle) this.onToggle(this.muted);
+    }
+}
+
+UIMuteButton.ICON_ON = '<svg viewBox="0 0 49.13 70.14" fill="currentColor" aria-hidden="true">'
+    + '<path d="M7.43,68.29c-2.31-1.26-4.13-3.01-5.45-5.25s-1.98-4.77-1.98-7.58.65-5.41,1.96-7.62c1.3-2.21,3.12-3.93,5.45-5.14,'
+    + '2.33-1.22,4.96-1.82,7.89-1.82s5.45.59,7.73,1.76l-.09-42.63h26.19v14.77h-18.72v40.69c0,2.81-.65,5.34-1.96,7.58-1.3,2.24-3.1,'
+    + '3.99-5.38,5.25s-4.88,1.87-7.78,1.85c-2.93.03-5.55-.59-7.87-1.85Z"/></svg>';
+UIMuteButton.ICON_OFF = '<svg viewBox="0 0 56.02 70.14" fill="currentColor" aria-hidden="true">'
+    + '<rect x="26.51" y="-3.04" width="3" height="76.23" transform="translate(-16.59 30.08) rotate(-45)"/>'
+    + '<polygon points="33.86 35.68 33.86 14.77 52.58 14.77 52.58 0 26.38 0 26.44 28.27 33.86 35.68"/>'
+    + '<path d="M26.47,42.63c-2.29-1.17-4.86-1.76-7.73-1.76s-5.56.61-7.89,1.82c-2.33,1.22-4.15,2.93-5.45,5.14-1.3,2.21-1.96,4.75-1.96,'
+    + '7.62s.66,5.34,1.98,7.58,3.13,3.99,5.45,5.25c2.31,1.26,4.94,1.87,7.87,1.85,2.9.03,5.49-.59,7.78-1.85s4.08-3.01,5.38-5.25c1.3-2.24,'
+    + '1.96-4.77,1.96-7.58v-9.12l-7.39-7.39v3.68Z"/></svg>';
+
+/**
  * SpriteNumberFont — 숫자 전용 이미지 폰트(world/ui/num_small.png, num_big.png)로
  * 문자열을 그리는 렌더러. 각 시트는 글리프가 가로로 나열되고(0~9[, ?]),
  * 색상별로 세로로 흰/초록/노랑/빨강 4행이 쌓여 있다.

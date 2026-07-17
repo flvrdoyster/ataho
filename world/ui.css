@@ -15,6 +15,7 @@
     --ui-cursor-src: url('ui/cursor.png');
     --ui-bg: rgba(33, 66, 123, 1);
     --ui-font: 'DungGeunMo', 'KoddiUDOnGothic', sans-serif;
+    --ui-hud-item-gap: 24px;   /* .ui-hud-stats 내부(번 돈 / 걸음 수 등) 및 옆의 아이콘 버튼과 공용 */
     /* 아래 세 값은 폴백 기본값 — world/ui.js의 UI_CONFIG(FONT_SIZE/CURSOR_WIDTH/
        CURSOR_HEIGHT/PANEL_BORDER)가 로드 시 덮어씀. 실제 조정은 거기서. */
     --ui-font-size: 16px;
@@ -46,6 +47,7 @@
     box-sizing: border-box;
     display: flex;
     flex-direction: row;
+    gap: var(--ui-hud-item-gap);   /* .ui-hud-stats와 옆의 아이콘 버튼(뮤트 등) 사이 간격 */
     align-items: center;
     color: white;
     font-family: var(--ui-font);
@@ -61,7 +63,7 @@
     display: flex;
     flex-direction: row;
     justify-content: center;
-    gap: 24px;
+    gap: var(--ui-hud-item-gap);
     align-items: center;
 }
 
@@ -79,10 +81,13 @@
     line-height: 1;
 }
 
+/* em 단위 — .ui-hud의 font-size(--ui-font-size)를 상속받아 텍스트 높이에 맞춘다.
+   고정 px였을 때는 HUD의 다른 텍스트보다 훨씬 커서 .ui-hud 전체 높이를 밀어 올렸었다. */
 .ui-icon-btn {
     flex-shrink: 0;
-    width: 50px;
-    height: 50px;
+    font-size: inherit;   /* 브라우저 기본은 <button>에 font-size를 상속 안 시킴 — em 계산의 전제 */
+    width: 1.4em;
+    height: 1.4em;
     background: transparent;
     border: none;
     cursor: pointer;
@@ -96,10 +101,12 @@
 
 .ui-icon-btn:focus { outline: none; box-shadow: none; }
 
-.ui-icon-btn img {
-    width: 28px;
-    height: 28px;
+.ui-icon-btn img,
+.ui-icon-btn svg {
+    width: 1em;
+    height: 1em;
     display: block;
+    color: white;   /* svg 아이콘(currentColor)용 — UIMuteButton 등 */
 }
 
 /* ── 모바일 터치 액션 버튼 (화면 하단 고정, gensei-pc98 가상 게임패드 키캡 스타일) ── */

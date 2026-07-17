@@ -397,8 +397,10 @@ video:fullscreen::cue {
     /* 한 줄 최대 한글 20자(1자≈1em) 기준. 좁은 화면에서는 85vw로 캡. */
     max-width: min(20em, 85vw);
     z-index: 2000;
-    pointer-events: none;
-    /* Let clicks pass through if needed, though usually blocking */
+    /* 탭/클릭으로 다음 줄 넘기기 가능 — 떠 있는 동안은 이미 입력이 잠겨 있어(대사 중)
+       다른 조작과 겹치지 않는다 */
+    pointer-events: auto;
+    cursor: pointer;
     box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
     text-align: center;
     word-break: keep-all;

@@ -20,7 +20,6 @@ const CHAR_CONFIG = {
     WALK_ANIM_SPEED: 0.09,  // 걷기 애니메이션 프레임 간격 (s)
     SFX_SRC: 'sweep.mp3',   // 페이지(sweep/) 기준 상대 경로
     SFX_VOLUME: 0.9,
-    SFX_POOL: 3,            // 연속 재생용 오디오 풀 크기
     CLEAR_SFX: {            // 방 클리어 시 등급별 효과음
         perfect: 'success.mp3',
         success: 'success.mp3',
@@ -30,6 +29,7 @@ const CHAR_CONFIG = {
     BGM_VOLUME: 0.5,
     SPRITE_OFFSET_Y: -16,   // 스프라이트를 판석보다 한 타일 위로 (발 위치 보정)
     STAGE_CLEAR_DELAY: 0.8, // 방 클리어 후 다음 방으로 넘어가기까지 대기(s)
+    STAGE_FADE_DURATION: 0.3, // 스테이지 전환 페이드 인/아웃 각각 걸리는 시간(s)
     MONEY_GOAL: 1000,       // 외상 술값 — 전환 대사(DIALOGUE.next) 분기 기준.
                             // 정식 클리어 조건/선택지는 Step 7에서 확정 예정
     MASTER_SRC: 'master_all.png',  // 페이지(sweep/) 기준 상대 경로, 32x64 2프레임(정면/뒷모습) 가로 배치
@@ -48,7 +48,8 @@ const CHAR_CONFIG = {
 const MINIMAP_CONFIG = {
     CELL_PX: 5,   // 미니맵 내부 캔버스에서 한 칸이 차지하는 raw 픽셀 크기(칸 4px + 여백 1px)
     GAP: 1,
-    SCALE: 3,     // CSS 표시 배율 (image-rendering: pixelated로 또렷하게)
+    SCALE: 1.5,   // CSS 표시 배율 (image-rendering: pixelated로 또렷하게)
+    HUD_GAP: 4,   // HUD 바로 아래 간격(px) — 크기를 줄인 뒤로 HUD 쪽에 더 붙임
     COLORS: {
         obstacle: '#4a3a2a',
         wall: '#4a3a2a',
@@ -108,9 +109,6 @@ const DIALOGUE = {
 
 // ===== State =====
 let walkImg, sweepImg, masterImg;
-let sfxPool = [], sfxIndex = 0;
-let clearSfx = {};           // 등급명 -> Audio (CLEAR_SFX 기준, playerInit에서 로드)
-let doorSfx;
 let bgm = null;
 let hudMoney, hudSteps;
 let minimapCanvas, minimapCtx, minimapWrap;
@@ -119,6 +117,11 @@ let masterFrame = 0;         // 0: 정면, 1: 뒷모습(퇴장 중) — master_a
 let masterLeaveT = null;     // null이면 퇴장 시퀀스 아님, 숫자면 뒷모습 전환 후 경과 시간(s)
 let introPending = false;    // true면 playerUpdate 첫 프레임에 인트로 대사 시작
 let transitionSaid = false;  // 이번 클리어의 전환 대사(DIALOGUE.next)를 이미 띄웠는지
+let moneyAwarded = false;    // 이번 클리어의 보수를 이미 지급했는지 (이중/누락 지급 방지)
+let fadeEl = null;
+let fadePhase = 'none';      // 'none' | 'out' | 'in' — 스테이지 전환 화면 페이드
+let fadeT = 0;
+let pendingStageIndex = null;
 
 const player = {
     x: 0, y: 0,
@@ -141,6 +144,10 @@ const SWEEP_FRAMES = 3;        // ataho-sweep.png: 48x64 x 3프레임 (정면)
 
 function cellPx() {
     return CONFIG.TILE_SIZE * (window.GRID_CELL_TILES || 1);
+}
+
+function setFadeOpacity(v) {
+    if (fadeEl) fadeEl.style.opacity = String(v);
 }
 
 // 문(스폰 칸 바로 아래) 월드 픽셀 좌표 — 술집주인이 서는 자리.
@@ -256,29 +263,7 @@ async function playerInit(assets) {
     sweepImg = await loadImg(resolvePath('char/ataho-sweep.png'));
     masterImg = await loadImg(CHAR_CONFIG.MASTER_SRC);
 
-    // 효과음 풀 (빠른 연속 재생 대응)
-    for (let i = 0; i < CHAR_CONFIG.SFX_POOL; i++) {
-        const a = new Audio(CHAR_CONFIG.SFX_SRC);
-        a.volume = CHAR_CONFIG.SFX_VOLUME;
-        a.preload = 'auto';
-        sfxPool.push(a);
-    }
-
-    // 클리어 등급별 효과음 (같은 파일은 Audio 하나 공유)
-    const srcCache = {};
-    for (const [grade, src] of Object.entries(CHAR_CONFIG.CLEAR_SFX)) {
-        if (!srcCache[src]) {
-            srcCache[src] = new Audio(src);
-            srcCache[src].volume = CHAR_CONFIG.SFX_VOLUME;
-            srcCache[src].preload = 'auto';
-        }
-        clearSfx[grade] = srcCache[src];
-    }
-
-    doorSfx = new Audio(CHAR_CONFIG.DOOR_SFX);
-    doorSfx.volume = CHAR_CONFIG.SFX_VOLUME;
-    doorSfx.preload = 'auto';
-
+    setupSfx();
     setupBgm();
 
     player.width = cellPx();
@@ -286,6 +271,7 @@ async function playerInit(assets) {
 
     setupHUD();
     setupMinimap();
+    fadeEl = document.getElementById('stage-fade');
 
     // 스테이지(장애물 조합) 적용 후 그 위에서 먼지/스폰을 세팅
     if (window.sweepStage) window.sweepStage.applyFromURL();
@@ -307,6 +293,12 @@ function setupHUD() {
     hudSteps = new UIStat(['걸음 수 ', { num: true }]);
     statsEl.appendChild(hudMoney.el);
     statsEl.appendChild(hudSteps.el);
+    if (typeof UIMuteButton !== 'undefined') {
+        new UIMuteButton({
+            parent: document.getElementById('hud'),
+            onToggle: setAudioMuted
+        });
+    }
     document.getElementById('hud').style.visibility = 'visible';
 }
 
@@ -345,7 +337,7 @@ function setupMinimap() {
 function positionMinimap() {
     const hud = document.getElementById('hud');
     if (!hud || !minimapWrap) return;
-    minimapWrap.style.top = (hud.getBoundingClientRect().bottom + 12) + 'px';
+    minimapWrap.style.top = (hud.getBoundingClientRect().bottom + MINIMAP_CONFIG.HUD_GAP) + 'px';
 }
 
 // 화면(canvas)이 맵 전체를 담을 만큼 크면 카메라가 스크롤할 일이 없어 미니맵이
@@ -420,6 +412,7 @@ function loadStage() {
     masterLeaveT = null;
     halfWarningShown = false;
     transitionSaid = false;
+    moneyAwarded = false;
 
     // 먼지 레이어 초기화 (장애물 충돌이 이미 반영된 시점)
     if (typeof window.initDust === 'function') window.initDust();
@@ -439,33 +432,100 @@ function playerGetState() {
     };
 }
 
-function playSweepSfx() {
-    const a = sfxPool[sfxIndex];
-    if (!a) return;
-    sfxIndex = (sfxIndex + 1) % sfxPool.length;
-    a.currentTime = 0;
-    a.play().catch(() => { /* 자동재생 정책으로 첫 재생이 막히면 무시 */ });
+// ===== 효과음 (WebAudio) =====
+// HTMLAudioElement 풀 대신 AudioBuffer + BufferSource를 쓴다 — 이유(및 겪었던 증상)는
+// feedback_minigame_sfx_webaudio 메모리 참고. 요약: HTMLAudio는 (1) iOS가 요소별로 첫
+// 재생을 사용자 제스처 안에서 요구해 미리 만들어둔 여러 개를 전부 그 안에서 play()해야
+// 하고, (2) 겹쳐 재생하려면 풀을 직접 관리해야 하며, (3) currentTime=0 재사용이 로드
+// 타이밍에 따라 씹힐 수 있다 — 세 문제 다 sweep에서 실제로 재생 누락으로 나타났었다.
+// BufferSource는 매번 새로 만들어 겹침이 공짜고, AudioContext 하나만 resume()하면 끝난다.
+let audioCtx = null;
+let sfxGain = null;
+const sfxBuffers = {};   // src -> Promise<AudioBuffer|null> (playerInit에서 미리 디코딩 시작)
+
+function getAudioContext() {
+    if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        sfxGain = audioCtx.createGain();
+        sfxGain.gain.value = CHAR_CONFIG.SFX_VOLUME;
+        sfxGain.connect(audioCtx.destination);
+    }
+    return audioCtx;
 }
+
+function loadSfxBuffer(src) {
+    if (sfxBuffers[src]) return sfxBuffers[src];
+    const ctx = getAudioContext();
+    sfxBuffers[src] = fetch(src)
+        .then(res => res.arrayBuffer())
+        .then(data => ctx.decodeAudioData(data))
+        .catch(() => null);
+    return sfxBuffers[src];
+}
+
+function playSfxBuffer(src) {
+    const ctx = getAudioContext();
+    Promise.resolve(loadSfxBuffer(src)).then(buffer => {
+        if (!buffer) return;
+        const source = ctx.createBufferSource();
+        source.buffer = buffer;
+        source.connect(sfxGain);
+        source.start(0);
+    });
+}
+
+// 디코딩은 제스처 없이도 진행되지만, 실제 재생(context.resume())은 제스처가 필요하다 —
+// setupBgm()의 제스처 핸들러가 BGM과 함께 이 컨텍스트도 같이 resume한다.
+function setupSfx() {
+    loadSfxBuffer(CHAR_CONFIG.SFX_SRC);
+    Object.values(CHAR_CONFIG.CLEAR_SFX).forEach(loadSfxBuffer);
+    loadSfxBuffer(CHAR_CONFIG.DOOR_SFX);
+}
+
+function playSweepSfx() { playSfxBuffer(CHAR_CONFIG.SFX_SRC); }
 
 function playClearSfx(grade) {
-    const a = clearSfx[grade];
-    if (!a) return;
-    a.currentTime = 0;
-    a.play().catch(() => { });
+    const src = CHAR_CONFIG.CLEAR_SFX[grade];
+    if (src) playSfxBuffer(src);
 }
 
-function playDoorSfx() {
-    if (!doorSfx) return;
-    doorSfx.currentTime = 0;
-    doorSfx.play().catch(() => { });
-}
+function playDoorSfx() { playSfxBuffer(CHAR_CONFIG.DOOR_SFX); }
 
 // 대사 줄의 sfx 속성 처리 — DIALOGUE 테이블에서 어느 줄이 뜰 때 효과음이 나올지 지정.
-// 'door' 또는 CLEAR_SFX 등급명('perfect'/'success'/'half')을 받는다.
+// 'door' 또는 CLEAR_SFX 등급명('perfect'/'success'/'half')을 받는다. 등급명일 때는 그
+// 효과음 타이밍에 맞춰 번 돈도 함께 반영한다(HUD 숫자가 소리 없이 먼저 올라가지 않게).
 function playLineSfx(name) {
     if (!name) return;
     if (name === 'door') { playDoorSfx(); return; }
-    if (clearSfx[name]) playClearSfx(name);
+    if (!CHAR_CONFIG.CLEAR_SFX[name]) return;
+    playClearSfx(name);
+    awardStageMoney();
+}
+
+// 보수 지급 — 기본적으로 등급 sfx가 재생되는 대사 줄에서 소리와 함께 반영되지만,
+// 대사 편집으로 sfx 속성이 빠지거나 중복돼도 정확히 한 번만 지급되도록 플래그로 방어.
+// (전환 대사 직전에도 한 번 더 호출해 누락 케이스를 잡는다)
+function awardStageMoney() {
+    if (moneyAwarded || !player.lastResult) return;
+    if (typeof window.sweepAddMoney !== 'function') return;
+    moneyAwarded = true;
+    window.sweepAddMoney(player.lastResult.money);
+}
+
+// ===== 음소거 =====
+// UIMuteButton(world/ui.js)의 onToggle에서 호출. BGM은 pause/play, 효과음은 AudioContext
+// 자체를 suspend/resume — 개별 SFX 재생 코드는 손댈 필요가 없다.
+let audioMuted = false;
+
+function setAudioMuted(muted) {
+    audioMuted = muted;
+    if (muted) {
+        if (bgm) bgm.pause();
+        if (audioCtx) audioCtx.suspend().catch(() => { });
+    } else {
+        if (bgm) bgm.play().catch(() => { });
+        if (audioCtx) audioCtx.resume().catch(() => { });
+    }
 }
 
 // ===== BGM =====
@@ -473,14 +533,18 @@ function playLineSfx(name) {
 //   - 자동재생 정책: 첫 play()가 거부되면 이후 사용자 제스처마다 재시도
 //   - iOS 화면 잠금/앱 전환: 복귀 신호(visibilitychange/focus/pageshow)에서 재개
 //   - 핸들러는 once 없이 유지 — iOS는 언제든 오디오를 끊을 수 있어 일회성으론 부족
+// 단, 사용자가 직접 음소거했으면(audioMuted) 이 신호들이 되살리지 않게 막는다.
 function setupBgm() {
     bgm = new Audio(CHAR_CONFIG.BGM_SRC);
     bgm.loop = true;
     bgm.volume = CHAR_CONFIG.BGM_VOLUME;
     bgm.preload = 'auto';
 
+    // BGM + 효과음용 AudioContext 둘 다 같은 제스처 신호로 복구한다.
     const resume = () => {
+        if (audioMuted) return;
         if (bgm && bgm.paused) bgm.play().catch(() => { });
+        if (audioCtx && audioCtx.state !== 'running') audioCtx.resume().catch(() => { });
     };
     document.addEventListener('visibilitychange', () => {
         if (document.visibilityState === 'visible') resume();
@@ -552,6 +616,28 @@ function playerUpdate(dt) {
         }
     }
 
+    // 스테이지 전환 페이드 — player.state와 무관하게 여기서 전부 처리하고, 진행 중엔
+    // 다른 로직(이동 등)이 안 끼어들게 그대로 리턴한다.
+    if (fadePhase === 'out') {
+        fadeT += dt;
+        const t = Math.min(1, fadeT / CHAR_CONFIG.STAGE_FADE_DURATION);
+        setFadeOpacity(t);
+        if (t >= 1) {
+            window.sweepStage.applyStage(pendingStageIndex);
+            loadStage();
+            fadePhase = 'in';
+            fadeT = 0;
+        }
+        return;
+    }
+    if (fadePhase === 'in') {
+        fadeT += dt;
+        const t = Math.min(1, fadeT / CHAR_CONFIG.STAGE_FADE_DURATION);
+        setFadeOpacity(1 - t);
+        if (t >= 1) fadePhase = 'none';
+        return;
+    }
+
     if (player.state === 'idle') {
         const input = readInput();
         if (input && !isInteracting()) tryStep(input);
@@ -602,10 +688,9 @@ function playerUpdate(dt) {
                 if (!masterVisible) playDoorSfx();   // 이미 등장해 있었으면(넘긴 경우) 다시 들어오는 게 아님
                 masterVisible = true;   // 넘기지 않고 클리어했으면 이 시점에 등장
                 if (typeof window.sweepGetStageResult === 'function') {
+                    // 번 돈 반영은 여기서 하지 않는다 — 해당 등급 sfx가 재생되는 대사 줄
+                    // (playLineSfx)에서 소리와 함께 올라가야 자연스럽다.
                     player.lastResult = window.sweepGetStageResult(player.stepCount);
-                    if (typeof window.sweepAddMoney === 'function') {
-                        window.sweepAddMoney(player.lastResult.money);
-                    }
                     queueSay(DIALOGUE.clear[player.lastResult.grade] || DIALOGUE.clear.half);
                 }
                 return;
@@ -625,6 +710,7 @@ function playerUpdate(dt) {
         // 그것까지 닫힌 뒤에야 아래 전환 딜레이로 넘어간다
         if (!transitionSaid) {
             transitionSaid = true;
+            awardStageMoney();   // 평가 대사에 등급 sfx 줄이 없었어도 여기서 반드시 지급
             const money = (typeof window.sweepGetTotalMoney === 'function') ? window.sweepGetTotalMoney() : 0;
             queueSay(money >= CHAR_CONFIG.MONEY_GOAL ? DIALOGUE.next.over : DIALOGUE.next.under);
             return;
@@ -637,8 +723,9 @@ function playerUpdate(dt) {
             if (st.count > 1) {
                 while (next === st.index) next = Math.floor(Math.random() * st.count);
             }
-            st.applyStage(next);
-            loadStage();
+            pendingStageIndex = next;
+            fadePhase = 'out';
+            fadeT = 0;
         }
     }
 }
