@@ -77,19 +77,21 @@ const DIALOGUE = {
         { text: '이봐 아직 멀었어? 요령이 좋아야지!!', speaker: 'master' },
         { text: '…제길, 왜 내가 이런 일을 해야만 하지?', speaker: 'ataho' }
     ],
-    // 각 줄의 sfx: 그 줄이 뜨는 시점에 재생할 효과음('door' | CLEAR_SFX 등급명). 생략 가능.
+    // 각 줄에 붙는 두 속성은 서로 독립적으로 지정한다(다른 줄에 따로 달아도 됨):
+    //   sfx: 그 줄이 뜨는 시점에 재생할 효과음('door' | CLEAR_SFX 등급명)
+    //   pay: true면 그 줄이 뜨는 시점에 이번 클리어 보수를 지급
     clear: {
         perfect: [
-            { text: '호오… 벌써 끝냈나? 꽤 잘하는구만', speaker: 'master', sfx: 'perfect' },
+            { text: '호오… 벌써 끝냈나? 꽤 잘하는구만', speaker: 'master', sfx: 'perfect', pay: true },
             { text: '이런 거야 식은 죽 먹기지', speaker: 'ataho' }
         ],
         success: [
-            { text: '겨우 끝냈군, 어쨌든 합격일세!', speaker: 'master', sfx: 'success' },
+            { text: '겨우 끝냈군, 어쨌든 합격일세!', speaker: 'master', sfx: 'success', pay: true },
             { text: '조금만 분발했으면 최단 루트로도 가능했는데', speaker: 'ataho' }
         ],
         half: [
             { text: '겨우 끝냈군', speaker: 'master' },
-            { text: '시간을 초과했으니 유감이네만 청소비는 75G네!', speaker: 'master', sfx: 'half' },
+            { text: '시간을 초과했으니 유감이네만 청소비는 75G네!', speaker: 'master', sfx: 'half', pay: true },
             { text: '뭐라구!?', speaker: 'ataho' }
         ]
     },
@@ -221,20 +223,25 @@ function checkHalfWarning() {
 let dialogueQueue = [];
 let dialogueOnComplete = null;
 
+// 줄 하나를 실제로 띄우면서 그 줄에 달린 부수 효과(sfx, 보수 지급)를 독립적으로 처리한다 —
+// 둘은 서로 다른 줄에 따로 달 수 있어야 해서 한쪽에 얹어가는 방식(sfx 안에서 지급)을 쓰지 않는다.
+function showLine(line) {
+    if (line.sfx) playLineSfx(line.sfx);
+    if (line.pay) awardStageMoney();
+    window.sweepSay(line.text, line.speaker);
+}
+
 function queueSay(lines, onComplete) {
     if (!lines || !lines.length) return;
     dialogueQueue = lines.slice(1);
     dialogueOnComplete = onComplete || null;
-    playLineSfx(lines[0].sfx);
-    window.sweepSay(lines[0].text, lines[0].speaker);
+    showLine(lines[0]);
 }
 
 function advanceDialogueQueue() {
     if (isInteracting()) return;
     if (dialogueQueue.length > 0) {
-        const next = dialogueQueue.shift();
-        playLineSfx(next.sfx);
-        window.sweepSay(next.text, next.speaker);
+        showLine(dialogueQueue.shift());
     } else if (dialogueOnComplete) {
         const cb = dialogueOnComplete;
         dialogueOnComplete = null;
@@ -492,14 +499,12 @@ function playClearSfx(grade) {
 function playDoorSfx() { playSfxBuffer(CHAR_CONFIG.DOOR_SFX); }
 
 // 대사 줄의 sfx 속성 처리 — DIALOGUE 테이블에서 어느 줄이 뜰 때 효과음이 나올지 지정.
-// 'door' 또는 CLEAR_SFX 등급명('perfect'/'success'/'half')을 받는다. 등급명일 때는 그
-// 효과음 타이밍에 맞춰 번 돈도 함께 반영한다(HUD 숫자가 소리 없이 먼저 올라가지 않게).
+// 'door' 또는 CLEAR_SFX 등급명('perfect'/'success'/'half')을 받는다. 보수 지급 타이밍은
+// 별도 속성(pay)이라 여기서 다루지 않는다 — showLine() 참고.
 function playLineSfx(name) {
     if (!name) return;
     if (name === 'door') { playDoorSfx(); return; }
-    if (!CHAR_CONFIG.CLEAR_SFX[name]) return;
-    playClearSfx(name);
-    awardStageMoney();
+    if (CHAR_CONFIG.CLEAR_SFX[name]) playClearSfx(name);
 }
 
 // 보수 지급 — 기본적으로 등급 sfx가 재생되는 대사 줄에서 소리와 함께 반영되지만,

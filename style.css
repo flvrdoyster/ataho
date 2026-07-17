@@ -396,6 +396,10 @@ video:fullscreen::cue {
     font-size: 1rem;
     /* 한 줄 최대 한글 20자(1자≈1em) 기준. 좁은 화면에서는 85vw로 캡. */
     max-width: min(20em, 85vw);
+    /* 폭을 내용 기준으로 고정 — absolute 요소의 shrink-to-fit은 transform(translateX(-50%))
+       이동 전의 left 지점부터 남은 공간으로 계산해서, 화자가 화면 오른쪽에 있으면
+       max-width에 못 미쳐도 조기 개행되는 문제가 있었다 */
+    width: max-content;
     z-index: 2000;
     /* 탭/클릭으로 다음 줄 넘기기 가능 — 떠 있는 동안은 이미 입력이 잠겨 있어(대사 중)
        다른 조작과 겹치지 않는다 */

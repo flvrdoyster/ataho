@@ -98,8 +98,9 @@
       되밟기 α=0이면 true. `o_1`/`o_3`만 false(각 1칸 되밟기 필요), 나머지 10개는 true.
       `stage_editor.html`의 `serialize()`도 이 필드를 보존하도록 함께 수정 (2026-07-16) ✔
     - 오이스터가 에디터로 `o_13`~`o_16` 4개 방 추가 (2026-07-16). `calc_minsteps.js`로
-      minSteps/hamiltonian 계산 완료(56/true, 46/false, 26/true, 47/true) — 원작 재현
-      방 총 16개 ✔
+      minSteps/hamiltonian 계산 완료(56/true, 46/false, 26/true, 47/true) ✔
+    - `o_17`~`o_19` 3개 방 추가 (2026-07-17), minSteps/hamiltonian 계산 완료
+      (46/false, 55/true, 50/true) — 원작 재현 방 총 19개 ✔
 - [x] **걸음 수 채점 & 보수**
   - 걸음 수 카운트 (`char_sweep.js` — `player.stepCount`, 성공 이동마다 +1, 스테이지 로드 시 리셋,
     `window.sweepGetStepCount()`로 조회) ✔
