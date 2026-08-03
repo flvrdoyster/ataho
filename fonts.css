@@ -32,9 +32,10 @@
 }
 
 /* Dokkaebi DNR Gothic — 자체 프로젝트 픽셀 한글 폰트, world/ui.css(--ui-font)의
-   새 기본값. github.com/flvrdoyster/font 의 v1.0.0 릴리스 산출물을 그대로
-   자체 서빙(world/ui/DokkaebiDNRGothic-*.woff2). 업데이트 시 그 레포의 새
-   릴리스에서 다시 받아 이 두 파일을 갈아끼우면 된다. */
+   새 기본값. github.com/flvrdoyster/font 릴리스 산출물을 그대로 자체 서빙
+   (world/ui/DokkaebiDNRGothic-*.woff2). .github/workflows/update-dokkaebi-font.yml
+   이 매일 그 레포의 최신 릴리스를 확인해 자동으로 갈아끼우고 커밋한다
+   (버전 추적: world/ui/DokkaebiDNRGothic.version). */
 @font-face {
     font-family: 'Dokkaebi DNR Gothic';
     src: url('world/ui/DokkaebiDNRGothic-Regular.woff2') format('woff2');

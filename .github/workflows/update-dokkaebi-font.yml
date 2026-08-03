@@ -1,0 +1,49 @@
+name: Update Dokkaebi DNR Gothic font
+
+on:
+  schedule:
+    - cron: '0 0 * * *'
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+jobs:
+  update-font:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check latest flvrdoyster/font release
+        id: check
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          latest=$(gh release view -R flvrdoyster/font --json tagName -q .tagName)
+          current=$(cat world/ui/DokkaebiDNRGothic.version)
+          echo "latest=$latest" >> "$GITHUB_OUTPUT"
+          if [ "$latest" != "$current" ]; then
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Download new font assets
+        if: steps.check.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release download "${{ steps.check.outputs.latest }}" -R flvrdoyster/font \
+            -p "DokkaebiDNRGothic-Regular.woff2" \
+            -p "DokkaebiDNRGothic-Bold.woff2" \
+            -D world/ui --clobber
+          echo "${{ steps.check.outputs.latest }}" > world/ui/DokkaebiDNRGothic.version
+
+      - name: Commit and push
+        if: steps.check.outputs.changed == 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add world/ui/DokkaebiDNRGothic-Regular.woff2 world/ui/DokkaebiDNRGothic-Bold.woff2 world/ui/DokkaebiDNRGothic.version
+          git commit -m "도깨비 DNR 고딕 폰트 ${{ steps.check.outputs.latest }}로 업데이트"
+          git push
