@@ -6,7 +6,10 @@
  * 경로를 바꿔야 하면 --ui-frame-src 로 override:
  *   :root { --ui-frame-src: url('../world/ui/frame.png'); }
  *
- * 폰트는 도트 한글 폰트 DungGeunMo (fonts.css, 자체 서빙) 사용 — 별도 로드 필요.
+ * 폰트는 도트 한글 폰트 Dokkaebi DNR Gothic (fonts.css, 자체 서빙) 사용 —
+ * 별도 로드 필요. 자체 프로젝트 폰트로 교체(2026-08, github.com/flvrdoyster/font
+ * v1.0.0) — 이전엔 DungGeunMo였고, swim/swim2.js는 캔버스 렌더링이라 이 변수와
+ * 무관하게 여전히 DungGeunMo를 직접 쓴다(별개 전환).
  * KoddiUDOnGothic(사이트 공통 본문 서체)은 곡선이 매끈해 픽셀 UI에는 안 맞아 폴백으로만 둠.
  */
 
@@ -14,7 +17,8 @@
     --ui-frame-src: url('ui/frame.png');
     --ui-cursor-src: url('ui/cursor.png');
     --ui-bg: rgba(33, 66, 123, 1);
-    --ui-font: 'DungGeunMo', 'KoddiUDOnGothic', sans-serif;
+    --ui-font: 'Dokkaebi DNR Gothic', 'KoddiUDOnGothic', sans-serif;
+    --ui-font-weight: bold;   /* Dokkaebi DNR Gothic Regular는 얇아서 HUD엔 Bold가 나음 */
     --ui-hud-item-gap: 24px;   /* .ui-hud-stats 내부(번 돈 / 걸음 수 등) 및 옆의 아이콘 버튼과 공용 */
     /* 아래 세 값은 폴백 기본값 — world/ui.js의 UI_CONFIG(FONT_SIZE/CURSOR_WIDTH/
        CURSOR_HEIGHT/PANEL_BORDER)가 로드 시 덮어씀. 실제 조정은 거기서. */
@@ -51,6 +55,7 @@
     align-items: center;
     color: white;
     font-family: var(--ui-font);
+    font-weight: var(--ui-font-weight);
     font-size: var(--ui-font-size);
     white-space: nowrap;   /* 좁은 화면에서 width:fit-content가 줄어들 때 라벨 텍스트가
                                중간에서 줄바꿈되는 것 방지 — 대신 필요하면 화면 밖으로 넘침 */
@@ -128,6 +133,7 @@
     border: 1px solid rgba(255, 255, 255, 0.2);
     color: rgba(230, 230, 230, 0.95);   /* 아이콘 currentColor 소스 */
     font-family: var(--ui-font);
+    font-weight: var(--ui-font-weight);
     font-size: var(--ui-font-size);
     touch-action: none;
     user-select: none;
@@ -185,6 +191,7 @@
     gap: 4px;
     color: white;
     font-family: var(--ui-font);
+    font-weight: var(--ui-font-weight);
 }
 
 .ui-panel-title {
@@ -202,6 +209,7 @@
 .ui-panel-actions button {
     flex: 1;
     font-family: var(--ui-font);
+    font-weight: var(--ui-font-weight);
     font-size: var(--ui-font-size);
     color: white;
     background: transparent;
