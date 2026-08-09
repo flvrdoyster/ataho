@@ -21,19 +21,21 @@ jobs:
       - name: Install dependencies
         run: pip install google-analytics-data google-auth
 
+      # 속성 ID는 시크릿이 아니다 — 공개돼도 서비스 계정 권한 없이는 아무것도 못 읽는다.
       - name: Fetch GA4 data
         env:
           GA4_SERVICE_ACCOUNT_JSON: ${{ secrets.GA4_SERVICE_ACCOUNT_JSON }}
-          GA4_PROPERTY_ID: '516513119'
+          GA4_PROPERTY_ID: '516513119'        # 사이트 (atah.io / pc98 / suiko)
+          GA4_BLOG_PROPERTY_ID: '549191220'   # 블로그 (oysterbay.tistory.com)
         run: python scripts/ga4_dashboard.py
 
       # 페이지(dashboard/index.html·dashboard.css·dashboard.js)는 손으로 관리한다.
-      # 이 워크플로우는 데이터 파일만 건드리므로 add 대상도 그것 하나뿐이다.
+      # 이 워크플로우는 data/ 아래 데이터 파일만 건드린다.
       - name: Commit and push
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add dashboard/data/ga4.js
+          git add dashboard/data/
           if git diff --cached --quiet; then
             echo "No changes to commit"
           else

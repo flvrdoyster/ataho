@@ -1,6 +1,7 @@
 // 이 파일은 자동 생성됩니다 — scripts/ga4_dashboard.py 가 매일 덮어씁니다.
-// 직접 고치지 마세요. 페이지 쪽 수정은 dashboard/index.html 에서.
-window.GA4_DATA = {
+// 직접 고치지 마세요. 페이지 쪽 수정은 dashboard/ 의 html·css·js 에서.
+window.DASHBOARD_DATA = window.DASHBOARD_DATA || {};
+window.DASHBOARD_DATA['ga4'] = {
  "channels": [
   {
    "name": "Referral",
@@ -74,7 +75,7 @@ window.GA4_DATA = {
    "views": 52
   },
   {
-   "avgDuration": 211.43667426666667,
+   "avgDuration": 211.43667426666664,
    "date": "2026-07-15",
    "engagementRate": 0.8,
    "newUsers": 7,
@@ -155,7 +156,7 @@ window.GA4_DATA = {
    "views": 32
   },
   {
-   "avgDuration": 15.956415999999999,
+   "avgDuration": 15.956416,
    "date": "2026-07-24",
    "engagementRate": 0.5,
    "newUsers": 5,
@@ -200,7 +201,7 @@ window.GA4_DATA = {
    "views": 81
   },
   {
-   "avgDuration": 788.2639789310344,
+   "avgDuration": 788.2639789310346,
    "date": "2026-07-29",
    "engagementRate": 0.8620689655172413,
    "newUsers": 20,
@@ -272,7 +273,7 @@ window.GA4_DATA = {
    "views": 45
   },
   {
-   "avgDuration": 253.933289,
+   "avgDuration": 253.93328900000003,
    "date": "2026-08-06",
    "engagementRate": 0.64,
    "newUsers": 11,
@@ -281,7 +282,7 @@ window.GA4_DATA = {
    "views": 32
   },
   {
-   "avgDuration": 297.2478718260869,
+   "avgDuration": 297.24787182608696,
    "date": "2026-08-07",
    "engagementRate": 0.4782608695652174,
    "newUsers": 13,
@@ -534,112 +535,114 @@ window.GA4_DATA = {
   }
  ],
  "meta": {
+  "key": "ga4",
+  "label": "사이트",
   "propertyId": "516513119",
   "trendDays": 28,
-  "updatedAt": "2026-08-09 19:24"
+  "updatedAt": "2026-08-09 22:00"
  },
  "pages": [
   {
-   "host": "pc98.atah.io",
-   "path": "/kitan.html",
+   "name": "/kitan.html",
+   "note": "pc98.atah.io",
    "secPerView": 135.21212121212122,
    "users": 29,
    "views": 66
   },
   {
-   "host": "suiko.atah.io",
-   "path": "/kr.html",
+   "name": "/kr.html",
+   "note": "suiko.atah.io",
    "secPerView": 218.6829268292683,
    "users": 20,
    "views": 41
   },
   {
-   "host": "pc98.atah.io",
-   "path": "/torimono.html",
+   "name": "/torimono.html",
+   "note": "pc98.atah.io",
    "secPerView": 150.1578947368421,
    "users": 10,
    "views": 38
   },
   {
-   "host": "pc98.atah.io",
-   "path": "/hukyou.html",
+   "name": "/hukyou.html",
+   "note": "pc98.atah.io",
    "secPerView": 41.43333333333333,
    "users": 22,
    "views": 30
   },
   {
-   "host": "pc98.atah.io",
-   "path": "/kaitou.html",
+   "name": "/kaitou.html",
+   "note": "pc98.atah.io",
    "secPerView": 237.19230769230768,
    "users": 8,
    "views": 26
   },
   {
-   "host": "atah.io",
-   "path": "/sweep/index.html",
+   "name": "/sweep/index.html",
+   "note": "atah.io",
    "secPerView": 10.2,
    "users": 24,
    "views": 25
   },
   {
-   "host": "pc98.atah.io",
-   "path": "/",
+   "name": "/",
+   "note": "pc98.atah.io",
    "secPerView": 5.333333333333333,
    "users": 10,
    "views": 15
   },
   {
-   "host": "atah.io",
-   "path": "/haiyuki_manual/index.html",
+   "name": "/haiyuki_manual/index.html",
+   "note": "atah.io",
    "secPerView": 15.727272727272727,
    "users": 4,
    "views": 11
   },
   {
-   "host": "atah.io",
-   "path": "/",
+   "name": "/",
+   "note": "atah.io",
    "secPerView": 17.571428571428573,
    "users": 5,
    "views": 7
   },
   {
-   "host": "atah.io",
-   "path": "/haiyuki_web/",
+   "name": "/haiyuki_web/",
+   "note": "atah.io",
    "secPerView": 296.1666666666667,
    "users": 3,
    "views": 6
   },
   {
-   "host": "suiko.atah.io",
-   "path": "/debug.html",
+   "name": "/debug.html",
+   "note": "suiko.atah.io",
    "secPerView": 151.5,
    "users": 1,
    "views": 4
   },
   {
-   "host": "atah.io",
-   "path": "/haiyuki_web/index.html",
+   "name": "/haiyuki_web/index.html",
+   "note": "atah.io",
    "secPerView": 43.333333333333336,
    "users": 1,
    "views": 3
   },
   {
-   "host": "atah.io",
-   "path": "/scene_viewer/scene.html",
+   "name": "/scene_viewer/scene.html",
+   "note": "atah.io",
    "secPerView": 16.0,
    "users": 2,
    "views": 3
   },
   {
-   "host": "atah.io",
-   "path": "/balance/index.html",
+   "name": "/balance/index.html",
+   "note": "atah.io",
    "secPerView": 11.5,
    "users": 2,
    "views": 2
   },
   {
-   "host": "pc98.atah.io",
-   "path": "/kitan-opening.html",
+   "name": "/kitan-opening.html",
+   "note": "pc98.atah.io",
    "secPerView": 84.5,
    "users": 2,
    "views": 2

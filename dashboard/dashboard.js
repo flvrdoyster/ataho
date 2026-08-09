@@ -1,5 +1,7 @@
-/* atah.io 대시보드 — data/ga4.js 의 window.GA4_DATA 를 화면으로 그린다.
+/* atah.io 대시보드 — data/*.js 가 window.DASHBOARD_DATA 에 넣어 둔 대상들을 탭으로 그린다.
    데이터는 scripts/ga4_dashboard.py 가 매일 새로 쓰고, 이 파일은 손으로 관리한다.
+   대상을 늘리려면 수집 스크립트에 Target 을 추가하고 index.html 에 <script> 한 줄만
+   더하면 된다 — 탭은 여기서 자동으로 만들어진다.
 
    차트 규칙(고쳐도 되지만 이유는 알고 고치세요):
    - y축은 하나만. 크기가 다른 두 지표를 한 그림에 겹치지 않는다.
@@ -9,10 +11,13 @@
 (function () {
     'use strict';
 
-    const data = window.GA4_DATA;
-    const root = document.getElementById('ga4');
-    if (!data) {
-        root.innerHTML = '<p class="empty">아직 수집된 데이터가 없습니다.' +
+    const registry = window.DASHBOARD_DATA || {};
+    const nav = document.getElementById('dash-nav');
+    const panelRoot = document.getElementById('dash-panels');
+    const views = Object.keys(registry).map((key) => ({ key, data: registry[key] }));
+
+    if (!views.length) {
+        panelRoot.innerHTML = '<p class="empty">아직 수집된 데이터가 없습니다.' +
             '<br>GitHub Actions의 <b>GA4 Daily Dashboard</b> 워크플로우가 한 번 돌면 채워집니다.</p>';
         return;
     }
@@ -256,8 +261,16 @@
         });
     }
 
-    // --- 조각들 --------------------------------------------------------
+    // --- 화면 한 벌 ----------------------------------------------------
+    function buildHTML(data, key) {
     const parts = [];
+
+    if (!data.daily.length) {
+        return `<p class="meta-line">마지막 갱신 ${esc(data.meta.updatedAt)} KST · ` +
+            `GA4 속성 ${esc(data.meta.propertyId)}</p>` +
+            '<p class="empty">아직 이 대상에서 집계된 하루가 없습니다.' +
+            '<br>측정 코드를 심은 다음 날부터 채워집니다.</p>';
+    }
 
     /* 데일리 카운터 — 이 페이지가 말하는 숫자는 "어제 하루"다.
        데이터가 매일 아침 07:00에 한 번만 갱신되므로 그 시점의 "오늘"은 새벽치뿐이라
@@ -317,7 +330,7 @@
     parts.push(`<div class="card">
         <h2>일별 활성 사용자 · 세션</h2>
         <p class="card-note">최근 ${data.meta.trendDays}일 (어제까지)</p>
-        <div class="chart-box tall"><canvas id="c-daily"></canvas></div>
+        <div class="chart-box tall"><canvas id="c-daily-${key}"></canvas></div>
         ${tableView('표로 보기', ['날짜', '활성 사용자', '신규', '세션', '참여율', '평균 체류'],
             data.daily.slice().reverse().map((d) => [
                 d.date, fmt(d.users), fmt(d.newUsers), fmt(d.sessions),
@@ -326,42 +339,45 @@
 
     // 사이트별 / 코너별 — 항목마다 스파크라인을 붙인 소형 다중 그래프
     function rankTable(rows, nameHead, unitHead) {
-        return `<table class="rank"><thead><tr>` +
+        return `<div class="scroll"><table class="rank"><thead><tr>` +
             `<th>${esc(nameHead)}</th><th class="spark-cell">최근 ${data.meta.trendDays}일</th>` +
             `<th class="num">${esc(unitHead)}</th><th class="num">지난 7일 대비</th></tr></thead><tbody>` +
             rows.map((r) => `<tr><td class="name">${esc(r.name)}</td>` +
                 `<td class="spark-cell">${sparkline(r.daily, 120, 24)}</td>` +
                 `<td class="num">${fmt(r.cur)}</td>` +
                 `<td class="num">${deltaHTML(r.delta, '')}</td></tr>`).join('') +
-            `</tbody></table>`;
+            `</tbody></table></div>`;
     }
 
-    parts.push(`<div class="grid">
-        <div class="card">
-            <h2>사이트별 조회수</h2>
-            <p class="card-note">이 GA4 속성이 받는 호스트 전부 · 로컬(localhost·사설 IP) 방문은 제외</p>
-            ${rankTable(data.sites, '사이트', '최근 7일')}
-        </div>
-        <div class="card">
-            <h2>atah.io 코너별 조회수</h2>
-            <p class="card-note">경로 앞부분으로 묶음</p>
-            ${rankTable(data.sections, '코너', '최근 7일')}
-        </div>
-    </div>`);
+    // 호스트가 하나뿐인 대상(블로그)에는 이 둘이 무의미해서 수집 단계에서 비어 온다.
+    if (data.sites.length || data.sections.length) {
+        parts.push(`<div class="grid">
+            ${data.sites.length ? `<div class="card">
+                <h2>사이트별 조회수</h2>
+                <p class="card-note">이 GA4 속성이 받는 호스트 전부 · 로컬(localhost·사설 IP) 방문은 제외</p>
+                ${rankTable(data.sites, '사이트', '최근 7일')}
+            </div>` : ''}
+            ${data.sections.length ? `<div class="card">
+                <h2>atah.io 코너별 조회수</h2>
+                <p class="card-note">경로 앞부분으로 묶음</p>
+                ${rankTable(data.sections, '코너', '최근 7일')}
+            </div>` : ''}
+        </div>`);
+    }
 
     // 유입
     parts.push(`<div class="grid">
         <div class="card">
             <h2>유입 채널별 세션</h2>
             <p class="card-note">최근 7일</p>
-            <div class="chart-box"><canvas id="c-channels"></canvas></div>
+            <div class="chart-box"><canvas id="c-channels-${key}"></canvas></div>
             ${tableView('표로 보기', ['채널', '세션', '사용자'],
                 data.channels.map((c) => [esc(c.name), fmt(c.sessions), fmt(c.users)]))}
         </div>
         <div class="card">
             <h2>어디서 오는가 (Referral)</h2>
             <p class="card-note">최근 7일 · 링크를 타고 들어온 경우만</p>
-            <div class="chart-box"><canvas id="c-referral"></canvas></div>
+            <div class="chart-box"><canvas id="c-referral-${key}"></canvas></div>
             ${tableView('표로 보기', ['출처', '세션', '사용자'],
                 data.referral.map((r) => [esc(r.name), fmt(r.sessions), fmt(r.users)]))}
         </div>
@@ -397,14 +413,14 @@
     </div>`);
 
     // 점유율 막대 — 항목이 2~3개인 부분-전체는 파이 대신 한 줄 막대
-    function shareCard(title, note, items, key, unit) {
-        const total = items.reduce((a, i) => a + i[key], 0);
+    function shareCard(title, note, items, field, unit) {
+        const total = items.reduce((a, i) => a + i[field], 0);
         const bar = items.map((i, n) =>
-            `<span style="flex:${i[key] || 0.0001};background:${C.series[n]}" ` +
-            `title="${esc(i.name)} ${fmt(i[key])}${unit}"></span>`).join('');
+            `<span style="flex:${i[field] || 0.0001};background:${C.series[n]}" ` +
+            `title="${esc(i.name)} ${fmt(i[field])}${unit}"></span>`).join('');
         const legend = items.map((i, n) =>
             `<span><i class="key" style="background:${C.series[n]}"></i>${esc(i.name)} ` +
-            `<b>${fmt(i[key])}${unit}</b> (${pct(share(i[key], total))})</span>`).join('');
+            `<b>${fmt(i[field])}${unit}</b> (${pct(share(i[field], total))})</span>`).join('');
         return `<div class="card"><h2>${esc(title)}</h2><p class="card-note">${esc(note)}</p>` +
             `<div class="share-bar">${bar}</div><div class="share-legend">${legend}</div></div>`;
     }
@@ -417,40 +433,82 @@
     // 인기 페이지 / 국가
     parts.push(`<div class="grid">
         <div class="card">
-            <h2>인기 페이지</h2>
+            <h2>${data.sites.length ? '인기 페이지' : '인기 글'}</h2>
             <p class="card-note">최근 7일 · 조회수 상위 ${data.pages.length}개</p>
-            <table class="rank"><thead><tr><th>페이지</th><th class="num">조회</th>
+            <div class="scroll"><table class="rank"><thead><tr>
+                <th>${data.sites.length ? '페이지' : '글'}</th><th class="num">조회</th>
                 <th class="num">사용자</th><th class="num">조회당 체류</th></tr></thead><tbody>
-                ${data.pages.map((p) => `<tr><td><span class="host">${esc(p.host)}</span>` +
-                    `<span class="path">${esc(p.path)}</span></td>` +
+                ${data.pages.map((p) => `<tr><td>` +
+                    (p.note ? `<span class="host">${esc(p.note)}</span>` : '') +
+                    `<span class="path">${esc(p.name)}</span></td>` +
                     `<td class="num">${fmt(p.views)}</td><td class="num">${fmt(p.users)}</td>` +
                     `<td class="num">${dur(p.secPerView)}</td></tr>`).join('')}
-            </tbody></table>
+            </tbody></table></div>
         </div>
         <div class="card">
             <h2>국가</h2>
             <p class="card-note">최근 7일 활성 사용자 상위 ${data.countries.length}개국</p>
-            <table class="rank"><thead><tr><th>국가</th><th class="num">사용자</th></tr></thead><tbody>
+            <div class="scroll"><table class="rank"><thead><tr><th>국가</th><th class="num">사용자</th></tr></thead><tbody>
                 ${data.countries.map((c) => `<tr><td class="name">${esc(c.name)}</td>` +
                     `<td class="num">${fmt(c.users)}</td></tr>`).join('')}
-            </tbody></table>
+            </tbody></table></div>
         </div>
     </div>`);
 
     parts.push(`<p class="meta-line">GA4 속성 ${esc(data.meta.propertyId)} · Google Analytics Data API · ` +
         `GitHub Actions가 매일 07:00 KST에 갱신</p>`);
 
-    root.innerHTML = parts.join('');
+    return parts.join('');
+    }
 
-    // --- 캔버스 차트 ---------------------------------------------------
-    lineChart(document.getElementById('c-daily'), data.daily.map((d) => mmdd(d.date)), [
-        { label: '활성 사용자', data: data.daily.map((d) => d.users), fill: true },
-        { label: '세션', data: data.daily.map((d) => d.sessions), fill: true },
-    ]);
+    /* 캔버스 차트는 패널이 화면에 나온 뒤에 만든다 — 숨어 있는(display:none) 칸에서
+       만들면 Chart.js가 크기를 0으로 재서 탭을 눌렀을 때 찌그러진 채로 나온다. */
+    function makeCharts(data, key) {
+        const at = (id) => document.getElementById(`${id}-${key}`);
+        if (!at('c-daily')) return;   // 데이터가 없어 빈 화면을 그린 경우
 
-    barChart(document.getElementById('c-channels'),
-        data.channels.map((c) => c.name), data.channels.map((c) => c.sessions), '세션');
+        lineChart(at('c-daily'), data.daily.map((d) => mmdd(d.date)), [
+            { label: '활성 사용자', data: data.daily.map((d) => d.users), fill: true },
+            { label: '세션', data: data.daily.map((d) => d.sessions), fill: true },
+        ]);
+        barChart(at('c-channels'),
+            data.channels.map((c) => c.name), data.channels.map((c) => c.sessions), '세션');
+        barChart(at('c-referral'),
+            data.referral.map((r) => r.name), data.referral.map((r) => r.sessions), '세션');
+    }
 
-    barChart(document.getElementById('c-referral'),
-        data.referral.map((r) => r.name), data.referral.map((r) => r.sessions), '세션');
+    // --- 탭 ------------------------------------------------------------
+    const charted = new Set();
+
+    nav.innerHTML = views.map((v, i) =>
+        `<a href="#${esc(v.key)}" data-key="${esc(v.key)}"${i === 0 ? ' class="active"' : ''}>` +
+        `${esc(v.data.meta.label || v.key)}</a>`).join('');
+
+    panelRoot.innerHTML = views.map((v, i) =>
+        `<section class="panel" data-key="${esc(v.key)}"${i === 0 ? '' : ' hidden'}>` +
+        `${buildHTML(v.data, v.key)}</section>`).join('');
+
+    function activate(key) {
+        if (!views.some((v) => v.key === key)) return;
+        nav.querySelectorAll('a').forEach((a) =>
+            a.classList.toggle('active', a.dataset.key === key));
+        panelRoot.querySelectorAll('.panel').forEach((p) => {
+            p.hidden = p.dataset.key !== key;
+        });
+        if (!charted.has(key)) {
+            charted.add(key);
+            makeCharts(registry[key], key);
+        }
+    }
+
+    nav.addEventListener('click', (e) => {
+        const a = e.target.closest('a[data-key]');
+        if (!a) return;
+        e.preventDefault();
+        history.replaceState(null, '', `#${a.dataset.key}`);
+        activate(a.dataset.key);
+    });
+
+    const fromHash = window.location.hash.slice(1);
+    activate(views.some((v) => v.key === fromHash) ? fromHash : views[0].key);
 })();

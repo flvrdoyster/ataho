@@ -130,12 +130,8 @@ a:hover {
     display: flex;
     flex-wrap: wrap;
     align-items: flex-end;
-    gap: 20px 44px;
-    margin-bottom: 16px;
-    padding: 22px;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 10px;
+    gap: 20px 56px;
+    padding-bottom: 28px;
 }
 
 .hero-main {
@@ -186,7 +182,9 @@ a:hover {
 }
 
 .row-title {
-    margin: 24px 0 10px;
+    margin: 36px 0 16px;
+    padding-top: 18px;
+    border-top: 1px solid var(--border);
     font-size: 0.8125rem;
     font-weight: 400;
     color: var(--text-muted);
@@ -194,13 +192,10 @@ a:hover {
 
 /* --- 인사이트 ------------------------------------------------------ */
 .insights {
-    margin: 0 0 20px;
-    padding: 14px 18px;
+    margin: 0;
+    padding: 2px 0 2px 16px;
     list-style: none;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-left: 3px solid var(--series-1);
-    border-radius: 8px;
+    border-left: 2px solid var(--series-1);
 }
 
 .insights li {
@@ -217,20 +212,21 @@ a:hover {
     font-weight: 700;
 }
 
-/* --- 카드 & 그리드 -------------------------------------------------- */
+/* --- 구획 & 그리드 --------------------------------------------------
+   테두리 있는 카드를 쌓지 않는다. 구획은 여백이 나누고, 얇은 가로선 하나만
+   시작점을 표시한다 — 사이트의 어두운 미니멀 톤과 맞추기 위해서.
+   min-width:0 은 그리드 칸의 기본 최소폭(auto) 때문에 표가 칸을 밀고 나가
+   옆 구획을 덮는 걸 막는다. */
 .grid {
     display: grid;
-    gap: 16px;
-    margin-bottom: 16px;
-    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 28px 44px;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
 }
 
 .card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 18px;
     min-width: 0;
+    padding-top: 18px;
+    border-top: 1px solid var(--border);
 }
 
 .card h2 {
@@ -243,6 +239,18 @@ a:hover {
     margin: 0 0 14px;
     color: var(--text-muted);
     font-size: 0.75rem;
+}
+
+/* 구획 사이 숨 쉴 자리 — 카드끼리 붙어서 한 덩어리로 읽히지 않게 */
+.dash-main > .card,
+.dash-main > .grid {
+    margin-top: 36px;
+}
+
+/* 캔버스·SVG가 제 칸을 넘어 옆 구획 위로 흘러나오지 않게 */
+canvas,
+svg {
+    max-width: 100%;
 }
 
 /* 차트 통은 x축 라벨까지 포함한 높이 — 축이 잘려서 카드 안에 스크롤이 생기지 않게 */
@@ -258,16 +266,12 @@ a:hover {
 /* --- KPI 타일 ------------------------------------------------------ */
 .kpi-row {
     display: grid;
-    gap: 12px;
-    margin-bottom: 16px;
-    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 22px 32px;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
 }
 
 .kpi {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 14px 16px;
+    min-width: 0;
 }
 
 .kpi .label {
@@ -436,8 +440,12 @@ a:hover {
     color: var(--text-secondary);
 }
 
-.table-view .scroll {
+/* 넓은 표는 저 혼자 가로로 스크롤한다 — 칸을 밀고 나가 옆 구획을 덮지 않게 */
+.scroll {
     overflow-x: auto;
+}
+
+.table-view .scroll {
     margin-top: 8px;
 }
 
