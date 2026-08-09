@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <link rel="icon" href="https://atah.io/favicon.ico">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex">
+    <link rel="preload"
+        href="https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2105_2@1.0/KoddiUDOnGothic-Regular.woff" as="font"
+        type="font/woff" crossorigin>
+    <link rel="preload" href="https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2105_2@1.0/KoddiUDOnGothic-Bold.woff"
+        as="font" type="font/woff" crossorigin>
+    <link rel="stylesheet" href="../fonts.css">
+    <link rel="stylesheet" href="../footer.css">
+    <link rel="stylesheet" href="dashboard.css">
+    <title>대시보드 : atah.io</title>
+    <!-- GTM 없음: 이 페이지가 스스로를 집계하면 대시보드가 자기 방문으로 부풀어서 뺐습니다. -->
+</head>
+
+<body class="footer-static">
+    <div class="container">
+        <header class="dash-header">
+            <h1>atah.io 대시보드</h1>
+            <p class="dash-sub">사이트 지표를 매일 아침 자동으로 모아 둡니다.</p>
+            <nav class="dash-nav" aria-label="대시보드 종류">
+                <a href="#ga4" class="active">GA4 방문 통계</a>
+            </nav>
+        </header>
+
+        <main id="ga4" class="dash-main">
+            <noscript>
+                <p class="empty">이 대시보드는 자바스크립트로 그립니다.</p>
+            </noscript>
+        </main>
+    </div>
+
+    <script src="data/ga4.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.0/dist/chart.umd.js"></script>
+    <script src="dashboard.js"></script>
+    <script src="../footer.js"></script>
+</body>
+
+</html>
