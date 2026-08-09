@@ -52,7 +52,8 @@ window.GA4_DATA = {
    "engagementRate": 0.6071428571428571,
    "newUsers": 18,
    "sessions": 28,
-   "users": 23
+   "users": 23,
+   "views": 69
   },
   {
    "avgDuration": 171.77689916666665,
@@ -60,7 +61,8 @@ window.GA4_DATA = {
    "engagementRate": 0.5555555555555556,
    "newUsers": 12,
    "sessions": 18,
-   "users": 14
+   "users": 14,
+   "views": 36
   },
   {
    "avgDuration": 252.2125956551724,
@@ -68,15 +70,17 @@ window.GA4_DATA = {
    "engagementRate": 0.5517241379310345,
    "newUsers": 17,
    "sessions": 29,
-   "users": 20
+   "users": 20,
+   "views": 52
   },
   {
-   "avgDuration": 211.43667426666664,
+   "avgDuration": 211.43667426666667,
    "date": "2026-07-15",
    "engagementRate": 0.8,
    "newUsers": 7,
    "sessions": 15,
-   "users": 12
+   "users": 12,
+   "views": 57
   },
   {
    "avgDuration": 292.56141884615386,
@@ -84,7 +88,8 @@ window.GA4_DATA = {
    "engagementRate": 0.6923076923076923,
    "newUsers": 6,
    "sessions": 26,
-   "users": 10
+   "users": 10,
+   "views": 75
   },
   {
    "avgDuration": 381.57516652,
@@ -92,7 +97,8 @@ window.GA4_DATA = {
    "engagementRate": 0.84,
    "newUsers": 9,
    "sessions": 25,
-   "users": 13
+   "users": 13,
+   "views": 55
   },
   {
    "avgDuration": 168.38854135714286,
@@ -100,7 +106,8 @@ window.GA4_DATA = {
    "engagementRate": 0.5714285714285714,
    "newUsers": 9,
    "sessions": 14,
-   "users": 12
+   "users": 12,
+   "views": 18
   },
   {
    "avgDuration": 85.01524835714285,
@@ -108,7 +115,8 @@ window.GA4_DATA = {
    "engagementRate": 0.5714285714285714,
    "newUsers": 8,
    "sessions": 14,
-   "users": 11
+   "users": 11,
+   "views": 15
   },
   {
    "avgDuration": 308.63069344444443,
@@ -116,7 +124,8 @@ window.GA4_DATA = {
    "engagementRate": 0.6666666666666666,
    "newUsers": 6,
    "sessions": 9,
-   "users": 8
+   "users": 8,
+   "views": 16
   },
   {
    "avgDuration": 159.2811595625,
@@ -124,7 +133,8 @@ window.GA4_DATA = {
    "engagementRate": 0.75,
    "newUsers": 8,
    "sessions": 16,
-   "users": 13
+   "users": 13,
+   "views": 33
   },
   {
    "avgDuration": 278.06279340000003,
@@ -132,7 +142,8 @@ window.GA4_DATA = {
    "engagementRate": 0.5333333333333333,
    "newUsers": 10,
    "sessions": 15,
-   "users": 12
+   "users": 12,
+   "views": 19
   },
   {
    "avgDuration": 391.9773207272727,
@@ -140,15 +151,17 @@ window.GA4_DATA = {
    "engagementRate": 0.8181818181818182,
    "newUsers": 8,
    "sessions": 11,
-   "users": 10
+   "users": 10,
+   "views": 32
   },
   {
-   "avgDuration": 15.956416,
+   "avgDuration": 15.956415999999999,
    "date": "2026-07-24",
    "engagementRate": 0.5,
    "newUsers": 5,
    "sessions": 8,
-   "users": 7
+   "users": 7,
+   "views": 10
   },
   {
    "avgDuration": 131.00759186956523,
@@ -156,7 +169,8 @@ window.GA4_DATA = {
    "engagementRate": 0.5652173913043478,
    "newUsers": 13,
    "sessions": 23,
-   "users": 19
+   "users": 19,
+   "views": 29
   },
   {
    "avgDuration": 281.8581055769231,
@@ -164,7 +178,8 @@ window.GA4_DATA = {
    "engagementRate": 0.6538461538461539,
    "newUsers": 18,
    "sessions": 26,
-   "users": 24
+   "users": 24,
+   "views": 63
   },
   {
    "avgDuration": 379.776183625,
@@ -172,7 +187,8 @@ window.GA4_DATA = {
    "engagementRate": 0.5625,
    "newUsers": 11,
    "sessions": 16,
-   "users": 15
+   "users": 15,
+   "views": 40
   },
   {
    "avgDuration": 595.5466027499999,
@@ -180,15 +196,17 @@ window.GA4_DATA = {
    "engagementRate": 0.65,
    "newUsers": 12,
    "sessions": 20,
-   "users": 16
+   "users": 16,
+   "views": 81
   },
   {
-   "avgDuration": 788.2639789310346,
+   "avgDuration": 788.2639789310344,
    "date": "2026-07-29",
    "engagementRate": 0.8620689655172413,
    "newUsers": 20,
    "sessions": 29,
-   "users": 25
+   "users": 25,
+   "views": 100
   },
   {
    "avgDuration": 358.8910762857143,
@@ -196,7 +214,8 @@ window.GA4_DATA = {
    "engagementRate": 0.7142857142857143,
    "newUsers": 9,
    "sessions": 14,
-   "users": 13
+   "users": 13,
+   "views": 43
   },
   {
    "avgDuration": 586.4789708124999,
@@ -204,7 +223,8 @@ window.GA4_DATA = {
    "engagementRate": 0.875,
    "newUsers": 7,
    "sessions": 16,
-   "users": 11
+   "users": 11,
+   "views": 34
   },
   {
    "avgDuration": 386.0496983333333,
@@ -212,7 +232,8 @@ window.GA4_DATA = {
    "engagementRate": 0.9333333333333333,
    "newUsers": 8,
    "sessions": 15,
-   "users": 12
+   "users": 12,
+   "views": 28
   },
   {
    "avgDuration": 423.796029,
@@ -220,7 +241,8 @@ window.GA4_DATA = {
    "engagementRate": 0.6111111111111112,
    "newUsers": 16,
    "sessions": 18,
-   "users": 18
+   "users": 18,
+   "views": 39
   },
   {
    "avgDuration": 484.5228415,
@@ -228,7 +250,8 @@ window.GA4_DATA = {
    "engagementRate": 0.6071428571428571,
    "newUsers": 15,
    "sessions": 28,
-   "users": 19
+   "users": 19,
+   "views": 54
   },
   {
    "avgDuration": 314.27597660000004,
@@ -236,7 +259,8 @@ window.GA4_DATA = {
    "engagementRate": 0.6,
    "newUsers": 9,
    "sessions": 20,
-   "users": 14
+   "users": 14,
+   "views": 32
   },
   {
    "avgDuration": 409.8814874814815,
@@ -244,7 +268,8 @@ window.GA4_DATA = {
    "engagementRate": 0.7407407407407407,
    "newUsers": 11,
    "sessions": 27,
-   "users": 17
+   "users": 17,
+   "views": 45
   },
   {
    "avgDuration": 253.933289,
@@ -252,7 +277,8 @@ window.GA4_DATA = {
    "engagementRate": 0.64,
    "newUsers": 11,
    "sessions": 25,
-   "users": 19
+   "users": 19,
+   "views": 32
   },
   {
    "avgDuration": 297.2478718260869,
@@ -260,7 +286,8 @@ window.GA4_DATA = {
    "engagementRate": 0.4782608695652174,
    "newUsers": 13,
    "sessions": 23,
-   "users": 15
+   "users": 15,
+   "views": 44
   },
   {
    "avgDuration": 418.5163630909091,
@@ -268,7 +295,8 @@ window.GA4_DATA = {
    "engagementRate": 0.7272727272727273,
    "newUsers": 10,
    "sessions": 22,
-   "users": 15
+   "users": 15,
+   "views": 36
   }
  ],
  "devices": [
@@ -508,7 +536,7 @@ window.GA4_DATA = {
  "meta": {
   "propertyId": "516513119",
   "trendDays": 28,
-  "updatedAt": "2026-08-09 19:00"
+  "updatedAt": "2026-08-09 19:24"
  },
  "pages": [
   {
@@ -1029,11 +1057,6 @@ window.GA4_DATA = {
    "delta": 20.0,
    "prev": 135.0
   }
- },
- "today": {
-  "activeUsers": 11,
-  "screenPageViews": 39,
-  "sessions": 17
  },
  "trendDates": [
   "2026-07-12",

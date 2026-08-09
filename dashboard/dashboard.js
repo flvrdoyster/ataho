@@ -41,6 +41,7 @@
         (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
     const mmdd = (iso) => iso.slice(5).replace('-', '.');
     const share = (v, total) => (total ? v / total * 100 : 0);
+    const pctDelta = (cur, base) => (base ? (cur - base) / base * 100 : null);
 
     /* 증감은 색만으로 말하지 않는다 — 화살표(기호) + 숫자 + "지난 7일 대비" 문구가 함께 간다. */
     function deltaHTML(d, note) {
@@ -258,19 +259,39 @@
     // --- 조각들 --------------------------------------------------------
     const parts = [];
 
-    parts.push(`<p class="meta-line">최근 7일 (어제까지) · 마지막 갱신 ${esc(data.meta.updatedAt)} KST · ` +
-        `오늘은 진행 중이라 추세에서 뺐습니다 — 지금까지 ${fmt(data.today.activeUsers)}명 / ` +
-        `${fmt(data.today.sessions)}세션 / ${fmt(data.today.screenPageViews)}조회</p>`);
+    /* 데일리 카운터 — 이 페이지가 말하는 숫자는 "어제 하루"다.
+       데이터가 매일 아침 07:00에 한 번만 갱신되므로 그 시점의 "오늘"은 새벽치뿐이라
+       (실측: 00~06시가 전체 세션의 15%) 아예 싣지 않는다. 어제가 많았는지 적었는지는
+       옆의 7일 하루 평균과 견주면 된다. */
+    const yday = data.daily.length ? data.daily[data.daily.length - 1] : null;
+    const avg7 = data.summary.activeUsers.cur / 7;
+    parts.push(`<section class="hero">
+        <div class="hero-main">
+            <div class="label">어제 방문자${yday ? ` <span class="tag">${esc(mmdd(yday.date))}</span>` : ''}</div>
+            <div class="figure">${yday ? fmt(yday.users) : '—'}</div>
+            <div class="sub">${yday
+                ? `세션 ${fmt(yday.sessions)} · 페이지 조회 ${fmt(yday.views)}`
+                : '집계된 하루가 아직 없습니다'}</div>
+            ${yday ? deltaHTML(pctDelta(yday.users, avg7), '최근 7일 하루 평균 대비') : ''}
+        </div>
+        <div class="hero-side">
+            <div class="label">최근 7일 하루 평균</div>
+            <div class="value">${fmt(avg7)}<span class="unit">명</span></div>
+            <div class="sub">7일 합계 ${fmt(data.summary.activeUsers.cur)}명</div>
+        </div>
+    </section>`);
+
+    parts.push(`<p class="meta-line">마지막 갱신 ${esc(data.meta.updatedAt)} KST · ` +
+        `매일 아침 07:00 KST에 한 번 갱신하며, 모든 수치는 어제까지의 완결된 하루만 셉니다.</p>`);
 
     if (data.insights && data.insights.length) {
         parts.push(`<ul class="insights">${data.insights
             .map((i) => `<li>${esc(i.text)}</li>`).join('')}</ul>`);
     }
 
-    // KPI — 한눈에 읽는 숫자들. 각각 지난 7일 대비 증감 + 28일 스파크라인.
+    // KPI — 최근 7일 합계. 각각 지난 7일 대비 증감 + 28일 스파크라인.
     const s = data.summary;
-    const dailyViews = data.trendDates.map((_, i) =>
-        data.sites.reduce((a, site) => a + site.daily[i], 0));
+    const dailyViews = data.daily.map((d) => d.views);
     const kpis = [
         { label: '활성 사용자', value: fmt(s.activeUsers.cur), delta: s.activeUsers.delta,
           spark: data.daily.map((d) => d.users) },
@@ -286,6 +307,7 @@
           delta: s.averageSessionDuration.delta,
           spark: data.daily.map((d) => d.avgDuration) },
     ];
+    parts.push('<h2 class="row-title">최근 7일</h2>');
     parts.push(`<div class="kpi-row">${kpis.map((k) =>
         `<div class="kpi"><div class="label">${esc(k.label)}</div>` +
         `<div class="value">${k.value}</div>${deltaHTML(k.delta)}` +

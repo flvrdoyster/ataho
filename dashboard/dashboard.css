@@ -123,6 +123,75 @@ a:hover {
     text-align: center;
 }
 
+/* --- 데일리 카운터(히어로) ------------------------------------------
+   페이지가 가장 먼저 말하는 숫자. 히어로 수치는 화면당 하나뿐이고,
+   옆의 어제·평균은 그 숫자를 가늠할 기준자 역할이라 한 급 작게 둔다. */
+.hero {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: 20px 44px;
+    margin-bottom: 16px;
+    padding: 22px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+}
+
+.hero-main {
+    flex: 1 1 220px;
+}
+
+.hero-side {
+    flex: 0 1 150px;
+}
+
+.hero .label {
+    color: var(--text-secondary);
+    font-size: 0.8125rem;
+}
+
+.hero .tag {
+    margin-left: 4px;
+    padding: 1px 6px;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    color: var(--text-muted);
+    font-size: 0.6875rem;
+    vertical-align: 1px;
+}
+
+.hero .figure {
+    font-size: 3.5rem;
+    font-weight: 700;
+    line-height: 1.1;
+}
+
+.hero .value {
+    font-size: 1.75rem;
+    font-weight: 700;
+    line-height: 1.2;
+}
+
+.hero .unit {
+    margin-left: 2px;
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+    font-weight: 400;
+}
+
+.hero .sub {
+    color: var(--text-muted);
+    font-size: 0.75rem;
+}
+
+.row-title {
+    margin: 24px 0 10px;
+    font-size: 0.8125rem;
+    font-weight: 400;
+    color: var(--text-muted);
+}
+
 /* --- 인사이트 ------------------------------------------------------ */
 .insights {
     margin: 0 0 20px;

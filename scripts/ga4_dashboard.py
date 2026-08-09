@@ -171,17 +171,9 @@ def fetch(client):
                     "engagementRate", "averageSessionDuration")
     }
 
-    # --- 2) 오늘 (진행 중, 추세선에는 섞지 않음) -------------------------
-    today = totals(client, ("today", "today"))
-    data["today"] = {
-        "activeUsers": int(today.get("activeUsers", 0)),
-        "sessions": int(today.get("sessions", 0)),
-        "screenPageViews": int(today.get("screenPageViews", 0)),
-    }
-
-    # --- 3) 일별 추세 28일 ----------------------------------------------
+    # --- 2) 일별 추세 28일 ----------------------------------------------
     rows = report(client, dimensions=["date"],
-                  metrics=["activeUsers", "newUsers", "sessions",
+                  metrics=["activeUsers", "newUsers", "sessions", "screenPageViews",
                            "engagementRate", "averageSessionDuration"],
                   date_range=TREND, order_by=("date", False))
     data["daily"] = [
@@ -190,13 +182,14 @@ def fetch(client):
             "users": int(r["activeUsers"]),
             "newUsers": int(r["newUsers"]),
             "sessions": int(r["sessions"]),
+            "views": int(r["screenPageViews"]),
             "engagementRate": r["engagementRate"],
             "avgDuration": r["averageSessionDuration"],
         }
         for r in rows
     ]
 
-    # --- 4) 유입 채널 / Referral 소스 (최근 7일) -------------------------
+    # --- 3) 유입 채널 / Referral 소스 (최근 7일) -------------------------
     data["channels"] = [
         {"name": r["sessionDefaultChannelGroup"] or "(기타)",
          "sessions": int(r["sessions"]), "users": int(r["activeUsers"])}
@@ -217,7 +210,7 @@ def fetch(client):
                         order_by=("sessions", True), limit=10)
     ]
 
-    # --- 5) 사이트(호스트)별 + atah.io 코너별 조회수 추세 (28일) ---------
+    # --- 4) 사이트(호스트)별 + atah.io 코너별 조회수 추세 (28일) ---------
     # 날짜×호스트×경로를 한 번에 받아서 두 가지로 접는다.
     rows = report(client, dimensions=["date", "hostName", "pagePath"],
                   metrics=["screenPageViews"], date_range=TREND, limit=100000)
@@ -249,7 +242,7 @@ def fetch(client):
     data["sections"] = fold(section_buckets)
     data["trendDates"] = dates
 
-    # --- 6) 방문 시간대 (요일 × 시각, 28일) ------------------------------
+    # --- 5) 방문 시간대 (요일 × 시각, 28일) ------------------------------
     grid = [[0] * 24 for _ in range(7)]
     for r in report(client, dimensions=["dayOfWeek", "hour"],
                     metrics=["sessions"], date_range=TREND, limit=200):
@@ -261,7 +254,7 @@ def fetch(client):
             grid[wd][hh] = int(r["sessions"])
     data["heatmap"] = {"labels": WEEKDAY_LABELS, "grid": grid}
 
-    # --- 7) 기기 / 신규 vs 재방문 (최근 7일) -----------------------------
+    # --- 6) 기기 / 신규 vs 재방문 (최근 7일) -----------------------------
     device_names = {"mobile": "모바일", "desktop": "PC", "tablet": "태블릿"}
     data["devices"] = [
         {"name": device_names.get(r["deviceCategory"], r["deviceCategory"]),
@@ -280,7 +273,7 @@ def fetch(client):
                         order_by=("activeUsers", True))
     ]
 
-    # --- 8) 인기 페이지 / 국가 (최근 7일) --------------------------------
+    # --- 7) 인기 페이지 / 국가 (최근 7일) --------------------------------
     data["pages"] = [
         {"host": r["hostName"], "path": r["pagePath"],
          "views": int(r["screenPageViews"]), "users": int(r["activeUsers"]),
