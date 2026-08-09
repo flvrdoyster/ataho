@@ -207,7 +207,7 @@ window.DASHBOARD_DATA['blog'] = {
   "label": "블로그",
   "propertyId": "549191220",
   "trendDays": 28,
-  "updatedAt": "2026-08-09 22:01"
+  "updatedAt": "2026-08-09 22:04"
  },
  "pages": [],
  "referral": [],

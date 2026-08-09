@@ -75,7 +75,7 @@ window.DASHBOARD_DATA['ga4'] = {
    "views": 52
   },
   {
-   "avgDuration": 211.43667426666664,
+   "avgDuration": 211.43667426666667,
    "date": "2026-07-15",
    "engagementRate": 0.8,
    "newUsers": 7,
@@ -102,7 +102,7 @@ window.DASHBOARD_DATA['ga4'] = {
    "views": 55
   },
   {
-   "avgDuration": 168.38854135714286,
+   "avgDuration": 168.38854135714288,
    "date": "2026-07-18",
    "engagementRate": 0.5714285714285714,
    "newUsers": 9,
@@ -273,7 +273,7 @@ window.DASHBOARD_DATA['ga4'] = {
    "views": 45
   },
   {
-   "avgDuration": 253.93328900000003,
+   "avgDuration": 253.933289,
    "date": "2026-08-06",
    "engagementRate": 0.64,
    "newUsers": 11,
@@ -282,7 +282,7 @@ window.DASHBOARD_DATA['ga4'] = {
    "views": 32
   },
   {
-   "avgDuration": 297.24787182608696,
+   "avgDuration": 297.2478718260869,
    "date": "2026-08-07",
    "engagementRate": 0.4782608695652174,
    "newUsers": 13,
@@ -539,7 +539,7 @@ window.DASHBOARD_DATA['ga4'] = {
   "label": "사이트",
   "propertyId": "516513119",
   "trendDays": 28,
-  "updatedAt": "2026-08-09 22:00"
+  "updatedAt": "2026-08-09 22:04"
  },
  "pages": [
   {
