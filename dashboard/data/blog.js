@@ -5,11 +5,35 @@ window.DASHBOARD_DATA['blog'] = {
  "channels": [
   {
    "name": "Direct",
+   "sessions": 7,
+   "users": 7
+  },
+  {
+   "name": "Unassigned",
    "sessions": 2,
    "users": 2
+  },
+  {
+   "name": "Organic Search",
+   "sessions": 1,
+   "users": 1
+  },
+  {
+   "name": "Organic Social",
+   "sessions": 1,
+   "users": 1
+  },
+  {
+   "name": "Referral",
+   "sessions": 1,
+   "users": 0
   }
  ],
  "countries": [
+  {
+   "name": "South Korea",
+   "users": 7
+  },
   {
    "name": "(미상)",
    "users": 2
@@ -24,13 +48,27 @@ window.DASHBOARD_DATA['blog'] = {
    "sessions": 2,
    "users": 2,
    "views": 2
+  },
+  {
+   "avgDuration": 15.224436375,
+   "date": "2026-08-10",
+   "engagementRate": 0.0,
+   "newUsers": 7,
+   "sessions": 8,
+   "users": 7,
+   "views": 11
   }
  ],
  "devices": [
   {
    "name": "모바일",
-   "sessions": 2,
-   "users": 2
+   "sessions": 7,
+   "users": 6
+  },
+  {
+   "name": "PC",
+   "sessions": 3,
+   "users": 3
   }
  ],
  "heatmap": {
@@ -68,24 +106,24 @@ window.DASHBOARD_DATA['blog'] = {
     0,
     0,
     0,
+    1,
+    0,
+    1,
+    0,
+    1,
+    0,
+    0,
+    1,
     0,
     0,
     0,
     0,
     0,
     0,
+    2,
     0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0
+    1,
+    1
    ],
    [
     0,
@@ -230,11 +268,11 @@ window.DASHBOARD_DATA['blog'] = {
  },
  "insights": [
   {
-   "text": "유입 1위는 Direct — 전체 세션의 100%(2회)입니다.",
+   "text": "유입 1위는 Direct — 전체 세션의 58%(7회)입니다.",
    "tone": "flat"
   },
   {
-   "text": "모바일 세션 비중 100% — 조작·레이아웃 우선순위 판단에 씁니다.",
+   "text": "모바일 세션 비중 70% — 조작·레이아웃 우선순위 판단에 씁니다.",
    "tone": "flat"
   },
   {
@@ -247,28 +285,55 @@ window.DASHBOARD_DATA['blog'] = {
   "label": "블로그",
   "propertyId": "549191220",
   "trendDays": 28,
-  "updatedAt": "2026-08-10 07:22"
+  "updatedAt": "2026-08-11 07:30"
  },
  "pages": [
   {
    "name": "OYSTER BAY",
    "note": "",
    "secPerView": 0.0,
-   "users": 2,
+   "users": 4,
+   "views": 5
+  },
+  {
+   "name": "PC98 환세 시리즈 한글화",
+   "note": "",
+   "secPerView": 16.6,
+   "users": 4,
+   "views": 5
+  },
+  {
+   "name": "환세쾌도전 공략",
+   "note": "",
+   "secPerView": 0.0,
+   "users": 1,
    "views": 2
+  },
+  {
+   "name": "환세취호전 웹 에뮬레이터",
+   "note": "",
+   "secPerView": 8.0,
+   "users": 1,
+   "views": 1
   }
  ],
- "referral": [],
+ "referral": [
+  {
+   "name": "namu.wiki",
+   "sessions": 1,
+   "users": 0
+  }
+ ],
  "sections": [],
  "sites": [],
  "summary": {
   "activeUsers": {
-   "cur": 2.0,
+   "cur": 9.0,
    "delta": null,
    "prev": 0.0
   },
   "averageSessionDuration": {
-   "cur": 0.0,
+   "cur": 12.1795491,
    "delta": null,
    "prev": 0.0
   },
@@ -278,27 +343,32 @@ window.DASHBOARD_DATA['blog'] = {
    "prev": 0.0
   },
   "newUsers": {
-   "cur": 2.0,
+   "cur": 9.0,
    "delta": null,
    "prev": 0.0
   },
   "screenPageViews": {
-   "cur": 2.0,
+   "cur": 13.0,
    "delta": null,
    "prev": 0.0
   },
   "sessions": {
-   "cur": 2.0,
+   "cur": 10.0,
    "delta": null,
    "prev": 0.0
   }
  },
  "trendDates": [
-  "2026-08-09"
+  "2026-08-09",
+  "2026-08-10"
  ],
  "visitors": [
   {
    "name": "신규",
+   "users": 9
+  },
+  {
+   "name": "(미분류)",
    "users": 2
   }
  ]
