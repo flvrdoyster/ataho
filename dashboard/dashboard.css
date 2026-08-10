@@ -1,44 +1,13 @@
 @charset "utf-8";
 
-/* atah.io 대시보드 — 사이트 공용 톤(어두운 배경 + KoddiUDOnGothic)에 맞춘 지표 화면.
-   차트 색은 이 표면색(--surface) 기준으로 CVD/대비 검증을 통과한 값이라
-   임의로 바꾸지 마세요. 바꿀 땐 팔레트 전체를 다시 검증해야 합니다. */
+/* atah.io 대시보드 — 구조(무엇이 어디에 놓이는가)만 담습니다.
+   색·서체·글자 크기·둥글기·간격 같은 "어떻게 보이는가"는 전부 theme.css 의
+   토큰에서 읽어 옵니다. 그래야 나중에 다른 스킨(게임 톤 등)을 얹을 때
+   이 파일과 dashboard.js 를 건드리지 않아도 됩니다.
 
-:root {
-    color-scheme: dark;
-
-    /* 표면 & 잉크 */
-    --plane: #0b0c0e;
-    --surface: #17181c;
-    --surface-2: #1e2025;
-    --border: rgba(255, 255, 255, 0.10);
-    --text-primary: #ffffff;
-    --text-secondary: #c3c2b7;
-    --text-muted: #898781;
-    --grid: #2c2c2a;
-    --axis: #383835;
-    --deemph: #5b5c60;
-
-    /* 범주형 시리즈 — 고정 순서. 순서 자체가 색각 안전장치라 섞지 마세요. */
-    --series-1: #3987e5;
-    --series-2: #d95926;
-    --series-3: #199e70;
-    --series-4: #c98500;
-    --series-5: #d55181;
-    --series-6: #008300;
-
-    /* 연속형(크기) 램프 — 파랑 한 색, 어두울수록 0에 가까움 */
-    --seq-1: #184f95;
-    --seq-2: #256abf;
-    --seq-3: #3987e5;
-    --seq-4: #6da7ec;
-    --seq-5: #9ec5f4;
-    --seq-6: #cde2fb;
-
-    /* 상태 — 증감 표시 전용, 시리즈 색으로 재사용 금지 */
-    --good: #0ca30c;
-    --critical: #d03b3b;
-}
+   여기에 새 규칙을 넣을 때 지켜 주세요:
+   - 색·글자 크기·모서리 값을 직접 쓰지 말고 토큰을 만들어 theme.css 에 두기
+   - 없는 토큰이 필요하면 theme.css 에 추가하고 주석으로 쓰임새 한 줄 */
 
 * {
     box-sizing: border-box;
@@ -49,14 +18,14 @@ body {
     padding: 0;
     background: var(--plane);
     color: var(--text-primary);
-    font-family: 'KoddiUDOnGothic', sans-serif;
-    line-height: 1.6;
+    font-family: var(--font-ui);
+    line-height: var(--line-height);
     word-break: keep-all;
     overflow-wrap: break-word;
 }
 
 a {
-    color: rgba(123, 166, 222, 1);
+    color: var(--link);
     text-decoration: none;
 }
 
@@ -66,33 +35,33 @@ a:hover {
 }
 
 .container {
-    max-width: 1080px;
+    max-width: var(--page-max);
     margin: 0 auto;
-    padding: 32px 20px 0;
+    padding: var(--page-pad);
 }
 
 /* --- 머리말 -------------------------------------------------------- */
 .dash-header h1 {
     margin: 0;
-    font-size: 1.5rem;
+    font-size: var(--fs-h1);
 }
 
 .dash-sub {
     margin: 4px 0 16px;
     color: var(--text-secondary);
-    font-size: 0.875rem;
+    font-size: var(--fs-sm);
 }
 
 .dash-nav {
     display: flex;
     gap: 4px;
-    border-bottom: 1px solid var(--border);
+    border-bottom: var(--rule);
 }
 
 .dash-nav a {
     padding: 8px 14px;
     color: var(--text-muted);
-    font-size: 0.875rem;
+    font-size: var(--fs-sm);
     border-bottom: 2px solid transparent;
     margin-bottom: -1px;
 }
@@ -104,7 +73,7 @@ a:hover {
 
 .dash-nav a.active {
     color: var(--text-primary);
-    border-bottom-color: var(--series-1);
+    border-bottom-color: var(--accent);
 }
 
 .dash-main {
@@ -114,7 +83,7 @@ a:hover {
 .meta-line {
     margin: 0 0 20px;
     color: var(--text-muted);
-    font-size: 0.75rem;
+    font-size: var(--fs-note);
 }
 
 .empty {
@@ -144,48 +113,48 @@ a:hover {
 
 .hero .label {
     color: var(--text-secondary);
-    font-size: 0.8125rem;
+    font-size: var(--fs-label);
 }
 
 .hero .tag {
     margin-left: 4px;
     padding: 1px 6px;
     border: 1px solid var(--border);
-    border-radius: 999px;
+    border-radius: var(--radius-pill);
     color: var(--text-muted);
-    font-size: 0.6875rem;
+    font-size: var(--fs-micro);
     vertical-align: 1px;
 }
 
 .hero .figure {
-    font-size: 3.5rem;
-    font-weight: 700;
+    font-size: var(--fs-hero);
+    font-weight: var(--font-weight-bold);
     line-height: 1.1;
 }
 
 .hero .value {
-    font-size: 1.75rem;
-    font-weight: 700;
+    font-size: var(--fs-value);
+    font-weight: var(--font-weight-bold);
     line-height: 1.2;
 }
 
 .hero .unit {
     margin-left: 2px;
     color: var(--text-secondary);
-    font-size: 0.875rem;
+    font-size: var(--fs-sm);
     font-weight: 400;
 }
 
 .hero .sub {
     color: var(--text-muted);
-    font-size: 0.75rem;
+    font-size: var(--fs-note);
 }
 
 .row-title {
-    margin: 36px 0 16px;
+    margin: var(--gap-block) 0 16px;
     padding-top: 18px;
-    border-top: 1px solid var(--border);
-    font-size: 0.8125rem;
+    border-top: var(--rule);
+    font-size: var(--fs-label);
     font-weight: 400;
     color: var(--text-muted);
 }
@@ -195,11 +164,11 @@ a:hover {
     margin: 0;
     padding: 2px 0 2px 16px;
     list-style: none;
-    border-left: 2px solid var(--series-1);
+    border-left: 2px solid var(--accent);
 }
 
 .insights li {
-    font-size: 0.9375rem;
+    font-size: var(--fs-body);
     color: var(--text-secondary);
 }
 
@@ -207,60 +176,65 @@ a:hover {
     margin-top: 6px;
 }
 
+/* 문장 안에서 판단의 근거가 되는 수치만 밝게 — 나머지는 한 톤 내려 읽힙니다. */
 .insights b {
     color: var(--text-primary);
-    font-weight: 700;
+    font-weight: var(--font-weight-bold);
 }
 
 /* --- 구획 & 그리드 --------------------------------------------------
    테두리 있는 카드를 쌓지 않는다. 구획은 여백이 나누고, 얇은 가로선 하나만
    시작점을 표시한다 — 사이트의 어두운 미니멀 톤과 맞추기 위해서.
+   (스킨에서 --panel-frame 으로 9-슬라이스 테두리를 얹을 수 있게 자리를 비워 뒀다.)
    min-width:0 은 그리드 칸의 기본 최소폭(auto) 때문에 표가 칸을 밀고 나가
    옆 구획을 덮는 걸 막는다. */
 .grid {
     display: grid;
-    gap: 28px 44px;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: var(--gap-grid);
+    grid-template-columns: repeat(auto-fit, minmax(var(--grid-min), 1fr));
 }
 
 .card {
     min-width: 0;
-    padding-top: 18px;
-    border-top: 1px solid var(--border);
+    padding: var(--panel-pad);
+    border-top: var(--rule);
+    border-radius: var(--panel-radius);
+    background: var(--panel-bg);
 }
 
 .card h2 {
     margin: 0 0 2px;
-    font-size: 0.9375rem;
-    font-weight: 700;
+    font-size: var(--fs-body);
+    font-weight: var(--font-weight-bold);
 }
 
 .card .card-note {
     margin: 0 0 14px;
     color: var(--text-muted);
-    font-size: 0.75rem;
+    font-size: var(--fs-note);
 }
 
 /* 구획 사이 숨 쉴 자리 — 카드끼리 붙어서 한 덩어리로 읽히지 않게 */
 .dash-main > .card,
 .dash-main > .grid {
-    margin-top: 36px;
+    margin-top: var(--gap-block);
 }
 
 /* 캔버스·SVG가 제 칸을 넘어 옆 구획 위로 흘러나오지 않게 */
 canvas,
 svg {
     max-width: 100%;
+    image-rendering: var(--img-rendering);
 }
 
 /* 차트 통은 x축 라벨까지 포함한 높이 — 축이 잘려서 카드 안에 스크롤이 생기지 않게 */
 .chart-box {
     position: relative;
-    height: 260px;
+    height: var(--chart-h);
 }
 
 .chart-box.tall {
-    height: 300px;
+    height: var(--chart-h-tall);
 }
 
 /* --- KPI 타일 ------------------------------------------------------ */
@@ -276,12 +250,12 @@ svg {
 
 .kpi .label {
     color: var(--text-secondary);
-    font-size: 0.75rem;
+    font-size: var(--fs-note);
 }
 
 .kpi .value {
-    font-size: 1.75rem;
-    font-weight: 700;
+    font-size: var(--fs-kpi-value);
+    font-weight: var(--font-weight-bold);
     line-height: 1.25;
 }
 
@@ -291,7 +265,7 @@ svg {
 }
 
 .delta {
-    font-size: 0.75rem;
+    font-size: var(--fs-note);
     color: var(--text-muted);
 }
 
@@ -307,20 +281,20 @@ svg {
 .rank {
     width: 100%;
     border-collapse: collapse;
-    font-size: 0.8125rem;
+    font-size: var(--fs-label);
 }
 
 .rank th,
 .rank td {
     padding: 7px 8px;
-    border-bottom: 1px solid var(--border);
+    border-bottom: var(--rule);
     text-align: left;
 }
 
 .rank th {
     color: var(--text-muted);
     font-weight: 400;
-    font-size: 0.75rem;
+    font-size: var(--fs-note);
 }
 
 .rank tr:last-child td {
@@ -334,7 +308,7 @@ svg {
 }
 
 .rank td.spark-cell {
-    width: 132px;
+    width: var(--spark-w-rank);
     padding: 4px 8px;
 }
 
@@ -344,7 +318,7 @@ svg {
 
 .rank .path {
     color: var(--text-secondary);
-    font-size: 0.75rem;
+    font-size: var(--fs-note);
 }
 
 .rank .host {
@@ -357,7 +331,7 @@ svg {
     gap: 2px;              /* 마크를 가르는 건 테두리가 아니라 표면색 틈 */
     height: 22px;
     margin: 10px 0 12px;
-    border-radius: 4px;
+    border-radius: var(--radius-sm);
     overflow: hidden;
 }
 
@@ -369,7 +343,7 @@ svg {
     display: flex;
     flex-wrap: wrap;
     gap: 6px 16px;
-    font-size: 0.8125rem;
+    font-size: var(--fs-label);
     color: var(--text-secondary);
 }
 
@@ -378,7 +352,7 @@ svg {
     width: 10px;
     height: 10px;
     margin-right: 6px;
-    border-radius: 2px;
+    border-radius: var(--radius-xs);
     vertical-align: baseline;
 }
 
@@ -390,21 +364,21 @@ svg {
 /* --- 시간대 히트맵 --------------------------------------------------- */
 .heat {
     display: grid;
-    grid-template-columns: 22px repeat(24, 1fr);
-    gap: 2px;
+    grid-template-columns: var(--heat-label-w) repeat(24, 1fr);
+    gap: var(--heat-gap);
     align-items: center;
 }
 
 .heat .rowlabel,
 .heat .collabel {
     color: var(--text-muted);
-    font-size: 0.6875rem;
+    font-size: var(--fs-micro);
     text-align: center;
 }
 
 .heat .cell {
-    height: 22px;
-    border-radius: 2px;
+    height: var(--heat-cell);
+    border-radius: var(--radius-xs);
     background: var(--surface-2);
 }
 
@@ -414,25 +388,25 @@ svg {
     gap: 6px;
     margin-top: 12px;
     color: var(--text-muted);
-    font-size: 0.6875rem;
+    font-size: var(--fs-micro);
 }
 
 .heat-scale i {
     display: inline-block;
     width: 22px;
     height: 10px;
-    border-radius: 2px;
+    border-radius: var(--radius-xs);
 }
 
 /* --- 표로 보기 ------------------------------------------------------ */
 .table-view {
     margin-top: 12px;
-    font-size: 0.8125rem;
+    font-size: var(--fs-label);
 }
 
 .table-view summary {
     color: var(--text-muted);
-    font-size: 0.75rem;
+    font-size: var(--fs-note);
     cursor: pointer;
 }
 
@@ -458,7 +432,7 @@ svg {
 .table-view th,
 .table-view td {
     padding: 4px 8px;
-    border-bottom: 1px solid var(--border);
+    border-bottom: var(--rule);
     text-align: right;
     white-space: nowrap;
 }
@@ -475,33 +449,16 @@ svg {
 
 /* --- 푸터(공용 footer.css 위에 대시보드 여백만 얹음) ----------------- */
 .footer-static #footer {
-    border-top: 1px solid var(--border);
+    border-top: var(--rule);
     margin-top: 32px;
     color: var(--text-muted);
 }
 
+/* --- 좁은 화면 ------------------------------------------------------
+   값(글자 크기·히트맵 칸 등)은 theme.css 의 같은 미디어 쿼리에서 조정합니다.
+   여기엔 "무엇을 감추고 무엇을 접는가"만 둡니다. */
 @media (max-width: 640px) {
-    .container {
-        padding: 24px 14px 0;
-    }
-
-    .kpi .value {
-        font-size: 1.5rem;
-    }
-
-    .heat {
-        grid-template-columns: 20px repeat(24, 1fr);
-        gap: 1px;
-    }
-
-    .heat .cell {
-        height: 14px;
-    }
-
-    .rank td.spark-cell {
-        display: none;
-    }
-
+    .rank td.spark-cell,
     .rank th.spark-cell {
         display: none;
     }

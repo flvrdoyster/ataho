@@ -7,7 +7,10 @@
    - y축은 하나만. 크기가 다른 두 지표를 한 그림에 겹치지 않는다.
    - 색은 항목의 정체성을 따른다. 순위가 바뀌어도 같은 항목은 같은 색.
    - 크기(많고 적음)는 파랑 한 색의 명도로만 표현한다(무지개 금지).
-   - 모든 차트에는 같은 값을 읽을 수 있는 표가 함께 있다. */
+   - 모든 차트에는 같은 값을 읽을 수 있는 표가 함께 있다.
+
+   보이는 값(색·서체·굵기·둥글기)은 이 파일에 두지 않는다 — 전부 theme.css 의
+   토큰에서 읽는다. 테마를 갈아끼울 때 이 파일을 열지 않아도 되게 하려는 것. */
 (function () {
     'use strict';
 
@@ -23,8 +26,18 @@
     }
 
     // --- 토큰 & 포맷 -------------------------------------------------
+    /* 캔버스(Chart.js·스파크라인 SVG)는 CSS가 닿지 않는 그림이라, 색·서체·굵기를
+       여기서 직접 정해야 한다. 그 값을 코드에 박아 두면 테마를 갈아끼울 때 CSS와
+       JS 두 곳을 고쳐야 하므로, 전부 theme.css 의 토큰에서 읽어 온다.
+       새 시각 상수가 필요하면 여기 박지 말고 theme.css 에 토큰을 만들 것. */
     const css = getComputedStyle(document.documentElement);
-    const T = (name) => css.getPropertyValue(name).trim();
+    const T = (name, fallback) => css.getPropertyValue(name).trim() || fallback || '';
+    /* px·배수 토큰을 숫자로. 토큰이 없거나 이상하면 fallback — 테마 파일을
+       빠뜨려도 차트가 통째로 사라지지는 않게. */
+    const N = (name, fallback) => {
+        const v = parseFloat(T(name));
+        return Number.isFinite(v) ? v : fallback;
+    };
     const C = {
         surface: T('--surface'), textPrimary: T('--text-primary'),
         textSecondary: T('--text-secondary'), muted: T('--text-muted'),
@@ -33,7 +46,29 @@
                  T('--series-4'), T('--series-5'), T('--series-6')],
         seq: [T('--seq-1'), T('--seq-2'), T('--seq-3'), T('--seq-4'), T('--seq-5'), T('--seq-6')],
     };
-    const FONT = "'KoddiUDOnGothic', sans-serif";
+    const FONT = T('--font-ui', 'sans-serif');
+    const G = {   // 기하 — 전부 theme.css 에서
+        fontSize: N('--chart-font-size', 12),
+        lineW: N('--line-w', 2),
+        tension: N('--line-tension', 0.25),
+        fillAlpha: N('--line-fill-alpha', 0.1),
+        pointR: N('--point-r', 4),
+        barRadius: N('--bar-radius', 4),
+        barThickness: N('--bar-thickness', 24),
+        sparkW: N('--spark-w', 140), sparkH: N('--spark-h', 26),
+        sparkWsm: N('--spark-w-sm', 120), sparkHsm: N('--spark-h-sm', 24),
+        sparkLineW: N('--spark-line-w', 1.5),
+        sparkLineWcur: N('--spark-line-w-cur', 2),
+    };
+
+    /* 선 아래 면은 같은 색의 옅은 칠. #rrggbb 면 알파를 덧붙이고, 그 밖의
+       표기(rgba()·color-mix 등)를 쓰는 테마에서는 원색을 그대로 돌려준다 —
+       문자열을 잘못 이어 붙여 색이 통째로 무효가 되는 것보다 낫다. */
+    function fillColor(color) {
+        if (!/^#[0-9a-f]{6}$/i.test(color)) return color;
+        const a = Math.round(Math.min(1, Math.max(0, G.fillAlpha)) * 255);
+        return color + a.toString(16).padStart(2, '0');
+    }
 
     const nf = new Intl.NumberFormat('ko-KR');
     const fmt = (n) => nf.format(Math.round(n));
@@ -65,7 +100,7 @@
 
     /* 28일 스파크라인. 전체는 옅은 회색, 최근 7일만 파랑 — 지금 구간이 어디인지 보이게. */
     function sparkline(values, w, h) {
-        w = w || 120; h = h || 28;
+        w = w || G.sparkWsm; h = h || G.sparkHsm;
         if (!values.length) return '';
         const max = Math.max.apply(null, values.concat([1]));
         const step = values.length > 1 ? w / (values.length - 1) : 0;
@@ -76,12 +111,13 @@
         const path = (arr) => arr.map((p) => p.join(',')).join(' ');
         const tail = pts.slice(Math.max(0, pts.length - 8));
         return `<svg class="spark" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" aria-hidden="true">` +
-            `<polyline fill="none" stroke="${C.deemph}" stroke-width="1.5" stroke-linejoin="round" ` +
-            `stroke-linecap="round" points="${path(pts)}"/>` +
-            `<polyline fill="none" stroke="${C.series[0]}" stroke-width="2" stroke-linejoin="round" ` +
-            `stroke-linecap="round" points="${path(tail)}"/>` +
-            `<circle cx="${pts[pts.length - 1][0]}" cy="${pts[pts.length - 1][1]}" r="2.5" ` +
-            `fill="${C.series[0]}" stroke="${C.surface}" stroke-width="2"/></svg>`;
+            `<polyline fill="none" stroke="${C.deemph}" stroke-width="${G.sparkLineW}" ` +
+            `stroke-linejoin="round" stroke-linecap="round" points="${path(pts)}"/>` +
+            `<polyline fill="none" stroke="${C.series[0]}" stroke-width="${G.sparkLineWcur}" ` +
+            `stroke-linejoin="round" stroke-linecap="round" points="${path(tail)}"/>` +
+            `<circle cx="${pts[pts.length - 1][0]}" cy="${pts[pts.length - 1][1]}" ` +
+            `r="${G.sparkLineWcur * 1.25}" fill="${C.series[0]}" stroke="${C.surface}" ` +
+            `stroke-width="${G.sparkLineWcur}"/></svg>`;
     }
 
     function tableView(summary, head, rows) {
@@ -93,7 +129,7 @@
 
     // --- Chart.js 공통 ------------------------------------------------
     Chart.defaults.font.family = FONT;
-    Chart.defaults.font.size = 12;
+    Chart.defaults.font.size = G.fontSize;
     Chart.defaults.color = C.muted;
     Chart.defaults.maintainAspectRatio = false;
 
@@ -132,7 +168,7 @@
                     if (v === null || v === undefined) return;
                     ctx.save();
                     ctx.fillStyle = C.textSecondary;
-                    ctx.font = `12px ${FONT}`;
+                    ctx.font = `${G.fontSize}px ${FONT}`;
                     ctx.textAlign = 'left';
                     ctx.textBaseline = 'middle';
                     ctx.fillText(fmt(v), el.x + 8, el.y);
@@ -142,7 +178,8 @@
         },
     };
 
-    /* 선 끝 직접 라벨. 두 선이 붙어 있으면(14px 미만) 겹쳐 읽히므로 범례에 맡기고 그리지 않는다. */
+    /* 선 끝 직접 라벨. 두 선이 글자 한 줄(+여유 2px)보다 가까우면 겹쳐 읽히므로
+       범례에 맡기고 그리지 않는다 — 서체 크기를 키우면 이 기준도 같이 커진다. */
     const lineEndLabels = {
         id: 'lineEndLabels',
         afterDatasetsDraw(chart) {
@@ -153,14 +190,14 @@
             if (ends.length < 2) return;
             for (let i = 0; i < ends.length; i++) {
                 for (let j = i + 1; j < ends.length; j++) {
-                    if (Math.abs(ends[i].el.y - ends[j].el.y) < 14) return;
+                    if (Math.abs(ends[i].el.y - ends[j].el.y) < G.fontSize + 2) return;
                 }
             }
             const ctx = chart.ctx;
             ends.forEach((e) => {
                 ctx.save();
                 ctx.fillStyle = C.textSecondary;
-                ctx.font = `12px ${FONT}`;
+                ctx.font = `${G.fontSize}px ${FONT}`;
                 ctx.textAlign = 'right';
                 ctx.textBaseline = 'bottom';
                 ctx.fillText(e.label, e.el.x, e.el.y - 8);
@@ -178,14 +215,14 @@
                     label: d.label,
                     data: d.data,
                     borderColor: C.series[i],
-                    backgroundColor: C.series[i] + '1a',   /* 면은 ~10% 농도의 옅은 칠 */
-                    borderWidth: 2,
-                    tension: 0.25,
+                    backgroundColor: fillColor(C.series[i]),
+                    borderWidth: G.lineW,
+                    tension: G.tension,
                     fill: !!d.fill,
                     pointRadius: 0,
-                    pointHoverRadius: 4,
+                    pointHoverRadius: G.pointR,
                     pointHoverBorderColor: C.surface,
-                    pointHoverBorderWidth: 2,
+                    pointHoverBorderWidth: G.lineW,
                     pointHoverBackgroundColor: C.series[i],
                 })),
             },
@@ -230,9 +267,9 @@
                 datasets: [{
                     data: values,
                     backgroundColor: C.series[0],
-                    borderRadius: 4,
+                    borderRadius: G.barRadius,
                     borderSkipped: 'start',   /* 둥근 쪽은 값 끝, 기준선 쪽은 각지게 */
-                    maxBarThickness: 24,
+                    maxBarThickness: G.barThickness,
                 }],
             },
             options: {
@@ -277,7 +314,12 @@
        (실측: 00~06시가 전체 세션의 15%) 아예 싣지 않는다. 어제가 많았는지 적었는지는
        옆의 7일 하루 평균과 견주면 된다. */
     const yday = data.daily.length ? data.daily[data.daily.length - 1] : null;
-    const avg7 = data.summary.activeUsers.cur / 7;
+    /* 하루 평균은 일별 값을 직접 평균 낸다. summary.activeUsers 는 7일 구간을
+       한 번에 물어본 값이라 같은 사람이 여러 날 와도 한 명으로 세어져(중복 제외)
+       7로 나누면 실제 하루 평균보다 낮게 나온다 — 이 기준으로 어제와 견주면
+       평균보다 적은 날이 "증가"로 뒤집혀 보였다. */
+    const last7 = data.daily.slice(-7);
+    const avg7 = last7.reduce((sum, d) => sum + d.users, 0) / (last7.length || 1);
     parts.push(`<section class="hero">
         <div class="hero-main">
             <div class="label">어제 방문자${yday ? ` <span class="tag">${esc(mmdd(yday.date))}</span>` : ''}</div>
@@ -290,7 +332,7 @@
         <div class="hero-side">
             <div class="label">최근 7일 하루 평균</div>
             <div class="value">${fmt(avg7)}<span class="unit">명</span></div>
-            <div class="sub">7일 합계 ${fmt(data.summary.activeUsers.cur)}명</div>
+            <div class="sub">7일 전체 ${fmt(data.summary.activeUsers.cur)}명 (중복 제외)</div>
         </div>
     </section>`);
 
@@ -324,7 +366,7 @@
     parts.push(`<div class="kpi-row">${kpis.map((k) =>
         `<div class="kpi"><div class="label">${esc(k.label)}</div>` +
         `<div class="value">${k.value}</div>${deltaHTML(k.delta)}` +
-        sparkline(k.spark, 140, 26) + '</div>').join('')}</div>`);
+        sparkline(k.spark, G.sparkW, G.sparkH) + '</div>').join('')}</div>`);
 
     // 일별 추세
     parts.push(`<div class="card">
@@ -343,7 +385,7 @@
             `<th>${esc(nameHead)}</th><th class="spark-cell">최근 ${data.meta.trendDays}일</th>` +
             `<th class="num">${esc(unitHead)}</th><th class="num">지난 7일 대비</th></tr></thead><tbody>` +
             rows.map((r) => `<tr><td class="name">${esc(r.name)}</td>` +
-                `<td class="spark-cell">${sparkline(r.daily, 120, 24)}</td>` +
+                `<td class="spark-cell">${sparkline(r.daily, G.sparkWsm, G.sparkHsm)}</td>` +
                 `<td class="num">${fmt(r.cur)}</td>` +
                 `<td class="num">${deltaHTML(r.delta, '')}</td></tr>`).join('') +
             `</tbody></table></div>`;

@@ -1,0 +1,146 @@
+@charset "utf-8";
+
+/* 대시보드 테마 토큰 — 이 파일이 "어떻게 보이는가"를 혼자 쥐고 있습니다.
+   dashboard.css 는 구조(무엇이 어디에 놓이는가)만 담고 값은 전부 여기서 읽습니다.
+   dashboard.js 도 차트 색·서체·굵기·둥글기를 여기서 읽어 갑니다 — 스킨을 바꿀 때
+   자바스크립트를 건드리지 않게 하려는 것입니다.
+
+   지금 값은 "사이트 공용 톤"(어두운 배경 + KoddiUDOnGothic)이고, 개편 전과
+   화면이 똑같이 나오도록 기존 수치를 그대로 옮겨 놓았습니다.
+
+   ── 나중에 게임 스타일(world/ui.css 계열)을 얹을 때 ──
+   이 파일을 복사해 theme-pixel.css 를 만들고 index.html 의 링크만 바꾸면 됩니다.
+   실제로 손볼 자리는 아래 넷입니다:
+     1) --font-ui 를 'Dokkaebi DNR Gothic' 으로. 이때 --fs-* 를 rem 소수 대신
+        정수 px(12·16·24…)로 바꿔야 합니다 — 도트 서체는 배수가 아닌 크기에서
+        획이 뭉갭니다. 그래서 글자 크기를 여기 한자리에 모아 뒀습니다.
+     2) --img-rendering: pixelated (스파크라인·차트가 도트 톤과 섞이게)
+     3) 카드에 9-슬라이스 프레임 얹기. 토큰만으로는 안 되고 규칙 하나가 필요합니다:
+          :root { --panel-bg: rgba(33, 66, 123, 1); --panel-pad: 16px; --rule: none; }
+          .card {
+              border: 16px solid transparent;
+              border-image: url('../world/ui/frame.png') 16 fill / 16px round;
+          }
+        (world/ui.css 의 .frame-box 와 같은 방식입니다. 조각 크기 16은 frame.png
+         타일이 실제로 16px이라 고정 — 다른 값을 주면 테두리가 늘어나 보입니다.)
+     4) --radius-* 를 0 으로. 픽셀 UI에 둥근 모서리는 안 맞습니다.
+   index.html 의 폰트 preload 두 줄도 같이 바꿔야 첫 화면에서 서체가 늦게
+   붙지 않습니다. */
+
+:root {
+    color-scheme: dark;
+
+    /* ── 표면 & 잉크 ────────────────────────────────────────────────── */
+    --plane: #0b0c0e;
+    --surface: #17181c;
+    --surface-2: #1e2025;
+    --border: rgba(255, 255, 255, 0.10);
+    --text-primary: #ffffff;
+    --text-secondary: #c3c2b7;
+    --text-muted: #898781;
+    --grid: #2c2c2a;
+    --axis: #383835;
+    --deemph: #5b5c60;
+    --link: rgba(123, 166, 222, 1);
+
+    /* 범주형 시리즈 — 고정 순서. 순서 자체가 색각 안전장치라 섞지 마세요.
+       이 표면색(--surface) 기준으로 CVD/대비 검증을 통과한 값입니다. */
+    --series-1: #3987e5;
+    --series-2: #d95926;
+    --series-3: #199e70;
+    --series-4: #c98500;
+    --series-5: #d55181;
+    --series-6: #008300;
+
+    /* 연속형(크기) 램프 — 파랑 한 색, 어두울수록 0에 가까움 */
+    --seq-1: #184f95;
+    --seq-2: #256abf;
+    --seq-3: #3987e5;
+    --seq-4: #6da7ec;
+    --seq-5: #9ec5f4;
+    --seq-6: #cde2fb;
+
+    /* 강조 — 탭 밑줄·인사이트 세로선처럼 "지금 여기"를 가리키는 자리 전용 */
+    --accent: var(--series-1);
+
+    /* 상태 — 증감 표시 전용, 시리즈 색으로 재사용 금지 */
+    --good: #0ca30c;
+    --critical: #d03b3b;
+
+    /* ── 서체 ──────────────────────────────────────────────────────── */
+    --font-ui: 'KoddiUDOnGothic', sans-serif;
+    --font-weight-bold: 700;
+    --line-height: 1.6;
+
+    /* 글자 크기 — 스킨을 갈아끼울 때 여기만 보면 되도록 한자리에 모음.
+       ↓ 쓰이는 곳
+       h1 / 히어로 숫자 / 큰 수치(KPI·평균) / 본문·소제목 / 부제·탭 /
+       라벨·표 / 주석·증감 / 아주 작은 라벨(태그·히트맵 축) */
+    --fs-h1: 1.5rem;
+    --fs-hero: 3.5rem;
+    --fs-value: 1.75rem;
+    --fs-kpi-value: var(--fs-value);   /* KPI 타일만 따로 — 좁은 화면에서 먼저 줄어듭니다 */
+    --fs-body: 0.9375rem;
+    --fs-sm: 0.875rem;
+    --fs-label: 0.8125rem;
+    --fs-note: 0.75rem;
+    --fs-micro: 0.6875rem;
+
+    /* ── 형태 ──────────────────────────────────────────────────────── */
+    /* 구획을 나누는 가로선 하나. 카드 위, 탭 아래, 표의 행 사이가 전부 이 값입니다. */
+    --rule: 1px solid var(--border);
+    --radius-sm: 4px;
+    --radius-xs: 2px;
+    --radius-pill: 999px;
+
+    /* 패널(카드) — 지금은 테두리 없이 여백과 위쪽 가로선(--rule)만 씁니다. */
+    --panel-bg: transparent;
+    --panel-pad: 18px 0 0;
+    --panel-radius: 0;
+
+    /* 스파크라인·차트가 도트 톤과 섞여야 할 때 pixelated 로 */
+    --img-rendering: auto;
+
+    /* ── 간격 ──────────────────────────────────────────────────────── */
+    --page-max: 1080px;
+    --page-pad: 32px 20px 0;
+    --gap-block: 36px;          /* 구획과 구획 사이 */
+    --gap-grid: 28px 44px;      /* 2단 그리드 내부 */
+    --grid-min: 300px;          /* 이보다 좁아지면 한 단으로 접힘 */
+
+    /* ── 차트 기하 (dashboard.js 가 읽어 감) ───────────────────────── */
+    --chart-h: 260px;
+    --chart-h-tall: 300px;
+    --chart-font-size: 12px;    /* 캔버스 안 글자 — CSS로는 못 줘서 JS가 읽습니다 */
+    --line-w: 2px;
+    --line-tension: 0.25;       /* 0이면 꺾은선, 1에 가까울수록 둥근 곡선 */
+    --line-fill-alpha: 0.1;     /* 선 아래 면의 농도 */
+    --point-r: 4px;             /* 마우스를 올렸을 때만 나오는 점 */
+    --bar-radius: 4px;
+    --bar-thickness: 24px;
+
+    /* 스파크라인 — KPI 타일용(큰 것)과 순위표 칸용(작은 것) */
+    --spark-w: 140px;
+    --spark-h: 26px;
+    --spark-w-sm: 120px;
+    --spark-h-sm: 24px;
+    --spark-w-rank: 132px;      /* 표에서 스파크라인 칸이 차지하는 폭 */
+    --spark-line-w: 1.5px;      /* 28일 전체(옅은 회색) */
+    --spark-line-w-cur: 2px;    /* 최근 7일(강조) */
+
+    /* 히트맵 */
+    --heat-cell: 22px;
+    --heat-gap: 2px;
+    --heat-label-w: 22px;
+}
+
+/* 좁은 화면 — 값만 조정하고 구조는 dashboard.css 에서 바꿉니다. */
+@media (max-width: 640px) {
+    :root {
+        --page-pad: 24px 14px 0;
+        --fs-kpi-value: 1.5rem;
+        --heat-cell: 14px;
+        --heat-gap: 1px;
+        --heat-label-w: 20px;
+    }
+}
