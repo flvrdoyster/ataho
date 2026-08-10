@@ -19,8 +19,10 @@
  *
  * [트리거 items 속성 대안]
  * - itemsFrom: items를 직접 나열하는 대신, 이 이름의 전역 변수(예: window.RESOURCE_IMG_MANIFEST,
- *   resource/img/manifest.js가 정의하는 { 파일명 -> { caption, source, modified } } 객체)에서
+ *   resource/img/manifest.js가 정의하는 { 파일명 -> { caption, source, modified, group } } 객체)에서
  *   resource/img/ 안의 항목들을 읽어와 메뉴 항목으로 변환한다.
+ *   group이 있는 항목들이 연달아 나오면 그 위에 섹션 헤더가 붙는다 (같은 group끼리
+ *   떨어져 있으면 헤더가 여러 번 생기므로 manifest.js에서 서로 붙여 둘 것).
  */
 
 if (!window.MAP_DATA.triggers) window.MAP_DATA.triggers = [];

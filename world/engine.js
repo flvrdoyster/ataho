@@ -79,12 +79,13 @@ const keys = {
     w: false, s: false, a: false, d: false
 };
 
+// Shared by touch drag AND desktop mouse drag (handleMouseDown/Move/Up feed the
+// same state via updatePointerAim) — char_free.js reads this one source either way.
 const touchInput = { active: false, dx: 0, dy: 0 };
 
 let triggers = [];
 let activeTrigger = null;
 let lastTime = 0;
-let isTouchDevice = false;
 let focusedLinkIndex = -1;
 let bubbleTimeout = null;
 let lastBubbleTime = 0;
@@ -152,6 +153,7 @@ async function initGame() {
                         return {
                             label: meta.caption || file,
                             href: '#resource/img/' + file,
+                            group: meta.group || '',
                             data: {
                                 caption: meta.caption || file,
                                 source: meta.source || '',
@@ -236,10 +238,9 @@ async function initGame() {
     canvas.addEventListener('touchstart', handleTouchStart, { passive: false });
     canvas.addEventListener('touchmove', handleTouchMove, { passive: false });
     canvas.addEventListener('touchend', handleTouchEnd, { passive: false });
-
-    if ('ontouchstart' in window || navigator.maxTouchPoints > 0) {
-        isTouchDevice = true;
-    }
+    canvas.addEventListener('mousedown', handleMouseDown);
+    window.addEventListener('mousemove', handleMouseMove);
+    window.addEventListener('mouseup', handleMouseUp);
 
     window.addEventListener('resize', resizeCanvas);
     resizeCanvas();
@@ -324,70 +325,49 @@ function injectUI() {
     }
     const uiLayer = document.getElementById('ui-layer');
 
-    // Action Button — single interaction control for all platforms (click or tap).
-    if (!document.getElementById('action-btn')) {
-        const btn = document.createElement('div');
-        btn.id = 'action-btn';
-        btn.className = 'hidden';
+    // Bottom control bar. The buttons are flex children of this one positioned
+    // element, so a state showing both (MENU: Space=고른다 / ESC=고르지 않는다)
+    // lays them out side by side with the *pair* staying centered, instead of
+    // each button centering itself and stacking on top of the other. Every
+    // --action-btn-* var is set here and inherited by both buttons.
+    if (!document.getElementById('action-btns')) {
+        const bar = document.createElement('div');
+        bar.id = 'action-btns';
         const cfg = CONFIG.UI.ACTION_BUTTON;
-        btn.innerHTML = ACTION_ICONS.space;
-        btn.setAttribute('aria-label', cfg.LABEL || '');
-        uiLayer.appendChild(btn);
+        const vars = {
+            bottom: cfg.BOTTOM, left: cfg.LEFT, right: cfg.RIGHT, transform: cfg.TRANSFORM,
+            width: cfg.WIDTH, height: cfg.HEIGHT, bg: cfg.BG_COLOR, color: cfg.TEXT_COLOR,
+            border: cfg.BORDER, 'border-bottom': cfg.BORDER_BOTTOM, radius: cfg.RADIUS,
+            'font-size': cfg.FONT_SIZE, shadow: cfg.SHADOW,
+        };
+        for (const [name, value] of Object.entries(vars)) {
+            bar.style.setProperty(`--action-btn-${name}`, value);
+        }
+        uiLayer.appendChild(bar);
+    }
+    const btnBar = document.getElementById('action-btns');
 
-        btn.style.setProperty('--action-btn-width', cfg.WIDTH);
-        btn.style.setProperty('--action-btn-height', cfg.HEIGHT);
-        btn.style.setProperty('--action-btn-bottom', cfg.BOTTOM);
-        btn.style.setProperty('--action-btn-left', cfg.LEFT);
-        btn.style.setProperty('--action-btn-right', cfg.RIGHT);
-        btn.style.setProperty('--action-btn-bg', cfg.BG_COLOR);
-        btn.style.setProperty('--action-btn-color', cfg.TEXT_COLOR);
-        btn.style.setProperty('--action-btn-border', cfg.BORDER);
-        btn.style.setProperty('--action-btn-border-bottom', cfg.BORDER_BOTTOM);
-        btn.style.setProperty('--action-btn-radius', cfg.RADIUS);
-        btn.style.setProperty('--action-btn-font-size', cfg.FONT_SIZE);
-        btn.style.setProperty('--action-btn-shadow', cfg.SHADOW);
-        btn.style.setProperty('--action-btn-transform', cfg.TRANSFORM);
-
+    // The two buttons differ only in icon, label, and what they do — the look comes
+    // from the shared vars above. Space is the interaction control on every platform
+    // (click or tap); ESC is "고르지 않는다" for an open menu, and a dialogue has none
+    // by design since it is meant to be read to the end.
+    const makeActionButton = (id, icon, label, onClick) => {
+        if (document.getElementById(id)) return;
+        const btn = document.createElement('div');
+        btn.id = id;
+        btn.className = 'hidden';
+        btn.innerHTML = icon;
+        btn.setAttribute('aria-label', label);
         btn.addEventListener('click', (e) => {
             e.preventDefault();
             e.stopPropagation();
-            activateOrAdvance();
+            onClick();
         });
         btn.addEventListener('touchstart', (e) => { e.stopPropagation(); });
-    }
-
-    // ESC Button — closes an open menu modal (mobile has no keyboard). Same look as the
-    // action button; shown only while a menu is open (see enterMenu/closeModal).
-    if (!document.getElementById('esc-btn')) {
-        const escBtn = document.createElement('div');
-        escBtn.id = 'esc-btn';
-        escBtn.className = 'hidden';
-        const cfg = CONFIG.UI.ACTION_BUTTON; // share the action button's look
-        escBtn.innerHTML = ACTION_ICONS.esc;
-        escBtn.setAttribute('aria-label', 'ESC');
-        uiLayer.appendChild(escBtn);
-
-        escBtn.style.setProperty('--action-btn-width', cfg.WIDTH);
-        escBtn.style.setProperty('--action-btn-height', cfg.HEIGHT);
-        escBtn.style.setProperty('--action-btn-bottom', cfg.BOTTOM);
-        escBtn.style.setProperty('--action-btn-left', cfg.LEFT);
-        escBtn.style.setProperty('--action-btn-right', cfg.RIGHT);
-        escBtn.style.setProperty('--action-btn-bg', cfg.BG_COLOR);
-        escBtn.style.setProperty('--action-btn-color', cfg.TEXT_COLOR);
-        escBtn.style.setProperty('--action-btn-border', cfg.BORDER);
-        escBtn.style.setProperty('--action-btn-border-bottom', cfg.BORDER_BOTTOM);
-        escBtn.style.setProperty('--action-btn-radius', cfg.RADIUS);
-        escBtn.style.setProperty('--action-btn-font-size', cfg.FONT_SIZE);
-        escBtn.style.setProperty('--action-btn-shadow', cfg.SHADOW);
-        escBtn.style.setProperty('--action-btn-transform', cfg.TRANSFORM);
-
-        escBtn.addEventListener('click', (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            closeModal();
-        });
-        escBtn.addEventListener('touchstart', (e) => { e.stopPropagation(); });
-    }
+        btnBar.appendChild(btn);
+    };
+    makeActionButton('action-btn', ACTION_ICONS.space, CONFIG.UI.ACTION_BUTTON.LABEL || '', activateOrAdvance);
+    makeActionButton('esc-btn', ACTION_ICONS.esc, 'ESC', closeModal);
 
     // Dynamic Modal
     if (!document.getElementById('dynamic-modal')) {
@@ -411,9 +391,9 @@ function injectUI() {
         const bubble = document.createElement('div');
         bubble.id = 'speech-bubble';
         bubble.className = 'hidden';
-        // 모바일: 말풍선을 직접 탭해도 넘어가게 — action-btn(트리거 있는 화면에서만 보임)에
-        // 기대지 않는 공통 경로. 대사 중엔 입력이 이미 잠겨(update()의 isInteracting())
-        // 있어 탭이 다른 동작과 겹칠 일이 없다.
+        // 모바일: 말풍선을 직접 탭해도 넘어가게 — action-btn에 기대지 않는 공통 경로.
+        // 대사 중엔 입력이 이미 잠겨(update()의 isInteracting()) 있어 탭이 다른 동작과
+        // 겹칠 일이 없다.
         bubble.addEventListener('click', (e) => { e.stopPropagation(); activateOrAdvance(); });
         bubble.addEventListener('touchend', (e) => {
             e.preventDefault();
@@ -443,11 +423,13 @@ function openModal(trigger, skipDialogue = false) {
     }
 }
 
-// Pointer entry: a tap/click on the prompt pill or mobile action button. Advances
-// an open dialogue (mirroring the Space key) instead of restarting it; otherwise
-// begins interacting with the reachable trigger.
+// Pointer entry: a tap/click on the prompt pill or the action button. Mirrors the
+// Space key in every state — picks the focused menu item, advances an open dialogue
+// (instead of restarting it), or begins interacting with the reachable trigger.
 function activateOrAdvance() {
-    if (interactionState === 'DIALOGUE') {
+    if (interactionState === 'MENU') {
+        handleModalAction();
+    } else if (interactionState === 'DIALOGUE') {
         if (performance.now() - lastBubbleTime > 200) advanceInteraction();
     } else if (interactionState === 'NONE' && activeTrigger) {
         openModal(activeTrigger);
@@ -497,7 +479,22 @@ function enterMenu(trigger) {
     if (listEl) {
         listEl.innerHTML = '';
         if (trigger.items) {
+            // A run of items sharing a group (e.g. the image gallery's series name)
+            // gets a header above it. Judged per item, so an item that never got a
+            // group just renders headerless under whatever precedes it — gating on
+            // "every item has one" would let a single blank group, which
+            // gen-img-manifest.js writes for every new image, silently strip the
+            // headers off the whole menu. Menus with no groups render flat, unchanged.
+            let lastGroup = null;
             trigger.items.forEach(item => {
+                if (item.group && item.group !== lastGroup) {
+                    const header = document.createElement('li');
+                    header.className = 'modal-group-header';
+                    header.textContent = item.group;
+                    listEl.appendChild(header);
+                    lastGroup = item.group;
+                }
+
                 const li = document.createElement('li');
                 const a = document.createElement('a');
                 a.href = item.href || '#';
@@ -515,6 +512,12 @@ function enterMenu(trigger) {
                 if (a.href.includes('#') && !item.action && !item.text) {
                     a.addEventListener('click', () => { setTimeout(closeModal, 10); });
                 }
+
+                // Hover (desktop) and touch (mobile) drag the cursor along with the
+                // pointer — see focusModalLink. touchstart rather than a click so a
+                // touch that slides off and releases still leaves the cursor here.
+                a.addEventListener('mouseenter', () => focusModalLink(a));
+                a.addEventListener('touchstart', () => focusModalLink(a), { passive: true });
 
                 li.appendChild(a);
                 listEl.appendChild(li);
@@ -542,11 +545,9 @@ function enterMenu(trigger) {
     modal.classList.remove('hidden');
     interactionState = 'MENU';
 
-    // Mobile close affordance: surface ESC, hide the action button (Space is inert here).
-    const escBtn = document.getElementById('esc-btn');
-    if (escBtn) escBtn.classList.remove('hidden');
-    const actBtn = document.getElementById('action-btn');
-    if (actBtn) actBtn.classList.add('hidden');
+    // A menu is the one state offering both choices, so both buttons show side by
+    // side: Space picks the focused item (handleModalAction), ESC declines.
+    syncActionButtons();
 
     activeMenuTrigger = null; // consumed
     lastBubbleTime = performance.now();
@@ -560,13 +561,12 @@ function enterMenu(trigger) {
 function closeModal() {
     document.querySelectorAll('.modal').forEach(m => m.classList.add('hidden'));
     document.querySelectorAll('.modal a').forEach(a => a.classList.remove('focused'));
-    const escBtn = document.getElementById('esc-btn');
-    if (escBtn) escBtn.classList.add('hidden');
     const bubble = document.getElementById('speech-bubble');
     if (bubble) bubble.classList.add('hidden');
     if (bubbleTimeout) { clearTimeout(bubbleTimeout); bubbleTimeout = null; }
     interactionState = 'NONE';
     activeMenuTrigger = null;
+    syncActionButtons();
 }
 
 // A one-off result bubble (e.g. choosing "참는다") — no menu follows it.
@@ -596,15 +596,50 @@ function renderBubble(text, offsetY = 0, trigger = null) {
     lastBubbleTime = performance.now();
 }
 
-function resetModalFocus(modal) {
-    const links = modal.querySelectorAll('a');
+// Keep the cursor inside the scrolled viewport of a long menu (the list caps at
+// 40vh and scrolls). Adjusts the list's own scrollTop rather than calling
+// scrollIntoView, which is free to scroll ancestors — the map behind this modal
+// must not move. Only nudges by the overflow amount, so an item already in view
+// never causes a jump (hover/touch can only reach visible items anyway).
+function scrollFocusIntoView(link) {
+    const list = link.closest('ul');
+    if (!list) return;
+
+    // Scrolling up to a group's first item should reveal its header too, otherwise
+    // the section name stays stranded just above the fold.
+    const li = link.parentElement;
+    const prev = li && li.previousElementSibling;
+    const topEl = (prev && prev.classList.contains('modal-group-header')) ? prev : link;
+
+    const listRect = list.getBoundingClientRect();
+    const topRect = topEl.getBoundingClientRect();
+
+    if (topRect.top < listRect.top) {
+        list.scrollTop -= (listRect.top - topRect.top);
+        return;
+    }
+    const linkBottom = link.getBoundingClientRect().bottom;
+    if (linkBottom > listRect.bottom) {
+        list.scrollTop += (linkBottom - listRect.bottom);
+    }
+}
+
+// Single writer for the menu cursor — arrows, pointer, and the initial reset all
+// route here so `focusedLinkIndex` can never drift from the highlighted element.
+function applyModalFocus(links, index) {
     links.forEach(l => l.classList.remove('focused'));
-    if (links.length > 0) {
-        links[0].classList.add('focused');
-        focusedLinkIndex = 0;
+    if (index >= 0 && index < links.length) {
+        links[index].classList.add('focused');
+        focusedLinkIndex = index;
+        scrollFocusIntoView(links[index]);
     } else {
         focusedLinkIndex = -1;
     }
+}
+
+function resetModalFocus(modal) {
+    // applyModalFocus range-checks, so an empty menu lands on -1 by itself.
+    applyModalFocus(Array.from(modal.querySelectorAll('a')), 0);
 }
 
 function handleModalNav(direction) {
@@ -612,11 +647,20 @@ function handleModalNav(direction) {
     if (!modal) return;
     const links = Array.from(modal.querySelectorAll('a'));
     if (links.length === 0) return;
-    links.forEach(l => l.classList.remove('focused'));
-    focusedLinkIndex += direction;
-    if (focusedLinkIndex >= links.length) focusedLinkIndex = 0;
-    if (focusedLinkIndex < 0) focusedLinkIndex = links.length - 1;
-    links[focusedLinkIndex].classList.add('focused');
+    let next = focusedLinkIndex + direction;
+    if (next >= links.length) next = 0;
+    if (next < 0) next = links.length - 1;
+    applyModalFocus(links, next);
+}
+
+// Pointing at an item moves the cursor onto it, so the Space button always picks
+// what the player last pointed at. Without this the cursor is only movable by the
+// arrow keys, and on a touch device Space would forever pick the first entry.
+function focusModalLink(link) {
+    const modal = link.closest('.modal');
+    if (!modal) return;
+    const links = Array.from(modal.querySelectorAll('a'));
+    applyModalFocus(links, links.indexOf(link));
 }
 
 function handleModalAction() {
@@ -667,53 +711,79 @@ function handleTouchStart(e) {
     if (e.target !== canvas) return;
     e.preventDefault();
     touchInput.active = true;
-    updateTouchInput(e.touches[0]);
+    updatePointerAim(e.touches[0]);
 }
 
 function handleTouchMove(e) {
     if (e.target !== canvas) return;
     e.preventDefault();
-    if (touchInput.active) updateTouchInput(e.touches[0]);
+    if (touchInput.active) updatePointerAim(e.touches[0]);
 }
 
 function handleTouchEnd(e) {
     if (e.target !== canvas) return;
     e.preventDefault();
+    endPointerDrag(e.changedTouches[0]);
+}
 
-    if (touchInput.active && interactionState !== 'MENU') {
-        const touch = e.changedTouches[0];
-        const rect = canvas.getBoundingClientRect();
-        const scaleX = canvas.width / rect.width;
-        const scaleY = canvas.height / rect.height;
-        const touchX = (touch.clientX - rect.left) * scaleX + camera.x;
-        const touchY = (touch.clientY - rect.top) * scaleY + camera.y;
+// Desktop mouse equivalent of the touch drag above: press-and-hold walks toward
+// the pointer, drag re-aims it, release stops (mirrors touchstart/move/end).
+// mousedown is scoped to the canvas so drags start deliberately; move/up listen
+// on window so releasing off-canvas still stops movement instead of sticking.
+function handleMouseDown(e) {
+    if (e.target !== canvas || e.button !== 0) return;
+    e.preventDefault();
+    touchInput.active = true;
+    updatePointerAim(e);
+}
 
-        if (activeTrigger) {
-            if (touchX >= activeTrigger.x && touchX <= activeTrigger.x + activeTrigger.w &&
-                touchY >= activeTrigger.y && touchY <= activeTrigger.y + activeTrigger.h) {
-                activateOrAdvance();
-            }
+function handleMouseMove(e) {
+    if (touchInput.active) updatePointerAim(e);
+}
+
+function handleMouseUp(e) {
+    endPointerDrag(e);
+}
+
+// End of a drag, from either input. A release that lands on the reachable trigger
+// interacts with it instead of merely having walked there.
+function endPointerDrag(point) {
+    if (!touchInput.active) return;
+    if (interactionState !== 'MENU' && activeTrigger) {
+        const p = clientToCanvasPoint(point.clientX, point.clientY);
+        const px = p.x + camera.x;
+        const py = p.y + camera.y;
+        if (px >= activeTrigger.x && px <= activeTrigger.x + activeTrigger.w &&
+            py >= activeTrigger.y && py <= activeTrigger.y + activeTrigger.h) {
+            activateOrAdvance();
         }
     }
-
     touchInput.active = false;
     touchInput.dx = 0;
     touchInput.dy = 0;
 }
 
-function updateTouchInput(touch) {
+// Viewport coords -> canvas-internal coords. The canvas is stretched to the window
+// by CSS, so its backing-store size and its on-screen size differ by this scale.
+// Add camera.x/y to the result to reach world coords.
+function clientToCanvasPoint(clientX, clientY) {
+    const rect = canvas.getBoundingClientRect();
+    return {
+        x: (clientX - rect.left) * (canvas.width / rect.width),
+        y: (clientY - rect.top) * (canvas.height / rect.height),
+    };
+}
+
+// Aim the walk direction at `point` (anything with clientX/clientY — a Touch or a
+// MouseEvent). Writes the shared touchInput the character modules read.
+function updatePointerAim(point) {
     const ps = (typeof playerGetState === 'function') ? playerGetState() : { x: 0, y: 0, width: 16, height: 16 };
     const pCanvasX = ps.x + ps.width / 2 - camera.x;
     const pCanvasY = ps.y + ps.height / 2 - camera.y;
 
-    const rect = canvas.getBoundingClientRect();
-    const scaleX = canvas.width / rect.width;
-    const scaleY = canvas.height / rect.height;
-    const touchInternalX = (touch.clientX - rect.left) * scaleX;
-    const touchInternalY = (touch.clientY - rect.top) * scaleY;
-
-    let tx = touchInternalX - pCanvasX;
-    let ty = touchInternalY - pCanvasY;
+    const p = clientToCanvasPoint(point.clientX, point.clientY);
+    let tx = p.x - pCanvasX;
+    let ty = p.y - pCanvasY;
     const len = Math.sqrt(tx * tx + ty * ty);
     if (len > 10) {
         touchInput.dx = tx / len;
@@ -764,8 +834,27 @@ function update(dt) {
 
 // ===== Triggers =====
 function checkTriggers() {
-    if (interactionState === 'MENU') return;
+    // A menu latches activeTrigger — the modal is positioned against it — so the
+    // scan pauses while one is open. Button state is still derived every frame.
+    if (interactionState !== 'MENU') scanForActiveTrigger();
+    syncActionButtons();
+}
 
+// Both bottom buttons derived from (interactionState, activeTrigger) in one place,
+// so no caller has to remember to show or hide them. Space prompts an interaction
+// with sprite-object triggers (tile zones auto-fire instead) and advances an open
+// dialogue — including one a spriteless tile zone started, which would otherwise
+// leave the bubble with no visible way forward. ESC belongs to menus alone.
+function syncActionButtons() {
+    const showAction = interactionState !== 'NONE' || !!(activeTrigger && activeTrigger.sprite);
+    const showEsc = interactionState === 'MENU';
+    const actBtn = document.getElementById('action-btn');
+    if (actBtn) actBtn.classList.toggle('hidden', !showAction);
+    const escBtn = document.getElementById('esc-btn');
+    if (escBtn) escBtn.classList.toggle('hidden', !showEsc);
+}
+
+function scanForActiveTrigger() {
     const ps = (typeof playerGetState === 'function') ? playerGetState() : null;
     if (!ps) return;
 
@@ -795,25 +884,16 @@ function checkTriggers() {
     } else {
         lastAutoTriggerId = null;
     }
-
-    // Action button is only for sprite-object triggers (tile zones auto-fire above).
-    const btn = document.getElementById('action-btn');
-    if (btn) btn.classList.toggle('hidden', !(activeTrigger && activeTrigger.sprite));
 }
 
-// 화면에 떠 있는 조작 버튼(esc/action) 중 가장 위 모서리의 뷰포트 Y를 반환.
-// 말풍선/모달이 이 선 아래로 내려가지 않게 클램프하는 데 쓴다(둘 다 하단 중앙 고정이라
-// 캐릭터를 따라다니는 모달과 겹칠 수 있음). 표시된 버튼이 없으면 Infinity.
+// 조작 버튼 줄(#action-btns)의 뷰포트 Y를 반환. 말풍선/모달이 이 선 아래로 내려가지
+// 않게 클램프하는 데 쓴다(버튼 줄이 하단 중앙 고정이라 캐릭터를 따라다니는 모달과
+// 겹칠 수 있음). 버튼이 하나도 안 떠 있으면 줄의 높이가 0이 되므로 Infinity.
 function uiButtonsSafeTop() {
-    let top = Infinity;
-    ['esc-btn', 'action-btn'].forEach(id => {
-        const el = document.getElementById(id);
-        if (el && !el.classList.contains('hidden')) {
-            const r = el.getBoundingClientRect();
-            if (r.height > 0) top = Math.min(top, r.top);
-        }
-    });
-    return top;
+    const bar = document.getElementById('action-btns');
+    if (!bar) return Infinity;
+    const r = bar.getBoundingClientRect();
+    return r.height > 0 ? r.top : Infinity;
 }
 
 // ===== Rendering =====

@@ -1,17 +1,20 @@
 #!/usr/bin/env node
 /**
  * resource/img/manifest.js는 이미지 갤러리의 유일한 데이터 파일이다.
- * (파일명 -> { caption, source, modified }) 객체를 담고 있으며, 손으로 직접 편집한다.
+ * (파일명 -> { caption, source, modified, group }) 객체를 담고 있으며, 손으로 직접 편집한다.
  *
  * modified는 숫자 코드: 0=원본, 1=업스케일, 2=재구성, 3=기타.
+ * group은 갤러리 메뉴에서 묶어 보여줄 섹션 이름(예: "환세희담"). 같은 group 값을
+ * 가진 항목들이 연속해서 나열될 때만 섹션 헤더로 표시되므로(world/engine.js의
+ * enterMenu 참고), 같은 그룹끼리는 manifest.js 안에서 서로 붙어 있어야 한다.
  *
  * 이 이미지들은 유저가 만든 게 아니라 개발사 원본 자료 제공이 목적이므로,
- * 각 항목의 source/modified를 채워 출처와 수정 여부를 명시할 것.
+ * 각 항목의 source/modified/group을 채워 출처와 수정 여부, 소속 시리즈를 명시할 것.
  *
  * 이 스크립트는 resource/img/ 를 스캔해서, manifest.js에 아직 없는 새 이미지가
  * 있으면 채워 넣기 편하도록 빈 자리 항목(caption은 파일명에서 자동 추출, source: '',
- * modified: 0)만 추가한다. 기존 항목은 절대 건드리지 않는다. 이미지가 삭제돼도
- * 남은 항목은 자동으로 지우지 않는다.
+ * modified: 0, group: '')만 추가한다. 기존 항목은 절대 건드리지 않는다. 이미지가
+ * 삭제돼도 남은 항목은 자동으로 지우지 않는다.
  *
  * 갤러리(모달/라이트박스) 노출 순서 = manifest.js에 적힌 항목 순서 그대로.
  * 새 이미지는 맨 끝에 추가되며, 순서를 바꾸고 싶으면 manifest.js에서 항목을
@@ -60,7 +63,7 @@ function main() {
     let changed = false;
     for (const file of files) {
         if (!(file in manifest)) {
-            manifest[file] = { caption: deriveCaption(file), source: '', modified: 0 };
+            manifest[file] = { caption: deriveCaption(file), source: '', modified: 0, group: '' };
             changed = true;
         }
     }
@@ -73,10 +76,11 @@ function main() {
     }
 
     // 기존 항목 순서는 그대로 유지하고(재정렬 없음), 새 항목만 끝에 추가된 상태다.
-    const js = `// resource/img/ 이미지 갤러리 데이터. caption/source/modified는 직접 편집한다.\n` +
+    const js = `// resource/img/ 이미지 갤러리 데이터. caption/source/modified/group은 직접 편집한다.\n` +
         `// 새 이미지의 빈 자리 항목은 scripts/gen-img-manifest.js가 맨 끝에 자동으로 추가한다.\n` +
         `// 노출 순서 = 아래 나열된 순서 그대로. 순서를 바꾸려면 항목을 직접 옮길 것.\n` +
         `// modified: 0=원본, 1=업스케일, 2=재구성, 3=기타\n` +
+        `// group: 갤러리 메뉴 섹션 이름. 같은 group끼리는 서로 붙어 있어야 헤더로 묶인다.\n` +
         `window.RESOURCE_IMG_MANIFEST = ${JSON.stringify(manifest, null, 2)};\n`;
     fs.writeFileSync(MANIFEST_PATH, js);
 

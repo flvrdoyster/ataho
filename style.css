@@ -214,15 +214,25 @@ video:fullscreen::cue {
     z-index: 500;
 }
 
-/* Action button — single interaction control on all platforms (click or tap) */
-#action-btn,
-#esc-btn {
+/* Bottom control bar — the single positioned element the buttons live in, so the
+   pair stays centered as a group when a state shows both (see injectUI). Click-through
+   so the gap between buttons never eats a canvas drag; the buttons re-enable hits. */
+#action-btns {
     display: flex;
+    gap: 12px;
     position: fixed;
     bottom: var(--action-btn-bottom, 20vh);
     left: var(--action-btn-left, 50%);
     right: var(--action-btn-right, auto);
     transform: var(--action-btn-transform, translateX(-50%));
+    z-index: 1001;
+    pointer-events: none;
+}
+
+/* Action button — single interaction control on all platforms (click or tap) */
+#action-btn,
+#esc-btn {
+    display: flex;
     width: var(--action-btn-width, 80px);
     height: var(--action-btn-height, 34px);
     background: var(--action-btn-bg, rgba(245, 245, 245, 1));
@@ -234,7 +244,6 @@ video:fullscreen::cue {
     box-shadow: var(--action-btn-shadow, 0 4px 6px rgba(0, 0, 0, 0.2));
     align-items: center;
     justify-content: center;
-    z-index: 1001;
     pointer-events: auto;
     user-select: none;
     -webkit-tap-highlight-color: transparent;
@@ -259,8 +268,9 @@ video:fullscreen::cue {
 
 #action-btn:active,
 #esc-btn:active {
-    /* Push button down and squash the 3D base */
-    transform: var(--action-btn-transform, translateX(-50%)) translateY(4px);
+    /* Push button down and squash the 3D base. Centering lives on #action-btns now,
+       so this is a plain offset rather than a compound with the centering transform. */
+    transform: translateY(4px);
     border-bottom-width: 2px !important;
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2) !important;
 }
@@ -321,10 +331,47 @@ video:fullscreen::cue {
     max-height: 40vh;
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(0, 0, 0, 0.25) transparent;
+}
+
+.modal-content ul::-webkit-scrollbar {
+    width: 6px;
+}
+
+.modal-content ul::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.modal-content ul::-webkit-scrollbar-thumb {
+    background-color: rgba(0, 0, 0, 0.25);
+    border-radius: 3px;
 }
 
 .modal-content li {
     margin: 5px 0;
+}
+
+.modal-content li.modal-group-header {
+    margin: 0 0 4px;
+    font-size: 0.7rem;
+    color: rgba(0, 0, 0, 0.5);
+    text-align: left;
+}
+
+/* Divider sits between sections, so the first header does without one. A static
+   block pseudo-element flows above the label on its own; `margin: 0 auto` centers
+   it at half width without taking the header out of flow. */
+.modal-content li.modal-group-header:not(:first-child) {
+    margin-top: 14px;
+}
+
+.modal-content li.modal-group-header:not(:first-child)::before {
+    content: "";
+    display: block;
+    width: 50%;
+    margin: 0 auto 10px;
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
 }
 
 .modal-content li a {
@@ -337,9 +384,8 @@ video:fullscreen::cue {
     border-radius: 4px;
 }
 
-.modal-content li a:hover {
-    color: rgba(0, 0, 0, 1);
-}
+/* No :hover rule — hovering an item moves the cursor onto it (focusModalLink),
+   so `.focused` below is what draws the hover state. */
 
 .close-modal {
     display: none;
