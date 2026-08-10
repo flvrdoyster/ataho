@@ -568,11 +568,11 @@ function readInput() {
     if (keys.ArrowDown || keys.s) return { dx: 0, dy: 1, dir: 0 };
     if (keys.ArrowLeft || keys.a) return { dx: -1, dy: 0, dir: 1 };
     if (keys.ArrowRight || keys.d) return { dx: 1, dy: 0, dir: 3 };
-    if (touchInput.active) {
-        if (Math.abs(touchInput.dx) > Math.abs(touchInput.dy)) {
-            return touchInput.dx > 0 ? { dx: 1, dy: 0, dir: 3 } : { dx: -1, dy: 0, dir: 1 };
+    if (pointerInput.active) {
+        if (Math.abs(pointerInput.dx) > Math.abs(pointerInput.dy)) {
+            return pointerInput.dx > 0 ? { dx: 1, dy: 0, dir: 3 } : { dx: -1, dy: 0, dir: 1 };
         }
-        return touchInput.dy > 0 ? { dx: 0, dy: 1, dir: 0 } : { dx: 0, dy: -1, dir: 2 };
+        return pointerInput.dy > 0 ? { dx: 0, dy: 1, dir: 0 } : { dx: 0, dy: -1, dir: 2 };
     }
     return null;
 }

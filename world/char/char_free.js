@@ -161,15 +161,15 @@ function playerUpdate(dt) {
         dy *= factor;
     }
 
-    // Touch override
-    if (touchInput.active) {
-        if (Math.abs(touchInput.dx) > Math.abs(touchInput.dy)) {
-            player.direction = touchInput.dx > 0 ? 3 : 1;
+    // Pointer drag (touch or mouse) overrides the keys
+    if (pointerInput.active) {
+        if (Math.abs(pointerInput.dx) > Math.abs(pointerInput.dy)) {
+            player.direction = pointerInput.dx > 0 ? 3 : 1;
         } else {
-            player.direction = touchInput.dy > 0 ? 0 : 2;
+            player.direction = pointerInput.dy > 0 ? 0 : 2;
         }
-        dx = touchInput.dx;
-        dy = touchInput.dy;
+        dx = pointerInput.dx;
+        dy = pointerInput.dy;
     }
 
     dx *= CHAR_CONFIG.MOVEMENT_SPEED * dt;

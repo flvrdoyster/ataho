@@ -79,9 +79,11 @@ const keys = {
     w: false, s: false, a: false, d: false
 };
 
-// Shared by touch drag AND desktop mouse drag (handleMouseDown/Move/Up feed the
-// same state via updatePointerAim) — char_free.js reads this one source either way.
-const touchInput = { active: false, dx: 0, dy: 0 };
+// Walk direction from a pointer drag — touch and desktop mouse both feed it through
+// updatePointerAim, so the character modules read one source regardless of input.
+// Part of the implicit engine↔character contract: char_free.js and char_sweep.js
+// read it by name off the global scope.
+const pointerInput = { active: false, dx: 0, dy: 0 };
 
 let triggers = [];
 let activeTrigger = null;
@@ -710,14 +712,14 @@ function onKeyUp(e) {
 function handleTouchStart(e) {
     if (e.target !== canvas) return;
     e.preventDefault();
-    touchInput.active = true;
+    pointerInput.active = true;
     updatePointerAim(e.touches[0]);
 }
 
 function handleTouchMove(e) {
     if (e.target !== canvas) return;
     e.preventDefault();
-    if (touchInput.active) updatePointerAim(e.touches[0]);
+    if (pointerInput.active) updatePointerAim(e.touches[0]);
 }
 
 function handleTouchEnd(e) {
@@ -733,12 +735,12 @@ function handleTouchEnd(e) {
 function handleMouseDown(e) {
     if (e.target !== canvas || e.button !== 0) return;
     e.preventDefault();
-    touchInput.active = true;
+    pointerInput.active = true;
     updatePointerAim(e);
 }
 
 function handleMouseMove(e) {
-    if (touchInput.active) updatePointerAim(e);
+    if (pointerInput.active) updatePointerAim(e);
 }
 
 function handleMouseUp(e) {
@@ -748,7 +750,7 @@ function handleMouseUp(e) {
 // End of a drag, from either input. A release that lands on the reachable trigger
 // interacts with it instead of merely having walked there.
 function endPointerDrag(point) {
-    if (!touchInput.active) return;
+    if (!pointerInput.active) return;
     if (interactionState !== 'MENU' && activeTrigger) {
         const p = clientToCanvasPoint(point.clientX, point.clientY);
         const px = p.x + camera.x;
@@ -758,9 +760,9 @@ function endPointerDrag(point) {
             activateOrAdvance();
         }
     }
-    touchInput.active = false;
-    touchInput.dx = 0;
-    touchInput.dy = 0;
+    pointerInput.active = false;
+    pointerInput.dx = 0;
+    pointerInput.dy = 0;
 }
 
 // Viewport coords -> canvas-internal coords. The canvas is stretched to the window
@@ -775,7 +777,7 @@ function clientToCanvasPoint(clientX, clientY) {
 }
 
 // Aim the walk direction at `point` (anything with clientX/clientY — a Touch or a
-// MouseEvent). Writes the shared touchInput the character modules read.
+// MouseEvent). Writes the shared pointerInput the character modules read.
 function updatePointerAim(point) {
     const ps = (typeof playerGetState === 'function') ? playerGetState() : { x: 0, y: 0, width: 16, height: 16 };
     const pCanvasX = ps.x + ps.width / 2 - camera.x;
@@ -786,11 +788,11 @@ function updatePointerAim(point) {
     let ty = p.y - pCanvasY;
     const len = Math.sqrt(tx * tx + ty * ty);
     if (len > 10) {
-        touchInput.dx = tx / len;
-        touchInput.dy = ty / len;
+        pointerInput.dx = tx / len;
+        pointerInput.dy = ty / len;
     } else {
-        touchInput.dx = 0;
-        touchInput.dy = 0;
+        pointerInput.dx = 0;
+        pointerInput.dy = 0;
     }
 }
 
@@ -800,9 +802,9 @@ function update(dt) {
     // character module stops uniformly — no per-module interaction handling.
     if (isInteracting()) {
         for (const k in keys) keys[k] = false;
-        touchInput.active = false;
-        touchInput.dx = 0;
-        touchInput.dy = 0;
+        pointerInput.active = false;
+        pointerInput.dx = 0;
+        pointerInput.dy = 0;
     }
 
     // Character update
