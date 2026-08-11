@@ -5,34 +5,34 @@ window.DASHBOARD_DATA['ga4'] = {
  "channels": [
   {
    "name": "Referral",
-   "sessions": 107,
-   "users": 34
+   "sessions": 104,
+   "users": 33
   },
   {
    "name": "Direct",
-   "sessions": 45,
-   "users": 39
+   "sessions": 51,
+   "users": 45
   },
   {
    "name": "Unassigned",
-   "sessions": 17,
-   "users": 6
-  },
-  {
-   "name": "Organic Search",
-   "sessions": 10,
+   "sessions": 20,
    "users": 8
   },
   {
+   "name": "Organic Search",
+   "sessions": 16,
+   "users": 9
+  },
+  {
    "name": "Organic Social",
-   "sessions": 6,
-   "users": 4
+   "sessions": 5,
+   "users": 3
   }
  ],
  "countries": [
   {
    "name": "South Korea",
-   "users": 78
+   "users": 82
   },
   {
    "name": "(not set)",
@@ -43,11 +43,11 @@ window.DASHBOARD_DATA['ga4'] = {
    "users": 1
   },
   {
-   "name": "China",
+   "name": "Japan",
    "users": 1
   },
   {
-   "name": "Japan",
+   "name": "Taiwan",
    "users": 1
   },
   {
@@ -57,16 +57,7 @@ window.DASHBOARD_DATA['ga4'] = {
  ],
  "daily": [
   {
-   "avgDuration": 252.21259565517244,
-   "date": "2026-07-14",
-   "engagementRate": 0.5517241379310345,
-   "newUsers": 17,
-   "sessions": 29,
-   "users": 20,
-   "views": 52
-  },
-  {
-   "avgDuration": 211.43667426666667,
+   "avgDuration": 211.43667426666664,
    "date": "2026-07-15",
    "engagementRate": 0.8,
    "newUsers": 7,
@@ -210,7 +201,7 @@ window.DASHBOARD_DATA['ga4'] = {
    "views": 43
   },
   {
-   "avgDuration": 586.4789708124999,
+   "avgDuration": 586.4789708125,
    "date": "2026-07-31",
    "engagementRate": 0.875,
    "newUsers": 7,
@@ -264,7 +255,7 @@ window.DASHBOARD_DATA['ga4'] = {
    "views": 45
   },
   {
-   "avgDuration": 253.933289,
+   "avgDuration": 253.93328900000003,
    "date": "2026-08-06",
    "engagementRate": 0.64,
    "newUsers": 11,
@@ -273,7 +264,7 @@ window.DASHBOARD_DATA['ga4'] = {
    "views": 32
   },
   {
-   "avgDuration": 297.24787182608696,
+   "avgDuration": 297.2478718260869,
    "date": "2026-08-07",
    "engagementRate": 0.4782608695652174,
    "newUsers": 13,
@@ -300,30 +291,39 @@ window.DASHBOARD_DATA['ga4'] = {
    "views": 85
   },
   {
-   "avgDuration": 344.9692118333333,
+   "avgDuration": 246.52538274999998,
    "date": "2026-08-10",
-   "engagementRate": 0.0,
-   "newUsers": 5,
+   "engagementRate": 0.4583333333333333,
+   "newUsers": 9,
    "sessions": 24,
-   "users": 10,
-   "views": 29
+   "users": 13,
+   "views": 38
+  },
+  {
+   "avgDuration": 380.95895391666664,
+   "date": "2026-08-11",
+   "engagementRate": 0.0,
+   "newUsers": 11,
+   "sessions": 24,
+   "users": 14,
+   "views": 39
   }
  ],
  "devices": [
   {
    "name": "모바일",
-   "sessions": 103,
-   "users": 48
+   "sessions": 106,
+   "users": 53
   },
   {
    "name": "PC",
-   "sessions": 66,
+   "sessions": 68,
    "users": 33
   },
   {
    "name": "태블릿",
-   "sessions": 5,
-   "users": 3
+   "sessions": 4,
+   "users": 2
   }
  ],
  "heatmap": {
@@ -381,30 +381,30 @@ window.DASHBOARD_DATA['ga4'] = {
     5
    ],
    [
-    9,
+    7,
+    2,
+    2,
+    0,
+    0,
+    1,
+    2,
+    1,
+    1,
+    5,
+    5,
+    7,
     2,
     3,
-    0,
-    1,
-    1,
-    1,
-    1,
-    0,
+    3,
+    7,
+    3,
     5,
-    6,
+    2,
     4,
-    2,
-    3,
-    5,
-    7,
     6,
     5,
-    3,
-    2,
     7,
-    7,
-    7,
-    4
+    5
    ],
    [
     3,
@@ -523,23 +523,23 @@ window.DASHBOARD_DATA['ga4'] = {
  },
  "insights": [
   {
-   "text": "최근 7일 활성 사용자 84명 — 그 전 7일보다 13% 줄었습니다.",
+   "text": "최근 7일 활성 사용자 88명 — 그 전 7일보다 8% 줄었습니다.",
    "tone": "down"
   },
   {
-   "text": "조회수 1위 사이트는 pc98.atah.io — 최근 7일 전체 조회수의 61%(185회)입니다.",
+   "text": "조회수 1위 사이트는 pc98.atah.io — 최근 7일 전체 조회수의 61%(193회)입니다.",
    "tone": "flat"
   },
   {
-   "text": "유입 1위는 Referral — 전체 세션의 58%(107회)입니다. 그 안에서는 namu.wiki가 가장 많이 보냅니다.",
+   "text": "유입 1위는 Referral — 전체 세션의 53%(104회)입니다. 그 안에서는 namu.wiki가 가장 많이 보냅니다.",
    "tone": "flat"
   },
   {
-   "text": "atah.io에서 가장 많이 오른 코너는 메인 (아타호의 거처) — 조회수가 7회에서 12회로 71% 늘었습니다.",
+   "text": "atah.io에서 가장 많이 오른 코너는 메인 (아타호의 거처) — 조회수가 6회에서 14회로 133% 늘었습니다.",
    "tone": "up"
   },
   {
-   "text": "모바일 세션 비중 59% — 조작·레이아웃 우선순위 판단에 씁니다.",
+   "text": "모바일 세션 비중 60% — 조작·레이아웃 우선순위 판단에 씁니다.",
    "tone": "flat"
   },
   {
@@ -552,57 +552,57 @@ window.DASHBOARD_DATA['ga4'] = {
   "label": "사이트",
   "propertyId": "516513119",
   "trendDays": 28,
-  "updatedAt": "2026-08-11 07:30"
+  "updatedAt": "2026-08-12 07:34"
  },
  "pages": [
   {
-   "name": "/kaitou.html",
-   "note": "pc98.atah.io",
-   "secPerView": 196.86274509803923,
-   "users": 9,
-   "views": 51
-  },
-  {
    "name": "/kitan.html",
    "note": "pc98.atah.io",
-   "secPerView": 184.0212765957447,
-   "users": 18,
-   "views": 47
+   "secPerView": 173.2,
+   "users": 20,
+   "views": 60
   },
   {
    "name": "/kr.html",
    "note": "suiko.atah.io",
-   "secPerView": 163.02272727272728,
-   "users": 17,
-   "views": 44
+   "secPerView": 164.45652173913044,
+   "users": 18,
+   "views": 46
+  },
+  {
+   "name": "/kaitou.html",
+   "note": "pc98.atah.io",
+   "secPerView": 193.46666666666667,
+   "users": 7,
+   "views": 45
   },
   {
    "name": "/hukyou.html",
    "note": "pc98.atah.io",
-   "secPerView": 159.28571428571428,
-   "users": 20,
-   "views": 35
-  },
-  {
-   "name": "/torimono.html",
-   "note": "pc98.atah.io",
-   "secPerView": 118.11111111111111,
-   "users": 7,
-   "views": 27
+   "secPerView": 163.4375,
+   "users": 18,
+   "views": 32
   },
   {
    "name": "/",
    "note": "pc98.atah.io",
-   "secPerView": 4.708333333333333,
-   "users": 16,
-   "views": 24
+   "secPerView": 5.333333333333333,
+   "users": 17,
+   "views": 30
   },
   {
    "name": "/sweep/index.html",
    "note": "atah.io",
-   "secPerView": 11.136363636363637,
-   "users": 22,
-   "views": 22
+   "secPerView": 9.074074074074074,
+   "users": 27,
+   "views": 27
+  },
+  {
+   "name": "/torimono.html",
+   "note": "pc98.atah.io",
+   "secPerView": 110.375,
+   "users": 7,
+   "views": 24
   },
   {
    "name": "/haiyuki_manual/index.html",
@@ -614,15 +614,15 @@ window.DASHBOARD_DATA['ga4'] = {
   {
    "name": "/",
    "note": "atah.io",
-   "secPerView": 14.272727272727273,
+   "secPerView": 12.076923076923077,
    "users": 9,
-   "views": 11
+   "views": 13
   },
   {
    "name": "/haiyuki_web/",
    "note": "atah.io",
-   "secPerView": 129.22222222222223,
-   "users": 4,
+   "secPerView": 145.88888888888889,
+   "users": 5,
    "views": 9
   },
   {
@@ -664,12 +664,12 @@ window.DASHBOARD_DATA['ga4'] = {
  "referral": [
   {
    "name": "namu.wiki",
-   "sessions": 83,
-   "users": 26
+   "sessions": 82,
+   "users": 25
   },
   {
    "name": "oysterbay.tistory.com",
-   "sessions": 23,
+   "sessions": 21,
    "users": 11
   },
   {
@@ -680,9 +680,8 @@ window.DASHBOARD_DATA['ga4'] = {
  ],
  "sections": [
   {
-   "cur": 22,
+   "cur": 27,
    "daily": [
-    0,
     1,
     11,
     22,
@@ -709,16 +708,16 @@ window.DASHBOARD_DATA['ga4'] = {
     5,
     2,
     4,
-    1
+    3,
+    6
    ],
-   "delta": -15.384615384615385,
+   "delta": 0.0,
    "name": "미니게임 · 술창고 청소",
-   "prev": 26
+   "prev": 27
   },
   {
    "cur": 15,
    "daily": [
-    2,
     11,
     2,
     0,
@@ -745,52 +744,16 @@ window.DASHBOARD_DATA['ga4'] = {
     4,
     0,
     7,
-    1
+    1,
+    0
    ],
-   "delta": -65.9090909090909,
+   "delta": -31.818181818181817,
    "name": "환세패유기 해설서",
-   "prev": 44
+   "prev": 22
   },
   {
-   "cur": 12,
+   "cur": 14,
    "daily": [
-    2,
-    9,
-    1,
-    0,
-    0,
-    0,
-    0,
-    2,
-    0,
-    1,
-    0,
-    0,
-    0,
-    1,
-    22,
-    6,
-    4,
-    3,
-    1,
-    2,
-    1,
-    0,
-    3,
-    0,
-    3,
-    0,
-    5,
-    1
-   ],
-   "delta": -69.23076923076923,
-   "name": "환세패유기 (웹)",
-   "prev": 39
-  },
-  {
-   "cur": 12,
-   "daily": [
-    5,
     5,
     12,
     6,
@@ -817,16 +780,52 @@ window.DASHBOARD_DATA['ga4'] = {
     1,
     1,
     5,
-    3
+    3,
+    2
    ],
-   "delta": 71.42857142857143,
+   "delta": 133.33333333333331,
    "name": "메인 (아타호의 거처)",
-   "prev": 7
+   "prev": 6
+  },
+  {
+   "cur": 12,
+   "daily": [
+    9,
+    1,
+    0,
+    0,
+    0,
+    0,
+    2,
+    0,
+    1,
+    0,
+    0,
+    0,
+    1,
+    22,
+    6,
+    4,
+    3,
+    1,
+    2,
+    1,
+    0,
+    3,
+    0,
+    3,
+    0,
+    5,
+    1,
+    0
+   ],
+   "delta": -29.411764705882355,
+   "name": "환세패유기 (웹)",
+   "prev": 17
   },
   {
    "cur": 4,
    "daily": [
-    1,
     2,
     3,
     0,
@@ -853,16 +852,16 @@ window.DASHBOARD_DATA['ga4'] = {
     3,
     0,
     1,
+    0,
     0
    ],
-   "delta": -66.66666666666666,
+   "delta": -50.0,
    "name": "씬 뷰어",
-   "prev": 12
+   "prev": 8
   },
   {
    "cur": 2,
    "daily": [
-    4,
     1,
     7,
     0,
@@ -889,6 +888,7 @@ window.DASHBOARD_DATA['ga4'] = {
     1,
     0,
     1,
+    0,
     0
    ],
    "delta": -50.0,
@@ -898,7 +898,6 @@ window.DASHBOARD_DATA['ga4'] = {
   {
    "cur": 2,
    "daily": [
-    0,
     1,
     0,
     0,
@@ -925,6 +924,7 @@ window.DASHBOARD_DATA['ga4'] = {
     1,
     0,
     1,
+    0,
     0
    ],
    "delta": 0.0,
@@ -934,9 +934,8 @@ window.DASHBOARD_DATA['ga4'] = {
  ],
  "sites": [
   {
-   "cur": 185,
+   "cur": 193,
    "daily": [
-    26,
     20,
     34,
     23,
@@ -963,16 +962,16 @@ window.DASHBOARD_DATA['ga4'] = {
     23,
     26,
     49,
-    21
+    27,
+    27
    ],
-   "delta": -18.859649122807017,
+   "delta": -14.977973568281937,
    "name": "pc98.atah.io",
-   "prev": 228
+   "prev": 227
   },
   {
-   "cur": 69,
+   "cur": 76,
    "daily": [
-    14,
     30,
     36,
     28,
@@ -999,16 +998,16 @@ window.DASHBOARD_DATA['ga4'] = {
     18,
     3,
     24,
-    6
+    8,
+    8
    ],
-   "delta": -48.507462686567166,
+   "delta": -11.627906976744185,
    "name": "atah.io",
-   "prev": 134
+   "prev": 86
   },
   {
-   "cur": 49,
+   "cur": 50,
    "daily": [
-    12,
     7,
     5,
     4,
@@ -1035,47 +1034,47 @@ window.DASHBOARD_DATA['ga4'] = {
     3,
     7,
     12,
-    2
+    3,
+    4
    ],
-   "delta": 188.23529411764704,
+   "delta": 194.11764705882354,
    "name": "suiko.atah.io",
    "prev": 17
   }
  ],
  "summary": {
   "activeUsers": {
-   "cur": 84.0,
-   "delta": -13.402061855670103,
-   "prev": 97.0
+   "cur": 88.0,
+   "delta": -8.333333333333332,
+   "prev": 96.0
   },
   "averageSessionDuration": {
-   "cur": 365.5261080747126,
-   "delta": -33.29153436098188,
-   "prev": 547.9456086618706
+   "cur": 360.0920576910113,
+   "delta": -28.53192032425902,
+   "prev": 503.85019343571423
   },
   "engagementRate": {
-   "cur": 0.5574712643678161,
-   "delta": -24.768441022207334,
-   "prev": 0.7410071942446043
+   "cur": 0.5393258426966292,
+   "delta": -26.69357477909895,
+   "prev": 0.7357142857142858
   },
   "newUsers": {
-   "cur": 71.0,
-   "delta": -18.39080459770115,
-   "prev": 87.0
+   "cur": 77.0,
+   "delta": -8.333333333333332,
+   "prev": 84.0
   },
   "screenPageViews": {
-   "cur": 303.0,
-   "delta": -20.052770448548813,
-   "prev": 379.0
+   "cur": 319.0,
+   "delta": -3.3333333333333335,
+   "prev": 330.0
   },
   "sessions": {
-   "cur": 174.0,
-   "delta": 25.179856115107913,
-   "prev": 139.0
+   "cur": 178.0,
+   "delta": 27.142857142857142,
+   "prev": 140.0
   }
  },
  "trendDates": [
-  "2026-07-14",
   "2026-07-15",
   "2026-07-16",
   "2026-07-17",
@@ -1102,12 +1101,13 @@ window.DASHBOARD_DATA['ga4'] = {
   "2026-08-07",
   "2026-08-08",
   "2026-08-09",
-  "2026-08-10"
+  "2026-08-10",
+  "2026-08-11"
  ],
  "visitors": [
   {
    "name": "신규",
-   "users": 71
+   "users": 77
   },
   {
    "name": "재방문",
@@ -1115,7 +1115,7 @@ window.DASHBOARD_DATA['ga4'] = {
   },
   {
    "name": "(미분류)",
-   "users": 3
+   "users": 5
   }
  ]
 };

@@ -5,18 +5,18 @@ window.DASHBOARD_DATA['blog'] = {
  "channels": [
   {
    "name": "Direct",
-   "sessions": 7,
+   "sessions": 11,
    "users": 7
   },
   {
-   "name": "Unassigned",
-   "sessions": 2,
-   "users": 2
+   "name": "Organic Search",
+   "sessions": 3,
+   "users": 3
   },
   {
-   "name": "Organic Search",
-   "sessions": 1,
-   "users": 1
+   "name": "Unassigned",
+   "sessions": 3,
+   "users": 3
   },
   {
    "name": "Organic Social",
@@ -26,16 +26,16 @@ window.DASHBOARD_DATA['blog'] = {
   {
    "name": "Referral",
    "sessions": 1,
-   "users": 0
+   "users": 1
   }
  ],
  "countries": [
   {
    "name": "South Korea",
-   "users": 7
+   "users": 9
   },
   {
-   "name": "(미상)",
+   "name": "(not set)",
    "users": 2
   }
  ],
@@ -50,25 +50,34 @@ window.DASHBOARD_DATA['blog'] = {
    "views": 2
   },
   {
-   "avgDuration": 15.224436375,
+   "avgDuration": 13.64582225,
    "date": "2026-08-10",
-   "engagementRate": 0.0,
+   "engagementRate": 0.375,
    "newUsers": 7,
    "sessions": 8,
    "users": 7,
-   "views": 11
+   "views": 12
+  },
+  {
+   "avgDuration": 10.170584833333333,
+   "date": "2026-08-11",
+   "engagementRate": 0.0,
+   "newUsers": 2,
+   "sessions": 6,
+   "users": 3,
+   "views": 7
   }
  ],
  "devices": [
   {
    "name": "모바일",
-   "sessions": 7,
+   "sessions": 9,
    "users": 6
   },
   {
    "name": "PC",
-   "sessions": 3,
-   "users": 3
+   "sessions": 7,
+   "users": 5
   }
  ],
  "heatmap": {
@@ -134,22 +143,22 @@ window.DASHBOARD_DATA['blog'] = {
     0,
     0,
     0,
+    1,
+    1,
+    1,
+    1,
     0,
     0,
     0,
     0,
     0,
     0,
+    1,
     0,
     0,
     0,
     0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0
+    1
    ],
    [
     0,
@@ -268,11 +277,11 @@ window.DASHBOARD_DATA['blog'] = {
  },
  "insights": [
   {
-   "text": "유입 1위는 Direct — 전체 세션의 58%(7회)입니다.",
+   "text": "유입 1위는 Direct — 전체 세션의 58%(11회)입니다.",
    "tone": "flat"
   },
   {
-   "text": "모바일 세션 비중 70% — 조작·레이아웃 우선순위 판단에 씁니다.",
+   "text": "모바일 세션 비중 56% — 조작·레이아웃 우선순위 판단에 씁니다.",
    "tone": "flat"
   },
   {
@@ -285,9 +294,16 @@ window.DASHBOARD_DATA['blog'] = {
   "label": "블로그",
   "propertyId": "549191220",
   "trendDays": 28,
-  "updatedAt": "2026-08-11 07:30"
+  "updatedAt": "2026-08-12 07:35"
  },
  "pages": [
+  {
+   "name": "PC98 환세 시리즈 한글화",
+   "note": "",
+   "secPerView": 12.222222222222221,
+   "users": 6,
+   "views": 9
+  },
   {
    "name": "OYSTER BAY",
    "note": "",
@@ -296,23 +312,23 @@ window.DASHBOARD_DATA['blog'] = {
    "views": 5
   },
   {
-   "name": "PC98 환세 시리즈 한글화",
-   "note": "",
-   "secPerView": 16.6,
-   "users": 4,
-   "views": 5
-  },
-  {
    "name": "환세쾌도전 공략",
    "note": "",
-   "secPerView": 0.0,
-   "users": 1,
-   "views": 2
+   "secPerView": 2.75,
+   "users": 2,
+   "views": 4
   },
   {
    "name": "환세취호전 웹 에뮬레이터",
    "note": "",
-   "secPerView": 8.0,
+   "secPerView": 4.0,
+   "users": 1,
+   "views": 2
+  },
+  {
+   "name": "'환세 시리즈 연구' 카테고리의 글 목록",
+   "note": "",
+   "secPerView": 16.0,
    "users": 1,
    "views": 1
   }
@@ -321,55 +337,60 @@ window.DASHBOARD_DATA['blog'] = {
   {
    "name": "namu.wiki",
    "sessions": 1,
-   "users": 0
+   "users": 1
   }
  ],
  "sections": [],
  "sites": [],
  "summary": {
   "activeUsers": {
-   "cur": 9.0,
+   "cur": 11.0,
    "delta": null,
    "prev": 0.0
   },
   "averageSessionDuration": {
-   "cur": 12.1795491,
+   "cur": 10.636880437499999,
    "delta": null,
    "prev": 0.0
   },
   "engagementRate": {
-   "cur": 0.0,
+   "cur": 0.1875,
    "delta": null,
    "prev": 0.0
   },
   "newUsers": {
-   "cur": 9.0,
+   "cur": 11.0,
    "delta": null,
    "prev": 0.0
   },
   "screenPageViews": {
-   "cur": 13.0,
+   "cur": 21.0,
    "delta": null,
    "prev": 0.0
   },
   "sessions": {
-   "cur": 10.0,
+   "cur": 16.0,
    "delta": null,
    "prev": 0.0
   }
  },
  "trendDates": [
   "2026-08-09",
-  "2026-08-10"
+  "2026-08-10",
+  "2026-08-11"
  ],
  "visitors": [
   {
    "name": "신규",
-   "users": 9
+   "users": 11
   },
   {
    "name": "(미분류)",
    "users": 2
+  },
+  {
+   "name": "재방문",
+   "users": 1
   }
  ]
 };
