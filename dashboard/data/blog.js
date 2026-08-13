@@ -5,28 +5,23 @@ window.DASHBOARD_DATA['blog'] = {
  "channels": [
   {
    "name": "Direct",
-   "sessions": 14,
-   "users": 8
+   "sessions": 17,
+   "users": 9
   },
   {
    "name": "Referral",
-   "sessions": 6,
-   "users": 2
-  },
-  {
-   "name": "Cross-network",
-   "sessions": 3,
-   "users": 3
+   "sessions": 9,
+   "users": 5
   },
   {
    "name": "Organic Search",
-   "sessions": 3,
-   "users": 3
+   "sessions": 5,
+   "users": 5
   },
   {
    "name": "Unassigned",
-   "sessions": 3,
-   "users": 3
+   "sessions": 2,
+   "users": 2
   },
   {
    "name": "Organic Social",
@@ -37,7 +32,7 @@ window.DASHBOARD_DATA['blog'] = {
  "countries": [
   {
    "name": "South Korea",
-   "users": 14
+   "users": 17
   },
   {
    "name": "(not set)",
@@ -73,25 +68,34 @@ window.DASHBOARD_DATA['blog'] = {
    "views": 7
   },
   {
-   "avgDuration": 146.51979681818182,
+   "avgDuration": 110.77508927272729,
    "date": "2026-08-12",
-   "engagementRate": 0.0,
+   "engagementRate": 0.5454545454545454,
    "newUsers": 5,
    "sessions": 11,
    "users": 6,
    "views": 17
+  },
+  {
+   "avgDuration": 27.7014336,
+   "date": "2026-08-13",
+   "engagementRate": 0.0,
+   "newUsers": 3,
+   "sessions": 5,
+   "users": 3,
+   "views": 5
   }
  ],
  "devices": [
   {
-   "name": "모바일",
-   "sessions": 14,
-   "users": 7
+   "name": "PC",
+   "sessions": 17,
+   "users": 12
   },
   {
-   "name": "PC",
-   "sessions": 13,
-   "users": 9
+   "name": "모바일",
+   "sessions": 15,
+   "users": 7
   }
  ],
  "heatmap": {
@@ -213,12 +217,12 @@ window.DASHBOARD_DATA['blog'] = {
     0,
     0,
     0,
+    1,
     0,
-    0,
-    0,
-    0,
-    0,
-    0,
+    1,
+    1,
+    1,
+    1,
     0,
     0,
     0,
@@ -291,11 +295,11 @@ window.DASHBOARD_DATA['blog'] = {
  },
  "insights": [
   {
-   "text": "유입 1위는 Direct — 전체 세션의 47%(14회)입니다.",
+   "text": "유입 1위는 Direct — 전체 세션의 50%(17회)입니다.",
    "tone": "flat"
   },
   {
-   "text": "모바일 세션 비중 52% — 조작·레이아웃 우선순위 판단에 씁니다.",
+   "text": "모바일 세션 비중 47% — 조작·레이아웃 우선순위 판단에 씁니다.",
    "tone": "flat"
   },
   {
@@ -308,42 +312,42 @@ window.DASHBOARD_DATA['blog'] = {
   "label": "블로그",
   "propertyId": "549191220",
   "trendDays": 28,
-  "updatedAt": "2026-08-13 07:33"
+  "updatedAt": "2026-08-14 07:34"
  },
  "pages": [
   {
    "name": "PC98 환세 시리즈 한글화",
    "note": "",
-   "secPerView": 10.692307692307692,
+   "secPerView": 9.928571428571429,
    "users": 8,
-   "views": 13
+   "views": 14
   },
   {
    "name": "OYSTER BAY",
    "note": "",
-   "secPerView": 0.7142857142857143,
-   "users": 5,
-   "views": 7
+   "secPerView": 1.125,
+   "users": 6,
+   "views": 8
   },
   {
    "name": "환세쾌도전 공략",
    "note": "",
-   "secPerView": 2.2,
+   "secPerView": 1.8333333333333333,
    "users": 2,
-   "views": 5
+   "views": 6
   },
   {
    "name": "환세희담 공략",
    "note": "",
-   "secPerView": 26.6,
-   "users": 3,
-   "views": 5
+   "secPerView": 63.666666666666664,
+   "users": 4,
+   "views": 6
   },
   {
    "name": "환세풍광전 공략",
    "note": "",
-   "secPerView": 5.0,
-   "users": 2,
+   "secPerView": 5.666666666666667,
+   "users": 3,
    "views": 3
   },
   {
@@ -366,45 +370,52 @@ window.DASHBOARD_DATA['blog'] = {
    "secPerView": 12.0,
    "users": 1,
    "views": 1
+  },
+  {
+   "name": "환세풍광전 소개",
+   "note": "",
+   "secPerView": 1.0,
+   "users": 1,
+   "views": 1
   }
  ],
  "referral": [
   {
    "name": "namu.wiki",
-   "sessions": 6,
-   "users": 2
+   "sessions": 9,
+   "users": 5
   }
  ],
  "sections": [],
  "sites": [],
  "summary": {
   "activeUsers": {
-   "cur": 16.0,
+   "cur": 19.0,
    "delta": null,
    "prev": 0.0
   },
   "averageSessionDuration": {
-   "cur": 66.06927051851852,
+   "cur": 47.787052781250004,
    "delta": null,
    "prev": 0.0
   },
   "engagementRate": {
-   "cur": 0.18518518518518517,
+   "cur": 0.34375,
    "delta": null,
    "prev": 0.0
   },
   "newUsers": {
-   "cur": 16.0,
+   "cur": 19.0,
    "delta": null,
    "prev": 0.0
   },
   "screenPageViews": {
-   "cur": 38.0,
+   "cur": 43.0,
    "delta": null,
    "prev": 0.0
   },
   "sessions": {
-   "cur": 27.0,
+   "cur": 32.0,
    "delta": null,
    "prev": 0.0
   }
@@ -413,19 +424,20 @@ window.DASHBOARD_DATA['blog'] = {
   "2026-08-09",
   "2026-08-10",
   "2026-08-11",
-  "2026-08-12"
+  "2026-08-12",
+  "2026-08-13"
  ],
  "visitors": [
   {
    "name": "신규",
-   "users": 16
-  },
-  {
-   "name": "(미분류)",
-   "users": 3
+   "users": 19
   },
   {
    "name": "재방문",
+   "users": 3
+  },
+  {
+   "name": "(미분류)",
    "users": 2
   }
  ]
