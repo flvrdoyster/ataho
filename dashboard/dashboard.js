@@ -3,11 +3,18 @@
    대상을 늘리려면 수집 스크립트에 Target 을 추가하고 index.html 에 <script> 한 줄만
    더하면 된다 — 탭은 여기서 자동으로 만들어진다.
 
+   이 페이지의 주어는 "어제"다. 28일치도 담지만 어제가 많은 날이었는지 적은
+   날이었는지 가늠할 자로만 쓴다. 지표마다 GA4가 확정하는 시점이 달라서
+   (수집 스크립트의 SETTLED 주석 참조) 어제 칸에 올릴 수 있는 것과 없는 것이
+   갈린다 — 참여율·평균 체류는 맨 아래 확정 구간에만 둔다.
+
    차트 규칙(고쳐도 되지만 이유는 알고 고치세요):
    - y축은 하나만. 크기가 다른 두 지표를 한 그림에 겹치지 않는다.
    - 색은 항목의 정체성을 따른다. 순위가 바뀌어도 같은 항목은 같은 색.
    - 크기(많고 적음)는 파랑 한 색의 명도로만 표현한다(무지개 금지).
-   - 모든 차트에는 같은 값을 읽을 수 있는 표가 함께 있다.
+   - 많고 적음을 좋고 나쁨의 색으로 칠하지 않는다. 방문자가 적은 날이
+     나쁜 날은 아니므로 "평소 범위 / 많은 편 / 적은 편"이라는 말로만 쓴다.
+   - 캔버스로 그린 것에는 같은 값을 읽을 수 있는 표가 함께 있다.
 
    보이는 값(색·서체·굵기·둥글기)은 이 파일에 두지 않는다 — 전부 theme.css 의
    토큰에서 읽는다. 테마를 갈아끼울 때 이 파일을 열지 않아도 되게 하려는 것. */
@@ -42,6 +49,7 @@
         surface: T('--surface'), textPrimary: T('--text-primary'),
         textSecondary: T('--text-secondary'), muted: T('--text-muted'),
         grid: T('--grid'), axis: T('--axis'), deemph: T('--deemph'),
+        band: T('--band'),
         series: [T('--series-1'), T('--series-2'), T('--series-3'),
                  T('--series-4'), T('--series-5'), T('--series-6')],
         seq: [T('--seq-1'), T('--seq-2'), T('--seq-3'), T('--seq-4'), T('--seq-5'), T('--seq-6')],
@@ -53,12 +61,6 @@
         tension: N('--line-tension', 0.25),
         fillAlpha: N('--line-fill-alpha', 0.1),
         pointR: N('--point-r', 4),
-        barRadius: N('--bar-radius', 4),
-        barThickness: N('--bar-thickness', 24),
-        sparkW: N('--spark-w', 140), sparkH: N('--spark-h', 26),
-        sparkWsm: N('--spark-w-sm', 120), sparkHsm: N('--spark-h-sm', 24),
-        sparkLineW: N('--spark-line-w', 1.5),
-        sparkLineWcur: N('--spark-line-w-cur', 2),
     };
 
     /* 선 아래 면은 같은 색의 옅은 칠. #rrggbb 면 알파를 덧붙이고, 그 밖의
@@ -72,6 +74,9 @@
 
     const nf = new Intl.NumberFormat('ko-KR');
     const fmt = (n) => nf.format(Math.round(n));
+    /* 하루 평균처럼 1보다 작을 수 있는 값은 반올림하면 "0"이 되어 버린다
+       (평소 하루 0.7회짜리 페이지가 "0"으로 보이면 배율을 읽을 수가 없다). */
+    const dec1 = (n) => n.toFixed(1);
     const pct = (n, digits) => `${n.toFixed(digits === undefined ? 0 : digits)}%`;
     const dur = (s) => {
         const m = Math.floor(s / 60), sec = Math.round(s % 60);
@@ -81,45 +86,6 @@
         (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
     const mmdd = (iso) => iso.slice(5).replace('-', '.');
     const share = (v, total) => (total ? v / total * 100 : 0);
-    const pctDelta = (cur, base) => (base ? (cur - base) / base * 100 : null);
-
-    /* 증감은 색만으로 말하지 않는다 — 화살표(기호) + 숫자 + "지난 7일 대비" 문구가 함께 간다. */
-    function deltaHTML(d, note) {
-        const label = note === undefined ? '지난 7일 대비' : note;
-        const suffix = label ? ` ${label}` : '';
-        if (d === null || d === undefined) {
-            return `<div class="delta">비교 불가${suffix}</div>`;
-        }
-        const abs = Math.abs(d);
-        if (abs < 0.05) return `<div class="delta">변화 없음${suffix}</div>`;
-        const up = d > 0;
-        // 10% 미만은 소수점 한 자리까지 — 안 그러면 0.6% 증가가 "▲ 0%"로 보인다
-        return `<div class="delta"><span class="${up ? 'up' : 'down'}">` +
-            `${up ? '▲' : '▼'} ${pct(abs, abs < 10 ? 1 : 0)}</span>${suffix}</div>`;
-    }
-
-    /* 28일 스파크라인. 전체는 옅은 회색, 최근 7일만 파랑 — 지금 구간이 어디인지 보이게. */
-    function sparkline(values, w, h) {
-        w = w || G.sparkWsm; h = h || G.sparkHsm;
-        if (!values.length) return '';
-        const max = Math.max.apply(null, values.concat([1]));
-        const step = values.length > 1 ? w / (values.length - 1) : 0;
-        const pts = values.map((v, i) => [
-            +(i * step).toFixed(1),
-            +(h - 1.5 - (v / max) * (h - 3)).toFixed(1),
-        ]);
-        const path = (arr) => arr.map((p) => p.join(',')).join(' ');
-        const tail = pts.slice(Math.max(0, pts.length - 8));
-        return `<svg class="spark" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" aria-hidden="true">` +
-            `<polyline fill="none" stroke="${C.deemph}" stroke-width="${G.sparkLineW}" ` +
-            `stroke-linejoin="round" stroke-linecap="round" points="${path(pts)}"/>` +
-            `<polyline fill="none" stroke="${C.series[0]}" stroke-width="${G.sparkLineWcur}" ` +
-            `stroke-linejoin="round" stroke-linecap="round" points="${path(tail)}"/>` +
-            `<circle cx="${pts[pts.length - 1][0]}" cy="${pts[pts.length - 1][1]}" ` +
-            `r="${G.sparkLineWcur * 1.25}" fill="${C.series[0]}" stroke="${C.surface}" ` +
-            `stroke-width="${G.sparkLineWcur}"/></svg>`;
-    }
-
     function tableView(summary, head, rows) {
         return `<details class="table-view"><summary>${esc(summary)}</summary><div class="scroll">` +
             `<table><thead><tr>${head.map((h) => `<th>${esc(h)}</th>`).join('')}</tr></thead>` +
@@ -155,29 +121,6 @@
         },
     };
 
-    /* 가로 막대 끝에 값 — 축 눈금 대신 값을 바로 읽게 (layout.padding.right로 자리 확보) */
-    const barValues = {
-        id: 'barValues',
-        afterDatasetsDraw(chart) {
-            const ctx = chart.ctx;
-            chart.data.datasets.forEach((ds, di) => {
-                const meta = chart.getDatasetMeta(di);
-                if (meta.hidden) return;
-                meta.data.forEach((el, i) => {
-                    const v = ds.data[i];
-                    if (v === null || v === undefined) return;
-                    ctx.save();
-                    ctx.fillStyle = C.textSecondary;
-                    ctx.font = `${G.fontSize}px ${FONT}`;
-                    ctx.textAlign = 'left';
-                    ctx.textBaseline = 'middle';
-                    ctx.fillText(fmt(v), el.x + 8, el.y);
-                    ctx.restore();
-                });
-            });
-        },
-    };
-
     /* 선 끝 직접 라벨. 두 선이 글자 한 줄(+여유 2px)보다 가까우면 겹쳐 읽히므로
        범례에 맡기고 그리지 않는다 — 서체 크기를 키우면 이 기준도 같이 커진다. */
     const lineEndLabels = {
@@ -206,7 +149,7 @@
         },
     };
 
-    function lineChart(canvas, labels, datasets) {
+    function lineChart(canvas, labels, datasets, extraPlugins) {
         return new Chart(canvas, {
             type: 'line',
             data: {
@@ -219,7 +162,11 @@
                     borderWidth: G.lineW,
                     tension: G.tension,
                     fill: !!d.fill,
-                    pointRadius: 0,
+                    /* 점마다 다른 크기를 줄 수 있다 — 어제 점만 크게 그릴 때 쓴다 */
+                    pointRadius: d.pointRadius === undefined ? 0 : d.pointRadius,
+                    pointBackgroundColor: C.series[i],
+                    pointBorderColor: C.surface,
+                    pointBorderWidth: G.lineW,
                     pointHoverRadius: G.pointR,
                     pointHoverBorderColor: C.surface,
                     pointHoverBorderWidth: G.lineW,
@@ -254,251 +201,233 @@
                     y: { beginAtZero: true, grid: gridStyle, border: { display: false }, ticks: { precision: 0 } },
                 },
             },
-            plugins: [crosshair, lineEndLabels],
+            plugins: [crosshair, lineEndLabels].concat(extraPlugins || []),
         });
     }
 
-    /* 항목이 하나뿐인 막대는 전부 같은 색 — 길이가 이미 크기를 말하므로 색까지 쓰지 않는다. */
-    function barChart(canvas, labels, values, unit) {
-        return new Chart(canvas, {
-            type: 'bar',
-            data: {
-                labels,
-                datasets: [{
-                    data: values,
-                    backgroundColor: C.series[0],
-                    borderRadius: G.barRadius,
-                    borderSkipped: 'start',   /* 둥근 쪽은 값 끝, 기준선 쪽은 각지게 */
-                    maxBarThickness: G.barThickness,
-                }],
+    /* 어제 하루를 28일 분포 위에 얹어 그린다 — q1~q3 띠와 중앙값 선을 추세선
+       뒤에 깔면 "어제가 평소보다 위인지 아래인지"를 눈금을 읽지 않고 알 수 있다.
+       crosshair 와 같은 방식으로 데이터셋보다 먼저 그려 배경이 되게 한다. */
+    function normalBand(box) {
+        return {
+            id: 'normalBand',
+            beforeDatasetsDraw(chart) {
+                if (!box) return;
+                const { ctx, chartArea: area, scales } = chart;
+                const y = scales.y;
+                const top = y.getPixelForValue(box.q3);
+                const bottom = y.getPixelForValue(box.q1);
+                const mid = y.getPixelForValue(box.median);
+                ctx.save();
+                ctx.fillStyle = C.band;
+                ctx.fillRect(area.left, top, area.right - area.left, bottom - top);
+                ctx.strokeStyle = C.deemph;
+                ctx.setLineDash([3, 3]);
+                ctx.lineWidth = 1;
+                ctx.beginPath();
+                ctx.moveTo(area.left, mid);
+                ctx.lineTo(area.right, mid);
+                ctx.stroke();
+                ctx.restore();
             },
-            options: {
-                indexAxis: 'y',
-                responsive: true,
-                layout: { padding: { right: 44 } },
-                plugins: {
-                    legend: { display: false },
-                    tooltip: {
-                        backgroundColor: C.surface,
-                        borderColor: C.axis,
-                        borderWidth: 1,
-                        titleColor: C.textPrimary,
-                        bodyColor: C.textSecondary,
-                        padding: 10,
-                        displayColors: false,
-                        callbacks: { label: (ctx) => `${fmt(ctx.parsed.x)}${unit}` },
-                    },
-                },
-                scales: {
-                    x: { display: false, beginAtZero: true, grace: '4%' },
-                    y: { grid: { display: false }, border: axisStyle, ticks: { color: C.textSecondary } },
-                },
-            },
-            plugins: [barValues],
-        });
+        };
     }
 
     // --- 화면 한 벌 ----------------------------------------------------
+    /* 이 페이지의 주어는 "어제"다. 28일치는 어제를 가늠할 자로만 쓴다.
+       지표마다 확정 시점이 달라서(수집 스크립트의 SETTLED 주석 참조) 어제 칸에
+       올릴 수 있는 것과 없는 것이 갈린다 — 참여율·평균 체류는 맨 아래 확정 구간에만.
+
+       화면은 모듈(박스) 여럿을 12칸 격자에 올려 만든다. 구획을 하나 넣거나
+       빼거나 순서를 바꾸는 일이 mod() 호출 하나로 끝나게 하려는 것 —
+       배치 규칙은 CSS 한 곳(.dash-main / .module)에만 있다. */
     function buildHTML(data, key) {
     const parts = [];
+    const y = data.yesterday;
 
-    if (!data.daily.length) {
-        return `<p class="meta-line">마지막 갱신 ${esc(data.meta.updatedAt)} KST · ` +
+    /* 모듈 하나 = 박스 하나. span 은 12칸 중 몇 칸을 차지할지.
+       note·body 는 이 파일 안에서 만든 마크업이라 그대로 넣고, 데이터에서 온
+       문자열은 각 호출부에서 esc() 를 거친다. */
+    function mod(span, title, note, body, extra) {
+        return `<section class="module span-${span}${extra ? ' ' + extra : ''}">` +
+            (title ? `<h2>${esc(title)}</h2>` : '') +
+            (note ? `<p class="module-note">${note}</p>` : '') +
+            body + '</section>';
+    }
+
+    if (!data.daily.length || !y || !y.date) {
+        return mod(12, '', '',
+            `<p class="meta-line">마지막 갱신 ${esc(data.meta.updatedAt)} KST · ` +
             `GA4 속성 ${esc(data.meta.propertyId)}</p>` +
             '<p class="empty">아직 이 대상에서 집계된 하루가 없습니다.' +
-            '<br>측정 코드를 심은 다음 날부터 채워집니다.</p>';
+            '<br>측정 코드를 심은 다음 날부터 채워집니다.</p>');
     }
 
-    /* 데일리 카운터 — 이 페이지가 말하는 숫자는 "어제 하루"다.
-       데이터가 매일 아침 07:00에 한 번만 갱신되므로 그 시점의 "오늘"은 새벽치뿐이라
-       (실측: 00~06시가 전체 세션의 15%) 아예 싣지 않는다. 어제가 많았는지 적었는지는
-       옆의 7일 하루 평균과 견주면 된다. */
-    const yday = data.daily.length ? data.daily[data.daily.length - 1] : null;
-    /* 하루 평균은 일별 값을 직접 평균 낸다. summary.activeUsers 는 7일 구간을
-       한 번에 물어본 값이라 같은 사람이 여러 날 와도 한 명으로 세어져(중복 제외)
-       7로 나누면 실제 하루 평균보다 낮게 나온다 — 이 기준으로 어제와 견주면
-       평균보다 적은 날이 "증가"로 뒤집혀 보였다. */
-    const last7 = data.daily.slice(-7);
-    const avg7 = last7.reduce((sum, d) => sum + d.users, 0) / (last7.length || 1);
-    parts.push(`<section class="hero">
-        <div class="hero-main">
-            <div class="label">어제 방문자${yday ? ` <span class="tag">${esc(mmdd(yday.date))}</span>` : ''}</div>
-            <div class="figure">${yday ? fmt(yday.users) : '—'}</div>
-            <div class="sub">${yday
-                ? `세션 ${fmt(yday.sessions)} · 페이지 조회 ${fmt(yday.views)}`
-                : '집계된 하루가 아직 없습니다'}</div>
-            ${yday ? deltaHTML(pctDelta(yday.users, avg7), '최근 7일 하루 평균 대비') : ''}
-        </div>
-        <div class="hero-side">
-            <div class="label">최근 7일 하루 평균</div>
-            <div class="value">${fmt(avg7)}<span class="unit">명</span></div>
-            <div class="sub">7일 전체 ${fmt(data.summary.activeUsers.cur)}명 (중복 제외)</div>
-        </div>
-    </section>`);
+    const base = data.baseline || {};
+    const WHERE = { high: '많은 편', low: '적은 편', usual: '평소 범위' };
 
-    parts.push(`<p class="meta-line">마지막 갱신 ${esc(data.meta.updatedAt)} KST · ` +
-        `매일 아침 07:00 KST에 한 번 갱신하며, 모든 수치는 어제까지의 완결된 하루만 셉니다.</p>`);
+    /* 어제가 분포의 어디인지 한 줄로. 색은 좋고 나쁨이 아니라 위치를 말한다 —
+       방문자가 적은 날이 "나쁜 날"은 아니므로 증감색은 쓰지 않는다.
+       num 은 칸마다 다르다 — 방문자·세션은 정수지만 "한 사람당 2.7장"은
+       반올림하면 3장이 되어 4.0장과의 차이가 사라진다. */
+    function standing(box, unit, num) {
+        if (!box) return '<div class="standing"></div>';
+        return `<div class="standing"><span class="where ${esc(box.where)}">` +
+            `${esc(WHERE[box.where])}</span>` +
+            `<span class="dim">중앙값 ${(num || fmt)(box.median)}${esc(unit)}</span></div>`;
+    }
 
+    function stat(label, box, unit, num, sub) {
+        const f = num || fmt;
+        return `<div class="stat">
+            <div class="label">${esc(label)}</div>
+            <div class="value">${box ? f(box.value) : '—'}` +
+            `<span class="unit">${esc(unit)}</span></div>
+            ${standing(box, unit, f)}
+            ${sub ? `<div class="sub">${esc(sub)}</div>` : ''}
+        </div>`;
+    }
+
+    // 1) 어제 스탯 네 칸
+    const pu = base.perUser;
+    parts.push(mod(5, '', '', `
+        <div class="yday-title">어제 <span class="tag">${esc(mmdd(y.date))}</span></div>
+        <p class="meta-line">마지막 갱신 ${esc(data.meta.updatedAt)} KST ·
+            매일 아침 07:00 KST에 어제 하루치를 모읍니다.</p>
+        <div class="stat-grid">
+            ${stat('방문자', base.users, '명', fmt, `새로 온 사람 ${fmt(y.newUsers)}명`)}
+            ${stat('페이지 조회', base.views, '회', fmt)}
+            ${stat('세션', base.sessions, '', fmt)}
+            ${stat('한 사람당', pu, '장', dec1)}
+        </div>`, 'accent stretch'));
+
+    // 2) 평소와 견주면 — 28일 추세선 + 분포 띠. 어제 점만 크게.
+    /* data.meta.trendDays 는 수집 스크립트가 "요청한" 구간(항상 28)이라 실제
+       받아온 일수와 다를 수 있다 — 블로그는 속성을 튼 지 얼마 안 돼 daily 가
+       5행뿐인데 trendDays 를 그대로 쓰면 "최근 28일"이라고 거짓말하게 된다.
+       실제로 그려지는 data.daily.length 를 쓴다(아래 「평소/일」 설명과 같은 이유). */
+    parts.push(mod(7, '평소와 견주면',
+        `최근 ${data.daily.length}일 일별 방문자 ·
+         띠는 가운데 절반이 들어오는 구간, 점선은 중앙값`,
+        `<div class="chart-box"><canvas id="c-trend-${key}"></canvas></div>
+         ${tableView('표로 보기', ['날짜', '방문자', '세션', '조회'],
+             data.daily.slice().reverse().map((d) => [
+                 d.date, fmt(d.users), fmt(d.sessions), fmt(d.views)]))}`, 'stretch'));
+
+    // 3) 인사이트
     if (data.insights && data.insights.length) {
-        parts.push(`<ul class="insights">${data.insights
-            .map((i) => `<li>${esc(i.text)}</li>`).join('')}</ul>`);
+        parts.push(mod(12, '', '',
+            `<ul class="insights">${data.insights
+                .map((i) => `<li>${esc(i.text)}</li>`).join('')}</ul>`));
     }
 
-    // KPI — 최근 7일 합계. 각각 지난 7일 대비 증감 + 28일 스파크라인.
-    const s = data.summary;
-    const dailyViews = data.daily.map((d) => d.views);
-    const kpis = [
-        { label: '활성 사용자', value: fmt(s.activeUsers.cur), delta: s.activeUsers.delta,
-          spark: data.daily.map((d) => d.users) },
-        { label: '신규 사용자', value: fmt(s.newUsers.cur), delta: s.newUsers.delta,
-          spark: data.daily.map((d) => d.newUsers) },
-        { label: '세션', value: fmt(s.sessions.cur), delta: s.sessions.delta,
-          spark: data.daily.map((d) => d.sessions) },
-        { label: '페이지 조회', value: fmt(s.screenPageViews.cur), delta: s.screenPageViews.delta,
-          spark: dailyViews },
-        { label: '참여율', value: pct(s.engagementRate.cur * 100, 1), delta: s.engagementRate.delta,
-          spark: data.daily.map((d) => d.engagementRate) },
-        { label: '평균 체류시간', value: dur(s.averageSessionDuration.cur),
-          delta: s.averageSessionDuration.delta,
-          spark: data.daily.map((d) => d.avgDuration) },
-    ];
-    parts.push('<h2 class="row-title">최근 7일</h2>');
-    parts.push(`<div class="kpi-row">${kpis.map((k) =>
-        `<div class="kpi"><div class="label">${esc(k.label)}</div>` +
-        `<div class="value">${k.value}</div>${deltaHTML(k.delta)}` +
-        sparkline(k.spark, G.sparkW, G.sparkH) + '</div>').join('')}</div>`);
+    // 4) 어제 본 페이지 — 사이트별 소계를 위에 한 줄로
+    /* 이름 우선순위: 코너(atah.io 안) → 페이지 제목(pc98/suiko — <title>에서
+       따온 사람이 읽는 이름) → 원시 경로(둘 다 없을 때만). 원래 경로로 바꿔치기
+       한 경우에만 그 경로를 작게 보조줄로 남긴다 — "환세풍광전" 아래 "/hukyou.html".
+       「평소/일」 칸의 배율은 수집 스크립트가 튀었다고 판정한 행에만 붙인다 —
+       문턱을 여기서 다시 재면 표와 인사이트 문장이 언젠가 어긋난다. */
+    const pageRows = data.ydayPages.map((p) => {
+        const label = p.section || p.title || p.name;
+        const sub = label !== p.name ? p.name : '';
+        const usual = p.priorAvg > 0
+            ? dec1(p.priorAvg) + (p.spike
+                ? `<span class="ratio">${dec1(p.views / p.priorAvg)}배</span>` : '')
+            : '<span class="dim" title="어제 이전 구간에는 조회가 없던 페이지">처음</span>';
+        /* 호스트는 이름 옆에 작게 붙인다 — 제 줄을 차지하면 한 행이 3줄이 되고
+           같은 호스트가 아홉 번 반복된다. 위의 점유율 막대가 이미 비중을 말한다. */
+        return `<tr><td class="page">` +
+            `<span class="name">${esc(label)}</span>` +
+            (p.host ? `<span class="host">${esc(p.host)}</span>` : '') +
+            (sub ? `<div class="path">${esc(sub)}</div>` : '') +
+            `</td><td class="num">${fmt(p.views)}</td>` +
+            `<td class="num usual">${usual}</td>` +
+            `<td class="num">${fmt(p.users)}</td></tr>`;
+    }).join('');
 
-    // 일별 추세
-    parts.push(`<div class="card">
-        <h2>일별 활성 사용자 · 세션</h2>
-        <p class="card-note">최근 ${data.meta.trendDays}일 (어제까지)</p>
-        <div class="chart-box tall"><canvas id="c-daily-${key}"></canvas></div>
-        ${tableView('표로 보기', ['날짜', '활성 사용자', '신규', '세션', '참여율', '평균 체류'],
-            data.daily.slice().reverse().map((d) => [
-                d.date, fmt(d.users), fmt(d.newUsers), fmt(d.sessions),
-                pct(d.engagementRate * 100, 1), dur(d.avgDuration)]))}
-    </div>`);
+    const siteTotal = data.ydaySites.reduce((a, s) => a + s.views, 0);
+    const siteBar = data.ydaySites.length ? `<div class="share-bar">${data.ydaySites
+        .map((s, n) => `<span style="flex:${s.views || 0.0001};background:${C.series[n]}" ` +
+            `title="${esc(s.name)} ${fmt(s.views)}회"></span>`).join('')}</div>` +
+        `<div class="share-legend">${data.ydaySites.map((s, n) =>
+            `<span><i class="key" style="background:${C.series[n]}"></i>${esc(s.name)} ` +
+            `<b>${fmt(s.views)}</b> (${pct(share(s.views, siteTotal))})</span>`).join('')}</div>` : '';
 
-    // 사이트별 / 코너별 — 항목마다 스파크라인을 붙인 소형 다중 그래프
-    function rankTable(rows, nameHead, unitHead) {
-        return `<div class="scroll"><table class="rank"><thead><tr>` +
-            `<th>${esc(nameHead)}</th><th class="spark-cell">최근 ${data.meta.trendDays}일</th>` +
-            `<th class="num">${esc(unitHead)}</th><th class="num">지난 7일 대비</th></tr></thead><tbody>` +
-            rows.map((r) => `<tr><td class="name">${esc(r.name)}</td>` +
-                `<td class="spark-cell">${sparkline(r.daily, G.sparkWsm, G.sparkHsm)}</td>` +
-                `<td class="num">${fmt(r.cur)}</td>` +
-                `<td class="num">${deltaHTML(r.delta, '')}</td></tr>`).join('') +
-            `</tbody></table></div>`;
+    /* 설명문은 대상에 맞춰 갈라진다 — 코너 묶음은 사이트에만 있고, 평소 평균의
+       기준 일수도 대상마다 다르다(블로그는 아직 5일치라 4일 평균이다).
+       meta.trendDays 를 그대로 쓰면 블로그에도 "27일 평균"이라고 적힌다. */
+    parts.push(mod(7, '어제 본 페이지',
+        `조회수 순${data.ydaySites.length ? ' · atah.io 안은 코너 이름으로 묶어 표시' : ''} ·
+         「평소/일」은 어제 이전 ${data.daily.length - 1}일의 하루 평균`,
+        `${siteBar}
+         <div class="scroll"><table class="rank pages"><thead><tr>
+            <th>페이지</th><th class="num">어제 조회</th>
+            <th class="num">평소/일</th><th class="num">사람</th>
+         </tr></thead><tbody>${pageRows ||
+            '<tr><td colspan="4" class="dim">어제 조회된 페이지가 없습니다.</td></tr>'}
+         </tbody></table></div>`));
+
+    // 5) 어제 온 곳
+    const srcRows = data.ydaySources.map((s) =>
+        `<tr><td class="name">${esc(s.name)}</td>` +
+        `<td class="num">${fmt(s.sessions)}</td></tr>`).join('');
+
+    /* 미분류를 목록에 섞지 않는 이유는 수집 스크립트 주석 참조 — 어제치는
+       GA4가 아직 재처리 중이라 대개 이게 1위로 올라온다. */
+    const unresolved = data.ydayUnresolved
+        ? `<p class="note-line">아직 분류 중 <b>${fmt(data.ydayUnresolved)}</b>건 —
+             GA4가 어제 유입을 재처리하는 중입니다. 내일이면 대개 채워집니다.</p>`
+        : '';
+
+    parts.push(mod(5, '어제 온 곳',
+        `유입원별 세션 · 한 세션에 출처가 여럿 붙는 경우가 있어
+         합계가 어제 세션 수와 다를 수 있습니다`,
+        `<div class="scroll"><table class="rank"><thead><tr>
+            <th>출처</th><th class="num">세션</th></tr></thead><tbody>${srcRows ||
+            '<tr><td colspan="2" class="dim">분류된 유입원이 없습니다.</td></tr>'}
+         </tbody></table></div>
+         ${unresolved}`));
+
+    // 6) 어제 시간대 — 24칸이라 전체폭이 가장 잘 맞는다
+    /* 색 계단 수는 실제 값의 종류만큼만 쓴다. 어제 최대가 4세션인데 6단계 램프를
+       그대로 쓰면 1세션과 2세션이 거의 같은 색이 되고 4세션 칸만 하얗게 튄다 —
+       구간이 값보다 잘게 쪼개져서 색이 정보를 잃는다. */
+    const hours = data.ydayHours || [];
+    const hourMax = Math.max(1, ...hours);
+    const steps = Math.min(C.seq.length, hourMax);
+    const strip = hours.map((v, hh) => {
+        const bg = v === 0 ? ''
+            : ` style="background:${C.seq[Math.min(steps, Math.ceil(v / hourMax * steps)) - 1]}"`;
+        return `<div class="cell"${bg} title="${hh}시 · ${fmt(v)}세션"></div>`;
+    }).join('');
+    const hourTicks = hours.map((_, hh) =>
+        `<div class="collabel">${hh % 6 === 0 ? `${hh}시` : ''}</div>`).join('');
+    const hourScale = C.seq.slice(0, steps)
+        .map((c) => `<i style="background:${c}"></i>`).join('');
+
+    parts.push(mod(12, '어제 시간대', '시각별 세션 · 속성 시간대 기준',
+        `<div class="hour-strip">${strip}</div>
+         <div class="hour-ticks">${hourTicks}</div>
+         <div class="legend-scale"><span>적음</span>${hourScale}` +
+        `<span>많음 (최대 ${fmt(hourMax)}세션)</span></div>`));
+
+    // 7) 확정 구간 — 어제 칸에 못 올리는 두 값
+    const st = data.settled;
+    if (st) {
+        parts.push(mod(12, '참여율 · 체류시간',
+            `어제를 뺀 마지막 ${data.meta.settledDays || 7}일 기준
+             (세션 ${fmt(st.sessions)}건). GA4가 참여 여부를 하루 이상 뒤에
+             확정하므로 어제 칸에는 올리지 않습니다.`,
+            `<div class="settled-row">
+                <div><div class="label">참여율</div>
+                     <div class="value">${pct(st.engagementRate * 100, 1)}</div></div>
+                <div><div class="label">평균 체류시간</div>
+                     <div class="value">${dur(st.avgDuration)}</div></div>
+             </div>`));
     }
 
-    // 호스트가 하나뿐인 대상(블로그)에는 이 둘이 무의미해서 수집 단계에서 비어 온다.
-    if (data.sites.length || data.sections.length) {
-        parts.push(`<div class="grid">
-            ${data.sites.length ? `<div class="card">
-                <h2>사이트별 조회수</h2>
-                <p class="card-note">이 GA4 속성이 받는 호스트 전부 · 로컬(localhost·사설 IP) 방문은 제외</p>
-                ${rankTable(data.sites, '사이트', '최근 7일')}
-            </div>` : ''}
-            ${data.sections.length ? `<div class="card">
-                <h2>atah.io 코너별 조회수</h2>
-                <p class="card-note">경로 앞부분으로 묶음</p>
-                ${rankTable(data.sections, '코너', '최근 7일')}
-            </div>` : ''}
-        </div>`);
-    }
-
-    // 유입
-    parts.push(`<div class="grid">
-        <div class="card">
-            <h2>유입 채널별 세션</h2>
-            <p class="card-note">최근 7일</p>
-            <div class="chart-box"><canvas id="c-channels-${key}"></canvas></div>
-            ${tableView('표로 보기', ['채널', '세션', '사용자'],
-                data.channels.map((c) => [esc(c.name), fmt(c.sessions), fmt(c.users)]))}
-        </div>
-        <div class="card">
-            <h2>어디서 오는가 (Referral)</h2>
-            <p class="card-note">최근 7일 · 링크를 타고 들어온 경우만</p>
-            <div class="chart-box"><canvas id="c-referral-${key}"></canvas></div>
-            ${tableView('표로 보기', ['출처', '세션', '사용자'],
-                data.referral.map((r) => [esc(r.name), fmt(r.sessions), fmt(r.users)]))}
-        </div>
-    </div>`);
-
-    // 시간대 히트맵 — 크기는 파랑 한 색의 명도로만
-    const grid = data.heatmap.grid;
-    const heatMax = Math.max(1, ...grid.map((row) => Math.max.apply(null, row)));
-    const bin = (v) => (v === 0 ? null : Math.min(5, Math.floor(v / heatMax * 5.999)));
-    let heatHTML = '<div class="heat">';
-    grid.forEach((row, wd) => {
-        heatHTML += `<div class="rowlabel">${data.heatmap.labels[wd]}</div>`;
-        row.forEach((v, hh) => {
-            const b = bin(v);
-            const bg = b === null ? '' : ` style="background:${C.seq[b]}"`;
-            heatHTML += `<div class="cell"${bg} title="${data.heatmap.labels[wd]} ${hh}시 · ${fmt(v)}세션"></div>`;
-        });
-    });
-    heatHTML += '<div class="rowlabel"></div>';
-    for (let hh = 0; hh < 24; hh++) {
-        heatHTML += `<div class="collabel">${hh % 6 === 0 ? hh : ''}</div>`;
-    }
-    heatHTML += '</div>';
-
-    parts.push(`<div class="card">
-        <h2>언제 오는가</h2>
-        <p class="card-note">요일 × 시각별 세션, 최근 ${data.meta.trendDays}일 누적 · 속성 시간대 기준</p>
-        ${heatHTML}
-        <div class="heat-scale"><span>적음</span>${C.seq.map((c) =>
-            `<i style="background:${c}"></i>`).join('')}<span>많음 (최대 ${fmt(heatMax)}세션)</span></div>
-        ${tableView('표로 보기', ['요일'].concat(Array.from({ length: 24 }, (_, h) => `${h}시`)),
-            grid.map((row, wd) => [data.heatmap.labels[wd]].concat(row.map(fmt))))}
-    </div>`);
-
-    // 점유율 막대 — 항목이 2~3개인 부분-전체는 파이 대신 한 줄 막대
-    function shareCard(title, note, items, field, unit) {
-        const total = items.reduce((a, i) => a + i[field], 0);
-        const bar = items.map((i, n) =>
-            `<span style="flex:${i[field] || 0.0001};background:${C.series[n]}" ` +
-            `title="${esc(i.name)} ${fmt(i[field])}${unit}"></span>`).join('');
-        const legend = items.map((i, n) =>
-            `<span><i class="key" style="background:${C.series[n]}"></i>${esc(i.name)} ` +
-            `<b>${fmt(i[field])}${unit}</b> (${pct(share(i[field], total))})</span>`).join('');
-        return `<div class="card"><h2>${esc(title)}</h2><p class="card-note">${esc(note)}</p>` +
-            `<div class="share-bar">${bar}</div><div class="share-legend">${legend}</div></div>`;
-    }
-
-    parts.push(`<div class="grid">
-        ${shareCard('기기', '최근 7일 세션', data.devices, 'sessions', '세션')}
-        ${shareCard('신규 vs 재방문', '최근 7일 사용자', data.visitors, 'users', '명')}
-    </div>`);
-
-    // 인기 페이지 / 국가
-    parts.push(`<div class="grid">
-        <div class="card">
-            <h2>${data.sites.length ? '인기 페이지' : '인기 글'}</h2>
-            <p class="card-note">최근 7일 · 조회수 상위 ${data.pages.length}개</p>
-            <div class="scroll"><table class="rank"><thead><tr>
-                <th>${data.sites.length ? '페이지' : '글'}</th><th class="num">조회</th>
-                <th class="num">사용자</th><th class="num">조회당 체류</th></tr></thead><tbody>
-                ${data.pages.map((p) => `<tr><td>` +
-                    (p.note ? `<span class="host">${esc(p.note)}</span>` : '') +
-                    `<span class="path">${esc(p.name)}</span></td>` +
-                    `<td class="num">${fmt(p.views)}</td><td class="num">${fmt(p.users)}</td>` +
-                    `<td class="num">${dur(p.secPerView)}</td></tr>`).join('')}
-            </tbody></table></div>
-        </div>
-        <div class="card">
-            <h2>국가</h2>
-            <p class="card-note">최근 7일 활성 사용자 상위 ${data.countries.length}개국</p>
-            <div class="scroll"><table class="rank"><thead><tr><th>국가</th><th class="num">사용자</th></tr></thead><tbody>
-                ${data.countries.map((c) => `<tr><td class="name">${esc(c.name)}</td>` +
-                    `<td class="num">${fmt(c.users)}</td></tr>`).join('')}
-            </tbody></table></div>
-        </div>
-    </div>`);
-
-    parts.push(`<p class="meta-line">GA4 속성 ${esc(data.meta.propertyId)} · Google Analytics Data API · ` +
-        `GitHub Actions가 매일 07:00 KST에 갱신</p>`);
+    parts.push(`<p class="meta-line span-12">GA4 속성 ${esc(data.meta.propertyId)} · ` +
+        `Google Analytics Data API · GitHub Actions가 매일 07:00 KST에 갱신</p>`);
 
     return parts.join('');
     }
@@ -507,16 +436,15 @@
        만들면 Chart.js가 크기를 0으로 재서 탭을 눌렀을 때 찌그러진 채로 나온다. */
     function makeCharts(data, key) {
         const at = (id) => document.getElementById(`${id}-${key}`);
-        if (!at('c-daily')) return;   // 데이터가 없어 빈 화면을 그린 경우
+        if (!at('c-trend')) return;   // 데이터가 없어 빈 화면을 그린 경우
 
-        lineChart(at('c-daily'), data.daily.map((d) => mmdd(d.date)), [
-            { label: '활성 사용자', data: data.daily.map((d) => d.users), fill: true },
-            { label: '세션', data: data.daily.map((d) => d.sessions), fill: true },
-        ]);
-        barChart(at('c-channels'),
-            data.channels.map((c) => c.name), data.channels.map((c) => c.sessions), '세션');
-        barChart(at('c-referral'),
-            data.referral.map((r) => r.name), data.referral.map((r) => r.sessions), '세션');
+        /* 어제 점만 크게 — 선 위에서 "오늘 말하는 날"이 어디인지 바로 짚이게.
+           Chart.js는 pointRadius에 배열을 받으면 점마다 다르게 그린다. */
+        const last = data.daily.length - 1;
+        lineChart(at('c-trend'), data.daily.map((d) => mmdd(d.date)), [
+            { label: '방문자', data: data.daily.map((d) => d.users), fill: true,
+              pointRadius: data.daily.map((_, i) => (i === last ? G.pointR : 0)) },
+        ], [normalBand(data.baseline && data.baseline.users)]);
     }
 
     // --- 탭 ------------------------------------------------------------

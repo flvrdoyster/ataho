@@ -76,8 +76,66 @@ a:hover {
     border-bottom-color: var(--accent);
 }
 
+/* --- 모듈 격자 -------------------------------------------------------
+   화면은 박스(모듈) 여럿을 12칸 격자에 올려 만든다. 각 모듈은 몇 칸을
+   차지할지만 정하고(.span-N), 어디에 놓일지는 격자가 순서대로 정한다 —
+   구획을 넣고 빼고 순서를 바꾸는 일이 dashboard.js 의 mod() 호출 한 줄로
+   끝나게 하려는 것. 배치 규칙은 여기 말고 어디에도 없다.
+
+   같은 줄에 놓인 모듈은 키를 맞춘다(기본 stretch). 박스가 보이는 배치에서는
+   높이가 들쭉날쭉하면 격자가 무너져 보인다. */
 .dash-main {
     padding: 20px 0 8px;
+}
+
+/* 격자는 탭 패널에 건다 — .dash-main 이 아니다. 대상(사이트·블로그)마다
+   .panel 이 하나씩 있고 모듈은 그 안에 들어가므로, .dash-main 에 걸면 모듈이
+   손자가 되어 격자에 참여하지 못한다(패널만 1칸으로 눌린다). */
+.panel {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    gap: var(--gap-grid);
+    /* 박스는 제 내용만큼만 높다. 줄 안에서 키를 맞추면(stretch) 짧은 박스가
+       옆의 긴 박스에 끌려 늘어나 안이 텅 빈다 — 실측으로 「어제 온 곳」이
+       내용 402px인데 721px까지 늘어나 300px 넘게 비었다. */
+    align-items: start;
+}
+
+/* 예외는 첫 줄뿐 — 화면 맨 위 두 박스는 키가 어긋나면 머리가 삐뚤어 보인다. */
+.module.stretch {
+    align-self: stretch;
+}
+
+/* display 를 지정하면 hidden 속성의 기본 display:none 을 덮어써서 숨은 탭까지
+   같이 보인다 — 위 규칙과 반드시 짝으로 있어야 한다. */
+.panel[hidden] {
+    display: none;
+}
+
+.module {
+    grid-column: span 12;
+    min-width: 0;                       /* 표가 칸을 밀고 나가지 않게 */
+    padding: var(--panel-pad);
+    border: var(--panel-border);
+    border-radius: var(--panel-radius);
+    background: var(--panel-bg);
+}
+
+/* 쓸 수 있는 폭들. 지금 화면이 쓰는 건 5·7·12뿐이지만 나머지도 남겨 둔다 —
+   모듈을 하나 더 붙일 때 CSS를 열지 않고 mod(4, …) 처럼 부르기만 하면 되게. */
+.span-4 { grid-column: span 4; }
+.span-5 { grid-column: span 5; }
+.span-6 { grid-column: span 6; }
+.span-7 { grid-column: span 7; }
+.span-8 { grid-column: span 8; }
+.span-12 { grid-column: span 12; }
+
+/* 박스가 전부 같은 무게로 쌓이면 무엇부터 볼지 알 수 없다 — 예전에 박스를
+   걷어냈던 이유가 그거였다. 박스는 모두 유지하되 이 화면의 주어(어제 스탯)
+   하나만 면을 한 단 밝히고 테두리를 또렷하게 해서 시선의 출발점을 만든다. */
+.module.accent {
+    background: var(--panel-bg-accent);
+    border-color: var(--panel-border-accent);
 }
 
 .meta-line {
@@ -92,88 +150,109 @@ a:hover {
     text-align: center;
 }
 
-/* --- 데일리 카운터(히어로) ------------------------------------------
-   페이지가 가장 먼저 말하는 숫자. 히어로 수치는 화면당 하나뿐이고,
-   옆의 어제·평균은 그 숫자를 가늠할 기준자 역할이라 한 급 작게 둔다. */
-.hero {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: flex-end;
-    gap: 20px 56px;
-    padding-bottom: 28px;
-}
-
-.hero-main {
-    flex: 1 1 220px;
-}
-
-.hero-side {
-    flex: 0 1 150px;
-}
-
-.hero .label {
-    color: var(--text-secondary);
-    font-size: var(--fs-label);
-}
-
-.hero .tag {
-    margin-left: 4px;
-    padding: 1px 6px;
-    border: 1px solid var(--border);
-    border-radius: var(--radius-pill);
-    color: var(--text-muted);
-    font-size: var(--fs-micro);
-    vertical-align: 1px;
-}
-
-.hero .figure {
-    font-size: var(--fs-hero);
-    font-weight: var(--font-weight-bold);
-    line-height: 1.1;
-}
-
-.hero .value {
-    font-size: var(--fs-value);
+.yday-title {
+    font-size: var(--fs-h1);
     font-weight: var(--font-weight-bold);
     line-height: 1.2;
 }
 
-.hero .unit {
-    margin-left: 2px;
-    color: var(--text-secondary);
-    font-size: var(--fs-sm);
+.yday-title .tag {
+    margin-left: 6px;
+    padding: 2px 8px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-pill);
+    color: var(--text-muted);
+    font-size: var(--fs-micro);
     font-weight: 400;
+    vertical-align: 3px;
 }
 
-.hero .sub {
+.module .meta-line {
+    margin: 4px 0 var(--gap-tight);
+}
+
+/* 네 칸을 2×2로 — 한 줄에 넷을 세우면 숫자가 서로 붙어 읽히고, 좁은 화면에서
+   먼저 무너진다. 2×2는 넓은 화면과 좁은 화면에서 같은 모양으로 버틴다. */
+.stat-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 24px 20px;
+}
+
+.stat .label {
+    color: var(--text-secondary);
+    font-size: var(--fs-label);
+}
+
+.stat .value {
+    font-size: var(--fs-hero);
+    font-weight: var(--font-weight-bold);
+    line-height: 1.1;
+    letter-spacing: var(--tracking-num);
+    font-variant-numeric: tabular-nums;
+}
+
+.stat .unit {
+    margin-left: 3px;
+    color: var(--text-muted);
+    font-size: var(--fs-label);
+    font-weight: 400;
+    letter-spacing: normal;
+}
+
+.stat .sub {
+    margin-top: 2px;
     color: var(--text-muted);
     font-size: var(--fs-note);
 }
 
-.row-title {
-    margin: var(--gap-block) 0 16px;
-    padding-top: 18px;
-    border-top: var(--rule);
-    font-size: var(--fs-label);
-    font-weight: 400;
+/* 어제가 28일 분포의 어디인지. 좋고 나쁨이 아니라 위치를 말하므로 색을 쓰지
+   않는다 — 방문자가 적은 날이 나쁜 날은 아니다. 대신 평소를 벗어난 칸만
+   글자를 밝혀서, 네 칸을 훑을 때 그 칸이 먼저 눈에 걸리게 한다. */
+.standing {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2px 8px;
+    margin-top: 4px;
+    min-height: 1.2em;          /* 기준이 없는 칸에서도 아래 줄이 어긋나지 않게 */
+    font-size: var(--fs-note);
+}
+
+.standing .where {
     color: var(--text-muted);
 }
 
-/* --- 인사이트 ------------------------------------------------------ */
+.standing .where.high,
+.standing .where.low {
+    color: var(--text-primary);
+}
+
+.standing .dim,
+.dim {
+    color: var(--text-muted);
+}
+
+/* --- 인사이트 ------------------------------------------------------
+   페이지에서 유일하게 문장으로 말하는 자리.
+   예전엔 박스 없이 배경 위에 바로 놓여서, 62ch로 한 줄 길이를 제한해 읽기
+   좋은 폭(60~75자)을 맞췄다. 지금은 박스 안에 있어서 그 제한을 그대로
+   두면 "박스는 넓은데 글은 절반만 채운" 빈 자리가 생긴다 — 박스의 안쪽
+   여백(--panel-pad)이 이제 그 역할을 겸하므로 따로 폭을 제한하지 않는다. */
 .insights {
     margin: 0;
-    padding: 2px 0 2px 16px;
+    padding: 2px 0 2px 18px;
     list-style: none;
     border-left: 2px solid var(--accent);
 }
 
 .insights li {
     font-size: var(--fs-body);
+    line-height: 1.65;
     color: var(--text-secondary);
 }
 
 .insights li + li {
-    margin-top: 6px;
+    margin-top: 10px;
 }
 
 /* 문장 안에서 판단의 근거가 되는 수치만 밝게 — 나머지는 한 톤 내려 읽힙니다. */
@@ -182,42 +261,23 @@ a:hover {
     font-weight: var(--font-weight-bold);
 }
 
-/* --- 구획 & 그리드 --------------------------------------------------
-   테두리 있는 카드를 쌓지 않는다. 구획은 여백이 나누고, 얇은 가로선 하나만
-   시작점을 표시한다 — 사이트의 어두운 미니멀 톤과 맞추기 위해서.
-   (스킨에서 --panel-frame 으로 9-슬라이스 테두리를 얹을 수 있게 자리를 비워 뒀다.)
-   min-width:0 은 그리드 칸의 기본 최소폭(auto) 때문에 표가 칸을 밀고 나가
-   옆 구획을 덮는 걸 막는다. */
-.grid {
-    display: grid;
-    gap: var(--gap-grid);
-    grid-template-columns: repeat(auto-fit, minmax(var(--grid-min), 1fr));
+/* --- 모듈 안의 제목 --------------------------------------------------
+   제목은 조용하게, 데이터는 크게. 제목을 본문과 같은 크기의 굵은 글씨로 두면
+   박스 일곱이 모두 같은 목소리로 말해서 무엇부터 볼지 알 수 없다. */
+.module h2 {
+    margin: 0 0 4px;
+    font-size: var(--fs-section-title);
+    font-weight: 400;
+    letter-spacing: var(--tracking-title);
+    color: var(--text-muted);
 }
 
-.card {
-    min-width: 0;
-    padding: var(--panel-pad);
-    border-top: var(--rule);
-    border-radius: var(--panel-radius);
-    background: var(--panel-bg);
-}
-
-.card h2 {
-    margin: 0 0 2px;
-    font-size: var(--fs-body);
-    font-weight: var(--font-weight-bold);
-}
-
-.card .card-note {
-    margin: 0 0 14px;
+/* .module 안으로 한정하지 않는다 — 한정했다가 모듈 밖의 설명문이 스타일을
+   못 받고 기본 <p>(1rem·흰색)로 나와, 설명문이 제목보다 커진 적이 있다. */
+.module-note {
+    margin: 0 0 var(--gap-tight);
     color: var(--text-muted);
     font-size: var(--fs-note);
-}
-
-/* 구획 사이 숨 쉴 자리 — 카드끼리 붙어서 한 덩어리로 읽히지 않게 */
-.dash-main > .card,
-.dash-main > .grid {
-    margin-top: var(--gap-block);
 }
 
 /* 캔버스·SVG가 제 칸을 넘어 옆 구획 위로 흘러나오지 않게 */
@@ -227,74 +287,70 @@ svg {
     image-rendering: var(--img-rendering);
 }
 
-/* 차트 통은 x축 라벨까지 포함한 높이 — 축이 잘려서 카드 안에 스크롤이 생기지 않게 */
+/* 차트 통은 x축 라벨까지 포함한 높이 — 축이 잘려서 박스 안에 스크롤이 생기지 않게 */
 .chart-box {
     position: relative;
     height: var(--chart-h);
 }
 
-.chart-box.tall {
-    height: var(--chart-h-tall);
+/* --- 확정 구간 (참여율·체류시간) -------------------------------------
+   어제 칸에 못 올리는 두 값. 어제 수치가 아니라는 걸 위치(맨 아래)와
+   크기(한 급 작게)로 함께 말한다. */
+.settled-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px 48px;
 }
 
-/* --- KPI 타일 ------------------------------------------------------ */
-.kpi-row {
-    display: grid;
-    gap: 22px 32px;
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-}
-
-.kpi {
-    min-width: 0;
-}
-
-.kpi .label {
+.settled-row .label {
     color: var(--text-secondary);
     font-size: var(--fs-note);
 }
 
-.kpi .value {
-    font-size: var(--fs-kpi-value);
+/* 어제 스탯(--fs-hero)보다 확실히 작게. 페이지 맨 아래의 보조 정보인데
+   두 번째로 큰 숫자로 놓이면 "어제"가 주어라는 위계가 흐려진다. */
+.settled-row .value {
+    font-size: var(--fs-body);
     font-weight: var(--font-weight-bold);
-    line-height: 1.25;
+    line-height: 1.4;
+    font-variant-numeric: tabular-nums;
 }
 
-.kpi .spark {
-    display: block;
-    margin-top: 6px;
-}
-
-.delta {
-    font-size: var(--fs-note);
+/* 표 아래 붙는 단서 한 줄 (미분류 세션 등) */
+.note-line {
+    margin: 10px 0 0;
     color: var(--text-muted);
+    font-size: var(--fs-note);
 }
 
-.delta .up {
-    color: var(--good);
+.note-line b {
+    color: var(--text-secondary);
+    font-weight: var(--font-weight-bold);
 }
 
-.delta .down {
-    color: var(--critical);
-}
-
-/* --- 순위 표(스파크라인 딸린 소형 다중 그래프) ---------------------- */
+/* --- 순위 표 -------------------------------------------------------- */
 .rank {
     width: 100%;
     border-collapse: collapse;
     font-size: var(--fs-label);
+    /* 숫자 폭을 고정해 자릿수가 세로로 맞아떨어지게 — 표를 훑을 때
+       23과 3의 자릿수 차이가 눈으로 바로 잡힌다 */
+    font-variant-numeric: tabular-nums;
 }
 
 .rank th,
 .rank td {
-    padding: 7px 8px;
+    padding: 9px 8px;
     border-bottom: var(--rule);
     text-align: left;
 }
 
 .rank th {
+    padding-bottom: 6px;
     color: var(--text-muted);
     font-weight: 400;
-    font-size: var(--fs-note);
+    font-size: var(--fs-micro);
+    letter-spacing: var(--tracking-title);
 }
 
 .rank tr:last-child td {
@@ -307,13 +363,16 @@ svg {
     font-variant-numeric: tabular-nums;
 }
 
-.rank td.spark-cell {
-    width: var(--spark-w-rank);
-    padding: 4px 8px;
-}
-
+/* 페이지 칸은 두 줄 — 첫 줄에 이름과 호스트를 나란히, 둘째 줄에 실제 경로.
+   호스트를 제 줄에 두면 한 행이 세 줄이 되고 같은 호스트가 아홉 번 반복된다. */
 .rank .name {
     color: var(--text-primary);
+}
+
+.rank .host {
+    margin-left: 8px;
+    color: var(--text-muted);
+    font-size: var(--fs-micro);
 }
 
 .rank .path {
@@ -321,8 +380,31 @@ svg {
     font-size: var(--fs-note);
 }
 
-.rank .host {
+/* 숫자 칸은 제 내용만큼만 차지하고, 남는 폭은 전부 이름 칸이 가져간다.
+   기본 auto 배치에서는 네 칸이 균등하게 벌어져 이름과 숫자가 표 양 끝으로
+   떨어졌다 — "환세풍광전"과 "23"이 화면 양쪽 끝에 있었다. */
+.rank.pages .page {
+    width: 100%;
+}
+
+.rank.pages td.num,
+.rank.pages th.num {
+    width: 1%;
+    white-space: nowrap;
+}
+
+/* 「평소/일」 칸 — 어제 조회수를 재는 자일 뿐 그 자체가 주인공은 아니라
+   한 톤 내려 둔다. 안 그러면 옆의 어제 조회수와 같은 무게로 읽힌다. */
+.rank td.usual {
     color: var(--text-muted);
+}
+
+/* 평소보다 튄 페이지에만 붙는 배율. 판정은 수집 스크립트가 하고 여기선
+   보여주기만 한다. 색이 아니라 숫자와 위치로 말한다. */
+.rank .ratio {
+    margin-left: 6px;
+    color: var(--text-primary);
+    font-weight: var(--font-weight-bold);
 }
 
 /* --- 점유율 막대(부분-전체) ----------------------------------------- */
@@ -361,28 +443,33 @@ svg {
     font-variant-numeric: tabular-nums;
 }
 
-/* --- 시간대 히트맵 --------------------------------------------------- */
-.heat {
+/* --- 어제 시간대 띠 ---------------------------------------------------
+   요일×시각 히트맵(28일 누적)을 어제 하루 24칸으로 바꾼 자리. 세로축이
+   없어지니 한 줄이면 되고, 칸 색은 히트맵과 같은 파랑 명도 계단을 쓴다. */
+.hour-strip,
+.hour-ticks {
     display: grid;
-    grid-template-columns: var(--heat-label-w) repeat(24, 1fr);
-    gap: var(--heat-gap);
-    align-items: center;
+    grid-template-columns: repeat(24, 1fr);
+    gap: var(--strip-gap);
 }
 
-.heat .rowlabel,
-.heat .collabel {
+.hour-strip .cell {
+    height: var(--strip-cell);
+    border-radius: var(--radius-xs);
+    background: var(--surface-2);
+}
+
+.hour-ticks {
+    margin-top: 4px;
+}
+
+.hour-ticks .collabel {
     color: var(--text-muted);
     font-size: var(--fs-micro);
     text-align: center;
 }
 
-.heat .cell {
-    height: var(--heat-cell);
-    border-radius: var(--radius-xs);
-    background: var(--surface-2);
-}
-
-.heat-scale {
+.legend-scale {
     display: flex;
     align-items: center;
     gap: 6px;
@@ -391,7 +478,7 @@ svg {
     font-size: var(--fs-micro);
 }
 
-.heat-scale i {
+.legend-scale i {
     display: inline-block;
     width: 22px;
     height: 10px;
@@ -455,11 +542,22 @@ svg {
 }
 
 /* --- 좁은 화면 ------------------------------------------------------
-   값(글자 크기·히트맵 칸 등)은 theme.css 의 같은 미디어 쿼리에서 조정합니다.
-   여기엔 "무엇을 감추고 무엇을 접는가"만 둡니다. */
-@media (max-width: 640px) {
-    .rank td.spark-cell,
-    .rank th.spark-cell {
-        display: none;
+   값(글자 크기·시간대 칸 높이)은 theme.css 의 미디어 쿼리에서 토큰으로
+   조정합니다 — 여기엔 "무엇을 접는가"만 둡니다.
+   모듈의 span 을 하나하나 다시 쓰지 않고 격자를 1칸으로 접습니다. 그러면
+   모든 모듈이 자동으로 전체폭이 되므로, 나중에 모듈을 더해도 여기를
+   고칠 일이 없습니다.
+   스탯 2×2 격자는 그대로 둡니다 — 한 줄로 펴면 숫자가 너무 좁아지고,
+   한 칸씩 쌓으면 네 칸을 훑는 맛이 사라집니다. */
+@media (max-width: 860px) {
+    .panel {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    /* 모듈만이 아니라 격자의 모든 자식을 되돌린다 — .module 만 되돌리면
+       모듈이 아닌 자식(맨 아래 출처 표시 줄)에 span-12 가 남아, 1칸짜리
+       격자에 암시적 열 11개가 생기면서 배치가 어긋난다. */
+    .panel > * {
+        grid-column: span 1;
     }
 }
