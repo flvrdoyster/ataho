@@ -5,51 +5,51 @@ window.DASHBOARD_DATA['blog'] = {
  "baseline": {
   "perUser": {
    "max": 2.8333333333333335,
-   "median": 1.7142857142857142,
+   "median": 2.166666666666667,
    "min": 1.0,
-   "n": 5,
-   "q1": 1.3333333333333335,
-   "q3": 2.5833333333333335,
-   "rank": 4,
-   "value": 1.6666666666666667,
-   "vsMedian": -2.777777777777768,
+   "n": 6,
+   "q1": 1.5357142857142856,
+   "q3": 2.8219696969696972,
+   "rank": 2,
+   "value": 2.8181818181818183,
+   "vsMedian": 30.069930069930063,
    "where": "usual"
   },
   "sessions": {
-   "max": 11,
-   "median": 6,
+   "max": 13,
+   "median": 7.0,
    "min": 2,
-   "n": 5,
-   "q1": 3.5,
-   "q3": 9.5,
-   "rank": 4,
-   "value": 5,
-   "vsMedian": -16.666666666666664,
-   "where": "usual"
+   "n": 6,
+   "q1": 4.25,
+   "q3": 11.5,
+   "rank": 1,
+   "value": 13,
+   "vsMedian": 85.71428571428571,
+   "where": "high"
   },
   "users": {
-   "max": 7,
-   "median": 3,
+   "max": 11,
+   "median": 4.5,
    "min": 2,
-   "n": 5,
-   "q1": 2.5,
-   "q3": 6.5,
-   "rank": 3,
-   "value": 3,
-   "vsMedian": 0.0,
-   "where": "usual"
+   "n": 6,
+   "q1": 2.75,
+   "q3": 8.0,
+   "rank": 1,
+   "value": 11,
+   "vsMedian": 144.44444444444443,
+   "where": "high"
   },
   "views": {
-   "max": 17,
-   "median": 7,
+   "max": 31,
+   "median": 9.5,
    "min": 2,
-   "n": 5,
-   "q1": 3.5,
-   "q3": 14.5,
-   "rank": 4,
-   "value": 5,
-   "vsMedian": -28.57142857142857,
-   "where": "usual"
+   "n": 6,
+   "q1": 5.0,
+   "q3": 20.5,
+   "rank": 1,
+   "value": 31,
+   "vsMedian": 226.3157894736842,
+   "where": "high"
   }
  },
  "daily": [
@@ -81,13 +81,31 @@ window.DASHBOARD_DATA['blog'] = {
    "date": "2026-08-13",
    "sessions": 5,
    "users": 3,
-   "views": 5
+   "views": 6
+  },
+  {
+   "date": "2026-08-14",
+   "sessions": 13,
+   "users": 11,
+   "views": 31
   }
  ],
  "insights": [
   {
-   "text": "아직 5일치만 쌓여서 '평소'를 가릴 기준이 얇습니다 — 견줄 만한 문장은 데이터가 더 모이면 나옵니다.",
+   "text": "'환세 시리즈 연구' 카테고리의 글 목록이 어제 5회 — 평소 하루 0.4회 보던 페이지라 12.5배로 뛰었습니다.",
+   "tone": "up"
+  },
+  {
+   "text": "어제 조회 31회 가운데 17회(55%)가 재방문 쪽입니다 — 1명이 1인당 17장씩 봤습니다(신규는 1.4장).",
    "tone": "flat"
+  },
+  {
+   "text": "최근 28일 동안 없던 유입원이 어제 생겼습니다 — daum.",
+   "tone": "up"
+  },
+  {
+   "text": "어제 방문자 11명은 최근 6일 중 가장 많습니다(그 전 최고 11명).",
+   "tone": "up"
   }
  ],
  "meta": {
@@ -96,13 +114,13 @@ window.DASHBOARD_DATA['blog'] = {
   "propertyId": "549191220",
   "settledDays": 7,
   "trendDays": 28,
-  "updatedAt": "2026-08-14 11:52"
+  "updatedAt": "2026-08-15 07:15"
  },
  "settled": {
-  "avgDuration": 51.50661188888889,
-  "engagementRate": 0.4074074074074074,
+  "avgDuration": 83.19005503125,
+  "engagementRate": 0.40625,
   "from": "8daysAgo",
-  "sessions": 27,
+  "sessions": 32,
   "to": "2daysAgo"
  },
  "ydayHours": [
@@ -116,26 +134,86 @@ window.DASHBOARD_DATA['blog'] = {
   0,
   0,
   0,
-  0,
-  0,
-  1,
-  0,
-  1,
-  1,
-  1,
+  3,
+  2,
   1,
   0,
   0,
   0,
+  1,
+  1,
   0,
+  1,
+  4,
+  2,
   0,
   0
  ],
  "ydayPages": [
   {
    "host": "",
+   "name": "환세쾌도전 공략",
+   "priorAvg": 1.2,
+   "section": "",
+   "spike": true,
+   "title": "",
+   "users": 7,
+   "views": 12
+  },
+  {
+   "host": "",
+   "name": "'환세 시리즈 연구' 카테고리의 글 목록",
+   "priorAvg": 0.4,
+   "section": "",
+   "spike": true,
+   "title": "",
+   "users": 1,
+   "views": 5
+  },
+  {
+   "host": "",
+   "name": "환세희담 공략",
+   "priorAvg": 1.2,
+   "section": "",
+   "spike": false,
+   "title": "",
+   "users": 1,
+   "views": 3
+  },
+  {
+   "host": "",
+   "name": "'환세 시리즈 연구' 카테고리의 글 목록 (2 Page)",
+   "priorAvg": 0.0,
+   "section": "",
+   "spike": false,
+   "title": "",
+   "users": 1,
+   "views": 2
+  },
+  {
+   "host": "",
    "name": "OYSTER BAY",
-   "priorAvg": 1.75,
+   "priorAvg": 1.6,
+   "section": "",
+   "spike": false,
+   "title": "",
+   "users": 2,
+   "views": 2
+  },
+  {
+   "host": "",
+   "name": "PC98 환세 시리즈 한글화",
+   "priorAvg": 2.8,
+   "section": "",
+   "spike": false,
+   "title": "",
+   "users": 2,
+   "views": 1
+  },
+  {
+   "host": "",
+   "name": "환세취호전 웹 에뮬레이터",
+   "priorAvg": 0.4,
    "section": "",
    "spike": false,
    "title": "",
@@ -144,27 +222,7 @@ window.DASHBOARD_DATA['blog'] = {
   },
   {
    "host": "",
-   "name": "PC98 환세 시리즈 한글화",
-   "priorAvg": 3.25,
-   "section": "",
-   "spike": false,
-   "title": "",
-   "users": 0,
-   "views": 1
-  },
-  {
-   "host": "",
-   "name": "환세쾌도전 공략",
-   "priorAvg": 1.25,
-   "section": "",
-   "spike": false,
-   "title": "",
-   "users": 0,
-   "views": 1
-  },
-  {
-   "host": "",
-   "name": "환세풍광전 소개",
+   "name": "환세패유기 소개",
    "priorAvg": 0.0,
    "section": "",
    "spike": false,
@@ -174,8 +232,18 @@ window.DASHBOARD_DATA['blog'] = {
   },
   {
    "host": "",
-   "name": "환세희담 공략",
-   "priorAvg": 1.25,
+   "name": "환세패유기 웹 버전",
+   "priorAvg": 0.2,
+   "section": "",
+   "spike": false,
+   "title": "",
+   "users": 2,
+   "views": 1
+  },
+  {
+   "host": "",
+   "name": "환세포물장 공략",
+   "priorAvg": 0.0,
    "section": "",
    "spike": false,
    "title": "",
@@ -184,8 +252,38 @@ window.DASHBOARD_DATA['blog'] = {
   },
   {
    "host": "",
-   "name": "환세풍광전 공략",
-   "priorAvg": 0.75,
+   "name": "환세포물장 소개",
+   "priorAvg": 0.0,
+   "section": "",
+   "spike": false,
+   "title": "",
+   "users": 1,
+   "views": 1
+  },
+  {
+   "host": "",
+   "name": "환세풍광전 소개",
+   "priorAvg": 0.2,
+   "section": "",
+   "spike": false,
+   "title": "",
+   "users": 1,
+   "views": 1
+  },
+  {
+   "host": "",
+   "name": "환세 시리즈 캐릭터 소개 (from 환세희담 매뉴얼, 일본판 DS 등)",
+   "priorAvg": 0.0,
+   "section": "",
+   "spike": false,
+   "title": "",
+   "users": 1,
+   "views": 0
+  },
+  {
+   "host": "",
+   "name": "환세쾌도전 소개",
+   "priorAvg": 0.0,
    "section": "",
    "spike": false,
    "title": "",
@@ -197,23 +295,27 @@ window.DASHBOARD_DATA['blog'] = {
  "ydaySources": [
   {
    "name": "직접 방문",
-   "sessions": 3
+   "sessions": 5
   },
   {
-   "name": "google",
-   "sessions": 1
+   "name": "daum",
+   "sessions": 5
   },
   {
    "name": "namu.wiki",
    "sessions": 1
+  },
+  {
+   "name": "naver",
+   "sessions": 1
   }
  ],
- "ydayUnresolved": 2,
+ "ydayUnresolved": 6,
  "yesterday": {
-  "date": "2026-08-13",
-  "newUsers": 3,
-  "sessions": 5,
-  "users": 3,
-  "views": 5
+  "date": "2026-08-14",
+  "newUsers": 9,
+  "sessions": 13,
+  "users": 11,
+  "views": 31
  }
 };
