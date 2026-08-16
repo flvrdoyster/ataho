@@ -4,52 +4,52 @@ window.DASHBOARD_DATA = window.DASHBOARD_DATA || {};
 window.DASHBOARD_DATA['blog'] = {
  "baseline": {
   "perUser": {
-   "max": 3.1818181818181817,
-   "median": 2.3333333333333335,
+   "max": 3.7142857142857144,
+   "median": 2.416666666666667,
    "min": 1.0,
-   "n": 7,
-   "q1": 1.7142857142857142,
-   "q3": 2.8333333333333335,
-   "rank": 3,
-   "value": 2.3333333333333335,
-   "vsMedian": 0.0,
-   "where": "usual"
+   "n": 8,
+   "q1": 1.7857142857142856,
+   "q3": 3.0946969696969697,
+   "rank": 1,
+   "value": 3.7142857142857144,
+   "vsMedian": 53.69458128078817,
+   "where": "high"
   },
   "sessions": {
    "max": 13,
-   "median": 8,
+   "median": 8.0,
    "min": 2,
-   "n": 7,
-   "q1": 5.0,
+   "n": 8,
+   "q1": 5.25,
    "q3": 11.0,
-   "rank": 3,
-   "value": 8,
-   "vsMedian": 0.0,
+   "rank": 2,
+   "value": 11,
+   "vsMedian": 37.5,
    "where": "usual"
   },
   "users": {
    "max": 11,
-   "median": 6,
+   "median": 6.0,
    "min": 2,
-   "n": 7,
+   "n": 8,
    "q1": 3.0,
    "q3": 7.0,
-   "rank": 3,
-   "value": 6,
-   "vsMedian": 0.0,
+   "rank": 2,
+   "value": 7,
+   "vsMedian": 16.666666666666664,
    "where": "usual"
   },
   "views": {
    "max": 35,
-   "median": 12,
+   "median": 13.5,
    "min": 2,
-   "n": 7,
-   "q1": 6.0,
-   "q3": 17.0,
-   "rank": 3,
-   "value": 14,
-   "vsMedian": 16.666666666666664,
-   "where": "usual"
+   "n": 8,
+   "q1": 6.25,
+   "q3": 23.75,
+   "rank": 2,
+   "value": 26,
+   "vsMedian": 92.5925925925926,
+   "where": "high"
   }
  },
  "daily": [
@@ -93,17 +93,23 @@ window.DASHBOARD_DATA['blog'] = {
    "date": "2026-08-15",
    "sessions": 8,
    "users": 6,
-   "views": 14
+   "views": 15
+  },
+  {
+   "date": "2026-08-16",
+   "sessions": 11,
+   "users": 7,
+   "views": 26
   }
  ],
  "insights": [
   {
-   "text": "PC98 환세 시리즈 한글화가 어제 6회 — 평소 하루 2.7회 보던 페이지라 2.2배로 뛰었습니다. 나머지 2곳은 평소보다 조용했습니다.",
+   "text": "환세포물장 공략이 어제 5회 — 평소 하루 0.1회 보던 페이지라 35.0배로 뛰었습니다.",
    "tone": "up"
   },
   {
-   "text": "최근 28일 동안 없던 유입원이 어제 생겼습니다 — cafe.naver.com.",
-   "tone": "up"
+   "text": "어제 한 사람이 평균 3.7장을 봤습니다 — 평소 2.4장이니 깊게 본 날입니다(28일 최대 3.7장).",
+   "tone": "flat"
   }
  ],
  "meta": {
@@ -112,105 +118,125 @@ window.DASHBOARD_DATA['blog'] = {
   "propertyId": "549191220",
   "settledDays": 7,
   "trendDays": 28,
-  "updatedAt": "2026-08-16 07:14"
+  "updatedAt": "2026-08-17 07:14"
  },
  "settled": {
-  "avgDuration": 193.86894982222225,
-  "engagementRate": 0.4444444444444444,
+  "avgDuration": 229.58471328301886,
+  "engagementRate": 0.49056603773584906,
   "from": "8daysAgo",
-  "sessions": 45,
+  "sessions": 53,
   "to": "2daysAgo"
  },
  "ydayHours": [
-  1,
-  0,
-  0,
-  0,
   0,
   0,
   0,
   1,
-  0,
   1,
   1,
-  0,
-  1,
-  1,
-  0,
-  1,
-  0,
-  0,
   0,
   0,
   0,
   2,
+  4,
   0,
-  0
+  0,
+  0,
+  0,
+  0,
+  0,
+  0,
+  0,
+  0,
+  1,
+  0,
+  1,
+  2
  ],
  "ydayPages": [
   {
    "host": "",
-   "name": "PC98 환세 시리즈 한글화",
-   "priorAvg": 2.6666666666666665,
+   "name": "OYSTER BAY",
+   "priorAvg": 1.4285714285714286,
    "section": "",
    "spike": true,
    "title": "",
-   "users": 2,
+   "users": 3,
    "views": 6
   },
   {
    "host": "",
-   "name": "환세패유기 소개",
-   "priorAvg": 0.16666666666666666,
+   "name": "환세취호전 웹 에뮬레이터",
+   "priorAvg": 0.42857142857142855,
    "section": "",
-   "spike": false,
+   "spike": true,
    "title": "",
-   "users": 1,
-   "views": 3
+   "users": 3,
+   "views": 5
   },
   {
    "host": "",
-   "name": "환세취호전 스태프 인터뷰 (from 일본판 DS 14호)",
-   "priorAvg": 0.0,
+   "name": "환세포물장 공략",
+   "priorAvg": 0.14285714285714285,
    "section": "",
-   "spike": false,
+   "spike": true,
    "title": "",
-   "users": 1,
-   "views": 1
+   "users": 3,
+   "views": 5
   },
   {
    "host": "",
-   "name": "환세쾌도전 공략",
-   "priorAvg": 3.0,
-   "section": "",
-   "spike": false,
-   "title": "",
-   "users": 1,
-   "views": 1
-  },
-  {
-   "host": "",
-   "name": "환세풍광전 공략",
-   "priorAvg": 0.6666666666666666,
-   "section": "",
-   "spike": false,
-   "title": "",
-   "users": 1,
-   "views": 1
-  },
-  {
-   "host": "",
-   "name": "환세희담 공략",
-   "priorAvg": 1.5,
+   "name": "PC98 환세 시리즈 한글화",
+   "priorAvg": 3.142857142857143,
    "section": "",
    "spike": false,
    "title": "",
    "users": 2,
+   "views": 4
+  },
+  {
+   "host": "",
+   "name": "환세쾌도전 공략",
+   "priorAvg": 2.7142857142857144,
+   "section": "",
+   "spike": false,
+   "title": "",
+   "users": 1,
+   "views": 2
+  },
+  {
+   "host": "",
+   "name": "'환세 시리즈 연구' 카테고리의 글 목록",
+   "priorAvg": 1.0,
+   "section": "",
+   "spike": false,
+   "title": "",
+   "users": 1,
    "views": 1
   },
   {
    "host": "",
-   "name": "환세희담 만화 (from 환세희담 매뉴얼)",
+   "name": "환세 시리즈 캐릭터 소개 (from 환세희담 매뉴얼, 일본판 DS 등)",
+   "priorAvg": 0.14285714285714285,
+   "section": "",
+   "spike": false,
+   "title": "",
+   "users": 1,
+   "views": 1
+  },
+  {
+   "host": "",
+   "name": "환세취호전 스태프 인터뷰 (from 일본판 DS 14호)",
+   "priorAvg": 0.14285714285714285,
+   "section": "",
+   "spike": false,
+   "title": "",
+   "users": 1,
+   "views": 1
+  },
+  {
+   "host": "",
+   "name": "환세포물장 스태프 인터뷰 (from 일본판 DS 10호)",
    "priorAvg": 0.0,
    "section": "",
    "spike": false,
@@ -223,31 +249,27 @@ window.DASHBOARD_DATA['blog'] = {
  "ydaySources": [
   {
    "name": "namu.wiki",
-   "sessions": 3
+   "sessions": 4
   },
   {
    "name": "직접 방문",
-   "sessions": 1
-  },
-  {
-   "name": "cafe.naver.com",
-   "sessions": 1
-  },
-  {
-   "name": "daum",
-   "sessions": 1
+   "sessions": 3
   },
   {
    "name": "google",
-   "sessions": 1
+   "sessions": 2
+  },
+  {
+   "name": "naver",
+   "sessions": 2
   }
  ],
- "ydayUnresolved": 2,
+ "ydayUnresolved": 4,
  "yesterday": {
-  "date": "2026-08-15",
+  "date": "2026-08-16",
   "newUsers": 4,
-  "sessions": 8,
-  "users": 6,
-  "views": 14
+  "sessions": 11,
+  "users": 7,
+  "views": 26
  }
 };
