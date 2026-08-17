@@ -5,50 +5,50 @@ window.DASHBOARD_DATA['blog'] = {
  "baseline": {
   "perUser": {
    "max": 3.7142857142857144,
-   "median": 2.416666666666667,
+   "median": 2.5,
    "min": 1.0,
-   "n": 8,
-   "q1": 1.7857142857142856,
-   "q3": 3.0946969696969697,
-   "rank": 1,
-   "value": 3.7142857142857144,
-   "vsMedian": 53.69458128078817,
-   "where": "high"
+   "n": 9,
+   "q1": 1.8571428571428572,
+   "q3": 3.1409090909090907,
+   "rank": 3,
+   "value": 3.1,
+   "vsMedian": 24.000000000000004,
+   "where": "usual"
   },
   "sessions": {
-   "max": 13,
-   "median": 8.0,
+   "max": 17,
+   "median": 8,
    "min": 2,
-   "n": 8,
-   "q1": 5.25,
-   "q3": 11.0,
-   "rank": 2,
-   "value": 11,
-   "vsMedian": 37.5,
-   "where": "usual"
+   "n": 9,
+   "q1": 5.5,
+   "q3": 12.0,
+   "rank": 1,
+   "value": 17,
+   "vsMedian": 112.5,
+   "where": "high"
   },
   "users": {
    "max": 11,
-   "median": 6.0,
+   "median": 6,
    "min": 2,
-   "n": 8,
+   "n": 9,
    "q1": 3.0,
-   "q3": 7.0,
+   "q3": 8.5,
    "rank": 2,
-   "value": 7,
-   "vsMedian": 16.666666666666664,
-   "where": "usual"
+   "value": 10,
+   "vsMedian": 66.66666666666666,
+   "where": "high"
   },
   "views": {
    "max": 35,
-   "median": 13.5,
+   "median": 15,
    "min": 2,
-   "n": 8,
-   "q1": 6.25,
-   "q3": 23.75,
+   "n": 9,
+   "q1": 6.5,
+   "q3": 28.5,
    "rank": 2,
-   "value": 26,
-   "vsMedian": 92.5925925925926,
+   "value": 31,
+   "vsMedian": 106.66666666666667,
    "where": "high"
   }
  },
@@ -100,16 +100,26 @@ window.DASHBOARD_DATA['blog'] = {
    "sessions": 11,
    "users": 7,
    "views": 26
+  },
+  {
+   "date": "2026-08-17",
+   "sessions": 17,
+   "users": 10,
+   "views": 31
   }
  ],
  "insights": [
   {
-   "text": "환세포물장 공략이 어제 5회 — 평소 하루 0.1회 보던 페이지라 35.0배로 뛰었습니다.",
+   "text": "환세희담 공략이 어제 5회 — 평소 하루 1.4회 보던 페이지라 3.6배로 뛰었습니다.",
    "tone": "up"
   },
   {
-   "text": "어제 한 사람이 평균 3.7장을 봤습니다 — 평소 2.4장이니 깊게 본 날입니다(28일 최대 3.7장).",
-   "tone": "flat"
+   "text": "최근 28일 동안 없던 유입원이 어제 생겼습니다 — m.search.naver.com.",
+   "tone": "up"
+  },
+  {
+   "text": "어제 방문자 10명 — 평소(6명)보다 많은 편으로, 9일 중 2번째입니다.",
+   "tone": "up"
   }
  ],
  "meta": {
@@ -118,91 +128,51 @@ window.DASHBOARD_DATA['blog'] = {
   "propertyId": "549191220",
   "settledDays": 7,
   "trendDays": 28,
-  "updatedAt": "2026-08-17 07:14"
+  "updatedAt": "2026-08-18 07:16"
  },
  "settled": {
-  "avgDuration": 229.58471328301886,
-  "engagementRate": 0.49056603773584906,
+  "avgDuration": 248.68460741935482,
+  "engagementRate": 0.5161290322580645,
   "from": "8daysAgo",
-  "sessions": 53,
+  "sessions": 62,
   "to": "2daysAgo"
  },
  "ydayHours": [
   0,
   0,
+  1,
+  1,
+  0,
   0,
   1,
+  0,
   1,
-  1,
+  4,
+  3,
   0,
   0,
   0,
   2,
-  4,
-  0,
-  0,
-  0,
-  0,
-  0,
-  0,
-  0,
-  0,
-  0,
   1,
   0,
   1,
-  2
+  1,
+  0,
+  3,
+  1,
+  0,
+  1
  ],
  "ydayPages": [
   {
    "host": "",
-   "name": "OYSTER BAY",
-   "priorAvg": 1.4285714285714286,
-   "section": "",
-   "spike": true,
-   "title": "",
-   "users": 3,
-   "views": 6
-  },
-  {
-   "host": "",
-   "name": "환세취호전 웹 에뮬레이터",
-   "priorAvg": 0.42857142857142855,
+   "name": "환세희담 공략",
+   "priorAvg": 1.375,
    "section": "",
    "spike": true,
    "title": "",
    "users": 3,
    "views": 5
-  },
-  {
-   "host": "",
-   "name": "환세포물장 공략",
-   "priorAvg": 0.14285714285714285,
-   "section": "",
-   "spike": true,
-   "title": "",
-   "users": 3,
-   "views": 5
-  },
-  {
-   "host": "",
-   "name": "PC98 환세 시리즈 한글화",
-   "priorAvg": 3.142857142857143,
-   "section": "",
-   "spike": false,
-   "title": "",
-   "users": 2,
-   "views": 4
-  },
-  {
-   "host": "",
-   "name": "환세쾌도전 공략",
-   "priorAvg": 2.7142857142857144,
-   "section": "",
-   "spike": false,
-   "title": "",
-   "users": 1,
-   "views": 2
   },
   {
    "host": "",
@@ -212,32 +182,132 @@ window.DASHBOARD_DATA['blog'] = {
    "spike": false,
    "title": "",
    "users": 1,
-   "views": 1
+   "views": 4
+  },
+  {
+   "host": "",
+   "name": "PC98 환세 시리즈 한글화",
+   "priorAvg": 3.25,
+   "section": "",
+   "spike": false,
+   "title": "",
+   "users": 3,
+   "views": 4
   },
   {
    "host": "",
    "name": "환세 시리즈 캐릭터 소개 (from 환세희담 매뉴얼, 일본판 DS 등)",
-   "priorAvg": 0.14285714285714285,
+   "priorAvg": 0.25,
    "section": "",
    "spike": false,
    "title": "",
    "users": 1,
-   "views": 1
+   "views": 2
   },
   {
    "host": "",
-   "name": "환세취호전 스태프 인터뷰 (from 일본판 DS 14호)",
-   "priorAvg": 0.14285714285714285,
+   "name": "환세취호전 웹 에뮬레이터",
+   "priorAvg": 1.0,
    "section": "",
    "spike": false,
    "title": "",
    "users": 1,
-   "views": 1
+   "views": 2
   },
   {
    "host": "",
-   "name": "환세포물장 스태프 인터뷰 (from 일본판 DS 10호)",
+   "name": "환세패유기 소개",
+   "priorAvg": 0.5,
+   "section": "",
+   "spike": false,
+   "title": "",
+   "users": 2,
+   "views": 2
+  },
+  {
+   "host": "",
+   "name": "환세포물장 공략",
+   "priorAvg": 0.75,
+   "section": "",
+   "spike": false,
+   "title": "",
+   "users": 2,
+   "views": 2
+  },
+  {
+   "host": "",
+   "name": "환세풍광전 소개",
+   "priorAvg": 0.25,
+   "section": "",
+   "spike": false,
+   "title": "",
+   "users": 2,
+   "views": 2
+  },
+  {
+   "host": "",
+   "name": "'분류 전체보기' 카테고리의 글 목록",
    "priorAvg": 0.0,
+   "section": "",
+   "spike": false,
+   "title": "",
+   "users": 1,
+   "views": 1
+  },
+  {
+   "host": "",
+   "name": "'환세 시리즈 연구' 카테고리의 글 목록 (2 Page)",
+   "priorAvg": 0.25,
+   "section": "",
+   "spike": false,
+   "title": "",
+   "users": 1,
+   "views": 1
+  },
+  {
+   "host": "",
+   "name": "OYSTER BAY",
+   "priorAvg": 2.0,
+   "section": "",
+   "spike": false,
+   "title": "",
+   "users": 1,
+   "views": 1
+  },
+  {
+   "host": "",
+   "name": "방명록",
+   "priorAvg": 0.0,
+   "section": "",
+   "spike": false,
+   "title": "",
+   "users": 1,
+   "views": 1
+  },
+  {
+   "host": "",
+   "name": "환세 시리즈 숏 애니메이션 (from DSアニメ総集編'98)",
+   "priorAvg": 0.0,
+   "section": "",
+   "spike": false,
+   "title": "",
+   "users": 1,
+   "views": 1
+  },
+  {
+   "host": "",
+   "name": "환세패유기 웹 버전",
+   "priorAvg": 0.375,
+   "section": "",
+   "spike": false,
+   "title": "",
+   "users": 1,
+   "views": 1
+  },
+  {
+   "host": "",
+   "name": "환세포물장 소개",
+   "priorAvg": 0.125,
    "section": "",
    "spike": false,
    "title": "",
@@ -249,7 +319,7 @@ window.DASHBOARD_DATA['blog'] = {
  "ydaySources": [
   {
    "name": "namu.wiki",
-   "sessions": 4
+   "sessions": 7
   },
   {
    "name": "직접 방문",
@@ -257,19 +327,23 @@ window.DASHBOARD_DATA['blog'] = {
   },
   {
    "name": "google",
-   "sessions": 2
+   "sessions": 3
+  },
+  {
+   "name": "m.search.naver.com",
+   "sessions": 3
   },
   {
    "name": "naver",
-   "sessions": 2
+   "sessions": 1
   }
  ],
- "ydayUnresolved": 4,
+ "ydayUnresolved": 6,
  "yesterday": {
-  "date": "2026-08-16",
-  "newUsers": 4,
-  "sessions": 11,
-  "users": 7,
-  "views": 26
+  "date": "2026-08-17",
+  "newUsers": 7,
+  "sessions": 17,
+  "users": 10,
+  "views": 31
  }
 };
