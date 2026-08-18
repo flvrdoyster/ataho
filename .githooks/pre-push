@@ -1,0 +1,56 @@
+#!/usr/bin/env bash
+# dashboard/data/*.js 가 오래된 채로 push 되는 걸 막는다.
+#
+# merge=ours(.gitattributes) 는 머지 때 신선도를 안 따지고 무조건 로컬을 쓰므로,
+# 로컬이 실제로 오래됐는데 그걸 모르고 push 하면 origin의 더 최신 자동 커밋
+# 데이터를 조용히 덮어쓸 수 있다. 이걸 push 직전에 잡아 준다.
+#
+# 활성화(클론마다 1회, 로컬 설정이라 git으로 관리 안 됨):
+#   git config core.hooksPath .githooks
+#
+# 급할 때 건너뛰기: SKIP_GA4_CHECK=1 git push
+
+if [ -n "$SKIP_GA4_CHECK" ]; then
+  exit 0
+fi
+
+REPO_ROOT="$(git rev-parse --show-toplevel)"
+cd "$REPO_ROOT" || exit 0
+
+command -v python3 >/dev/null 2>&1 || exit 0
+
+python3 - "$@" <<'PYEOF'
+import json
+import sys
+from datetime import datetime, timedelta, timezone
+from pathlib import Path
+
+KST = timezone(timedelta(hours=9))
+expected = (datetime.now(KST).date() - timedelta(days=1)).isoformat()
+
+stale = []
+for name in ("ga4", "blog"):
+    path = Path(f"dashboard/data/{name}.js")
+    if not path.exists():
+        continue
+    try:
+        text = path.read_text(encoding="utf-8")
+        body = text.split("=", 2)[2].strip().rstrip(";")
+        date = json.loads(body)["yesterday"]["date"]
+    except Exception:
+        continue  # 형식이 안 맞으면 이 훅의 책임이 아니다 — 조용히 넘어간다
+    if date and date < expected:
+        stale.append((name, date))
+
+if stale:
+    print("⚠️  dashboard/data 가 오래됐습니다 (push 를 막습니다):")
+    for name, date in stale:
+        print(f"   {name}.js: yesterday.date = {date} (기대: {expected})")
+    print()
+    print("   먼저 재수집하세요:")
+    print("     python3 scripts/ga4_dashboard.py")
+    print("   급하면 이번만 건너뛰기: SKIP_GA4_CHECK=1 git push")
+    sys.exit(1)
+
+sys.exit(0)
+PYEOF
