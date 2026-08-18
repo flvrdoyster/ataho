@@ -6907,7 +6907,7 @@ window.DASHBOARD_DATA['ga4'] = {
   "propertyId": "516513119",
   "settledDays": 7,
   "trendDays": 28,
-  "updatedAt": "2026-08-18 15:15"
+  "updatedAt": "2026-08-18 16:23"
  },
  "settled": {
   "avgDuration": 293.7473525752689,
