@@ -76,6 +76,27 @@ a:hover {
     border-bottom-color: var(--accent);
 }
 
+/* --- 미확인 피드백 리마인드 띠 ----------------------------------------
+   탭바 바로 위. 남아 있을 때만 dashboard.js 가 만들어 넣으므로, 0건이면
+   이 규칙이 아무 데도 안 붙고 화면은 예전과 똑같다. */
+.reminder {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 4px 10px;
+    margin: 0 0 14px;
+    padding: 10px 14px;
+    border-left: 3px solid var(--attention);
+    border-radius: var(--radius-sm);
+    background: var(--panel-bg);
+    font-size: var(--fs-label);
+}
+
+.reminder b {
+    color: var(--text-primary);
+    font-weight: var(--font-weight-bold);
+}
+
 /* --- 모듈 격자 -------------------------------------------------------
    화면은 박스(모듈) 여럿을 12칸 격자에 올려 만든다. 각 모듈은 몇 칸을
    차지할지만 정하고(.span-N), 어디에 놓일지는 격자가 순서대로 정한다 —
@@ -150,21 +171,52 @@ a:hover {
     text-align: center;
 }
 
+/* 날짜 화살표가 붙으면서 flex 로 바꿨다 — .tag 의 margin-left 는 gap 이
+   대신하므로 뺐다(flex 안에서 margin 과 gap 을 같이 쓰면 간격이 이중으로 붙는다). */
 .yday-title {
+    display: flex;
+    align-items: center;
+    gap: 6px;
     font-size: var(--fs-h1);
     font-weight: var(--font-weight-bold);
     line-height: 1.2;
 }
 
 .yday-title .tag {
-    margin-left: 6px;
     padding: 2px 8px;
     border: 1px solid var(--border);
     border-radius: var(--radius-pill);
     color: var(--text-muted);
     font-size: var(--fs-micro);
     font-weight: 400;
-    vertical-align: 3px;
+}
+
+/* 날짜 화살표 — 히어로 제목 옆. 히스토리를 눌러 과거로 오갈 때 씀.
+   버튼 리셋을 최소로만: 이 자리는 장식보다 눌리는 느낌이 중요하다. */
+.date-nav {
+    appearance: none;
+    width: 26px;
+    height: 26px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    background: var(--panel-bg);
+    color: var(--text-secondary);
+    font-size: var(--fs-note);
+    font-weight: 400;
+    line-height: 1;
+    cursor: pointer;
+}
+
+.date-nav:hover:not(:disabled) {
+    background: var(--panel-bg-accent);
+    border-color: var(--panel-border-accent);
+    color: var(--text-primary);
+}
+
+/* 더 갈 데가 없는 쪽 — history 시작(◀)이거나 이미 최신(▶) */
+.date-nav:disabled {
+    opacity: 0.35;
+    cursor: default;
 }
 
 .module .meta-line {
@@ -262,14 +314,16 @@ a:hover {
 }
 
 /* --- 모듈 안의 제목 --------------------------------------------------
-   제목은 조용하게, 데이터는 크게. 제목을 본문과 같은 크기의 굵은 글씨로 두면
-   박스 일곱이 모두 같은 목소리로 말해서 무엇부터 볼지 알 수 없다. */
+   제목은 조용하게, 데이터는 크게. 다만 "조용하게"를 크기·색·굵기까지 전부
+   설명문과 똑같이 맞췄더니 제목이 제목으로 안 보였다 — 바로 아래 .module-note
+   와 같은 0.75rem·muted·400 이라 두 줄이 한 덩어리로 읽혔다.
+   크기는 그대로 두고 굵기와 색으로만 한 겹 올린다. */
 .module h2 {
     margin: 0 0 4px;
     font-size: var(--fs-section-title);
-    font-weight: 400;
+    font-weight: var(--font-weight-bold);
     letter-spacing: var(--tracking-title);
-    color: var(--text-muted);
+    color: var(--text-secondary);
 }
 
 /* .module 안으로 한정하지 않는다 — 한정했다가 모듈 밖의 설명문이 스타일을
@@ -443,23 +497,57 @@ svg {
     font-variant-numeric: tabular-nums;
 }
 
-/* --- 어제 시간대 띠 ---------------------------------------------------
-   요일×시각 히트맵(28일 누적)을 어제 하루 24칸으로 바꾼 자리. 세로축이
-   없어지니 한 줄이면 되고, 칸 색은 히트맵과 같은 파랑 명도 계단을 쓴다. */
-.hour-strip,
-.hour-ticks {
+/* --- 어제 시간대 막대 ---------------------------------------------------
+   시각마다 막대 하나, 높이가 세션 수. 크기를 색이 아니라 길이로 말하므로
+   색은 한 가지면 되고 범례가 필요 없다(예전엔 6단계 램프 + "적음~많음"
+   범례였는데, 값이 0~4뿐이라 색이 거의 정보를 못 실었다).
+
+   막대 뒤에 옅은 칸(트랙)을 깔아 둔다 — 24칸 중 절반이 0인 날이 많아서,
+   트랙이 없으면 "그 시각에 아무도 안 왔다"와 "그 시각 칸이 아예 없다"가
+   구분되지 않는다. */
+.hour-chart {
     display: grid;
     grid-template-columns: repeat(24, 1fr);
     gap: var(--strip-gap);
+    align-items: end;
+    height: var(--strip-h);
+    padding-top: 1.1em;         /* 최댓값 숫자가 앉을 자리 */
+    box-sizing: content-box;
 }
 
-.hour-strip .cell {
-    height: var(--strip-cell);
+.hour-col {
+    position: relative;
+    display: flex;
+    align-items: flex-end;
+    height: 100%;
     border-radius: var(--radius-xs);
     background: var(--surface-2);
 }
 
+.hour-col .bar {
+    width: 100%;
+    min-height: 2px;            /* 1세션이 선 하나로 사라지지 않게 */
+    border-radius: var(--radius-xs);
+    background: var(--series-1);
+}
+
+/* 축 눈금을 안 그리는 대신 최댓값 하나에만 숫자를 얹어 그날의 자를 알려준다 */
+.hour-col .peak {
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    margin-bottom: 2px;
+    color: var(--text-secondary);
+    font-size: var(--fs-micro);
+    font-weight: var(--font-weight-bold);
+    line-height: 1;
+}
+
 .hour-ticks {
+    display: grid;
+    grid-template-columns: repeat(24, 1fr);
+    gap: var(--strip-gap);
     margin-top: 4px;
 }
 
@@ -467,22 +555,6 @@ svg {
     color: var(--text-muted);
     font-size: var(--fs-micro);
     text-align: center;
-}
-
-.legend-scale {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    margin-top: 12px;
-    color: var(--text-muted);
-    font-size: var(--fs-micro);
-}
-
-.legend-scale i {
-    display: inline-block;
-    width: 22px;
-    height: 10px;
-    border-radius: var(--radius-xs);
 }
 
 /* --- 표로 보기 ------------------------------------------------------ */

@@ -18,8 +18,12 @@ jobs:
         with:
           python-version: '3.11'
 
+      # requests 는 google-auth 의 토큰 갱신 transport 가 쓴다(피드백 시트를
+      # Sheets REST 로 직접 부르는 데 필요). google-analytics-data 가 전이
+      # 의존성으로 끌어오긴 하지만, 남의 의존성에 기대면 그쪽이 바뀔 때 조용히
+      # 깨지므로 명시한다.
       - name: Install dependencies
-        run: pip install google-analytics-data google-auth
+        run: pip install google-analytics-data google-auth requests
 
       # 속성 ID는 시크릿이 아니다 — 공개돼도 서비스 계정 권한 없이는 아무것도 못 읽는다.
       - name: Fetch GA4 data
@@ -27,6 +31,10 @@ jobs:
           GA4_SERVICE_ACCOUNT_JSON: ${{ secrets.GA4_SERVICE_ACCOUNT_JSON }}
           GA4_PROPERTY_ID: '516513119'        # 사이트 (atah.io / pc98 / suiko)
           GA4_BLOG_PROPERTY_ID: '549191220'   # 블로그 (oysterbay.tistory.com)
+          # 에뮬레이터 피드백 시트(gensei-pc98). 서비스 계정에 뷰어로 공유돼
+          # 있어야 하고, 프로젝트에 Sheets API 가 켜져 있어야 한다 — 둘 중
+          # 하나라도 안 되면 피드백만 조용히 건너뛰고 GA4 수집은 그대로 돈다.
+          FEEDBACK_SHEET_ID: '10IdRL3n0wKav9TvPbS0kkm5Pq6fAaMxDNWauTNYy5cE'
         run: python scripts/ga4_dashboard.py
 
       # 페이지(dashboard/index.html·dashboard.css·dashboard.js)는 손으로 관리한다.
