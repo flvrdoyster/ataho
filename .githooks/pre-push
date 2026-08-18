@@ -1,9 +1,12 @@
 #!/usr/bin/env bash
-# dashboard/data/*.js 가 오래된 채로 push 되는 걸 막는다.
+# dashboard/data/*.js 의 history(28일치 기록)가 origin보다 뒤처진 채로
+# push 되는 걸 막는다.
 #
-# merge=ours(.gitattributes) 는 머지 때 신선도를 안 따지고 무조건 로컬을 쓰므로,
-# 로컬이 실제로 오래됐는데 그걸 모르고 push 하면 origin의 더 최신 자동 커밋
-# 데이터를 조용히 덮어쓸 수 있다. 이걸 push 직전에 잡아 준다.
+# merge=ours(.gitattributes)는 머지 때 신선도를 안 따지고 무조건 로컬을 쓴다.
+# 로컬이 origin에서 며칠 안 당겨온 채로 컬렉터를 돌리면, "어제" 날짜 자체는
+# 맞게 나와도 그 사이 origin이 이미 채워둔 history 항목들은 로컬에 없을 수
+# 있다 — 이 상태로 push 하면 그 항목들이 조용히 사라진다. 그래서 "어제 날짜가
+# 맞나"가 아니라 "origin의 history 날짜를 로컬이 다 갖고 있나"를 비교한다.
 #
 # 활성화(클론마다 1회, 로컬 설정이라 git으로 관리 안 됨):
 #   git config core.hooksPath .githooks
@@ -19,38 +22,67 @@ cd "$REPO_ROOT" || exit 0
 
 command -v python3 >/dev/null 2>&1 || exit 0
 
-python3 - "$@" <<'PYEOF'
+ZERO="0000000000000000000000000000000000000000"
+TMPDIR="$(mktemp -d)"
+trap 'rm -rf "$TMPDIR"' EXIT
+
+blocked=0
+
+# pre-push 훅은 push 될 갱신 내역을 stdin으로 받는다:
+#   <local ref> <local sha1> <remote ref> <remote sha1>
+while read -r local_ref local_sha remote_ref remote_sha; do
+  [ "$local_sha" = "$ZERO" ] && continue   # 브랜치/태그 삭제 — 비교 불필요
+  [ "$remote_sha" = "$ZERO" ] && continue  # origin에 아직 없는 새 브랜치 — 비교 대상 없음
+
+  for name in ga4 blog; do
+    path="dashboard/data/${name}.js"
+    git show "${local_sha}:${path}" >"$TMPDIR/local_${name}.js" 2>/dev/null
+    git show "${remote_sha}:${path}" >"$TMPDIR/remote_${name}.js" 2>/dev/null
+  done
+
+  python3 - "$TMPDIR" <<'PYEOF'
 import json
 import sys
-from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
-KST = timezone(timedelta(hours=9))
-expected = (datetime.now(KST).date() - timedelta(days=1)).isoformat()
+tmp = Path(sys.argv[1])
 
-stale = []
-for name in ("ga4", "blog"):
-    path = Path(f"dashboard/data/{name}.js")
-    if not path.exists():
-        continue
+
+def history_keys(path):
+    if not path.exists() or path.stat().st_size == 0:
+        return None
     try:
         text = path.read_text(encoding="utf-8")
         body = text.split("=", 2)[2].strip().rstrip(";")
-        date = json.loads(body)["yesterday"]["date"]
+        return set(json.loads(body).get("history", {}).keys())
     except Exception:
-        continue  # 형식이 안 맞으면 이 훅의 책임이 아니다 — 조용히 넘어간다
-    if date and date < expected:
-        stale.append((name, date))
+        return None  # 형식이 안 맞으면 이 훅의 책임이 아니다 — 조용히 넘어간다
 
-if stale:
-    print("⚠️  dashboard/data 가 오래됐습니다 (push 를 막습니다):")
-    for name, date in stale:
-        print(f"   {name}.js: yesterday.date = {date} (기대: {expected})")
-    print()
-    print("   먼저 재수집하세요:")
-    print("     python3 scripts/ga4_dashboard.py")
-    print("   급하면 이번만 건너뛰기: SKIP_GA4_CHECK=1 git push")
-    sys.exit(1)
 
-sys.exit(0)
+blocked = False
+for name in ("ga4", "blog"):
+    local_keys = history_keys(tmp / f"local_{name}.js")
+    remote_keys = history_keys(tmp / f"remote_{name}.js")
+    if local_keys is None or remote_keys is None:
+        continue
+    gap = sorted(remote_keys - local_keys)
+    if gap:
+        blocked = True
+        print(f"   {name}.js: origin에는 있는데 로컬엔 없는 날짜 — {', '.join(gap)}")
+
+sys.exit(1 if blocked else 0)
 PYEOF
+  if [ $? -ne 0 ]; then
+    blocked=1
+  fi
+done
+
+if [ "$blocked" -eq 1 ]; then
+  echo "⚠️  로컬의 dashboard/data history가 origin보다 뒤처졌습니다 (push를 막습니다)."
+  echo "   먼저 origin을 반영한 뒤 다시 시도하세요:"
+  echo "     git fetch origin && git merge origin/main"
+  echo "   급하면 이번만 건너뛰기: SKIP_GA4_CHECK=1 git push"
+  exit 1
+fi
+
+exit 0
