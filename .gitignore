@@ -6,3 +6,7 @@
 # Playwright
 haiyuki_web/tests/
 .ga4_creds/
+
+# Python
+__pycache__/
+*.pyc
