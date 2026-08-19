@@ -309,11 +309,16 @@
        같은 이유로 갈린다: 최신 날짜는 "어제"가 맞지만, 히스토리를 눌러 과거
        날짜를 보고 있을 땐 "어제"라고 하면 거짓말이 된다(그 날짜는 이제
        어제가 아니다). heroWord 는 히어로 타이틀 전용 — 바로 옆에 날짜 태그가
-       또 있어서 "08.15 (08.15)"처럼 겹치지 않게 "그날"로 대신한다.
+       또 있어서 "08.15 (08.15)"처럼 겹치지 않게 "{n}일 전"으로 대신한다
+       (fbPending.oldestDays 와 같은 표기). n 은 최신("어제" = 1일 전) 기준
+       날짜 차이로 구하므로 뷰어의 로컬 타임존과 무관하다.
        위의 "데이터 없음" 가드보다 반드시 뒤에 있어야 한다 — y.date 가 없을 때
        mmdd(y.date) 를 부르면 죽는다. */
     const dayLabel = isLatest ? '어제' : mmdd(y.date);
-    const heroWord = isLatest ? '어제' : '그날';
+    const daysAgo = Math.round(
+        (Date.parse(`${data.yesterday.date}T00:00:00Z`) - Date.parse(`${y.date}T00:00:00Z`))
+        / 86400000) + 1;
+    const heroWord = isLatest ? '어제' : `${daysAgo}일 전`;
 
     const base = data.baseline || {};
     const WHERE = { high: '많은 편', low: '적은 편', usual: '평소 범위' };
