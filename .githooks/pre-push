@@ -8,6 +8,12 @@
 # 있다 — 이 상태로 push 하면 그 항목들이 조용히 사라진다. 그래서 "어제 날짜가
 # 맞나"가 아니라 "origin의 history 날짜를 로컬이 다 갖고 있나"를 비교한다.
 #
+# 단, 28일 보존 창(TREND_DAYS, scripts/ga4_dashboard.py) 밖으로 자연스럽게
+# 밀려난 옛 날짜는 비교에서 뺀다 — origin의 마지막 push가 며칠 전이면 그때는
+# 아직 창 안이었던 날짜를, 오늘 로컬이 정상적으로 가지치기했을 뿐인데 그걸
+# "유실"로 오탐하면 안 되기 때문이다(2026-08-20 실제로 겪음: 7/22가 오늘
+# 기준 창 밖으로 나가 로컬엔 없고 origin의 옛 커밋엔 남아 있었다).
+#
 # 활성화(클론마다 1회, 로컬 설정이라 git으로 관리 안 됨):
 #   git config core.hooksPath .githooks
 #
@@ -43,9 +49,16 @@ while read -r local_ref local_sha remote_ref remote_sha; do
   python3 - "$TMPDIR" <<'PYEOF'
 import json
 import sys
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 tmp = Path(sys.argv[1])
+
+# scripts/ga4_dashboard.py의 TREND_DAYS와 반드시 같은 값이어야 한다 — 거기서
+# 바뀌면 여기도 같이 고칠 것.
+TREND_DAYS = 28
+KST = timezone(timedelta(hours=9))
+cutoff = (datetime.now(KST).date() - timedelta(days=TREND_DAYS)).isoformat()
 
 
 def history_keys(path):
@@ -65,7 +78,9 @@ for name in ("ga4", "blog"):
     remote_keys = history_keys(tmp / f"remote_{name}.js")
     if local_keys is None or remote_keys is None:
         continue
-    gap = sorted(remote_keys - local_keys)
+    # 오늘 기준 보존 창 밖으로 밀려난 날짜는 "로컬이 뒤처짐"이 아니라
+    # "정상적으로 늙어서 빠짐"이므로 비교에서 뺀다.
+    gap = sorted(d for d in (remote_keys - local_keys) if d >= cutoff)
     if gap:
         blocked = True
         print(f"   {name}.js: origin에는 있는데 로컬엔 없는 날짜 — {', '.join(gap)}")
