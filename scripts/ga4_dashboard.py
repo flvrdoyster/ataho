@@ -119,7 +119,7 @@ SECTION_PREFIXES = [
     ("/balance", "미니게임 · 균형잡기"),
     ("/sweep", "미니게임 · 술창고 청소"),
     ("/swim", "미니게임 · 헤엄치기"),
-    ("/scene_viewer", "씬 뷰어"),
+    ("/scene_viewer", "장면 뷰어"),
     ("/world", "월드 (에디터/뷰어)"),
     ("/dashboard", "대시보드"),
 ]

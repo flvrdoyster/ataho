@@ -283,7 +283,7 @@
        화면은 모듈(박스) 여럿을 12칸 격자에 올려 만든다. 구획을 하나 넣거나
        빼거나 순서를 바꾸는 일이 mod() 호출 하나로 끝나게 하려는 것 —
        배치 규칙은 CSS 한 곳(.dash-main / .module)에만 있다. */
-    function buildHTML(data, key, primary, isLatest) {
+    function buildHTML(data, key, primary, isLatest, latestDate) {
     const parts = [];
     const y = data.yesterday;
 
@@ -311,12 +311,16 @@
        어제가 아니다). heroWord 는 히어로 타이틀 전용 — 바로 옆에 날짜 태그가
        또 있어서 "08.15 (08.15)"처럼 겹치지 않게 "{n}일 전"으로 대신한다
        (fbPending.oldestDays 와 같은 표기). n 은 최신("어제" = 1일 전) 기준
-       날짜 차이로 구하므로 뷰어의 로컬 타임존과 무관하다.
+       날짜 차이로 구하므로 뷰어의 로컬 타임존과 무관하다 — 단 이때 쓰는
+       "최신"은 반드시 latestDate 인자여야 한다. data.yesterday 는 과거
+       스냅샷을 볼 땐 그 날짜 자신의 yesterday 로 바뀌어 있어서(history 항목이
+       자기 자신을 yesterday 로 갖고 있음) data.yesterday.date 를 쓰면 항상
+       y.date 와 같아져 n 이 늘 1로 나온다 — 실제로 겪은 버그.
        위의 "데이터 없음" 가드보다 반드시 뒤에 있어야 한다 — y.date 가 없을 때
        mmdd(y.date) 를 부르면 죽는다. */
     const dayLabel = isLatest ? '어제' : mmdd(y.date);
     const daysAgo = Math.round(
-        (Date.parse(`${data.yesterday.date}T00:00:00Z`) - Date.parse(`${y.date}T00:00:00Z`))
+        (Date.parse(`${latestDate}T00:00:00Z`) - Date.parse(`${y.date}T00:00:00Z`))
         / 86400000) + 1;
     const heroWord = isLatest ? '어제' : `${daysAgo}일 전`;
 
@@ -589,7 +593,8 @@
         const picked = snapshotFor(v.data, wantDate) || snapshotFor(v.data, null);
         if (!picked) return;
         const panel = panelRoot.querySelector(`.panel[data-key="${v.key}"]`);
-        panel.innerHTML = buildHTML(picked.snap, v.key, v.key === views[0].key, picked.isLatest);
+        panel.innerHTML = buildHTML(
+            picked.snap, v.key, v.key === views[0].key, picked.isLatest, v.data.yesterday.date);
         panel.dataset.date = picked.date;
 
         // 화살표 경계 — 더 이전 기록이 없으면 ◀ 비활성, 이미 최신이면 ▶는
