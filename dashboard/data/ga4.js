@@ -8,12 +8,12 @@ window.DASHBOARD_DATA['ga4'] = {
    "median": 2.928205128205128,
    "min": 1.4285714285714286,
    "n": 28,
-   "q1": 2.308333333333333,
+   "q1": 2.35,
    "q3": 3.6126373626373622,
-   "rank": 26,
-   "value": 1.6,
-   "vsMedian": -45.35901926444833,
-   "where": "low"
+   "rank": 20,
+   "value": 2.5,
+   "vsMedian": -14.62346760070052,
+   "where": "usual"
   },
   "sessions": {
    "max": 36,
@@ -47,8 +47,8 @@ window.DASHBOARD_DATA['ga4'] = {
    "q1": 32.5,
    "q3": 53.5,
    "rank": 27,
-   "value": 16,
-   "vsMedian": -63.63636363636363,
+   "value": 25,
+   "vsMedian": -43.18181818181818,
    "where": "low"
   }
  },
@@ -220,7 +220,7 @@ window.DASHBOARD_DATA['ga4'] = {
    "date": "2026-08-19",
    "sessions": 12,
    "users": 10,
-   "views": 16
+   "views": 25
   }
  ],
  "history": {
@@ -6429,12 +6429,12 @@ window.DASHBOARD_DATA['ga4'] = {
      "median": 2.928205128205128,
      "min": 1.4285714285714286,
      "n": 28,
-     "q1": 2.308333333333333,
+     "q1": 2.35,
      "q3": 3.6126373626373622,
-     "rank": 26,
-     "value": 1.6,
-     "vsMedian": -45.35901926444833,
-     "where": "low"
+     "rank": 20,
+     "value": 2.5,
+     "vsMedian": -14.62346760070052,
+     "where": "usual"
     },
     "sessions": {
      "max": 36,
@@ -6478,10 +6478,6 @@ window.DASHBOARD_DATA['ga4'] = {
     {
      "text": "환세패유기 해설서가 08.18 10회 — 평소 하루 2.5회 보던 페이지라 4.0배로 뛰었습니다. 나머지 5곳은 평소보다 조용했습니다.",
      "tone": "up"
-    },
-    {
-     "text": "08.18 한 사람이 평균 1.6장을 봤습니다 — 평소 2.9장이니 얕게 본 날입니다(28일 최소 1.4장).",
-     "tone": "flat"
     },
     {
      "text": "08.18 방문자 12명 — 평소(15명)보다 적은 편으로, 28일 중 22번째입니다.",
@@ -6658,12 +6654,12 @@ window.DASHBOARD_DATA['ga4'] = {
      "median": 2.928205128205128,
      "min": 1.4285714285714286,
      "n": 28,
-     "q1": 2.308333333333333,
+     "q1": 2.35,
      "q3": 3.6126373626373622,
-     "rank": 26,
-     "value": 1.6,
-     "vsMedian": -45.35901926444833,
-     "where": "low"
+     "rank": 20,
+     "value": 2.5,
+     "vsMedian": -14.62346760070052,
+     "where": "usual"
     },
     "sessions": {
      "max": 36,
@@ -6697,15 +6693,15 @@ window.DASHBOARD_DATA['ga4'] = {
      "q1": 32.5,
      "q3": 53.5,
      "rank": 27,
-     "value": 16,
-     "vsMedian": -63.63636363636363,
+     "value": 25,
+     "vsMedian": -43.18181818181818,
      "where": "low"
     }
    },
    "confirmed": false,
    "insights": [
     {
-     "text": "어제 한 사람이 평균 1.6장을 봤습니다 — 평소 2.9장이니 얕게 본 날입니다(28일 최소 1.4장).",
+     "text": "어제 조회 25회 가운데 18회(72%)가 재방문 쪽입니다 — 5명이 1인당 4장씩 봤습니다(신규는 1.0장).",
      "tone": "flat"
     },
     {
@@ -6748,7 +6744,7 @@ window.DASHBOARD_DATA['ga4'] = {
      "spike": false,
      "title": "환세취호전",
      "users": 3,
-     "views": 5
+     "views": 7
     },
     {
      "host": "pc98.atah.io",
@@ -6758,7 +6754,27 @@ window.DASHBOARD_DATA['ga4'] = {
      "spike": false,
      "title": "환세희담",
      "users": 2,
+     "views": 5
+    },
+    {
+     "host": "suiko.atah.io",
+     "name": "/debug.html",
+     "priorAvg": 0.2222222222222222,
+     "section": "",
+     "spike": false,
+     "title": "환세취호전 (디버그)",
+     "users": 1,
      "views": 4
+    },
+    {
+     "host": "pc98.atah.io",
+     "name": "/",
+     "priorAvg": 3.5185185185185186,
+     "section": "",
+     "spike": false,
+     "title": "PC98 웹 에뮬레이터",
+     "users": 2,
+     "views": 3
     },
     {
      "host": "atah.io",
@@ -6779,16 +6795,6 @@ window.DASHBOARD_DATA['ga4'] = {
      "title": "환세풍광전",
      "users": 2,
      "views": 2
-    },
-    {
-     "host": "pc98.atah.io",
-     "name": "/",
-     "priorAvg": 3.5185185185185186,
-     "section": "",
-     "spike": false,
-     "title": "PC98 웹 에뮬레이터",
-     "users": 2,
-     "views": 1
     },
     {
      "host": "pc98.atah.io",
@@ -6814,11 +6820,11 @@ window.DASHBOARD_DATA['ga4'] = {
    "ydaySites": [
     {
      "name": "pc98.atah.io",
-     "views": 9
+     "views": 12
     },
     {
      "name": "suiko.atah.io",
-     "views": 5
+     "views": 11
     },
     {
      "name": "atah.io",
@@ -6849,13 +6855,13 @@ window.DASHBOARD_DATA['ga4'] = {
     "newUsers": 5,
     "sessions": 12,
     "users": 10,
-    "views": 16
+    "views": 25
    }
   }
  },
  "insights": [
   {
-   "text": "어제 한 사람이 평균 1.6장을 봤습니다 — 평소 2.9장이니 얕게 본 날입니다(28일 최소 1.4장).",
+   "text": "어제 조회 25회 가운데 18회(72%)가 재방문 쪽입니다 — 5명이 1인당 4장씩 봤습니다(신규는 1.0장).",
    "tone": "flat"
   },
   {
@@ -6869,7 +6875,7 @@ window.DASHBOARD_DATA['ga4'] = {
   "propertyId": "516513119",
   "settledDays": 7,
   "trendDays": 28,
-  "updatedAt": "2026-08-20 00:15"
+  "updatedAt": "2026-08-20 07:17"
  },
  "settled": {
   "avgDuration": 358.08464771764704,
@@ -6913,7 +6919,7 @@ window.DASHBOARD_DATA['ga4'] = {
    "spike": false,
    "title": "환세취호전",
    "users": 3,
-   "views": 5
+   "views": 7
   },
   {
    "host": "pc98.atah.io",
@@ -6923,7 +6929,27 @@ window.DASHBOARD_DATA['ga4'] = {
    "spike": false,
    "title": "환세희담",
    "users": 2,
+   "views": 5
+  },
+  {
+   "host": "suiko.atah.io",
+   "name": "/debug.html",
+   "priorAvg": 0.2222222222222222,
+   "section": "",
+   "spike": false,
+   "title": "환세취호전 (디버그)",
+   "users": 1,
    "views": 4
+  },
+  {
+   "host": "pc98.atah.io",
+   "name": "/",
+   "priorAvg": 3.5185185185185186,
+   "section": "",
+   "spike": false,
+   "title": "PC98 웹 에뮬레이터",
+   "users": 2,
+   "views": 3
   },
   {
    "host": "atah.io",
@@ -6944,16 +6970,6 @@ window.DASHBOARD_DATA['ga4'] = {
    "title": "환세풍광전",
    "users": 2,
    "views": 2
-  },
-  {
-   "host": "pc98.atah.io",
-   "name": "/",
-   "priorAvg": 3.5185185185185186,
-   "section": "",
-   "spike": false,
-   "title": "PC98 웹 에뮬레이터",
-   "users": 2,
-   "views": 1
   },
   {
    "host": "pc98.atah.io",
@@ -6979,11 +6995,11 @@ window.DASHBOARD_DATA['ga4'] = {
  "ydaySites": [
   {
    "name": "pc98.atah.io",
-   "views": 9
+   "views": 12
   },
   {
    "name": "suiko.atah.io",
-   "views": 5
+   "views": 11
   },
   {
    "name": "atah.io",
@@ -7014,6 +7030,6 @@ window.DASHBOARD_DATA['ga4'] = {
   "newUsers": 5,
   "sessions": 12,
   "users": 10,
-  "views": 16
+  "views": 25
  }
 };
