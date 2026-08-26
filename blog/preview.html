@@ -170,7 +170,25 @@
       </div>
     </div>
 
+    <nav class="area_titlenav" aria-label="작품별로 보기">
+      <a href="#">환세희담</a>
+      <a href="#">환세풍광전</a>
+      <a href="#">환세쾌도전</a>
+      <a href="#">환세포물장</a>
+      <a href="#">환세취호전</a>
+      <a href="#">환세패유기</a>
+    </nav>
+
     <hr class="hide">
+
+    <!-- skin.html 과 같은 위치(#dkWrap 직계, .area_menu 의 뒤 형제)에 둡니다.
+         검색을 펼쳤을 때 제목을 감추는 규칙이 형제 선택자라, 여기 있지 않으면
+         미리보기에서 그 동작을 확인할 수 없습니다. -->
+    <div class="area_list">
+      <div class="tit_category">
+        <a class="link_category" href="#">최근 글 목록 예시</a>
+      </div>
+    </div>
 
     <div id="dkContent" class="cont_skin" role="main">
       <div id="cMain">
@@ -270,12 +288,6 @@ console.log(greet('KoddiUDOnGothic'));</code></pre>
           </div>
         </div>
 
-        <div class="area_list" style="margin-top:60px">
-          <div class="tit_category">
-            <a class="link_category" href="#">최근 글 목록 예시</a>
-          </div>
-        </div>
-
         <div id="mArticle" class="article_skin">
           <div class="list_content">
             <a href="#" class="thumbnail_post"><img
@@ -292,6 +304,54 @@ console.log(greet('KoddiUDOnGothic'));</code></pre>
             </div>
           </div>
         </div>
+
+
+        <p class="preview-note">↓ 페이지네이션 — 넓은 화면에선 원형 화살표(리스트형), 좁은 화면(≤820px)에선
+          "이전/다음" 글자가 붙은 간단형으로 바뀝니다. 두 벌이 같은 .link_prev/.link_next 클래스를
+          쓰기 때문에, 한쪽에만 필요한 크기 지정이 다른 쪽으로 새지 않는지 여기서 확인하세요.</p>
+            <div class="area_paging area_paging_list">
+              <span class="inner_paging">
+                <a href="#" class="link_prev "><span class="screen_out">이전</span>
+                  <svg class="ico ico_pg_circle" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"
+                    aria-hidden="true" focusable="false">
+                    <circle class="ico_box" cx="12" cy="12" r="11" />
+                    <path d="M13.5 8 L9.5 12 L13.5 16" />
+                  </svg>
+                </a>
+                
+                  <a href="#" class="link_page"><span>1</span></a>
+                
+                  <a href="#" class="link_page"><span class="selected">2</span></a>
+                
+                  <a href="#" class="link_page"><span>3</span></a>
+                
+                <a href="#" class="link_next "><span class="screen_out">다음</span>
+                  <svg class="ico ico_pg_circle" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"
+                    aria-hidden="true" focusable="false">
+                    <circle class="ico_box" cx="12" cy="12" r="11" />
+                    <path d="M10.5 8 L14.5 12 L10.5 16" />
+                  </svg>
+                </a>
+              </span>
+            </div>
+
+            <div class="area_paging area_paging_simple">
+              <div class="inner_paging">
+                <a href="#" class="link_prev ">
+                  <svg class="ico ico_pg_simple" viewBox="0 0 10 18" xmlns="http://www.w3.org/2000/svg"
+                    aria-hidden="true" focusable="false">
+                    <path d="M8.5 1.5 L1.5 9 L8.5 16.5" />
+                  </svg>이전
+                </a>
+
+                <a href="#" class="link_next ">
+                  다음<svg class="ico ico_pg_simple" viewBox="0 0 10 18" xmlns="http://www.w3.org/2000/svg"
+                    aria-hidden="true" focusable="false">
+                    <path d="M1.5 1.5 L8.5 9 L1.5 16.5" />
+                  </svg>
+                </a>
+              </div>
+            </div>
 
         <div id="mEtc" class="wrap_etc">
           <div class="inner_aside">

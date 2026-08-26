@@ -136,8 +136,36 @@ address, caption, cite, code, dfn, em, var {
   color: var(--accent, #0068da)
 }
 
+/* 고정 헤더(.area_head, 80px)를 비켜주는 여백은 .area_titlenav 가 지고
+   .cont_skin 은 0으로 둡니다 — 이제 헤더 바로 다음에 항상 .area_titlenav 가
+   오기 때문입니다(모바일·카테고리 레이어 열림 상태의 같은 짝은 각각의 규칙 참고). */
 .cont_skin {
-  margin-top: 80px
+  margin-top: 0
+}
+
+.area_titlenav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 80px;
+  padding: 14px max(15px, calc(50% - 410px));
+  border-bottom: var(--rule, 1px solid rgba(0, 0, 0, .1))
+}
+
+.area_titlenav a {
+  padding: 6px 14px;
+  border-radius: var(--radius-pill, 999px);
+  background: rgba(0, 104, 218, .08);   /* --accent 의 옅은 틴트 */
+  color: var(--accent, #0068da);
+  font-size: 13px;
+  font-weight: var(--font-weight-bold, 700);
+  text-decoration: none;
+  white-space: nowrap
+}
+
+.area_titlenav a:hover {
+  background: rgba(0, 104, 218, .16);
+  text-decoration: none
 }
 
 .article_skin {
@@ -246,7 +274,12 @@ address, caption, cite, code, dfn, em, var {
    (칼럼 왼쪽 -410 + 사진 50 + 여백 16 + 200 = -144). 넘치는 소개글은 말줄임 처리됩니다. */
 .area_head .area_profile .info_profile {
   float: left;
-  max-width: 200px
+  max-width: 200px;
+  /* 이름 드롭다운(.list_name)의 기준점. 예전엔 .area_profile 기준에 left:92px 로
+     고정돼 있었는데, .area_profile 의 좌측 padding 이 화면 폭에 따라 변하게 되면서
+     드롭다운만 제자리에 남아 어긋났습니다. 이름 블록 자체를 기준으로 삼으면
+     바깥 여백이 어떻게 바뀌든 항상 이름 아래에 붙습니다. */
+  position: relative
 }
 
 .area_head .btn_name {
@@ -277,8 +310,8 @@ address, caption, cite, code, dfn, em, var {
 .area_head .list_name {
   display: none;
   position: absolute;
-  top: 44px;
-  left: 92px;
+  top: 29px;   /* 이름 버튼 아래 — .info_profile 기준 */
+  left: 0;
   border: 1px solid #dcdcdc;
   border-radius: var(--radius-xs, 2px);
   background-color: #fff
@@ -509,6 +542,15 @@ address, caption, cite, code, dfn, em, var {
   overflow: hidden;
   white-space: nowrap;
   z-index: 21
+}
+
+/* 검색을 펼치면 메뉴가 215px → 385px 로 넓어지면서 왼쪽 끝이 제목 위로 올라옵니다
+   (실측 119px 겹침). 펼친 상태에 맞춰 제목 폭을 잡으면 남는 자리가 56px 뿐이라
+   제목 구실을 못 하므로, 검색 중에만 제목을 감춥니다 — 검색어를 넣는 동안
+   카테고리 이름은 필요 없습니다. .area_menu 와 .area_list 는 #dkWrap 아래
+   형제이고 메뉴가 앞에 옵니다(확인함). */
+.area_menu:has(.area_search.on)~.area_list .tit_category {
+  visibility: hidden
 }
 
 .tit_category .link_category {
@@ -776,8 +818,13 @@ address, caption, cite, code, dfn, em, var {
   overflow: hidden
 }
 
-.area_paging .link_prev,
-.area_paging .link_next {
+/* 아래 크기 지정은 반드시 .area_paging_list(리스트형, 원형 화살표) 안으로
+   한정해야 합니다. 페이징 마크업은 두 벌인데 — 리스트형은 링크 자체가 24×24
+   아이콘이고, 간단형(.area_paging_simple, 좁은 화면)은 링크 안에 작은 화살표와
+   "이전/다음" 글자가 나란히 들어갑니다. .area_paging 전체에 걸면 간단형 링크까지
+   24×24 로 묶여서 글자가 아이콘 아래로 밀려납니다. */
+.area_paging_list .link_prev,
+.area_paging_list .link_next {
   float: left;
   width: 24px;
   height: 24px;
@@ -785,22 +832,22 @@ address, caption, cite, code, dfn, em, var {
   color: var(--text-muted, #767676)
 }
 
-.area_paging .link_prev {
+.area_paging_list .link_prev {
   margin-right: 20px;
 }
 
-.area_paging .link_next {
+.area_paging_list .link_next {
   margin-left: 20px;
 }
 
 /* 더 이상 페이지가 없을 때. 여기만 토큰 스케일보다 옅게 둡니다 —
    읽을 텍스트가 아니라 "누를 수 없음"을 알리는 상태 표시라서. */
-.area_paging .no-more-prev,
-.area_paging .no-more-next {
+.area_paging_list .no-more-prev,
+.area_paging_list .no-more-next {
   color: #ccc
 }
 
-.area_paging .ico_pg_circle {
+.area_paging_list .ico_pg_circle {
   display: block;
   width: 100%;
   height: 100%
@@ -965,8 +1012,17 @@ address, caption, cite, code, dfn, em, var {
   max-width: 630px
 }
 
+/* [##_tag_label_rep_##] 가 통째로 "태그1, 태그2, 태그3" 형태(쉼표는 실제 텍스트)로
+   나오는 merge tag라, <a> 마다 클래스가 안 붙고(개별 스타일 못 줌) 칩(pill) 모양도
+   못 만듭니다(쉼표가 칩 사이에 그대로 낄 것이므로). 그래서 옅은 회색 대신 포인트
+   색으로만 구분해, 이 글이 어느 작품 태그를 갖고 있는지 눈에 띄게 합니다. */
 .skin_view .list_tag .desc_tag a {
-  color: var(--text-muted, #767676)
+  color: var(--accent, #0068da);
+  font-weight: var(--font-weight-bold, 700)
+}
+
+.skin_view .list_tag .desc_tag a:hover {
+  text-decoration: underline
 }
 
 .skin_view .list_tag .link_tag {
@@ -1519,7 +1575,14 @@ address, caption, cite, code, dfn, em, var {
     margin-right: 8px
   }
 
+  /* 좁은 화면에서는 데스크탑용 좌우 한계(중앙 ±144px)를 되돌립니다. 그 값은
+     프로필 이름과 오른쪽 메뉴가 헤더에 함께 놓인 데스크탑 기하에서 나온 것인데,
+     여기서는 메뉴가 서랍으로 빠지고 목록 페이지(#tt-body-category 등)에서는
+     프로필 이름·소개도 숨겨져(아래 규칙) 아바타만 남습니다. */
   .area_list .tit_category {
+    left: 25%;
+    right: auto;
+    width: 50%;
     line-height: 60px
   }
 
@@ -2307,7 +2370,18 @@ address, caption, cite, code, dfn, em, var {
 
   /* 리스트 및 방명록 공통 */
   .cont_skin {
-    margin-top: 63px
+    margin-top: 0
+  }
+
+  .area_titlenav {
+    margin-top: 63px;
+    padding: 12px 15px;
+    gap: 6px
+  }
+
+  .area_titlenav a {
+    padding: 5px 12px;
+    font-size: 12px
   }
 
   #tt-body-search .area_head .btn_name,
@@ -2398,9 +2472,13 @@ address, caption, cite, code, dfn, em, var {
     overflow: hidden
   }
 
+  /* 카테고리 레이어가 열리면 뒤 콘텐츠는 overflow:hidden 으로 스크롤이 잠기고
+     안 보입니다 — .area_titlenav 의 margin-top:63px 가 이미 자리를 잡아주므로
+     여기서 padding-top 을 더 얹을 필요가 없습니다(예전엔 61px 를 더해 63px 와
+     거의 같은 값을 흉내 냈는데, 지금은 진짜 63px 를 쓰고 있어 그 값이 필요 없음). */
   .layer_on .cont_skin {
     margin-top: 0;
-    padding-top: 61px
+    padding-top: 0
   }
 
   .layer_on .dimmed_layer {
