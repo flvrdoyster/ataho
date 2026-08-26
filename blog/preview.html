@@ -1,0 +1,366 @@
+<!doctype html>
+<html lang="ko">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport"
+    content="user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, width=device-width">
+  <title>스킨 미리보기</title>
+
+  <!-- skin.html과 동일한 폰트/토큰/스타일시트. 파일명만 실제 로컬 파일에 맞춤(style.css → skin.css) -->
+  <link rel="stylesheet" href="https://atah.io/fonts.css">
+  <link rel="stylesheet" href="https://atah.io/design-tokens.css">
+  <link rel="stylesheet" href="./skin.css">
+
+  <script src="//t1.daumcdn.net/tistory_admin/lib/jquery/jquery-3.5.1.min.js"
+    integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script>
+
+  <style>
+    /* ↓↓↓ 이 <style> 블록은 미리보기 전용입니다. skin.css에는 없는 내용이고,
+       실제 티스토리에 올라가는 것도 아닙니다. */
+    #previewBadge {
+      position: fixed;
+      right: 14px;
+      bottom: 14px;
+      z-index: 999;
+      max-width: 260px;
+      padding: 10px 14px;
+      border-radius: 8px;
+      background: rgba(20, 20, 20, .85);
+      color: #fff;
+      font-family: -apple-system, sans-serif;
+      font-size: 12px;
+      line-height: 1.6;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, .25);
+    }
+
+    #previewBadge b {
+      color: #9fc4ec;
+    }
+
+    .preview-video-box {
+      display: block;
+      background: repeating-linear-gradient(45deg, #eee, #eee 10px, #f7f7f7 10px, #f7f7f7 20px);
+      border: 1px dashed #ccc;
+      box-sizing: border-box;
+    }
+
+    .preview-note {
+      font-family: -apple-system, sans-serif !important;
+      font-size: 12px !important;
+      line-height: 1.6 !important;
+      padding: 8px 12px !important;
+      margin: 12px 0 8px !important;
+      border-radius: 6px !important;
+      background: #fafafa;
+      color: #888 !important;
+      border: 1px dashed #ddd;
+    }
+
+    .preview-note.verified {
+      background: #eef8f3;
+      border-style: solid;
+      color: #3a7a5c !important;
+    }
+  </style>
+</head>
+
+<body id="tt-body-page">
+
+  <div id="dkIndex">
+    <a href="#dkBody">본문 바로가기</a>
+    <a href="#dkGnb">메뉴 바로가기</a>
+  </div>
+
+  <div id="dkWrap" class="wrap_skin ">
+    <div id="dkHead" role="banner" class="area_head ">
+      <h1 class="screen_out">미리보기 블로그</h1>
+      <div class="area_profile ">
+        <a class="link_profile" href="#"><img
+            src="data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='50' height='50'%3E%3Crect width='50' height='50' fill='%237ba6de'/%3E%3C/svg%3E"
+            width="50" height="50" class="img_profile" alt="프로필사진"></a>
+        <div class="info_profile">
+          <button type="button" class="btn_name">flvrdoyster
+            <svg class="ico_name" viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true" focusable="false">
+              <path d="M1.5 1 L5 5.2 L8.5 1" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"
+                stroke-linejoin="round" />
+            </svg>
+          </button>
+          <ul class="list_name">
+            <li><a href="#" class="link_name">글쓰기</a></li>
+            <li><a href="#" class="link_name">관리</a></li>
+            <li class="box_division"><a href="#" class="link_name">태그</a></li>
+            <li><a href="#" class="link_name">방명록</a></li>
+            <li><a href="#" class="link_name">RSS</a></li>
+          </ul>
+          <p class="txt_condition">스킨 미리보기용 샘플 블로그입니다</p>
+        </div>
+      </div>
+
+      <button type="button" class="btn_menu" aria-label="카테고리 메뉴열기">
+        <svg class="ico_menu" viewBox="0 0 40 31" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"
+          focusable="false">
+          <rect x="1" y="1" width="38" height="29" rx="4" stroke="currentColor" stroke-width="2" />
+          <rect x="10" y="10" width="20" height="2" rx="1" fill="currentColor" />
+          <rect x="10" y="15" width="20" height="2" rx="1" fill="currentColor" />
+          <rect x="10" y="20" width="20" height="2" rx="1" fill="currentColor" />
+        </svg>
+      </button>
+    </div>
+
+    <div class="dimmed_layer"></div>
+
+    <button type="button" class="btn_close" aria-label="닫기">
+      <svg class="ico_close" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"
+        focusable="false">
+        <line x1="4" y1="4" x2="14" y2="14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+        <line x1="14" y1="4" x2="4" y2="14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+      </svg>
+    </button>
+
+    <div class="area_menu">
+      <div class="area_search">
+        <button type="button" class="btn_search" aria-label="검색하기">
+          <svg class="ico_search" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"
+            aria-hidden="true" focusable="false">
+            <circle cx="6.5" cy="6.5" r="4.5" stroke="currentColor" stroke-width="1.4" />
+            <line x1="9.8" y1="9.8" x2="14" y2="14" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" />
+          </svg>
+        </button>
+        <form action="#" method="get" class="frm_search" onsubmit="return false">
+          <fieldset>
+            <legend class="screen_out">검색하기 폼</legend>
+            <label for="tfSearch" class="lab_search"><span class="screen_out">블로그 내 검색</span>
+              <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"
+                focusable="false">
+                <circle cx="6.5" cy="6.5" r="4.5" stroke="currentColor" stroke-width="1.4" />
+                <line x1="9.8" y1="9.8" x2="14" y2="14" stroke="currentColor" stroke-width="1.4"
+                  stroke-linecap="round" />
+              </svg>
+            </label>
+            <input id="tfSearch" type="text" name="q" value="" class="tf_search">
+          </fieldset>
+        </form>
+      </div>
+
+      <div role="navigation" class="area_navi">
+        <button type="button" class="btn_cate">CATEGORY
+          <svg class="ico_cate" viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"
+            focusable="false">
+            <path d="M1.5 1 L5 5.2 L8.5 1" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"
+              stroke-linejoin="round" />
+          </svg>
+        </button>
+
+        <div class="list_cate">
+          <ul>
+            <li><a href="#">전체보기 (128)</a></li>
+            <li class="selected"><a href="#">디자인 로그 (24)</a>
+              <ul>
+                <li><a href="#">스킨 편집 (6)</a></li>
+                <li><a href="#">타이포그래피 (4)</a></li>
+              </ul>
+            </li>
+            <li><a href="#">개발 (52)</a></li>
+            <li><a href="#">일상 (52)</a></li>
+          </ul>
+
+          <ul class="menu_profile">
+            <li><a href="#">방명록</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <hr class="hide">
+
+    <div id="dkContent" class="cont_skin" role="main">
+      <div id="cMain">
+        <div id="mArticle" class="article_skin">
+          <div class="skin_view">
+            <h2 id="dkBody" class="screen_out">티스토리 뷰</h2>
+            <div class="area_title">
+              <strong class="tit_category"><a href="#">디자인 로그</a></strong>
+              <h3 class="tit_post"><a href="#">스킨 미리보기 — 폰트·색·본문 타이포그래피 확인용 샘플 글</a></h3>
+              <span class="txt_detail my_post">flvrdoyster
+                <span class="txt_bar"></span>2026.08.26
+              </span>
+            </div>
+
+            <div class="area_view" id="article-view">
+              <div class="contents_style">
+
+                <h2 data-ke-size="size26">제목 2 (h2) — data-ke-size</h2>
+                <p data-ke-size="size18">18pt 문단입니다. blockquote·리스트·코드블럭 앞뒤 여백, 폰트(KoddiUDOnGothic), 링크
+                  <a href="#">색상 샘플</a>, <strong>굵게 강조</strong> 표시가 정상적으로 보이는지 확인하는 문단입니다.
+                </p>
+
+                <h3 data-ke-size="size23">제목 3 (h3)</h3>
+                <p data-ke-size="size16">16pt 기본 문단입니다. 문단과 문단 사이 여백, 줄간격(line-height)이 자연스러운지, 그리고 자간(letter-spacing)
+                  보정이 과하지 않은지 확인해보세요.</p>
+                <p data-ke-size="size16">두 번째 16pt 문단 — 문단 간 30px 여백이 일정하게 적용되는지 보는 용도입니다.</p>
+
+                <h4 data-ke-size="size19">제목 4 (h4)</h4>
+                <p data-ke-size="size14">14pt 작은 문단입니다. 부가 설명이나 각주처럼 쓰는 크기예요.</p>
+
+                <p class="preview-note">⚠️ 아래 인용구는 실제 글에서 확인 못한 추정 마크업입니다(이 블로그 글 중엔 인용구를 쓴 글이 없었어요).</p>
+                <blockquote data-ke-style="style2">
+                  <p>인용구(style2) 샘플입니다. 이 블록 바로 아래 문단과의 간격이 예전엔 0으로 붙어있던 버그를 고쳤는지 확인하는 용도예요.</p>
+                </blockquote>
+                <p data-ke-size="size16">인용구 바로 다음 문단 — 위 여백이 자연스럽게 떨어져 보이면 정상입니다.</p>
+
+                <blockquote data-ke-style="style3">
+                  <p>인용구(style3, 박스형) 샘플입니다.</p>
+                </blockquote>
+
+                <ul>
+                  <li>리스트 항목 1 — 항목 간 간격 확인용</li>
+                  <li>리스트 항목 2</li>
+                  <li>리스트 항목 3</li>
+                </ul>
+
+                <ol>
+                  <li>순서 리스트 1</li>
+                  <li>순서 리스트 2</li>
+                </ol>
+
+                <pre><code class="hljs">const greet = (name) => {
+  return `안녕, ${name}!`;
+};
+
+console.log(greet('KoddiUDOnGothic'));</code></pre>
+
+                <p class="preview-note verified">✅ 아래 이미지 블록은 실제 oysterbay.tistory.com 글(#134)에서 확인한 진짜 마크업 구조입니다(span 래퍼 포함).</p>
+                <figure class="imageblock alignCenter" data-ke-mobilestyle="alignCenter">
+                  <span data-url="#" data-phocus="true">
+                    <img
+                      src="data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='800' height='450'%3E%3Crect width='800' height='450' fill='%23eef1f4'/%3E%3Ctext x='50%25' y='50%25' font-family='sans-serif' font-size='24' fill='%23999' text-anchor='middle' dominant-baseline='middle'%3ESAMPLE IMAGE 800x450%3C/text%3E%3C/svg%3E"
+                      loading="lazy" width="800" height="450" alt="샘플 이미지">
+                  </span>
+                  <figcaption>이미지 캡션 샘플 — figure.imageblock.alignCenter (캡션 자체는 실제 글에서 못 봐서 미검증)</figcaption>
+                </figure>
+
+                <p class="preview-note">⚠️ 아래 파일첨부 카드는 실제 글에서 확인 못한 추정 마크업입니다(이 블로그 글 중엔 파일첨부를 쓴 글이 없었어요). 레이아웃은 맞게 고쳤지만 세부 구조(span/div 등)는 티스토리 실제 출력과 다를 수 있습니다.</p>
+                <figure class="fileblock" data-ke-align="alignCenter">
+                  <a href="#" onclick="return false">
+                    <span class="image"></span>
+                    <div class="desc">
+                      <div class="filename"><span class="name">스킨_미리보기_아주긴파일이름_테스트용.zip</span></div>
+                      <span class="size">12.3MB</span>
+                    </div>
+                  </a>
+                </figure>
+                <p class="preview-note">↑ 파일첨부 카드 — 이 페이지를 좁은 창(모바일 폭)으로 줄여서 옆으로 안 튀어나오는지 확인하세요.</p>
+
+                <p class="preview-note">⚠️ 아래 동영상 블록도 마찬가지로 실제 글에서 확인 못한 추정 마크업입니다.</p>
+                <figure data-ke-type="video" data-ke-style="alignCenter">
+                  <iframe class="preview-video-box" width="0" height="0" src="about:blank" title="샘플 동영상 (width/height 정보 없음)"></iframe>
+                </figure>
+                <p class="preview-note">↑ width/height 없는 동영상 임베드 — 창 폭을 줄여도 찌그러지지 않고 비율이 유지되는지 확인하세요.</p>
+
+              </div>
+
+              <div class="area_etc">
+                <dl class="list_tag">
+                  <dt class="tit_tag">TAG</dt>
+                  <dd class="desc_tag"><a href="#" class="link_tag">스킨편집</a> <a href="#" class="link_tag">타이포그래피</a>
+                    <a href="#" class="link_tag">KoddiUDOnGothic</a>
+                  </dd>
+                </dl>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="area_list" style="margin-top:60px">
+          <div class="tit_category">
+            <a class="link_category" href="#">최근 글 목록 예시</a>
+          </div>
+        </div>
+
+        <div id="mArticle" class="article_skin">
+          <div class="list_content">
+            <a href="#" class="thumbnail_post"><img
+                src="data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='148' height='148'%3E%3Crect width='148' height='148' fill='%23eef1f4'/%3E%3C/svg%3E"
+                alt=""></a>
+            <a href="#" class="link_post">
+              <strong class="tit_post">글 목록 카드 — 썸네일/제목/요약 레이아웃 샘플</strong>
+              <p class="txt_post">글 목록에서 썸네일, 제목, 요약 텍스트가 어떻게 배치되는지 확인하는 카드입니다. 링크 색과 카테고리 색도 함께 보세요.</p>
+            </a>
+            <div class="detail_info">
+              <a href="#" class="link_cate">디자인 로그</a>
+              <span class="txt_bar"></span>
+              2026.08.25
+            </div>
+          </div>
+        </div>
+
+        <div id="mEtc" class="wrap_etc">
+          <div class="inner_aside">
+            <div class="box_aside">
+              <strong>공지사항</strong>
+              <ul class="list_board">
+                <li><a href="#" class="link_board">스킨 미리보기 페이지 안내</a></li>
+              </ul>
+            </div>
+
+            <div class="box_aside">
+              <strong>최근에 올라온 글</strong>
+              <ul class="list_board">
+                <li><a href="#" class="link_board">샘플 글 제목 1</a></li>
+                <li><a href="#" class="link_board">샘플 글 제목 2</a></li>
+              </ul>
+            </div>
+
+            <div class="box_aside lst">
+              <dl class="list_total">
+                <dt>Total</dt>
+                <dd>12,345</dd>
+              </dl>
+              <dl class="list_visitor">
+                <dt>Today</dt>
+                <dd>67</dd>
+              </dl>
+              <dl class="list_visitor">
+                <dt>Yesterday</dt>
+                <dd>89</dd>
+              </dl>
+            </div>
+
+            <div class="box_aside">
+              <strong>TAG</strong>
+              <ul class="list_tag">
+                <li><a href="#" class="link_tag">스킨편집</a></li>
+                <li><a href="#" class="link_tag">KoddiUDOnGothic</a></li>
+              </ul>
+              <a href="#" class="link_more">more</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <hr class="hide">
+    <div id="dkFoot" role="contentinfo" class="area_foot">
+      Blog is powered by
+      <em class="emph_t">Tistory</em> / Designed by
+      <em class="emph_t">Tistory</em>
+    </div>
+  </div>
+
+  <div id="previewBadge">
+    🔍 <b>로컬 미리보기</b><br>
+    이 페이지는 skin.css를 눈으로 확인하기 위한 용도로, 실제 티스토리엔 올라가지 않습니다.<br>
+    프로필 사진·카테고리·통계 등은 전부 샘플 값이에요. 창 폭을 줄여 모바일(≤820px) 레이아웃도 확인해보세요.
+  </div>
+
+  <script src="./images/script.js"></script>
+  <script>
+    (function ($) {
+      $.Area.init();
+    })(jQuery);
+  </script>
+
+</body>
+
+</html>
