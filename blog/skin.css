@@ -1,9 +1,20 @@
 @charset "UTF-8";
 
-/* 색·서체·형태 값은 전부 atah.io/design-tokens.css 에서 옵니다
-   (skin.html <head> 참고). 이 파일엔 로컬 토큰을 두지 않습니다.
+/* 색·형태 값은 전부 atah.io/design-tokens.css 에서 옵니다(skin.html <head> 참고).
+   서체(--font-ui)만 이 블로그에서 로컬로 덮어씁니다 — 사이트 공통 폰트
+   KoddiUDOnGothic 은 한자 글리프가 없어서, 환세 시리즈 원제 등 일본어 한자가
+   자주 섞이는 이 블로그에선 한 단어 안에서도 시스템 폰트로 튀는 문제가 있었습니다
+   (2026-08-27, "DSアニメ総集編" 같은 단어에서 가나/한자 사이 이음매 확인함).
+   Noto Sans KR 은 한글·한자·가나를 하나의 폰트로 다 갖고 있어 이음매가 없습니다
+   — 실제로 시스템 폴백과 다른 폭으로 렌더링되는 걸 캔버스 측정으로 검증함
+   (KoddiUDOnGothic·Pretendard 둘 다 한자에서 시스템 폴백과 폭이 같았음 = 커버리지 없음).
+   다른 서브프로젝트(대시보드 등)는 안 건드림 — 로컬 override라 공유 토큰 자체는
+   그대로 KoddiUDOnGothic. */
+:root {
+  --font-ui: 'Noto Sans KR', sans-serif;
+}
 
-   본문 텍스트 위계는 공유 토큰 3단계로만 표현합니다:
+/* 본문 텍스트 위계는 공유 토큰 3단계로만 표현합니다:
      --text-primary   (#1a1a1a) 본문·제목·닉네임처럼 실제로 읽는 글
      --text-secondary (#4d4d4d) 요약·캡션·인용구 등 본문에 딸린 보조 텍스트
      --text-muted     (#767676) 날짜·메타·사이드바 링크 등 UI 성격 텍스트
@@ -166,6 +177,31 @@ address, caption, cite, code, dfn, em, var {
 .area_titlenav a:hover {
   background: rgba(0, 104, 218, .16);
   text-decoration: none
+}
+
+/* 홈 히어로 밴드 — 텍스트 없이 이미지 하나. 기본은 숨김, #tt-body-index(홈)에서만
+   보이게 아래서 풀어줌(다른 페이지는 body id 가 다름 — tt-body-page/-tag/-guestbook
+   등, 실측 확인함). 배경 틴트는 이미지가 아직 없거나 로딩 전에도 빈 흰 배경으로
+   뚝 끊기지 않게 하는 안전망 겸, 이미지 로드 후엔 살짝 보이는 프레임 역할. */
+.area_hero {
+  display: none;
+  padding: 24px max(15px, calc(50% - 410px));
+  text-align: center;
+  background: linear-gradient(180deg, #eef3fa, #fff)
+}
+
+#tt-body-index .area_hero {
+  display: block
+}
+
+.hero_img {
+  display: inline-block;
+  max-width: 100%;
+  max-height: 260px;
+  width: auto;
+  height: auto;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges
 }
 
 .article_skin {
@@ -2397,6 +2433,14 @@ address, caption, cite, code, dfn, em, var {
   .area_titlenav a {
     padding: 5px 12px;
     font-size: 12px
+  }
+
+  .area_hero {
+    padding: 16px 15px
+  }
+
+  .hero_img {
+    max-height: 160px
   }
 
   #tt-body-search .area_head .btn_name,

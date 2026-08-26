@@ -16,9 +16,16 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
   <title>[##_page_title_##]</title>
   <link rel="alternate" type="application/rss+xml" title="[##_title_##]" href="[##_rss_url_##]" />
 
-  <!-- atah.io 공유 폰트·디자인 토큰 (fonts.css, design-tokens.css) -->
-  <link rel="stylesheet" href="https://atah.io/fonts.css">
+  <!-- atah.io 공유 디자인 토큰. 폰트(--font-ui)는 skin.css 에서 이 블로그만
+       Noto Sans KR 로 로컬 override — 아래 구글 폰트 링크 참고. -->
   <link rel="stylesheet" href="https://atah.io/design-tokens.css">
+
+  <!-- 본문에 환세 시리즈 원제 등 일본어 한자가 자주 섞이는데, 사이트 공통 폰트
+       (KoddiUDOnGothic)는 한자 글리프가 없어 한 단어 안에서도 시스템 폰트로
+       튀었습니다(예: "DSアニメ総集編" — 가나는 온고딕, 한자만 OS 기본 폰트).
+       Noto Sans KR은 한글·한자·가나를 하나의 폰트로 다 갖고 있어 이음매가 없습니다. -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet">
 
   <link rel="stylesheet" href="./style.css">
 
@@ -146,6 +153,19 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         <a href="/tag/환세취호전">환세취호전</a>
         <a href="/tag/환세패유기">환세패유기</a>
       </nav>
+
+      <!-- 홈 히어로 밴드 — 텍스트 없이 이미지 하나만. 홈(#tt-body-index)에서만
+           보이도록 skin.css 에서 처리(다른 페이지 body id 는 다름 — 실측 확인함:
+           글 tt-body-page, 태그 tt-body-tag, 방명록 tt-body-guestbook).
+           .area_titlenav(작품 태그칩)는 그대로 모든 페이지에 유지, 이 밴드는
+           그 아래·아티클 목록 위에 별도로 얹음.
+           이미지(hero.psd → 웹용 export → images/ 업로드)가 아직 준비 전이라
+           <img> 는 주석 처리해뒀습니다 — 이대로 적용하면 깨진 이미지 아이콘 대신
+           옅은 그라데이션 배경만 있는 빈 밴드로 보입니다. 이미지 준비되면
+           아래 주석을 풀고 src 경로를 실제 파일명으로 맞추세요. -->
+      <div class="area_hero">
+        <!-- <img src="./images/hero.png" alt="" class="hero_img"> -->
+      </div>
 
       <hr class="hide">
 
