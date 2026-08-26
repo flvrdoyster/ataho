@@ -1,13 +1,15 @@
 @charset "UTF-8";
 
-/* 이 스킨만의 로컬 토큰. 공유 값(--brand, --accent, --text-primary 등)은
-   atah.io/design-tokens.css 에서 옵니다(skin.html <head> 참고) — 여기선
-   그 파일에 없는, 이 블로그에만 쓰이는 값만 추가합니다. */
-:root {
-  --text-faint: #999; /* 본문/캡션(--text-primary·--text-muted)보다 한 단계 더 옅은 톤.
-                          동영상 placeholder·더보기 버튼 같은 UI 텍스트, 드롭다운·페이징
-                          아이콘처럼 "장식/보조 UI" 성격 요소에 공통으로 씀 */
-}
+/* 색·서체·형태 값은 전부 atah.io/design-tokens.css 에서 옵니다
+   (skin.html <head> 참고). 이 파일엔 로컬 토큰을 두지 않습니다.
+
+   본문 텍스트 위계는 공유 토큰 3단계로만 표현합니다:
+     --text-primary   (#1a1a1a) 본문·제목·닉네임처럼 실제로 읽는 글
+     --text-secondary (#4d4d4d) 요약·캡션·인용구 등 본문에 딸린 보조 텍스트
+     --text-muted     (#767676) 날짜·메타·사이드바 링크 등 UI 성격 텍스트
+   셋 다 흰 배경에서 4.5:1 이상이라 본문 가독성 기준을 넘깁니다
+   (--text-muted 가 하한선이니 이보다 옅게 두지 말 것).
+   예외는 "더 이상 페이지 없음" 같은 비활성 상태 표시뿐 — 일부러 옅게 남깁니다. */
 
 /* reset */
 body, div, dl, dt, dd, ul, ol, li, h1, h2, h3, h4, h5, h6, pre, code, form, fieldset, legend, textarea, p, blockquote, th, td, input, select, textarea, button {
@@ -55,12 +57,12 @@ body, th, td, input, select, textarea, button {
   font-size: 14px;
   line-height: 1.5;
   font-family: var(--font-ui, 'KoddiUDOnGothic', sans-serif);
-  color: #666
+  color: var(--text-secondary, #4d4d4d)
 }
 
 /* color값은 디자인가이드에 맞게사용 */
 a {
-  color: #333;
+  color: var(--text-primary, #1a1a1a);
   text-decoration: none
 }
 
@@ -163,7 +165,8 @@ address, caption, cite, code, dfn, em, var {
   outline: -webkit-focus-ring-color auto 5px
 }
 
-/* 공통이미지 */
+/* 공통이미지 — 스프라이트 기반 아이콘(댓글 위젯 등 티스토리가 직접 넣는 마크업 전용).
+   스킨이 직접 그리는 아이콘은 아래 .ico(인라인 SVG)를 씁니다. */
 .ico_skin {
   display: inline-block;
   overflow: hidden;
@@ -171,6 +174,30 @@ address, caption, cite, code, dfn, em, var {
   line-height: 0;
   background: url("images/ico_skin.gif") 0 0 no-repeat;
   text-indent: -9999px
+}
+
+/* ── 인라인 아이콘 공통 ───────────────────────────────────────────────
+   스킨이 그리는 SVG 아이콘(메뉴·화살표·돋보기·닫기·페이징)의 선 두께와 마감을
+   여기 한 곳에서 관리합니다. 개별 SVG 에는 stroke-width 를 쓰지 않습니다 —
+   예전엔 아이콘마다 1.3 / 1.4 / 1.6 / 1.8 / 2 로 제각각이었습니다.
+
+   전제: 모든 아이콘은 viewBox 를 표시 크기와 1:1 로 맞춥니다(10×6 아이콘은
+   10×6 px 로 표시). 그래야 user unit 1 = 1px 이라 어느 아이콘에서든 같은
+   굵기로 보입니다. 새 아이콘을 추가할 때도 이 규칙을 지켜 주세요.
+
+   .ico_box 는 아이콘 안의 '상자'(햄버거 바깥 틀, 페이징 원)에 붙입니다.
+   옆에 놓이는 실제 버튼 테두리(.btn_cate, .area_search)와 같은 두께라야
+   나란히 뒀을 때 따로 놀지 않습니다. */
+.ico {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: var(--ico-stroke-w, 1.5px);
+  stroke-linecap: round;
+  stroke-linejoin: round
+}
+
+.ico .ico_box {
+  stroke-width: var(--ui-border-w, 1px)
 }
 
 /* 헤더 */
@@ -200,19 +227,26 @@ address, caption, cite, code, dfn, em, var {
   content: ''
 }
 
+/* 헤더 좌우 요소를 본문 칼럼(.article_skin, 820px 중앙)의 좌우 끝에 맞춥니다.
+   예전엔 프로필이 화면 왼쪽 끝, 메뉴가 오른쪽 끝에 붙어 있어서 넓은 화면에선
+   둘 사이가 1000px 넘게 비고 본문 칼럼과 축도 어긋났습니다.
+   화면이 좁아 칼럼 바깥 여백이 30px 도 안 남을 땐 예전처럼 가장자리 여백을 씁니다. */
 .area_head .area_profile {
   position: relative;
   float: left;
-  padding: 15px 0 0 30px
+  padding: 15px 0 0 max(30px, calc(50% - 410px))
 }
 
 .area_head .area_profile .link_profile {
   float: left
 }
 
+/* 200px 상한은 가운데 카테고리 제목의 자리를 확보하려는 것입니다 —
+   프로필 오른쪽 끝이 중앙 -144px 을 넘지 않아야 제목이 정중앙을 유지할 수 있습니다
+   (칼럼 왼쪽 -410 + 사진 50 + 여백 16 + 200 = -144). 넘치는 소개글은 말줄임 처리됩니다. */
 .area_head .area_profile .info_profile {
   float: left;
-  max-width: 270px
+  max-width: 200px
 }
 
 .area_head .btn_name {
@@ -227,14 +261,14 @@ address, caption, cite, code, dfn, em, var {
   height: 6px;
   margin: 7px 0 0 6px;
   vertical-align: top;
-  color: var(--text-faint, #999);
+  color: var(--text-muted, #767676);
   transition: transform .15s
 }
 
 .area_head .txt_condition {
   width: 100%;
   font-size: 12px;
-  color: #aaa;
+  color: var(--text-muted, #767676);
   white-space: nowrap;
   text-overflow: ellipsis;
   overflow: hidden
@@ -266,7 +300,7 @@ address, caption, cite, code, dfn, em, var {
   padding-left: 15px;
   margin-bottom: 7px;
   text-decoration: none;
-  color: #666
+  color: var(--text-secondary, #4d4d4d)
 }
 
 .area_head .link_name:hover {
@@ -282,7 +316,7 @@ address, caption, cite, code, dfn, em, var {
 
 .area_menu {
   position: fixed;
-  right: 15px;
+  right: max(15px, calc(50% - 410px));   /* 본문 칼럼 오른쪽 끝에 맞춤 — .area_profile 주석 참고 */
   top: 21px;
   z-index: 31
 }
@@ -290,13 +324,13 @@ address, caption, cite, code, dfn, em, var {
 .area_menu .area_search {
   display: inline-block;
   margin: 0 2px;
-  border: 1px solid #ddd;
-  border-radius: 3px;
+  border: var(--ui-border-w, 1px) solid #ddd;
+  border-radius: var(--radius-sm, 4px);
   vertical-align: top
 }
 
 .area_menu .on.area_search {
-  border: 1px solid #aaa
+  border: var(--ui-border-w, 1px) solid #aaa
 }
 
 .area_menu .btn_search {
@@ -312,7 +346,7 @@ address, caption, cite, code, dfn, em, var {
   width: 16px;
   height: 16px;
   margin-top: -1px;
-  color: var(--text-faint, #999);
+  color: var(--text-muted, #767676);
   vertical-align: middle
 }
 
@@ -332,7 +366,7 @@ address, caption, cite, code, dfn, em, var {
   width: 16px;
   height: 16px;
   margin: 10px 9px 0 12px;
-  color: #999
+  color: var(--text-muted, #767676)
 }
 
 .area_menu .lab_search svg {
@@ -347,7 +381,7 @@ address, caption, cite, code, dfn, em, var {
   margin-top: 9px;
   border: 0 none;
   vertical-align: top;
-  color: #333
+  color: var(--text-primary, #1a1a1a)
 }
 
 .area_menu .area_navi {
@@ -359,8 +393,8 @@ address, caption, cite, code, dfn, em, var {
 .area_menu .btn_cate {
   width: 160px;
   height: 38px;
-  border: 1px solid var(--accent, #0068da);
-  border-radius: 3px;
+  border: var(--ui-border-w, 1px) solid var(--accent, #0068da);
+  border-radius: var(--radius-sm, 4px);
   font-weight: bold;
   font-size: 12px;
   line-height: 38px;
@@ -389,8 +423,8 @@ address, caption, cite, code, dfn, em, var {
   left: 0;
   width: 158px;
   padding: 18px 0 10px;
-  border: 1px solid var(--accent, #0068da);
-  border-radius: 0 0 3px 3px;
+  border: var(--ui-border-w, 1px) solid var(--accent, #0068da);
+  border-radius: 0 0 var(--radius-sm, 4px) var(--radius-sm, 4px);
   background-color: #fff
 }
 
@@ -407,7 +441,7 @@ address, caption, cite, code, dfn, em, var {
   padding-left: 17px;
   margin-bottom: 12px;
   font-size: 12px;
-  color: #333
+  color: var(--text-primary, #1a1a1a)
 }
 
 .area_navi .list_cate ul li {
@@ -419,7 +453,7 @@ address, caption, cite, code, dfn, em, var {
   padding-left: 17px;
   margin-bottom: 12px;
   font-size: 12px;
-  color: #333;
+  color: var(--text-primary, #1a1a1a);
   height: 17px
 }
 
@@ -439,7 +473,7 @@ address, caption, cite, code, dfn, em, var {
 }
 
 .area_navi .list_cate ul li ul li ul li {
-  color: #b4b4b4;
+  color: var(--text-muted, #767676);
   padding-left: 21px
 }
 
@@ -447,7 +481,7 @@ address, caption, cite, code, dfn, em, var {
   padding-left: 0;
   margin-bottom: 6px;
   font-size: 12px;
-  color: #666
+  color: var(--text-secondary, #4d4d4d)
 }
 
 .area_navi .list_cate ul li ul li ul li a::before {
@@ -458,11 +492,17 @@ address, caption, cite, code, dfn, em, var {
   display: none
 }
 
+/* 목록 페이지 카테고리 제목 — 헤더 가운데.
+   헤더 좌우를 본문 칼럼(±410px)에 맞추면서 메뉴가 안쪽(중앙 +187px)으로 들어왔기
+   때문에, 예전처럼 width:50%(중앙 ±25%)로 두면 긴 카테고리명이 메뉴 밑으로 깔립니다.
+   프로필(중앙 -144px)과 메뉴(중앙 +187px) 사이에서 더 좁은 쪽에 맞춰 좌우 대칭으로
+   묶어, 화면 정중앙을 유지하면서도 양쪽 어디와도 겹치지 않게 합니다. */
 .area_list .tit_category {
   position: fixed;
   top: 1px;
-  width: 50%;
-  left: 25%;
+  left: calc(50% - 144px);
+  right: calc(50% - 144px);
+  width: auto;
   line-height: 80px;
   text-align: center;
   text-overflow: ellipsis;
@@ -516,6 +556,14 @@ address, caption, cite, code, dfn, em, var {
   margin: 0 20px 33px 0
 }
 
+/* 목록형 위젯(공지사항·최근 글·최근 댓글·링크)에 항목이 하나도 없으면 박스째 숨깁니다.
+   min-height 가 135px 이라, 비어 있어도 제목만 덩그러니 남은 칸이 생겼습니다
+   (실제로 공지사항이 그 상태였음). 목록이 없는 위젯 — 방문자수(dl)·달력·태그 —
+   은 .list_board 를 갖지 않으므로 이 규칙에 걸리지 않습니다. */
+.wrap_etc .box_aside:has(.list_board):not(:has(.list_board li)) {
+  display: none
+}
+
 .wrap_etc .lst {
   margin-right: 0
 }
@@ -533,7 +581,7 @@ address, caption, cite, code, dfn, em, var {
   overflow: hidden;
   width: 170px;
   font-size: 12px;
-  color: #aaa;
+  color: var(--text-muted, #767676);
   white-space: nowrap;
   text-overflow: ellipsis
 }
@@ -555,12 +603,12 @@ address, caption, cite, code, dfn, em, var {
 
 .wrap_etc .list_visitor dt {
   float: left;
-  color: #aaa
+  color: var(--text-muted, #767676)
 }
 
 .wrap_etc .list_visitor dd {
   float: right;
-  color: #aaa
+  color: var(--text-muted, #767676)
 }
 
 .wrap_etc .link_more {
@@ -569,7 +617,7 @@ address, caption, cite, code, dfn, em, var {
   right: 10px;
   font-size: 12px;
   text-decoration: underline;
-  color: #aaa
+  color: var(--text-muted, #767676)
 }
 
 .wrap_etc .list_tag {
@@ -591,7 +639,7 @@ address, caption, cite, code, dfn, em, var {
   line-height: 26px;
   border: 1px solid #f0f0f0;
   background-color: #f0f0f0;
-  color: var(--text-faint, #999);
+  color: var(--text-muted, #767676);
   max-width: 65px;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -599,7 +647,7 @@ address, caption, cite, code, dfn, em, var {
 }
 
 .wrap_etc .list_tag .link_tag:hover {
-  border: 1px solid var(--accent, #0068da);
+  border: var(--ui-border-w, 1px) solid var(--accent, #0068da);
   background-color: #fff;
   text-decoration: none;
   color: var(--accent, #0068da)
@@ -621,14 +669,14 @@ address, caption, cite, code, dfn, em, var {
 
 .tt-calendar .cal_month a {
   font-weight: bold;
-  color: #666
+  color: var(--text-secondary, #4d4d4d)
 }
 
 .tt-calendar .cal_month a:first-child, .tt-calendar .cal_month a:last-child {
   height: 17px;
   padding: 0 10px;
   vertical-align: top;
-  color: #ccc
+  color: var(--text-muted, #767676)
 }
 
 .tt-calendar td, th {
@@ -640,17 +688,17 @@ address, caption, cite, code, dfn, em, var {
 }
 
 .tt-calendar thead th {
-  color: #ccc;
+  color: var(--text-muted, #767676);
   margin-bottom: 2px
 }
 
 .tt-calendar tbody td {
-  color: #aaa
+  color: var(--text-muted, #767676)
 }
 
 .tt-calendar tbody td .cal_click {
   font-weight: bold;
-  color: #777
+  color: var(--text-secondary, #4d4d4d)
 }
 
 .wrap_etc .tbl_calendar {
@@ -673,19 +721,19 @@ address, caption, cite, code, dfn, em, var {
   font-weight: normal;
   font-size: 10px;
   text-align: center;
-  color: #ccc
+  color: var(--text-muted, #767676)
 }
 
 .wrap_etc .link_day {
   display: block;
   font-size: 10px;
   text-align: center;
-  color: #aaa
+  color: var(--text-muted, #767676)
 }
 
 .wrap_etc .day_event {
   font-weight: bold;
-  color: #777
+  color: var(--text-secondary, #4d4d4d)
 }
 
 .wrap_etc .list_keep {
@@ -696,12 +744,12 @@ address, caption, cite, code, dfn, em, var {
   overflow: hidden;
   margin-bottom: 8px;
   font-size: 12px;
-  color: #aaa
+  color: var(--text-muted, #767676)
 }
 
 .wrap_etc .link_keep {
   font-size: 12px;
-  color: #aaa
+  color: var(--text-muted, #767676)
 }
 
 .area_foot {
@@ -710,7 +758,7 @@ address, caption, cite, code, dfn, em, var {
   line-height: 50px;
   text-align: center;
   background-color: #f0f0f0;
-  color: #aaa
+  color: var(--text-muted, #767676)
 }
 
 /* 페이징 */
@@ -734,7 +782,7 @@ address, caption, cite, code, dfn, em, var {
   width: 24px;
   height: 24px;
   margin-top: 6px;
-  color: #999
+  color: var(--text-muted, #767676)
 }
 
 .area_paging .link_prev {
@@ -745,6 +793,8 @@ address, caption, cite, code, dfn, em, var {
   margin-left: 20px;
 }
 
+/* 더 이상 페이지가 없을 때. 여기만 토큰 스케일보다 옅게 둡니다 —
+   읽을 텍스트가 아니라 "누를 수 없음"을 알리는 상태 표시라서. */
 .area_paging .no-more-prev,
 .area_paging .no-more-next {
   color: #ccc
@@ -768,11 +818,11 @@ address, caption, cite, code, dfn, em, var {
 .area_paging .link_page span {
   display: block;
   padding: 9px 14px 5px;
-  color: #666
+  color: var(--text-secondary, #4d4d4d)
 }
 
 .area_paging .link_page span.selected {
-  border-radius: 3px;
+  border-radius: var(--radius-sm, 4px);
   background-color: var(--accent, #0068da);
   color: #fff;
   font-weight: bold;
@@ -800,19 +850,19 @@ address, caption, cite, code, dfn, em, var {
   margin-top: 7px;
   font-size: 40px;
   font-weight: bold;
-  color: #000;
+  color: var(--text-primary, #1a1a1a);
   line-height: 50px
 }
 
 .skin_view .tit_post a {
-  color: #000
+  color: var(--text-primary, #1a1a1a)
 }
 
 .skin_view .txt_detail {
   display: block;
   margin-top: 20px;
   font-size: 12px;
-  color: #aaa
+  color: var(--text-muted, #767676)
 }
 
 .skin_view .txt_detail .txt_bar {
@@ -829,24 +879,21 @@ address, caption, cite, code, dfn, em, var {
 
 .skin_view .link_detail {
   font-size: 12px;
-  color: #aaa
+  color: var(--text-muted, #767676)
 }
 
 .skin_view .link_detail:hover {
   text-decoration: none
 }
 
-.skin_view .area_view {
-  padding: 20px 0;
-  font-size: 16px;
-}
-
-/* 본문 텍스트(제목/문단/리스트/인용구/코드) 타이포그래피는
-   전부 #article-view [data-ke-*] 규칙(하단, "텍스트 관련" 섹션)에서
-   단일 관리합니다. 예전엔 여기에도 h1~h4/p/ul,ol/blockquote/pre 규칙이
-   따로 있었는데, 에디터가 실제로 넣는 data-ke-size/data-ke-style
-   속성과 절반만 겹쳐서 속성별로 신·구 규칙이 뒤섞여 적용되는 문제가
-   있었음(예: 인용구 아래 여백이 사라지는 등) — 정리함. */
+/* 본문 텍스트(제목/문단/리스트/인용구/코드) 타이포그래피는 글자 크기까지
+   포함해 전부 #article-view 규칙(하단 "텍스트 관련" 섹션)에서 단일 관리합니다.
+   예전엔 .skin_view .area_view 에도 h1~h4/p/ul,ol/blockquote/pre 와 font-size
+   규칙이 따로 있었는데, 에디터가 실제로 넣는 data-ke-size/data-ke-style 속성과
+   절반만 겹쳐서 속성별로 신·구 규칙이 뒤섞여 적용됐습니다 — 예를 들어 모바일
+   본문은 글자 크기만 구 규칙(17px), 행간은 신 규칙(1.75), 색은 또 구 규칙에서
+   와서 셋의 출처가 전부 달랐습니다. .area_view 쪽 padding 은 #article-view 의
+   ID 선택자에 밀려 애초에 적용되지도 않던 죽은 값이라 함께 걷어냈습니다. */
 
 .skin_view .area_view iframe {
   max-width: 100%
@@ -914,18 +961,18 @@ address, caption, cite, code, dfn, em, var {
   margin-right: 2px;
   font-weight: bold;
   font-size: 12px;
-  color: #aaa;
+  color: var(--text-muted, #767676);
   max-width: 630px
 }
 
 .skin_view .list_tag .desc_tag a {
-  color: #aaa
+  color: var(--text-muted, #767676)
 }
 
 .skin_view .list_tag .link_tag {
   font-weight: bold;
   font-size: 12px;
-  color: #aaa
+  color: var(--text-muted, #767676)
 }
 
 .skin_view .list_tag .link_tag:hover {
@@ -975,7 +1022,7 @@ address, caption, cite, code, dfn, em, var {
 .skin_view .another_category table th {
   width: 100%;
   font-size: 12px;
-  color: #aaa;
+  color: var(--text-muted, #767676);
   padding: 0 !important
 }
 
@@ -1171,7 +1218,7 @@ address, caption, cite, code, dfn, em, var {
   border-top: 1px solid #eee;
   font-size: 12px;
   line-height: 44px;
-  color: #aaa
+  color: var(--text-muted, #767676)
 }
 
 .on .btn_replymore {
@@ -1195,7 +1242,7 @@ address, caption, cite, code, dfn, em, var {
 
 .area_reply .list_reply .tt_more_preview_comments_text {
   font-size: 12px;
-  color: #aaa
+  color: var(--text-muted, #767676)
 }
 
 .area_reply .list_reply li {
@@ -1231,7 +1278,7 @@ address, caption, cite, code, dfn, em, var {
   max-width: 515px;
   margin: 4px 5px 0 0;
   font-weight: bold;
-  color: #333;
+  color: var(--text-primary, #1a1a1a);
   white-space: nowrap
 }
 
@@ -1274,7 +1321,7 @@ address, caption, cite, code, dfn, em, var {
   display: block;
   margin-top: 7px;
   font-size: 12px;
-  color: #aaa
+  color: var(--text-muted, #767676)
 }
 
 .area_reply .btn_replymenu {
@@ -1341,13 +1388,18 @@ address, caption, cite, code, dfn, em, var {
   color: var(--accent, #0068da)
 }
 
+/* 제목은 2줄까지 허용합니다. 예전엔 white-space:nowrap 으로 무조건 1줄이라
+   긴 제목이 잘렸는데(예: "환세 시리즈 캐릭터 소개 (from …)"), 목록 페이지가
+   전체 조회수의 40% 가까이 되는 자리라 제목이 끝까지 보이는 편이 낫습니다. */
 .list_content .tit_post {
-  display: block;
-  font-weight: normal;
-  font-size: 28px;
-  text-overflow: ellipsis;
+  display: -webkit-box;
   overflow: hidden;
-  white-space: nowrap
+  font-weight: bold;
+  font-size: 26px;
+  line-height: 1.35;
+  color: var(--text-primary, #1a1a1a);
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2
 }
 
 .list_content .txt_post {
@@ -1355,11 +1407,11 @@ address, caption, cite, code, dfn, em, var {
   display: -ms-flexbox;
   display: box;
   overflow: hidden;
-  max-height: 80px;
-  margin-top: 1px;
+  max-height: 84px;   /* 28px × 3줄 — 예전엔 80px 이라 3번째 줄이 4px 잘렸음 */
+  margin-top: 4px;
   font-size: 16px;
   line-height: 28px;
-  color: #666;
+  color: var(--text-secondary, #4d4d4d);
   vertical-align: top;
   word-break: break-all;
   -webkit-box-orient: vertical;
@@ -1369,7 +1421,7 @@ address, caption, cite, code, dfn, em, var {
 .list_content .detail_info {
   margin-top: 16px;
   font-size: 12px;
-  color: #aaa;
+  color: var(--text-muted, #767676);
 }
 
 .list_content .detail_info .link_cate {
@@ -1421,11 +1473,11 @@ address, caption, cite, code, dfn, em, var {
   border: 1px solid #f0f0f0;
   background-color: #f0f0f0;
   font-weight: 100;
-  color: #666
+  color: var(--text-secondary, #4d4d4d)
 }
 
 .skin_tag .link_tag:hover {
-  border: 1px solid var(--accent, #0068da);
+  border: var(--ui-border-w, 1px) solid var(--accent, #0068da);
   background-color: #fff;
   text-decoration: none;
   color: var(--accent, #0068da)
@@ -1483,7 +1535,7 @@ address, caption, cite, code, dfn, em, var {
 
   .area_head .btn_name {
     margin-top: 2px;
-    color: #333;
+    color: var(--text-primary, #1a1a1a);
     font-family: var(--font-ui, 'KoddiUDOnGothic', sans-serif);
     margin-bottom: 0px
   }
@@ -1644,7 +1696,7 @@ address, caption, cite, code, dfn, em, var {
     display: inline-block;
     width: 18px;
     height: 18px;
-    color: #666;
+    color: var(--text-secondary, #4d4d4d);
     vertical-align: middle
   }
 
@@ -1657,12 +1709,12 @@ address, caption, cite, code, dfn, em, var {
     height: 42px;
     font-size: 11px;
     line-height: 42px;
-    color: #999
+    color: var(--text-muted, #767676)
   }
 
   .area_foot .emph_t {
     font-weight: bold;
-    color: var(--text-faint, #999);
+    color: var(--text-muted, #767676);
     font-family: var(--font-ui, 'KoddiUDOnGothic', sans-serif)
   }
 
@@ -1704,7 +1756,7 @@ address, caption, cite, code, dfn, em, var {
     display: block;
     width: 10px;
     height: 18px;
-    color: #666
+    color: var(--text-secondary, #4d4d4d)
   }
 
   .area_paging .link_prev .ico_pg_simple {
@@ -1720,7 +1772,7 @@ address, caption, cite, code, dfn, em, var {
   .area_paging .no-more-prev,
   .area_paging .no-more-next {
     text-decoration: none;
-    color: #999
+    color: var(--text-muted, #767676)
   }
 
   .area_paging .no-more-prev .ico_pg_simple,
@@ -1774,15 +1826,9 @@ address, caption, cite, code, dfn, em, var {
     margin: 0 8px
   }
 
-  .skin_view .area_view {
-    padding: 22px 15px 22px
-  }
-
-  .skin_view .area_view p {
-    font-size: 17px;
-    line-height: 24px;
-    color: #333
-  }
+  /* 본문(#article-view)의 좁은 화면 값은 이 블록이 아니라 파일 끝
+     "텍스트 관련" 섹션 바로 뒤에 있습니다 — #article-view 규칙들이 이 미디어쿼리
+     '뒤'에 오기 때문에, 여기에 두면 특이도가 같아 뒤 규칙에 덮여 죽습니다. */
 
   .skin_view .img_view {
     width: 100%;
@@ -1833,7 +1879,7 @@ address, caption, cite, code, dfn, em, var {
 
   .area_reply .tit_reply {
     padding-left: 15px;
-    color: #333;
+    color: var(--text-primary, #1a1a1a);
     font-family: var(--font-ui, 'KoddiUDOnGothic', sans-serif);
     font-weight: bold;
     display: block;
@@ -1866,7 +1912,7 @@ address, caption, cite, code, dfn, em, var {
 
   .area_reply .list_reply .tt_more_preview_comments_text {
     font-size: 14px;
-    color: #666
+    color: var(--text-secondary, #4d4d4d)
   }
 
   .area_reply .list_reply li {
@@ -1927,7 +1973,7 @@ address, caption, cite, code, dfn, em, var {
     font-size: 13px;
     overflow: visible;
     margin: 0px 5px 2px 0;
-    color: #333;
+    color: var(--text-primary, #1a1a1a);
     vertical-align: top;
     white-space: normal;
     font-family: var(--font-ui, 'KoddiUDOnGothic', sans-serif)
@@ -1952,7 +1998,7 @@ address, caption, cite, code, dfn, em, var {
     margin-top: 0;
     line-height: 20px;
     font-size: 14px;
-    color: #333
+    color: var(--text-primary, #1a1a1a)
   }
 
   .area_reply .txt_date {
@@ -1994,7 +2040,7 @@ address, caption, cite, code, dfn, em, var {
     display: block;
     font-size: 14px;
     line-height: 32px;
-    color: #333;
+    color: var(--text-primary, #1a1a1a);
     text-align: center
   }
 
@@ -2007,7 +2053,7 @@ address, caption, cite, code, dfn, em, var {
     border-top: 1px solid #e0e0e0;
     border-bottom: 1px solid #efefef;
     font-size: 13px;
-    color: #666
+    color: var(--text-secondary, #4d4d4d)
   }
 
   .area_reply .reply_write {
@@ -2029,7 +2075,7 @@ address, caption, cite, code, dfn, em, var {
     left: 10px;
     top: 8px;
     font-size: 14px;
-    color: #999
+    color: var(--text-muted, #767676)
   }
 
   .area_reply .reply_writer {
@@ -2071,7 +2117,7 @@ address, caption, cite, code, dfn, em, var {
     left: 11px;
     top: 7px;
     font-size: 14px;
-    color: #999
+    color: var(--text-muted, #767676)
   }
 
   .area_reply .info_pw .lab_info {
@@ -2118,7 +2164,7 @@ address, caption, cite, code, dfn, em, var {
     position: static;
     padding-left: 33px;
     font-size: 14px;
-    color: #666
+    color: var(--text-secondary, #4d4d4d)
   }
 
   .area_reply .writer_check .ico_check {
@@ -2196,7 +2242,7 @@ address, caption, cite, code, dfn, em, var {
 
   .skin_view .another_category table th {
     font-size: 14px;
-    color: #999
+    color: var(--text-muted, #767676)
   }
 
   .skin_view .another_category table th a {
@@ -2251,12 +2297,12 @@ address, caption, cite, code, dfn, em, var {
     margin-bottom: 9px;
     padding: 0 15px;
     font-size: 14px;
-    color: #999
+    color: var(--text-muted, #767676)
   }
 
   .skin_view .list_other .link_other {
     font-size: 15px;
-    color: #333
+    color: var(--text-primary, #1a1a1a)
   }
 
   /* 리스트 및 방명록 공통 */
@@ -2279,9 +2325,10 @@ address, caption, cite, code, dfn, em, var {
     margin-top: 21px
   }
 
-  /* 리스트 */
+  /* 리스트 — 높이는 내용에 맡깁니다. 예전엔 max-height:113px 로 고정돼 있었는데
+     제목이 2줄이 되면 카드 밖으로 넘칩니다(제목·요약 모두 line-clamp 로 이미
+     줄 수가 묶여 있어서 별도 상한이 필요 없습니다). */
   .list_content {
-    max-height: 113px;
     padding: 21px 15px 20px
   }
 
@@ -2302,18 +2349,18 @@ address, caption, cite, code, dfn, em, var {
   }
 
   .list_content .txt_post {
-    max-height: 37px;
-    margin-top: 2px;
+    max-height: 38px;   /* 19px × 2줄 — 예전 37px 은 2번째 줄이 1px 잘렸음 */
+    margin-top: 4px;
     font-size: 14px;
     line-height: 19px;
-    color: #6b6b6b;
+    color: var(--text-secondary, #4d4d4d);
     -webkit-line-clamp: 2
   }
 
   .list_content .detail_info {
     margin-top: 8px;
     font-size: 13px;
-    color: #bbb
+    color: var(--text-muted, #767676)
   }
 
   .list_content .detail_info .link_cate {
@@ -2420,11 +2467,11 @@ only screen and (max-width:820px) and (min-resolution: 1.5dppx) {
 
 .tt-comment-cont .tt-wrap-cmt .tt_desc {
   font-size: 15px;
-  color: #666;
+  color: var(--text-secondary, #4d4d4d);
 }
 
 .tt-comment-cont .tt-txt-mention {
-  color: #666;
+  color: var(--text-secondary, #4d4d4d);
 }
 
 .tt-comment-cont .tt-wrap-cmt .tt_txt_g {
@@ -2457,14 +2504,27 @@ only screen and (max-width:820px) and (min-resolution: 1.5dppx) {
 /* 전체 공통 */
 #article-view {
   margin: 0;
-  padding: 20px 20px 50px;
+  /* 좌우 70px 은 여백이 아니라 읽기 폭(measure) 조절입니다 — 칼럼은 820px 이지만
+     본문 글줄은 680px 로 잡혀 16px 한글 기준 한 줄 약 42자가 됩니다.
+     예전엔 좌우 20px 이라 한 줄 48자로, 한글에서 편한 범위(35~45자)보다 길었습니다. */
+  padding: 20px 70px 50px;
   word-wrap: break-word;
   color: var(--text-primary, #1a1a1a);
   min-height: 370px;
+  font-size: 16px;   /* 본문 기준 크기 — 아래 h2~h4·p 규칙의 em 이 이 값을 기준으로 잡힘 */
   font-family: var(--font-ui, 'KoddiUDOnGothic', sans-serif);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   letter-spacing: -0.01em;
+}
+
+/* 좁은 화면 본문 — 위 규칙과 특이도가 같으므로 반드시 '뒤'에 와야 적용됩니다.
+   글줄이 화면 폭에 묶이므로 measure 조절용 좌우 여백은 걷고, 글자만 한 단계 키웁니다. */
+@media only screen and (max-width:820px) {
+  #article-view {
+    padding: 20px 20px 50px;
+    font-size: 17px;
+  }
 }
 
 .contents_style>* {
@@ -2603,7 +2663,11 @@ only screen and (max-width:820px) and (min-resolution: 1.5dppx) {
 /* 첨부: 공통 */
 
 /* 이미지 클릭 관련 - lightbox */
-#article-view span[data-lightbox] {
+/* 이미지 확대 커서. 이 블로그의 실제 마크업은 data-lightbox 가 아니라
+   data-phocus(티스토리 이미지 뷰어) 라서 예전 선택자는 아무 데도 안 걸렸습니다.
+   둘 다 받아둡니다. */
+#article-view span[data-lightbox],
+#article-view span[data-phocus] {
   cursor: pointer;
 }
 
@@ -3174,7 +3238,7 @@ hr[data-ke-style='style8'],
   align-items: center;
   position: relative;
   text-align: center;
-  color: var(--text-faint, #999);
+  color: var(--text-muted, #767676);
   font-size: 16px;
   line-height: 30px;
 }
@@ -3241,7 +3305,7 @@ hr[data-ke-style='style8'],
 }
 
 #article-view div[data-ke-type='moreLess'] .btn-toggle-moreless {
-  color: var(--text-faint, #999);
+  color: var(--text-muted, #767676);
   font-size: 16px;
   line-height: 26px;
   font-family: var(--font-ui, 'KoddiUDOnGothic', sans-serif);
@@ -3413,7 +3477,7 @@ hr[data-ke-style='style8'],
 
 #article-view figure.imageslideblock figcaption {
   text-align: center;
-  color: #777;
+  color: var(--text-secondary, #4d4d4d);
   font-size: 14px;
 }
 
@@ -3452,7 +3516,7 @@ hr[data-ke-style='style8'],
   margin: 20px 0;
   font-size: 14px;
   line-height: 14px;
-  color: var(--text-faint, #999);
+  color: var(--text-muted, #767676);
   position: relative;
   width: 100%;
   text-align: left;
