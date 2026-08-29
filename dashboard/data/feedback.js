@@ -4,5 +4,5 @@ window.DASHBOARD_FEEDBACK = {
  "available": false,
  "error": "HTTPError",
  "sheetUrl": "https://docs.google.com/spreadsheets/d/10IdRL3n0wKav9TvPbS0kkm5Pq6fAaMxDNWauTNYy5cE/edit",
- "updatedAt": "2026-08-28 14:54"
+ "updatedAt": "2026-08-29 12:27"
 };
