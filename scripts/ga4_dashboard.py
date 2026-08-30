@@ -66,6 +66,37 @@ TREND = (f"{TREND_DAYS}daysAgo", "yesterday")
 #   - 유입원은 그 중간이라 어제치를 쓰되 미분류분을 합치지 않고 따로 센다
 SETTLED = ("8daysAgo", "2daysAgo")     # 어제를 뺀, 확정된 마지막 7일
 
+# --- 최장 방문 -----------------------------------------------------------------
+# GA4 Data API 는 세션을 낱개로 주지 않는다 — 세션 ID 같은 차원이 없고, 체류
+# 시간도 평균(averageSessionDuration)으로만 나온다. 그래서 "가장 오래 머문
+# 방문"을 직접 물어볼 수단이 없다.
+#
+# 우회 방법: **세션 내내 값이 안 바뀌는 차원**들로 잘게 쪼갠다. 칸 하나에
+# 세션이 딱 1건만 남으면 그 칸의 "평균"은 나눌 게 하나뿐이라 곧 그 세션의
+# 실제 체류 시간이다. 하루 세션이 10~35건뿐인 규모라 대개 잘 갈라진다.
+#
+# 다만 항상 되지는 않아서 관문 두 개를 세워 두고, 통과 못 하면 그날은 값을
+# 남기지 않는다(화면에서 그냥 빠진다):
+#   1) 정합성 — 쪼갠 세션 수의 합이 원본 총계와 같아야 한다. 다르면 한 세션이
+#      여러 칸에 흩어졌다는 뜻이고(체류 시간도 나뉘어 들어간다), 그러면
+#      "1건짜리 칸"이 온전한 세션이 아니라 조각일 수 있어 값이 실제보다
+#      짧게 나온다.
+#   2) 확정 — 세션이 2건 이상 뭉친 칸은 개별 값을 알 수 없지만 그 칸의 합계
+#      (세션수 × 평균)가 상한이다. 찾은 최댓값이 모든 뭉친 칸의 상한보다
+#      크거나 같아야 "이게 진짜 최댓값"이라고 말할 수 있다.
+#
+# 실측(2026-08-20, 20일 대조): 두 관문 모두 통과한 날이 9일(45%). 어제(1일 전)는
+# 유입원이 아직 안 굳어 세션이 19건→37건으로 쪼개지므로 거의 항상 탈락한다 —
+# HISTORY_REFRESH_AGE 갱신 때 유입원이 확정된 상태로 다시 계산되며 대개 살아난다.
+#
+# 검산(2026-08-20, 08-28의 70.8분 건): 이 칸의 조건을 쪼개기가 아니라 필터로
+# 걸어 통째로 조회하니 세션 1·사용자 1·페이지뷰 7·참여 41분이 나왔고,
+# 이벤트 시각도 15:31~16:42 = 71분으로 계산값과 일치했다. 필터로 걸러 남긴
+# 부스러기가 아니라 실제 한 사람의 한 방문이 맞다.
+LONGEST_DIMS = ("sessionSource", "deviceCategory", "city", "browser",
+                "screenResolution", "operatingSystemVersion", "language",
+                "landingPagePlusQueryString")
+
 # --- 히스토리("살아있는 기록") ----------------------------------------------
 # 매일 어제(1일 전)를 새로 모으고, 그저께(2일 전)를 한 번 더 조회해 어제
 # 저장해 둔 값을 덮어쓴다. 딱 한 번만 갱신하고 그 뒤로는 다시 안 건드린다.
@@ -225,6 +256,69 @@ def totals(client, target, date_range, metrics):
     return rows[0] if rows else {m: 0.0 for m in metrics}
 
 
+def fetch_longest_visit(client, target, date_range):
+    """그 하루 중 가장 오래 머문 방문 하나. 못 믿을 날은 None.
+
+    방법과 관문 두 개는 LONGEST_DIMS 주석에 적어 뒀다. 여기서는 그걸 그대로
+    집행하고, 통과했을 때만 그 방문의 맥락(페이지뷰·참여 시간 등)을 한 번 더
+    물어 붙인다. 하루 단위로만 부른다 — 여러 날을 한 번에 쪼개면 칸마다 세션이
+    뭉쳐 관문을 못 넘는다(실측: 7일 통째로는 130건→132건으로 정합성 실패).
+    """
+    base = totals(client, target, date_range, ["sessions", "averageSessionDuration"])
+    n_sessions, avg = base["sessions"], base["averageSessionDuration"]
+    if n_sessions < 1:
+        return None
+    total_duration = n_sessions * avg
+
+    rows = report(client, target, dimensions=LONGEST_DIMS,
+                  metrics=["sessions", "averageSessionDuration"],
+                  date_range=date_range, limit=5000)
+    if not rows:
+        return None
+
+    # 관문 1) 정합성 — 세션 수와 총 체류 시간이 원본과 맞아떨어져야 한다.
+    if (abs(sum(r["sessions"] for r in rows) - n_sessions) > 0.5
+            or abs(sum(r["sessions"] * r["averageSessionDuration"]
+                       for r in rows) - total_duration) > 1):
+        return None
+
+    singles = [r for r in rows if r["sessions"] == 1]
+    if not singles:
+        return None
+    best = max(singles, key=lambda r: r["averageSessionDuration"])
+    seconds = best["averageSessionDuration"]
+
+    # 관문 2) 확정 — 뭉친 칸에 더 긴 세션이 숨어 있을 여지가 없어야 한다.
+    bound = max((r["sessions"] * r["averageSessionDuration"]
+                 for r in rows if r["sessions"] > 1), default=0)
+    if seconds < bound:
+        return None
+    if seconds <= 0:
+        return None
+
+    # 통과 — 이 한 방문의 맥락을 붙인다. 위에서 쓴 차원값 전부를 필터로 걸면
+    # 그 세션 하나만 남는다(호스트 필터까지 9개, GA4 한도와 같다).
+    pin = FilterExpression(and_group=FilterExpressionList(expressions=[
+        FilterExpression(filter=Filter(
+            field_name=d, string_filter=Filter.StringFilter(value=best[d])))
+        for d in LONGEST_DIMS]))
+    detail = report(client, target, metrics=["screenPageViews", "userEngagementDuration"],
+                    date_range=date_range, dimension_filter=pin)
+    d0 = detail[0] if detail else {}
+
+    source = best["sessionSource"]
+    return {
+        "seconds": round(seconds),
+        "engagementSeconds": round(d0.get("userEngagementDuration", 0)),
+        "pageViews": int(d0.get("screenPageViews", 0)),
+        # 화면이 그대로 쓸 수 있게 여기서 사람 말로 바꿔 둔다 — 유입원 라벨은
+        # 어제 표(ydaySources)와 같은 규칙을 쓴다.
+        "source": SOURCE_LABELS.get(source, source) or "출처 미상",
+        "landing": best["landingPagePlusQueryString"],
+        "device": DEVICE_LABELS.get(best["deviceCategory"], best["deviceCategory"]),
+    }
+
+
 def classify_section(path):
     path = path.split("?")[0].split("#")[0]
     if path in ("/", "/index.html", ""):
@@ -251,6 +345,7 @@ def pct_delta(cur, prev):
 # 거짓말을 한다. 합계에서 떼어 내 따로 센다.
 UNRESOLVED_SOURCES = {"(not set)", "(data not available)", ""}
 SOURCE_LABELS = {"(direct)": "직접 방문"}
+DEVICE_LABELS = {"mobile": "모바일", "desktop": "데스크톱", "tablet": "태블릿"}
 
 # 인사이트 문장을 낼지 말지 가르는 문턱. 이 사이트는 하루 15~20명 규모라
 # 문턱이 낮으면 매일 "몇 배 뛰었다"가 나와 아무 뜻이 없어진다.
@@ -496,6 +591,12 @@ def fetch(client, target, age=1, include_settled=True):
         if 0 <= hh < 24:
             hours[hh] = int(r["sessions"])
     data["ydayHours"] = hours
+
+    # --- 5-1) 그날의 최장 방문 ---------------------------------------------
+    # 날짜에 딸린 값이라 history 항목에 함께 얼린다. 화면의 "확정 구간" 칸은
+    # 이 값을 날짜마다 새로 묻지 않고 쌓인 history 에서 최댓값을 고른다.
+    # 못 믿을 날은 None 이고, 그런 날은 화면에서 후보로 안 잡힌다.
+    data["longest"] = fetch_longest_visit(client, target, day_range(age))
 
     # --- 6) 확정 구간 지표 -------------------------------------------------
     # 참여율·평균 체류는 어제치를 믿을 수 없다(파일 맨 위 주석 참조).
@@ -786,7 +887,8 @@ HEADER = """// 이 파일은 자동 생성됩니다 — scripts/ga4_dashboard.py
 # — 항목마다 28개짜리 배열을 복제하면 history가 금방 커진다. 밑줄 필드(인사이트
 # 계산용 중간 재료)도 당연히 뺀다.
 HISTORY_KEEP = ("yesterday", "baseline", "ydayPages", "ydaySites",
-                "ydaySources", "ydayUnresolved", "ydayHours", "insights", "confirmed")
+                "ydaySources", "ydayUnresolved", "ydayHours", "insights", "confirmed",
+                "longest")
 
 
 def snapshot_shape(data):

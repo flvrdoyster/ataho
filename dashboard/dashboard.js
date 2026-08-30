@@ -94,6 +94,28 @@
         (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
     const mmdd = (iso) => iso.slice(5).replace('-', '.');
     const share = (v, total) => (total ? v / total * 100 : 0);
+    const shiftDate = (iso, days) =>
+        new Date(Date.parse(`${iso}T00:00:00Z`) + days * 86400000)
+            .toISOString().slice(0, 10);
+
+    /* 확정 구간(어제를 뺀 7일) 안에서 가장 오래 머문 방문. 수집기의 SETTLED
+       (8daysAgo~2daysAgo)와 같은 창을 날짜로 다시 그린다 — 최신이 어제이므로
+       어제-7 ~ 어제-1 이다. 판정을 못 내린 날은 longest 가 없어 건너뛴다. */
+    function longestInSettled(viewData) {
+        const latest = viewData.yesterday && viewData.yesterday.date;
+        const hist = viewData.history;
+        if (!latest || !hist) return null;
+        const start = shiftDate(latest, -7), end = shiftDate(latest, -1);
+        let best = null;
+        Object.keys(hist).forEach((d) => {
+            if (d < start || d > end) return;
+            const L = hist[d] && hist[d].longest;
+            if (L && L.seconds && (!best || L.seconds > best.longest.seconds)) {
+                best = { date: d, longest: L };
+            }
+        });
+        return best;
+    }
     function tableView(summary, head, rows) {
         return `<details class="table-view"><summary>${esc(summary)}</summary><div class="scroll">` +
             `<table><thead><tr>${head.map((h) => `<th>${esc(h)}</th>`).join('')}</tr></thead>` +
@@ -524,6 +546,18 @@
     // 나란히 두면 시점이 섞인다).
     const st = data.settled;
     if (st) {
+        /* 최장 방문은 날짜마다 하나씩 얼려 둔 값(history 항목의 longest) 중에서
+           고른다 — 여기서 새로 계산할 수는 없다(화면엔 원본 세션이 없다).
+           수집기가 판정을 못 내린 날은 longest 가 없어 후보에서 자연히 빠지므로,
+           확정 구간 7일이 통째로 비어 값이 아예 안 나오는 날도 있다. */
+        const long_ = longestInSettled(data);
+        const longRow = long_ ? `
+            <p class="note-line">가장 오래 머문 방문 <b>${dur(long_.longest.seconds)}</b>
+             · ${esc(mmdd(long_.date))} · ${esc(long_.longest.source)}에서
+             ${esc(long_.longest.device)}로 ${esc(long_.longest.landing)}
+             ${fmt(long_.longest.pageViews)}번 열어봄
+             (실제 참여 ${dur(long_.longest.engagementSeconds)})</p>` : '';
+
         parts.push(mod(12, '참여율 · 체류시간',
             `어제를 뺀 마지막 ${data.meta.settledDays || 7}일 기준
              (세션 ${fmt(st.sessions)}건). GA4가 참여 여부를 하루 이상 뒤에
@@ -533,7 +567,7 @@
                      <div class="value">${pct(st.engagementRate * 100, 1)}</div></div>
                 <div><div class="label">평균 체류시간</div>
                      <div class="value">${dur(st.avgDuration)}</div></div>
-             </div>`));
+             </div>${longRow}`));
     }
 
     parts.push(`<p class="meta-line span-12">GA4 속성 ${esc(data.meta.propertyId)} · ` +

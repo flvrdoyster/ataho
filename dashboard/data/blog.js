@@ -226,6 +226,7 @@ window.DASHBOARD_DATA['blog'] = {
      "tone": "down"
     }
    ],
+   "longest": null,
    "ydayHours": [
     0,
     0,
@@ -342,6 +343,14 @@ window.DASHBOARD_DATA['blog'] = {
      "tone": "up"
     }
    ],
+   "longest": {
+    "device": "모바일",
+    "engagementSeconds": 36,
+    "landing": "/129",
+    "pageViews": 2,
+    "seconds": 47,
+    "source": "m.cafe.naver.com"
+   },
    "ydayHours": [
     0,
     0,
@@ -500,6 +509,14 @@ window.DASHBOARD_DATA['blog'] = {
      "tone": "up"
     }
    ],
+   "longest": {
+    "device": "데스크톱",
+    "engagementSeconds": 43,
+    "landing": "/129",
+    "pageViews": 2,
+    "seconds": 46,
+    "source": "naver"
+   },
    "ydayHours": [
     0,
     0,
@@ -640,6 +657,14 @@ window.DASHBOARD_DATA['blog'] = {
      "tone": "flat"
     }
    ],
+   "longest": {
+    "device": "데스크톱",
+    "engagementSeconds": 28,
+    "landing": "/129",
+    "pageViews": 2,
+    "seconds": 743,
+    "source": "직접 방문"
+   },
    "ydayHours": [
     0,
     0,
@@ -820,6 +845,14 @@ window.DASHBOARD_DATA['blog'] = {
      "tone": "flat"
     }
    ],
+   "longest": {
+    "device": "데스크톱",
+    "engagementSeconds": 30,
+    "landing": "/44",
+    "pageViews": 2,
+    "seconds": 1036,
+    "source": "google"
+   },
    "ydayHours": [
     0,
     0,
@@ -1006,6 +1039,7 @@ window.DASHBOARD_DATA['blog'] = {
      "tone": "up"
     }
    ],
+   "longest": null,
    "ydayHours": [
     0,
     0,
@@ -1276,6 +1310,14 @@ window.DASHBOARD_DATA['blog'] = {
      "tone": "up"
     }
    ],
+   "longest": {
+    "device": "데스크톱",
+    "engagementSeconds": 25,
+    "landing": "/129",
+    "pageViews": 4,
+    "seconds": 1236,
+    "source": "직접 방문"
+   },
    "ydayHours": [
     1,
     0,
@@ -1472,6 +1514,7 @@ window.DASHBOARD_DATA['blog'] = {
      "tone": "flat"
     }
    ],
+   "longest": null,
    "ydayHours": [
     0,
     0,
@@ -1692,6 +1735,7 @@ window.DASHBOARD_DATA['blog'] = {
      "tone": "up"
     }
    ],
+   "longest": null,
    "ydayHours": [
     0,
     0,
@@ -1968,6 +2012,14 @@ window.DASHBOARD_DATA['blog'] = {
      "tone": "up"
     }
    ],
+   "longest": {
+    "device": "모바일",
+    "engagementSeconds": 167,
+    "landing": "/53",
+    "pageViews": 4,
+    "seconds": 416,
+    "source": "google"
+   },
    "ydayHours": [
     0,
     0,
@@ -2180,6 +2232,7 @@ window.DASHBOARD_DATA['blog'] = {
      "tone": "flat"
     }
    ],
+   "longest": null,
    "ydayHours": [
     1,
     0,
@@ -2402,6 +2455,7 @@ window.DASHBOARD_DATA['blog'] = {
      "tone": "up"
     }
    ],
+   "longest": null,
    "ydayHours": [
     0,
     0,
@@ -2610,6 +2664,14 @@ window.DASHBOARD_DATA['blog'] = {
      "tone": "flat"
     }
    ],
+   "longest": {
+    "device": "모바일",
+    "engagementSeconds": 102,
+    "landing": "/129",
+    "pageViews": 3,
+    "seconds": 933,
+    "source": "google"
+   },
    "ydayHours": [
     0,
     0,
@@ -2748,6 +2810,14 @@ window.DASHBOARD_DATA['blog'] = {
      "tone": "flat"
     }
    ],
+   "longest": {
+    "device": "데스크톱",
+    "engagementSeconds": 37,
+    "landing": "/129",
+    "pageViews": 1,
+    "seconds": 242,
+    "source": "google"
+   },
    "ydayHours": [
     0,
     0,
@@ -3006,6 +3076,14 @@ window.DASHBOARD_DATA['blog'] = {
      "tone": "up"
     }
    ],
+   "longest": {
+    "device": "모바일",
+    "engagementSeconds": 61,
+    "landing": "/133/",
+    "pageViews": 2,
+    "seconds": 5259,
+    "source": "직접 방문"
+   },
    "ydayHours": [
     0,
     0,
@@ -3224,6 +3302,7 @@ window.DASHBOARD_DATA['blog'] = {
      "tone": "flat"
     }
    ],
+   "longest": null,
    "ydayHours": [
     0,
     0,
@@ -3466,6 +3545,7 @@ window.DASHBOARD_DATA['blog'] = {
      "tone": "up"
     }
    ],
+   "longest": null,
    "ydayHours": [
     0,
     1,
@@ -3728,6 +3808,14 @@ window.DASHBOARD_DATA['blog'] = {
      "tone": "flat"
     }
    ],
+   "longest": {
+    "device": "모바일",
+    "engagementSeconds": 197,
+    "landing": "/",
+    "pageViews": 11,
+    "seconds": 210,
+    "source": "직접 방문"
+   },
    "ydayHours": [
     0,
     0,
