@@ -10,9 +10,9 @@ window.DASHBOARD_DATA['ga4'] = {
    "n": 28,
    "q1": 2.3249999999999997,
    "q3": 3.696428571428571,
-   "rank": 25,
-   "value": 2.0714285714285716,
-   "vsMedian": -31.818181818181806,
+   "rank": 26,
+   "value": 1.9333333333333333,
+   "vsMedian": -36.36363636363636,
    "where": "low"
   },
   "sessions": {
@@ -22,9 +22,9 @@ window.DASHBOARD_DATA['ga4'] = {
    "n": 28,
    "q1": 17.5,
    "q3": 24.75,
-   "rank": 20,
-   "value": 19,
-   "vsMedian": -13.636363636363635,
+   "rank": 18,
+   "value": 20,
+   "vsMedian": -9.090909090909092,
    "where": "usual"
   },
   "users": {
@@ -34,9 +34,9 @@ window.DASHBOARD_DATA['ga4'] = {
    "n": 28,
    "q1": 11.25,
    "q3": 16.75,
-   "rank": 13,
-   "value": 14,
-   "vsMedian": 0.0,
+   "rank": 9,
+   "value": 15,
+   "vsMedian": 7.142857142857142,
    "where": "usual"
   },
   "views": {
@@ -218,8 +218,8 @@ window.DASHBOARD_DATA['ga4'] = {
   },
   {
    "date": "2026-08-30",
-   "sessions": 19,
-   "users": 14,
+   "sessions": 20,
+   "users": 15,
    "views": 29
   }
  ],
@@ -6432,9 +6432,9 @@ window.DASHBOARD_DATA['ga4'] = {
      "n": 28,
      "q1": 2.3249999999999997,
      "q3": 3.696428571428571,
-     "rank": 25,
-     "value": 2.0714285714285716,
-     "vsMedian": -31.818181818181806,
+     "rank": 26,
+     "value": 1.9333333333333333,
+     "vsMedian": -36.36363636363636,
      "where": "low"
     },
     "sessions": {
@@ -6477,7 +6477,7 @@ window.DASHBOARD_DATA['ga4'] = {
    "confirmed": true,
    "insights": [
     {
-     "text": "08.29 한 사람이 평균 2.1장을 봤습니다 — 평소 3.0장이니 얕게 본 날입니다(28일 최소 1.7장).",
+     "text": "08.29 한 사람이 평균 1.9장을 봤습니다 — 평소 3.0장이니 얕게 본 날입니다(28일 최소 1.7장).",
      "tone": "flat"
     },
     {
@@ -6686,9 +6686,9 @@ window.DASHBOARD_DATA['ga4'] = {
      "n": 28,
      "q1": 2.3249999999999997,
      "q3": 3.696428571428571,
-     "rank": 25,
-     "value": 2.0714285714285716,
-     "vsMedian": -31.818181818181806,
+     "rank": 26,
+     "value": 1.9333333333333333,
+     "vsMedian": -36.36363636363636,
      "where": "low"
     },
     "sessions": {
@@ -6698,9 +6698,9 @@ window.DASHBOARD_DATA['ga4'] = {
      "n": 28,
      "q1": 17.5,
      "q3": 24.75,
-     "rank": 20,
-     "value": 19,
-     "vsMedian": -13.636363636363635,
+     "rank": 18,
+     "value": 20,
+     "vsMedian": -9.090909090909092,
      "where": "usual"
     },
     "users": {
@@ -6710,9 +6710,9 @@ window.DASHBOARD_DATA['ga4'] = {
      "n": 28,
      "q1": 11.25,
      "q3": 16.75,
-     "rank": 13,
-     "value": 14,
-     "vsMedian": 0.0,
+     "rank": 9,
+     "value": 15,
+     "vsMedian": 7.142857142857142,
      "where": "usual"
     },
     "views": {
@@ -6731,11 +6731,11 @@ window.DASHBOARD_DATA['ga4'] = {
    "confirmed": false,
    "insights": [
     {
-     "text": "어제 한 사람이 평균 2.1장을 봤습니다 — 평소 3.0장이니 얕게 본 날입니다(28일 최소 1.7장).",
+     "text": "어제 한 사람이 평균 1.9장을 봤습니다 — 평소 3.0장이니 얕게 본 날입니다(28일 최소 1.7장).",
      "tone": "flat"
     },
     {
-     "text": "어제 조회 29회 가운데 17회(59%)가 재방문 쪽입니다 — 5명이 1인당 3장씩 봤습니다(신규는 1.2장).",
+     "text": "어제 조회 29회 가운데 17회(59%)가 재방문 쪽입니다 — 5명이 1인당 3장씩 봤습니다(신규는 1.1장).",
      "tone": "flat"
     }
    ],
@@ -6762,7 +6762,7 @@ window.DASHBOARD_DATA['ga4'] = {
     2,
     0,
     0,
-    1,
+    2,
     1,
     1
    ],
@@ -6854,7 +6854,7 @@ window.DASHBOARD_DATA['ga4'] = {
      "section": "메인 (아타호의 거처)",
      "spike": false,
      "title": "아타호의 거처",
-     "users": 1,
+     "users": 2,
      "views": 0
     }
    ],
@@ -6882,12 +6882,12 @@ window.DASHBOARD_DATA['ga4'] = {
      "sessions": 3
     },
     {
-     "name": "cafe.naver.com",
+     "name": "직접 방문",
      "sessions": 2
     },
     {
-     "name": "직접 방문",
-     "sessions": 1
+     "name": "cafe.naver.com",
+     "sessions": 2
     },
     {
      "name": "github.com",
@@ -6902,19 +6902,19 @@ window.DASHBOARD_DATA['ga4'] = {
    "yesterday": {
     "date": "2026-08-30",
     "newUsers": 8,
-    "sessions": 19,
-    "users": 14,
+    "sessions": 20,
+    "users": 15,
     "views": 29
    }
   }
  },
  "insights": [
   {
-   "text": "어제 한 사람이 평균 2.1장을 봤습니다 — 평소 3.0장이니 얕게 본 날입니다(28일 최소 1.7장).",
+   "text": "어제 한 사람이 평균 1.9장을 봤습니다 — 평소 3.0장이니 얕게 본 날입니다(28일 최소 1.7장).",
    "tone": "flat"
   },
   {
-   "text": "어제 조회 29회 가운데 17회(59%)가 재방문 쪽입니다 — 5명이 1인당 3장씩 봤습니다(신규는 1.2장).",
+   "text": "어제 조회 29회 가운데 17회(59%)가 재방문 쪽입니다 — 5명이 1인당 3장씩 봤습니다(신규는 1.1장).",
    "tone": "flat"
   }
  ],
@@ -6925,7 +6925,7 @@ window.DASHBOARD_DATA['ga4'] = {
   "propertyId": "516513119",
   "settledDays": 7,
   "trendDays": 28,
-  "updatedAt": "2026-08-31 08:48"
+  "updatedAt": "2026-08-31 09:07"
  },
  "settled": {
   "avgDuration": 331.5117118230769,
@@ -6956,7 +6956,7 @@ window.DASHBOARD_DATA['ga4'] = {
   2,
   0,
   0,
-  1,
+  2,
   1,
   1
  ],
@@ -7048,7 +7048,7 @@ window.DASHBOARD_DATA['ga4'] = {
    "section": "메인 (아타호의 거처)",
    "spike": false,
    "title": "아타호의 거처",
-   "users": 1,
+   "users": 2,
    "views": 0
   }
  ],
@@ -7076,12 +7076,12 @@ window.DASHBOARD_DATA['ga4'] = {
    "sessions": 3
   },
   {
-   "name": "cafe.naver.com",
+   "name": "직접 방문",
    "sessions": 2
   },
   {
-   "name": "직접 방문",
-   "sessions": 1
+   "name": "cafe.naver.com",
+   "sessions": 2
   },
   {
    "name": "github.com",
@@ -7096,8 +7096,8 @@ window.DASHBOARD_DATA['ga4'] = {
  "yesterday": {
   "date": "2026-08-30",
   "newUsers": 8,
-  "sessions": 19,
-  "users": 14,
+  "sessions": 20,
+  "users": 15,
   "views": 29
  }
 };
