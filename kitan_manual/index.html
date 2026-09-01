@@ -3,7 +3,13 @@
 
 <head>
     <meta charset="UTF-8">
+    <link rel="icon" href="https://atah.io/favicon.ico">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preload"
+        href="https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2105_2@1.0/KoddiUDOnGothic-Regular.woff" as="font"
+        type="font/woff" crossorigin>
+    <link rel="preload" href="https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2105_2@1.0/KoddiUDOnGothic-Bold.woff"
+        as="font" type="font/woff" crossorigin>
     <link rel="stylesheet" href="../fonts.css">
     <link rel="stylesheet" href="../design-tokens.css">
     <link rel="stylesheet" href="../footer.css">
@@ -16,6 +22,16 @@
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400&display=swap" rel="stylesheet">
 
     <title>환세희담 해설서 : atah.io</title>
+    <!-- Google Tag Manager -->
+    <script>(function (w, d, s, l, i) {
+            w[l] = w[l] || []; w[l].push({
+                'gtm.start':
+                    new Date().getTime(), event: 'gtm.js'
+            }); var f = d.getElementsByTagName(s)[0],
+                j = d.createElement(s), dl = l != 'dataLayer' ? '&l=' + l : ''; j.async = true; j.src =
+                    'https://www.googletagmanager.com/gtm.js?id=' + i + dl; f.parentNode.insertBefore(j, f);
+        })(window, document, 'script', 'dataLayer', 'GTM-PR4S897C');</script>
+    <!-- End Google Tag Manager -->
 
     <style>
         * {
@@ -505,6 +521,19 @@
             color: var(--text-muted, #767676);
         }
 
+        /* 옮긴이 주 — 원문에 없는, 번역/판본에 대한 부연을 다는 콜아웃.
+           haiyuki_manual과 같은 스타일로 두 매뉴얼의 주석 모양을 맞춤 */
+        .note {
+            display: block;
+            margin: 10px 15px;
+            padding: 6px 10px;
+            border-left: 3px solid rgba(0, 102, 204, 0.5);
+            background-color: rgba(0, 102, 204, 0.05);
+            color: rgba(80, 80, 100, 1);
+            font-size: 0.9em;
+            font-style: italic;
+        }
+
         table.control-table {
             width: 100%;
             max-width: 560px;
@@ -521,6 +550,12 @@
             border: 1px solid #999;
             padding: 6px 10px;
             text-align: left;
+        }
+
+        /* 헤더 행에만 구분색 — 원본 「커맨드 조작」 표(PDF 15쪽)의
+           왼쪽 열에 깔린 연파랑에서 가져옴 */
+        table.control-table th {
+            background: #bcd4f5;
         }
 
         table.control-table th:first-child,
@@ -556,7 +591,10 @@
 
         .entry {
             display: flex;
-            align-items: center;
+            /* center로 두면 entry-desc가 여러 줄로 꺾일 때 아이콘이
+               전체 블록 한가운데로 밀려서 이름 줄이랑 안 맞아 보임 —
+               위쪽 기준으로 맞춤 */
+            align-items: flex-start;
             gap: 12px;
             padding: 8px 10px;
             border: 1px solid #ccc;
@@ -576,6 +614,10 @@
 
         .entry .entry-body {
             flex: 1 1 auto;
+            /* min-width 기본값(auto)은 내용 기준 최소폭이라, 설명 텍스트
+               길이·띄어쓰기 위치에 따라 줄바꿈 여부가 항목마다 달라짐 —
+               0으로 풀어서 폭에 맞춰 항상 동일하게 줄바꿈되게 함 */
+            min-width: 0;
         }
 
         .entry .entry-name {
@@ -618,6 +660,9 @@
 
         .credits-block {
             padding: 20px;
+            /* 명단이라 본문만큼 클 필요가 없음 — 안쪽 두 열이 같이 줄어들어
+               역할(0.8em)/이름 사이 크기 차는 그대로 유지됨 */
+            font-size: 0.9em;
             /* TODO: background-image: url('img/credits_bg.png'); 로 교체 예정 */
         }
 
@@ -676,10 +721,6 @@
             .char-grid {
                 gap: 12px;
             }
-
-            .entry {
-                flex-wrap: wrap;
-            }
         }
 
         @media (max-width: 480px) {
@@ -709,6 +750,10 @@
 </head>
 
 <body class="footer-static">
+    <!-- Google Tag Manager (noscript) -->
+    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-PR4S897C" height="0" width="0"
+            style="display:none;visibility:hidden"></iframe></noscript>
+    <!-- End Google Tag Manager (noscript) -->
 
     <!-- 프레임 장식: 브라우저 창에 고정. 코너 4 + 변 4, 순수 장식이라 aria-hidden -->
     <div class="frame-deco" aria-hidden="true">
@@ -1029,8 +1074,8 @@
                                 <td>캠프 모드 진입 (아래 「캠프 모드」 항목 참고)</td>
                             </tr>
                             <tr>
-                                <td>NPC에게 말 걸기 · 보물상자 열기</td>
                                 <td>해당 대상에 접촉</td>
+                                <td>NPC에게 말 걸기 · 보물상자 열기</td>
                             </tr>
                         </tbody>
                     </table>
