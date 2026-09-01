@@ -39,7 +39,14 @@
     --accent: #0068da;
 
     /* ── 서체 ──────────────────────────────────────────────────────── */
-    --font-ui: 'KoddiUDOnGothic', sans-serif;
+    /* KoddiUDOnGothic은 한자가 아예 없고 일부 가타카나(장음부호 ー 등)도
+       빠져있음. 이 사이트가 다루는 소재 특성상(일본 원작 레트로 게임 번역)
+       원어 표기·스태프명 등에 한자·가나가 섞여 나오는 서브프로젝트가
+       반복되므로, 여기서 공통 폴백으로 Noto Sans KR을 끼워둠. 폰트 이름만
+       걸어둔 것이라 실제 로드는 안 하고(용량 부담 없음), 이 폴백이 필요한
+       페이지가 각자 <head>에서 Google Fonts로 로드해야 실제로 먹힘
+       (예: blog/skin.html, kitan_manual/index.html). */
+    --font-ui: 'KoddiUDOnGothic', 'Noto Sans KR', sans-serif;
     --font-weight-bold: 700;
     --line-height: 1.6;
 

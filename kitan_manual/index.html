@@ -1,0 +1,1818 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../fonts.css">
+    <link rel="stylesheet" href="../design-tokens.css">
+    <link rel="stylesheet" href="../footer.css">
+
+    <!-- design-tokens.css의 --font-ui가 KoddiUDOnGothic 뒤에 'Noto Sans KR'을
+         폴백으로 물고 있음(한자·가타카나 장음부호 등 KoddiUDOnGothic에 없는
+         글자용) — 폰트 이름만 걸려있고 실제 로드는 여기서 해야 먹힘.
+         원어 표기, 스태프/크레딧 명단 등에서 씀 (blog/skin.html과 동일 방식) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400&display=swap" rel="stylesheet">
+
+    <title>환세희담 해설서 : atah.io</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            /* 문서는 스크롤하지 않는다. 스크롤은 .page-scroll 안에서만 */
+        }
+
+        body {
+            font-family: var(--font-ui, 'KoddiUDOnGothic', sans-serif);
+            line-height: var(--line-height, 1.6);
+            color: var(--text-primary, #1a1a1a);
+            word-break: keep-all;
+            overflow-wrap: break-word;
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        h1, h2, h3, h4 {
+            margin: 0 0 0.5em;
+            font-weight: var(--font-weight-bold, 700);
+        }
+
+        p {
+            margin: 0 0 1em;
+        }
+
+        a {
+            color: var(--link, #0068da);
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        :root {
+            --nav-height: 50px;
+            --content-max: 800px;
+
+            /* ---- 프레임 스케일: 원본 아트 1px → 화면 몇 px 인가 ----
+               이 값 하나만 바꾸면 프레임 전체가 비율 유지한 채 커지고 작아짐.
+               0.168 → 좌측 밴드 320px 아트가 화면 약 54px 로 그려짐. */
+            --fs: 0.168;
+
+            /* ---- 원본 아트 실측 치수(px). 아래 좌표는 전부 여기서 파생 ----
+               img/frame/ 의 PNG 8장을 실측한 값. 조각을 교체하면
+               여기 숫자만 실제 파일 크기로 맞춰주면 됨. */
+            /* 밴드 두께 */
+            --f-left-w: 320;
+            --f-right-w: 290;
+            --f-top-h: 114;
+            --f-bottom-h: 100;
+
+            /* 코너 4장 크기 */
+            --f-tl-w: 424;
+            --f-tl-h: 620;
+            --f-tr-w: 600;
+            --f-tr-h: 878;
+            --f-bl-w: 616;
+            --f-bl-h: 838;
+            --f-br-w: 300;
+            --f-br-h: 572;
+
+            /* 콘텐츠 좌우 인셋 = 그쪽 코너 중 더 넓은 쪽의 폭.
+               코너가 밴드보다 넓어서, 이만큼 비워야 본문이 코너에 안 가림.
+               좌 = max(tl-w, bl-w), 우 = max(tr-w, br-w) */
+            --f-content-l: 616;
+            --f-content-r: 600;
+
+            /* 변 타일 1장의 길이(반복 단위) */
+            --f-top-tile-w: 1482;
+            --f-bottom-tile-w: 1160;
+            --f-left-tile-h: 1342;
+            --f-right-tile-h: 1350;
+        }
+
+        /* ================= 4면 프레임 =================
+           border-image(9-slice)를 쓰지 않는다. 이 아트는 코너 모티프
+           (좌우 밴드의 미로 패턴 / 하단 포트홀)가 밴드 두께보다 훨씬 커서,
+           9-slice로 넣으면 코너가 border-width 안으로 눌려 찌그러진다.
+
+           대신 8조각으로 나눠 깔았다:
+             · 코너 4장 — 고정 크기, 원본 비율 그대로 (안 늘어남)
+             · 변 4장   — 코너 사이를 반복해서 채움 (background-repeat: round)
+
+           변 조각은 원본에서 "잘라 이어붙여도 티가 안 나는" 구간을 찾아서
+           떴다. 각 조각의 시작/끝 단면이 서로 거의 같아(픽셀 단면 비교로
+           탐색) 반복 이음매가 보이지 않고, 코너와 만나는 지점도 원본에서
+           실제로 붙어 있던 위치라 위상이 어긋나지 않는다.
+           그래서 위/아래가 서로 다른 그림이어도 각자 자기 조각으로 반복된다.
+           ============================================= */
+
+        /* 프레임은 브라우저 창에 고정되어 테두리를 두른다. 스크롤되지 않는다. */
+        .frame-deco {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 600;
+        }
+
+        /* 스크롤되는 건 이 컨테이너 안쪽뿐.
+           좌우는 코너 폭만큼, 위는 상단바+네비, 아래는 하단바만큼 비운다. */
+        .page-scroll {
+            position: fixed;
+            /* --nav-height-live: 네비가 줄바꿈돼서 실제 높이가 커지면 JS가
+               갱신하는 값(맨 아래 스크립트). 로드 전 첫 페인트엔 폴백으로
+               --nav-height(1줄 기준) 사용 */
+            top: calc(var(--f-top-h) * var(--fs) * 1px + var(--nav-height-live, var(--nav-height)));
+            bottom: calc(var(--f-bottom-h) * var(--fs) * 1px);
+            left: calc(var(--f-content-l) * var(--fs) * 1px);
+            right: calc(var(--f-content-r) * var(--fs) * 1px);
+            overflow-y: auto;
+            overflow-x: hidden;
+            scroll-behavior: smooth;
+            overscroll-behavior: contain;
+
+            /* 커스텀 스크롤바 — 트랙(바 뒤 배경)은 안 깔고 막대만 얇게 보이게.
+               Firefox는 scrollbar-color, 나머지는 ::-webkit-scrollbar 계열 */
+            scrollbar-width: thin;
+            scrollbar-color: rgba(0, 0, 0, 0.25) transparent;
+        }
+
+        .page-scroll::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .page-scroll::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .page-scroll::-webkit-scrollbar-thumb {
+            background-color: rgba(0, 0, 0, 0.25);
+            border-radius: 4px;
+        }
+
+        .page-scroll::-webkit-scrollbar-thumb:hover {
+            background-color: rgba(0, 0, 0, 0.4);
+        }
+
+        /* 주의: 여기에 background-repeat 를 두면 특정도(0-1-1)가 아래
+           .f-top 같은 클래스 단일 선택자(0-1-0)를 이겨서 변의 반복이 죽는다.
+           배경 관련 속성은 각 조각 규칙에서만 지정할 것. */
+        .frame-deco i {
+            position: absolute;
+            display: block;
+        }
+
+        /* ---- 코너 4장: 고정 크기, 반복 없음 ---- */
+
+        .f-tl,
+        .f-tr,
+        .f-bl,
+        .f-br {
+            background-size: 100% 100%;
+            background-repeat: no-repeat;
+        }
+
+        .f-tl {
+            top: 0;
+            left: 0;
+            width: calc(var(--f-tl-w) * var(--fs) * 1px);
+            height: calc(var(--f-tl-h) * var(--fs) * 1px);
+            background-image: url('img/frame/corner-tl.png');
+        }
+
+        .f-tr {
+            top: 0;
+            right: 0;
+            width: calc(var(--f-tr-w) * var(--fs) * 1px);
+            height: calc(var(--f-tr-h) * var(--fs) * 1px);
+            background-image: url('img/frame/corner-tr.png');
+        }
+
+        .f-bl {
+            bottom: 0;
+            left: 0;
+            width: calc(var(--f-bl-w) * var(--fs) * 1px);
+            height: calc(var(--f-bl-h) * var(--fs) * 1px);
+            background-image: url('img/frame/corner-bl.png');
+        }
+
+        .f-br {
+            bottom: 0;
+            right: 0;
+            width: calc(var(--f-br-w) * var(--fs) * 1px);
+            height: calc(var(--f-br-h) * var(--fs) * 1px);
+            background-image: url('img/frame/corner-br.png');
+        }
+
+        /* ---- 변 4장: 코너 사이를 반복해서 채움 ----
+           round = 정수 개가 딱 맞게 들어가도록 타일을 미세 조정.
+           덕분에 끝에서 타일이 반쯤 잘리지 않는다. */
+
+        .f-top {
+            top: 0;
+            left: calc(var(--f-tl-w) * var(--fs) * 1px);
+            right: calc(var(--f-tr-w) * var(--fs) * 1px);
+            height: calc(var(--f-top-h) * var(--fs) * 1px);
+            background-image: url('img/frame/edge-top.png');
+            background-size: calc(var(--f-top-tile-w) * var(--fs) * 1px) 100%;
+            background-repeat: round no-repeat;
+        }
+
+        .f-bottom {
+            bottom: 0;
+            left: calc(var(--f-bl-w) * var(--fs) * 1px);
+            right: calc(var(--f-br-w) * var(--fs) * 1px);
+            height: calc(var(--f-bottom-h) * var(--fs) * 1px);
+            background-image: url('img/frame/edge-bottom.png');
+            background-size: calc(var(--f-bottom-tile-w) * var(--fs) * 1px) 100%;
+            background-repeat: round no-repeat;
+        }
+
+        .f-left {
+            left: 0;
+            top: calc(var(--f-tl-h) * var(--fs) * 1px);
+            bottom: calc(var(--f-bl-h) * var(--fs) * 1px);
+            width: calc(var(--f-left-w) * var(--fs) * 1px);
+            background-image: url('img/frame/edge-left.png');
+            background-size: 100% calc(var(--f-left-tile-h) * var(--fs) * 1px);
+            background-repeat: no-repeat round;
+        }
+
+        .f-right {
+            right: 0;
+            top: calc(var(--f-tr-h) * var(--fs) * 1px);
+            bottom: calc(var(--f-br-h) * var(--fs) * 1px);
+            width: calc(var(--f-right-w) * var(--fs) * 1px);
+            background-image: url('img/frame/edge-right.png');
+            background-size: 100% calc(var(--f-right-tile-h) * var(--fs) * 1px);
+            background-repeat: no-repeat round;
+        }
+
+        /* -------------------- 상단 고정 네비게이션 -------------------- */
+
+        .manual-nav {
+            position: fixed;
+            top: calc(var(--f-top-h) * var(--fs) * 1px);
+            left: calc(var(--f-content-l) * var(--fs) * 1px);
+            right: calc(var(--f-content-r) * var(--fs) * 1px);
+            min-height: var(--nav-height);
+            z-index: 500;
+            display: flex;
+            border-bottom: 1px solid #999;
+            background: #fff;
+        }
+
+        /* 좌우 스크롤 대신 줄바꿈 — 자리가 모자란 항목은 아래 줄로 떨어짐.
+           그만큼 네비 실제 높이가 늘어날 수 있어서 JS가 --nav-height-live로
+           .page-scroll 상단 여백을 맞춰줌(아래 스크립트). */
+        .manual-nav ul {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            width: 100%;
+        }
+
+        .manual-nav li {
+            flex: 0 0 auto;
+            display: flex;
+        }
+
+        .manual-nav a {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 10px;
+            white-space: nowrap;
+            text-decoration: none;
+            border-right: 1px solid #ccc;
+            color: inherit;
+        }
+
+        .manual-nav li:last-child a {
+            border-right: none;
+        }
+
+        .manual-nav a.active {
+            background: #eee;
+            font-weight: bold;
+        }
+
+        /* -------------------- 헤더 -------------------- */
+
+        .manual-header {
+            text-align: center;
+            padding: 20px 0;
+        }
+
+        .manual-header .header-greeting {
+            margin: 10px 0 0;
+            font-size: 0.85em;
+            color: var(--text-secondary, #4d4d4d);
+        }
+
+        .manual-header .translator-info {
+            margin-top: 10px;
+            font-size: 0.85em;
+            color: var(--text-muted, #767676);
+        }
+
+        /* -------------------- 공통 레이아웃 -------------------- */
+
+        .section-inner {
+            max-width: var(--content-max);
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* -------------------- 챕터 타이틀 (섹션 헤더) --------------------
+           섹션 사이 간격은 section 자체가 아니라 이 구분선(border-top)이
+           들고 있음: margin-top = 이전 섹션 내용과 선 사이 간격,
+           padding = 선과 이 섹션 타이틀 텍스트 사이 간격. 위아래 대칭. */
+
+        .chapter-title {
+            margin-top: 40px;
+            margin-bottom: 40px;
+            padding: 20px 0;
+            border-top: 2px solid #000;
+        }
+
+        .chapter-title h2 {
+            margin: 0;
+            text-align: center;
+        }
+
+        .chapter-title .pct-stage {
+            /* 챕터 배너 실제 원본이 1400×900(14:9)이라 그 비율로 맞춤.
+               본문 폭(800px)에 꽉 채우지 않고 살짝 줄여서 중앙 배치 —
+               원본 해상도 이상으로 늘리지 않는 선에서 여백을 둠 */
+            aspect-ratio: 14 / 9;
+            width: 90%;
+            max-width: 600px;
+            margin: 10px auto 0;
+        }
+
+        /* -------------------- % 포지셔닝 유틸 --------------------
+           원본 이미지를 통짜로 쓰지 않고, 배경 이미지 위에 개별 요소를
+           % 좌표로 얹을 때 쓰는 공용 패턴(챕터 타이틀 소컷 일러스트,
+           키 다이어그램 라벨 등). 구조만 있고 위치값은 채워 써야 함. */
+
+        .pct-stage {
+            position: relative;
+            width: 100%;
+            overflow: hidden;
+        }
+
+        .pct-elem {
+            position: absolute;
+            /* 사용 예: style="top: 12%; left: 60%; width: 18%;" */
+        }
+
+        /* -------------------- 프롤로그 (도입부 내레이션) --------------------
+           PDF 4~5쪽(스마슈의 독백 + 서술)에 대응. 「」로 묶인 독백은
+           살짝 기울이고 톤을 낮춰서, 뒤이은 서술문(narration-desc)과
+           목소리를 구분함. */
+
+        .prologue-narration {
+            margin-bottom: 30px;
+        }
+
+        .narration-quote {
+            font-style: italic;
+        }
+
+        .narration-quote p {
+            margin: 0 0 1.4em;
+        }
+
+        .narration-desc {
+            margin: 0;
+        }
+
+        /* -------------------- 프롤로그 (만화) -------------------- */
+
+        .comic-pages {
+            /* .section-inner 바깥에 있어서 좌우 패딩이 없음. 그래도 본문
+               폭(800px) 이상으로 퍼지진 않게 여기서 직접 상한만 잡음 */
+            max-width: var(--content-max);
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .comic-page {
+            width: 100%;
+            margin: 0;
+        }
+
+        /* -------------------- 메인 캐릭터 소개 --------------------
+           원본(PDF 10~12쪽)은 카드 그리드가 아니라 한 캐릭터당 이미지+설명이
+           나란히 붙는 한 줄이고, 그 줄 안에서 이미지/설명 좌우 순서가
+           캐릭터마다(짝수 번째마다) 뒤집힘 — 스마슈(이미지-왼쪽) / 화린
+           (이미지-오른쪽) 식. char.md 순서가 곧 원본 페이지 순서라
+           nth-child(even)만으로 그 교차를 그대로 재현. */
+
+        .char-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .char-card {
+            display: flex;
+        }
+
+        .char-card:nth-child(even) {
+            flex-direction: row-reverse;
+        }
+
+        .char-card .char-portrait {
+            flex: 0 0 42%;
+            aspect-ratio: 3 / 4;
+            position: relative;
+            /* width%만 주고 height는 aspect-ratio가 계산해주길 기대하면
+               flex(특히 세로 스택 column 컨테이너) 안에서 브라우저마다
+               제각각 어긋남 — img를 position:absolute + inset:0으로
+               박스에 못박아서, 박스 크기가 어떻게 나오든(42%든 60%든)
+               가로세로 항상 같은 비율로 줄어들게 함 */
+        }
+
+        /* 초상은 배경 없는 컷아웃이라 인물마다 실제 비율이 제각각(카드 프레임
+           3:4와 안 맞음) — 잘리거나 늘어나지 않게 contain으로 통일 */
+        .char-card .char-portrait img {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .char-card .char-body {
+            flex: 1 1 auto;
+            padding: 12px 14px;
+        }
+
+        .char-card .char-name .char-name-jp {
+            display: block;
+            font-size: 0.7em;
+            font-weight: normal;
+            color: var(--text-secondary, #4d4d4d);
+            /* KoddiUDOnGothic이 가나 자체는 갖고 있어도(--font-ui 폴백이
+               안 걸림) 일본어 폰트로서 모양이 어색해서, 빠진 글자만
+               땜빵하는 대신 이 요소 전체를 Noto Sans KR로 통일 렌더링 */
+            font-family: 'Noto Sans KR', sans-serif;
+        }
+
+        .char-card .char-meta {
+            font-size: 0.85em;
+            color: var(--text-muted, #767676);
+            margin-bottom: 0.5em;
+        }
+
+        /* -------------------- 소제목 있는 콘텐츠 블록 (공용) --------------------
+           게임 진행뿐 아니라 오마케(스태프 코멘트/특별부록/크레딧)에서도 씀 */
+
+        .content-block {
+            margin-bottom: 30px;
+        }
+
+        .screenshot-frame {
+            border: 1px solid #ccc;
+            max-width: 560px;
+            margin: 10px 0;
+        }
+
+        .figure-caption {
+            font-size: 0.85em;
+            color: var(--text-muted, #767676);
+        }
+
+        table.control-table {
+            width: 100%;
+            max-width: 560px;
+            border-collapse: collapse;
+            /* table-layout: fixed + 1열 고정폭 — 안 그러면 표마다 내용
+               길이에 따라 열 비율이 제각각으로 잡혀서 게임 진행 안의
+               표 4개가 서로 다른 모양으로 보임 */
+            table-layout: fixed;
+            margin: 10px 0;
+        }
+
+        table.control-table th,
+        table.control-table td {
+            border: 1px solid #999;
+            padding: 6px 10px;
+            text-align: left;
+        }
+
+        table.control-table th:first-child,
+        table.control-table td:first-child {
+            width: 40%;
+        }
+
+        /* 캠프 모드 스탯 용어, 전투 커맨드 설명처럼 "용어 — 설명" 쌍이
+           나열되는 곳에 공용으로 씀 */
+        .term-list {
+            margin: 10px 0;
+        }
+
+        .term-list dt {
+            font-weight: var(--font-weight-bold, 700);
+        }
+
+        .term-list dd {
+            margin: 0 0 0.8em;
+        }
+
+        /* -------------------- 무구·도구·특기·마법 -------------------- */
+
+        .entry-group {
+            margin-bottom: 30px;
+        }
+
+        .entry-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .entry {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 8px 10px;
+            border: 1px solid #ccc;
+        }
+
+        .entry .entry-icon {
+            flex: 0 0 auto;
+            width: 40px;
+            height: 40px;
+            /* 원본 게임 UI는 검정 배경이지만 그대로 쓰면 너무 세서 진한 회색으로 */
+            background: #333;
+            border-radius: var(--radius-sm, 4px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .entry .entry-body {
+            flex: 1 1 auto;
+        }
+
+        .entry .entry-name {
+            font-weight: var(--font-weight-bold, 700);
+        }
+
+        /* -------------------- 오마케: 스태프 코멘트 -------------------- */
+
+        .staff-comment-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 16px;
+        }
+
+        .staff-comment {
+            padding: 12px 14px;
+            border: 1px solid #ccc;
+        }
+
+        .staff-comment .staff-role {
+            font-size: 0.8em;
+            color: var(--text-muted, #767676);
+        }
+
+        .staff-comment .staff-name {
+            font-weight: bold;
+            margin-bottom: 4px;
+        }
+
+        /* 원어(일본어 필명) 표기 — .char-name-jp와 동일 패턴 */
+        .staff-comment .staff-name .staff-name-jp {
+            display: block;
+            font-size: 0.7em;
+            font-weight: normal;
+            color: var(--text-secondary, #4d4d4d);
+            font-family: 'Noto Sans KR', sans-serif;
+        }
+
+        /* -------------------- 오마케: 크레딧 -------------------- */
+
+        .credits-block {
+            padding: 20px;
+            /* TODO: background-image: url('img/credits_bg.png'); 로 교체 예정 */
+        }
+
+        /* 원본(PDF 28쪽)처럼 역할 열 + 이름 열 2단 표 — 역할이 같으면
+           rowspan으로 한 번만 쓰고 아래 이름들만 이어짐 */
+        .credits-block table {
+            width: 100%;
+            max-width: 480px;
+            margin: 0 auto;
+            border-collapse: collapse;
+        }
+
+        .credits-block td {
+            padding: 4px 10px;
+            vertical-align: top;
+        }
+
+        .credits-block .credit-role {
+            width: 35%;
+            font-size: 0.8em;
+            color: var(--text-muted, #767676);
+        }
+
+        .credits-block .credit-name {
+            /* 이름 대부분이 일본어 — 위 .char-name-jp와 같은 이유 */
+            font-family: 'Noto Sans KR', sans-serif;
+        }
+
+        /* 본문 문장 속에 일본어 고유명사가 한두 개 섞일 때 감싸는 인라인 유틸 */
+        .jp-inline {
+            font-family: 'Noto Sans KR', sans-serif;
+        }
+
+        /* -------------------- 문서 정보 -------------------- */
+
+        .manual-info {
+            max-width: var(--content-max);
+            margin: 30px auto 0;
+            padding: 20px 20px 0;
+            font-size: 0.82em;
+            color: var(--text-muted, #767676);
+        }
+
+        /* -------------------- 모바일 (800px 이하) -------------------- */
+
+        @media (max-width: 800px) {
+            :root {
+                /* 프레임 전체를 비율 유지한 채 축소 — 값 하나만 바꾸면 됨 */
+                --fs: 0.105;
+            }
+
+            .page-frame {
+                margin: calc(var(--nav-height) + 12px) 8px 12px;
+            }
+
+            .char-grid {
+                gap: 12px;
+            }
+
+            .entry {
+                flex-wrap: wrap;
+            }
+        }
+
+        @media (max-width: 480px) {
+            :root {
+                --fs: 0.08;
+            }
+
+            /* 폰(480px 이하)부터는 이미지-왼쪽/오른쪽 좌우 2단이 너무 좁아져서,
+               둘 다 세로 스택(이미지 위, 설명 아래)으로 통일 */
+            .char-card,
+            .char-card:nth-child(even) {
+                flex-direction: column;
+            }
+
+            /* 박스+contain 방식은 유지하되, 세로 스택에서 박스가 카드 폭
+               100%까지 늘어나 커 보이는 것만 줄임 — aspect-ratio: 3/4는
+               위 기본 규칙에서 그대로 상속되니 박스 자체가 원래 크기(42%
+               기준 박스)의 60%로 축소되는 효과, 안의 이미지는 여전히
+               object-fit: contain으로 그 박스에 맞춰짐 */
+            .char-card .char-portrait {
+                flex-basis: auto;
+                width: 60%;
+                align-self: center;
+            }
+        }
+    </style>
+</head>
+
+<body class="footer-static">
+
+    <!-- 프레임 장식: 브라우저 창에 고정. 코너 4 + 변 4, 순수 장식이라 aria-hidden -->
+    <div class="frame-deco" aria-hidden="true">
+        <i class="f-top"></i>
+        <i class="f-bottom"></i>
+        <i class="f-left"></i>
+        <i class="f-right"></i>
+        <i class="f-tl"></i>
+        <i class="f-tr"></i>
+        <i class="f-bl"></i>
+        <i class="f-br"></i>
+    </div>
+
+    <!-- ================= 상단 고정 네비게이션 ================= -->
+    <nav class="manual-nav" aria-label="매뉴얼 섹션 이동">
+        <ul>
+            <li><a href="#prologue" data-nav>프롤로그</a></li>
+            <li><a href="#characters" data-nav>메인 캐릭터 소개</a></li>
+            <li><a href="#gameplay" data-nav>게임의 진행 방법</a></li>
+            <li><a href="#items" data-nav>무구·도구·특기·마법</a></li>
+            <li><a href="#extra" data-nav>오마케</a></li>
+        </ul>
+    </nav>
+
+    <!-- 프레임 안쪽: 여기만 스크롤된다 (id는 footer.js가 푸터를 넣는 자리) -->
+    <div class="page-scroll" id="main-wrapper">
+
+
+
+    <!-- ================= 헤더 ================= -->
+    <header class="manual-header">
+        <div class="section-inner">
+            <h1>환세희담 해설서</h1>
+            <!-- 원본 PDF 2쪽, 개발진 인사말 -->
+            <p class="header-greeting">
+                이 게임은 스마슈를 비롯한 유쾌한 캐릭터들을 조작해서,<br>
+                대륙의 남북을 관통하는 철도로 여행하며 전설의 백성 「봉인 일족」의 수수께끼를 풀어나가기도 합니다만,<br>
+                딱히 신경 쓰지 않으셔도 즐겁게 플레이하실 수 있을 거라 생각합니다. 아니, 정말로요.<br>
+                더 즐겁게 플레이하시려면 이 취급설명서와 스타팅 매뉴얼을 잘 읽어주세요.<br>
+                그러면 불필요한 트러블도 줄고, 이걸 만든 홍보 스태프의 고생도 보답받는다는 것입니다.
+            </p>
+            <div class="translator-info">
+                <!-- TODO: 옮긴이 정보 -->
+            </div>
+        </div>
+    </header>
+
+    <main>
+
+        <!-- ================= 1. 프롤로그 ================= -->
+        <section id="prologue">
+            <div class="chapter-title">
+                <div class="section-inner">
+                    <div class="pct-stage">
+                        <img class="stage-base" src="img/chapter-prologue.png" alt="프롤로그 챕터 타이틀">
+                    </div>
+                    <h2>프롤로그</h2>
+                </div>
+            </div>
+
+            <div class="section-inner">
+                <div class="prologue-narration">
+                    <div class="narration-quote">
+                        <p>「시간이 조금 흘렀네.</p>
+                        <p>
+                            전설로 수놓아진 사내의 활약,<br>
+                            기적을 부리는 위대한 마술사,<br>
+                            붙잡히는 것 자체가 최고의 지위였던 미녀 왕녀,<br>
+                            무능함이 세일즈 포인트인 국왕,<br>
+                            나쁜 짓을 해야 제맛인 몬스터 무리,<br>
+                            그리고 마왕으로 대표되는 사랑스러운 악의 보스...
+                        </p>
+                        <p>
+                            정말 아주 잠깐 시간이 흘렀을 뿐인데,<br>
+                            그토록 세계를 뒤덮고 있던<br>
+                            이 멋진 녀석들이 과거의 유물이 되어버렸어.
+                        </p>
+                        <p>
+                            그 대신 치고 올라온 근대적인 테크놀로지라는 것도<br>
+                            나쁘진 않지만, 내가 보기엔<br>
+                            세상이 조금 지루해졌다구.
+                        </p>
+                        <p>
+                            근성 있는 녀석도 줄어들었어.<br>
+                            이 무사 수행을 하는 동안, 제대로 내 상대가 된 놈은<br>
+                            단 한 명도 없었어.<br>
+                            게다가 하나같이 권총 따위나 쓰고 있으니.<br>
+                            말세라구.
+                        </p>
+                        <p>
+                            아~아, 어디 뭐 재미있는 일 좀 안 생기려나.<br>
+                            옛날 모험담처럼 가슴 뛰는 그런 일 말이야...」
+                        </p>
+                    </div>
+                    <p class="narration-desc">
+                        차창 밖 풍경을 바라보며 스마슈는<br>
+                        그런 생각을 하고 있었다.<br>
+                        뜻하지 않게 그 바람이 이루어지리라고는 꿈에도 모른 채.
+                    </p>
+                </div>
+            </div>
+
+            <!-- .section-inner 바깥에 둬서 좌우 여백(20px 패딩) 없이 꽉 차게 표시 -->
+            <div class="comic-pages">
+                <figure class="comic-page">
+                    <img src="img/comic-01.png" alt="프롤로그 만화 1페이지">
+                </figure>
+                <figure class="comic-page">
+                    <img src="img/comic-02.png" alt="프롤로그 만화 2페이지">
+                </figure>
+                <figure class="comic-page">
+                    <img src="img/comic-03.png" alt="프롤로그 만화 3페이지">
+                </figure>
+            </div>
+        </section>
+
+        <!-- ================= 2. 메인 캐릭터 소개 ================= -->
+        <section id="characters">
+            <div class="chapter-title">
+                <div class="section-inner">
+                    <div class="pct-stage">
+                        <img class="stage-base" src="img/chapter-char.png" alt="메인 캐릭터 소개 챕터 타이틀">
+                    </div>
+                    <h2>메인 캐릭터 소개</h2>
+                </div>
+            </div>
+
+            <div class="section-inner">
+                <div class="char-grid">
+                    <article class="char-card">
+                        <div class="char-portrait">
+                            <img src="img/smsh.png" alt="스마슈">
+                        </div>
+                        <div class="char-body">
+                            <h3 class="char-name">
+                                스마슈
+                                <span class="char-name-jp">スマッシュ</span>
+                            </h3>
+                            <div class="char-meta">(수컷, 나이는 세지 않는다)</div>
+                            <p class="char-desc">
+                                일단 주인공입니다.<br>
+                                동양 문화를 가진 개민족 검사로, 지난 2년간 수행의 여행을 떠나 있었습니다.<br>
+                                그렇다고는 해도, 이 세계에서 검사는 시대에 뒤떨어진 막다른 길입니다.<br>
+                                그도 이번 여행에서 그것을 뼈저리게 느낀 모양인지, '전직이나 해볼까' 라고 생각하기 시작했습니다.<br>
+                                특기로서 2개의 강력한 필살검을 터득하고 있습니다만, 가장 잘하는 것은 무 돌려깎기입니다.<br>
+                                설령 이종족이라도 여성으로 보이기만 하면 물불 안 가리고 들이대는 호색한입니다.
+                            </p>
+                        </div>
+                    </article>
+
+                    <article class="char-card">
+                        <div class="char-portrait">
+                            <img src="img/fari.png" alt="화린">
+                        </div>
+                        <div class="char-body">
+                            <h3 class="char-name">
+                                화린
+                                <span class="char-name-jp">ファーリン</span>
+                            </h3>
+                            <div class="char-meta">(여성, 17세)</div>
+                            <p class="char-desc">
+                                스마슈를 비롯한 개민족과 무언가 관계가 있는 여우민족 족장입니다.<br>
+                                모범생 같은 성격이 화가 되어, 다른 5명과 지내다 보면 마음고생이 끊이지 않는 모양입니다.<br>
+                                그것 때문에 위가 상한 것인지, 최근에는 위장약을 손에서 놓지 못합니다.<br>
+                                기특하면서도, 박복한 소녀입니다.<br>
+                                스마슈의 제일 첫 번째 동료가 됩니다.<br>
+                                여우민족 족장으로서 단검술과 마법을 터득하고 있어, 분명 의지가 될 것입니다.
+                            </p>
+                        </div>
+                    </article>
+
+                    <article class="char-card">
+                        <div class="char-portrait">
+                            <img src="img/pet.png" alt="페톰">
+                        </div>
+                        <div class="char-body">
+                            <h3 class="char-name">
+                                페톰
+                                <span class="char-name-jp">ペトウム</span>
+                            </h3>
+                            <div class="char-meta">(남성, 연령 미상)</div>
+                            <p class="char-desc">
+                                후계자 부족으로 해마다 그 수가 줄어들고 있는 술사 중 한 명입니다.<br>
+                                보기에는 젊어 보입니다만 이래 봬도 꽤 나이를 먹어서, 젊은이의 육성에 골머리를 앓고 있는 베테랑 술사인 것입니다.<br>
+                                본인은 유유자적 마음 내키는 대로 살아 가고 싶어 합니다만, 트러블에 휘말리기 쉬운 운명인 모양입니다.<br>
+                                엄청난 대식가에다가 애주가이며, 애연가입니다.
+                            </p>
+                        </div>
+                    </article>
+
+                    <article class="char-card">
+                        <div class="char-portrait">
+                            <img src="img/kiri.png" alt="키리">
+                        </div>
+                        <div class="char-body">
+                            <h3 class="char-name">
+                                키리
+                                <span class="char-name-jp">キリ</span>
+                            </h3>
+                            <div class="char-meta">(여성, 18세)</div>
+                            <p class="char-desc">
+                                어쨌든 화려하게 눈에 띄는 것을 좋아하는 소녀입니다.<br>
+                                수수한 시골에서의 생활에 싫증이 나서, 가출이나 다름없이 고향을 떠나왔습니다.<br>
+                                실력이 좋은 모양이라, 철도회사에 고용되어, 열차강도를 격퇴하기 위한 경호원을 하면서 살아가고 있습니다.<br>
+                                특기인 기술은, 애용하는 기타에서 문자 그대로 사람을 미치게 만드는 충격을 내뿜는 것입니다.
+                            </p>
+                        </div>
+                    </article>
+
+                    <article class="char-card">
+                        <div class="char-portrait">
+                            <img src="img/ata.png" alt="아타호">
+                        </div>
+                        <div class="char-body">
+                            <h3 class="char-name">
+                                아타호
+                                <span class="char-name-jp">アターホー</span>
+                            </h3>
+                            <div class="char-meta">(아저씨)</div>
+                            <p class="char-desc">
+                                보이는 그대로인 호랑이민족 아저씨입니다.<br>
+                                나이에 비해서 정정하며, 외딴 산속에서 혼자 살고 있습니다.<br>
+                                수상쩍은 권법의 명수로, 그 단련하고 단련한 주먹은 바위조차도 일격에 부수기도 한다고 본인은 호언장담하고 있었습니다만 진상은 어떨까요?<br>
+                                자기 전에 한 잔하는 것을 무척이나 좋아합니다.
+                            </p>
+                        </div>
+                    </article>
+
+                    <article class="char-card">
+                        <div class="char-portrait">
+                            <img src="img/sila.png" alt="실라">
+                        </div>
+                        <div class="char-body">
+                            <h3 class="char-name">
+                                실라
+                                <span class="char-name-jp">シーラ</span>
+                            </h3>
+                            <div class="char-meta">(여성, 23세)</div>
+                            <p class="char-desc">
+                                대륙 북쪽에 떠 있는 비의 섬에 있는, 구름 왕국의 여왕입니다.<br>
+                                무척 제멋대로인 성격으로, 왕녀 시절부터 그 이름을 나라 안팎에 떨치고 있습니다.<br>
+                                하지만 분별은 있는 모양이라, 통치자로서는 유능합니다.<br>
+                                술사의 수행을 한 적도 있어, 마법을 사용할 수 있습니다만, 본인은 구국의 용사로부터 물려받은 채찍을 휘두르는 편이 특기인 모양입니다.<br>
+                                당근을 끔찍하리만큼 싫어해서, 왕녀 시절에 당근을 세계에서 소멸시키려고 하다가 흉악한 마수를 부활시켰던 적도 있었습니다.
+                            </p>
+                        </div>
+                    </article>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= 3. 게임의 진행 방법 ================= -->
+        <section id="gameplay">
+            <div class="chapter-title">
+                <div class="section-inner">
+                    <div class="pct-stage">
+                        <img class="stage-base" src="img/chapter-gameplay.png" alt="게임의 진행 방법 챕터 타이틀">
+                    </div>
+                    <h2>게임의 진행 방법</h2>
+                </div>
+            </div>
+
+            <div class="section-inner">
+
+                <!-- 기본 조작 (PDF 12쪽) -->
+                <div class="content-block">
+                    <h3>기본 조작</h3>
+                    <p>게임에서 사용하는 키</p>
+                    <div class="screenshot-frame">
+                        <!-- PDF 12쪽 키보드 배치도 -->
+                        <!-- <img src="img/key-layout.png" alt="사용하는 키 배치도"> -->
+                    </div>
+                    <table class="control-table">
+                        <thead>
+                            <tr>
+                                <th>키 / 버튼</th>
+                                <th>기능</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>방향키</td>
+                                <td>캐릭터·커서 이동</td>
+                            </tr>
+                            <tr>
+                                <td>Enter · Space</td>
+                                <td>커맨드 등의 결정</td>
+                            </tr>
+                            <tr>
+                                <td>ESC · Shift</td>
+                                <td>커맨드 등의 취소</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- 마을 · 던전 (PDF 13쪽) -->
+                <div class="content-block">
+                    <h3>마을 · 던전</h3>
+                    <div class="screenshot-frame">
+                        <!-- PDF 13쪽 마을 화면 스크린샷 -->
+                        <!-- <img src="img/screen_town.png" alt="마을 화면"> -->
+                    </div>
+                    <table class="control-table">
+                        <thead>
+                            <tr>
+                                <th>키 / 버튼</th>
+                                <th>기능</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>방향키</td>
+                                <td>캐릭터 이동</td>
+                            </tr>
+                            <tr>
+                                <td>ESC · Shift</td>
+                                <td>캠프 모드 진입 (아래 「캠프 모드」 항목 참고)</td>
+                            </tr>
+                            <tr>
+                                <td>NPC에게 말 걸기 · 보물상자 열기</td>
+                                <td>해당 대상에 접촉</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <p>
+                        데이터 세이브는 주로 마을의 역 개찰구나 여관에서 할 수 있습니다. 여관에서는 HP·MP도 회복할 수 있습니다.<br>
+                        또한 던전 안에는 데이터 세이브와 HP·MP 회복을 해주는 수수께끼의 캐릭터가 있습니다. 그를 발견하면 모험이 훨씬 편해질 것입니다.<br>
+                        데이터 로드는 게임 시작 화면에서만 가능합니다. 게임 도중에 로드하고 싶을 때는 한 번 리셋해 주세요.
+                    </p>
+                </div>
+
+                <!-- 캠프 모드 (PDF 14~15쪽) -->
+                <div class="content-block">
+                    <h3>캠프 모드</h3>
+                    <div class="screenshot-frame">
+                        <!-- PDF 14쪽 캠프 모드 화면 스크린샷 -->
+                        <!-- <img src="img/screen_camp.png" alt="캠프 모드 화면"> -->
+                    </div>
+                    <p>
+                        마을이나 던전에 있을 때 취소 키(ESC · Shift)를 누르면 캠프 모드에 들어갑니다.<br>
+                        여기서는 캐릭터의 파라미터 확인, 무기·방어구 장비, 도구·마법 사용 등을 할 수 있습니다.<br>
+                        동료가 2명 이상일 때는 방향키 ←→로 다른 캐릭터로 전환할 수 있습니다.<br>
+                        화면의 왼쪽에 표시되는 파라미터는 각각 다음과 같은 의미를 갖습니다.
+                    </p>
+
+                    <h4>화면 설명</h4>
+                    <dl class="term-list">
+                        <dt>레벨</dt>
+                        <dd>캐릭터의 종합적인 강함을 나타냅니다.</dd>
+                        <dt>상태</dt>
+                        <dd>정상·독·기절 3종류의 상태를 표시합니다. 기절은 전투 종료 후 자동으로 HP 1로 부활합니다.</dd>
+                        <dt>생명력</dt>
+                        <dd>이른바 HP입니다. 0이 되면 전투불능이 됩니다. 왼쪽이 현재치, 오른쪽이 최대치입니다.</dd>
+                        <dt>정신력 / 마력</dt>
+                        <dd>특기나 마법을 쓰면 소비됩니다. SP 또는 MP로 줄여서 표시합니다. 왼쪽이 현재치, 오른쪽이 최대치입니다.</dd>
+                        <dt>경험치</dt>
+                        <dd>일정치에 도달하면 레벨이 오릅니다. EXP로 줄여서 표시합니다.</dd>
+                        <dt>공격력</dt>
+                        <dd>공격 데미지의 크기를 나타냅니다.</dd>
+                        <dt>방어력</dt>
+                        <dd>적으로부터의 공격을 방어하는 능력치입니다.</dd>
+                        <dt>빠르기</dt>
+                        <dd>캐릭터의 스피드입니다. 역시 빠른 쪽이 유리하겠죠.</dd>
+                        <dt>운</dt>
+                        <dd>전투 중 다양한 행동에 영향을 줍니다.</dd>
+                        <dt>대사</dt>
+                        <dd>제멋대로 말하고 있습니다. 힌트가 되는 경우가 있을지도 모릅니다.</dd>
+                    </dl>
+
+                    <p>
+                        화면 오른쪽에는 캐릭터가 가진 무기·방어구·특기/마법·도구가 표시됩니다. 도구 두 번째 줄에 표시되는 것은 이벤트 관련 도구로, 보통은 사용할 수 없습니다.<br>
+                        무기·방어구 장비, 마법·도구 사용은 아래 순서로 할 수 있습니다.
+                    </p>
+
+                    <table class="control-table">
+                        <thead>
+                            <tr>
+                                <th>키 / 버튼</th>
+                                <th>기능</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>방향키 ←→</td>
+                                <td>캐릭터 선택</td>
+                            </tr>
+                            <tr>
+                                <td>방향키 ↑↓</td>
+                                <td>항목 선택</td>
+                            </tr>
+                            <tr>
+                                <td>Enter · Space</td>
+                                <td>항목 결정</td>
+                            </tr>
+                            <tr>
+                                <td>방향키 ←→</td>
+                                <td>아이템 · 마법 등 선택</td>
+                            </tr>
+                            <tr>
+                                <td>Enter · Space</td>
+                                <td>아이템 · 마법 등 결정</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <p>
+                        또한 무기·방어구·특기/마법·도구 각 선택지에 커서를 맞추면 각각에 대한 간단한 설명이 아래 공간에 표시됩니다.
+                    </p>
+                </div>
+
+                <!-- 전투 (PDF 16쪽) -->
+                <div class="content-block">
+                    <h3>전투</h3>
+                    <div class="screenshot-frame">
+                        <!-- PDF 16쪽 전투 화면 스크린샷 -->
+                        <!-- <img src="img/screen_battle.png" alt="전투 화면"> -->
+                    </div>
+                    <table class="control-table">
+                        <thead>
+                            <tr>
+                                <th>키 / 버튼</th>
+                                <th>기능</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>방향키</td>
+                                <td>커서 이동</td>
+                            </tr>
+                            <tr>
+                                <td>Enter · Space</td>
+                                <td>커맨드 결정</td>
+                            </tr>
+                            <tr>
+                                <td>ESC · Shift</td>
+                                <td>커맨드 취소</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <p>
+                        또한 전투 중에는 캠프 모드에 들어갈 수 없습니다.
+                    </p>
+
+                    <h4>커맨드 설명</h4>
+                    <dl class="term-list">
+                        <dt>공격</dt>
+                        <dd>장비하고 있는 무기로 적 1체를 공격합니다.</dd>
+                        <dt>특기 / 마법</dt>
+                        <dd>특기 또는 마법을 사용합니다 (→ 「무구·도구·특기·마법」 항목 참고).</dd>
+                        <dt>도구</dt>
+                        <dd>가지고 있는 도구를 사용합니다.</dd>
+                        <dt>도망</dt>
+                        <dd>전투에서 이탈합니다.</dd>
+                        <dt>일제공격</dt>
+                        <dd>캐릭터 전원이 「공격」을 실행합니다.</dd>
+                    </dl>
+
+                    <p>경험치는 적을 1체 쓰러뜨릴 때마다 얻을 수 있습니다. 그리고 전투 중이라도 일정치에 도달하면 레벨이 오르며, 그에 맞춰 능력치가 상승하고 HP·MP도 최대치까지 회복됩니다.</p>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- ================= 4. 무구·도구·특기·마법 ================= -->
+        <section id="items">
+            <div class="chapter-title">
+                <div class="section-inner">
+                    <div class="pct-stage">
+                        <img class="stage-base" src="img/chapter-items.png" alt="무구·도구·특기·마법 챕터 타이틀">
+                    </div>
+                    <h2>무구·도구·특기·마법</h2>
+                </div>
+            </div>
+
+            <div class="section-inner">
+
+                <div class="entry-group">
+                    <h3>무기</h3>
+                    <div class="entry-list">
+                        <div class="entry">
+                            <div class="entry-icon">
+                                <img src="img/icon/icon_r2c4.png" alt="닌자도">
+                            </div>
+                            <div class="entry-body">
+                                <div class="entry-name">닌자도</div>
+                                <p class="entry-desc">동방의 색다른 전사가 쓰는 검입니다. 스마슈가 처음부터 장비하고 있습니다.</p>
+                            </div>
+                        </div>
+                        <div class="entry">
+                            <div class="entry-icon">
+                                <img src="img/icon/icon_r2c5.png" alt="강철검">
+                            </div>
+                            <div class="entry-body">
+                                <div class="entry-name">강철검</div>
+                                <p class="entry-desc">솜씨 좋은 장인이 벼려낸 강력한 검입니다.</p>
+                            </div>
+                        </div>
+                        <div class="entry">
+                            <div class="entry-icon">
+                                <img src="img/icon/icon_r2c6.png" alt="만도">
+                            </div>
+                            <div class="entry-body">
+                                <div class="entry-name">만도</div>
+                                <p class="entry-desc">먼 이국에서 전해진 외래품 무기입니다.</p>
+                            </div>
+                        </div>
+                        <div class="entry">
+                            <div class="entry-icon">
+                                <img src="img/icon/icon_r4c0.png" alt="소형단검">
+                            </div>
+                            <div class="entry-body">
+                                <div class="entry-name">소형단검</div>
+                                <p class="entry-desc">호신용 무기입니다.</p>
+                            </div>
+                        </div>
+                        <div class="entry">
+                            <div class="entry-icon">
+                                <img src="img/icon/icon_r4c4.png" alt="전기기타">
+                            </div>
+                            <div class="entry-body">
+                                <div class="entry-name">전기기타</div>
+                                <p class="entry-desc">평범한 기타지만, 키리가 연주하면 무기가 되어버립니다.</p>
+                            </div>
+                        </div>
+                        <div class="entry">
+                            <div class="entry-icon">
+                                <img src="img/icon/icon_r5c0.png" alt="지팡이">
+                            </div>
+                            <div class="entry-body">
+                                <div class="entry-name">지팡이</div>
+                                <p class="entry-desc">몸가짐으로서 페톰이 들고 다닙니다.</p>
+                            </div>
+                        </div>
+                        <div class="entry">
+                            <div class="entry-icon">
+                                <img src="img/icon/icon_r5c1.png" alt="운목장">
+                            </div>
+                            <div class="entry-body">
+                                <div class="entry-name">운목장</div>
+                                <p class="entry-desc">세계수라 불리는 거목의 가지로 만든 지팡이입니다.</p>
+                            </div>
+                        </div>
+                        <div class="entry">
+                            <div class="entry-icon">
+                                <img src="img/icon/icon_r5c6.png" alt="주먹">
+                            </div>
+                            <div class="entry-body">
+                                <div class="entry-name">주먹</div>
+                                <p class="entry-desc">단련하고 단련한 아타호의 맨주먹입니다.</p>
+                            </div>
+                        </div>
+                        <div class="entry">
+                            <div class="entry-icon">
+                                <img src="img/icon/icon_r6c0.png" alt="여왕채찍">
+                            </div>
+                            <div class="entry-body">
+                                <div class="entry-name">여왕채찍</div>
+                                <p class="entry-desc">실라가 지닌 초강력한 채찍입니다.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="entry-group">
+                    <h3>방어구</h3>
+                    <div class="entry-list">
+                        <div class="entry">
+                            <div class="entry-icon">
+                                <img src="img/icon/icon_r3c2.png" alt="닌자복">
+                            </div>
+                            <div class="entry-body">
+                                <div class="entry-name">닌자복</div>
+                                <p class="entry-desc">스마슈가 처음부터 장비하는 천 재질의 방어구입니다.</p>
+                            </div>
+                        </div>
+                        <div class="entry">
+                            <div class="entry-icon">
+                                <img src="img/icon/icon_r3c3.png" alt="가죽갑옷">
+                            </div>
+                            <div class="entry-body">
+                                <div class="entry-name">가죽갑옷</div>
+                                <p class="entry-desc">가볍고 움직이기 편한 가죽제 방어구입니다.</p>
+                            </div>
+                        </div>
+                        <div class="entry">
+                            <div class="entry-icon">
+                                <img src="img/icon/icon_r3c4.png" alt="사슬갑옷">
+                            </div>
+                            <div class="entry-body">
+                                <div class="entry-name">사슬갑옷</div>
+                                <p class="entry-desc">천이나 가죽과는 비교도 안 되는 방어력이 매력입니다.</p>
+                            </div>
+                        </div>
+                        <div class="entry">
+                            <div class="entry-icon">
+                                <img src="img/icon/icon_r4c2.png" alt="여우의여행옷">
+                            </div>
+                            <div class="entry-body">
+                                <div class="entry-name">여우의여행옷</div>
+                                <p class="entry-desc">화린을 비롯한 여우족의 전통 의상입니다.</p>
+                            </div>
+                        </div>
+                        <div class="entry">
+                            <div class="entry-icon">
+                                <img src="img/icon/icon_r4c6.png" alt="화려한의상">
+                            </div>
+                            <div class="entry-body">
+                                <div class="entry-name">화려한의상</div>
+                                <p class="entry-desc">아무튼 화려한 키리의 평상복입니다.</p>
+                            </div>
+                        </div>
+                        <div class="entry">
+                            <div class="entry-icon">
+                                <img src="img/icon/icon_r5c3.png" alt="로브">
+                            </div>
+                            <div class="entry-body">
+                                <div class="entry-name">로브</div>
+                                <p class="entry-desc">페톰이 즐겨 입는 천으로 된 긴 옷입니다.</p>
+                            </div>
+                        </div>
+                        <div class="entry">
+                            <div class="entry-icon">
+                                <img src="img/icon/icon_r5c4.png" alt="현자로브">
+                            </div>
+                            <div class="entry-body">
+                                <div class="entry-name">현자로브</div>
+                                <p class="entry-desc">로브의 고급품입니다.</p>
+                            </div>
+                        </div>
+                        <div class="entry">
+                            <div class="entry-icon">
+                                <img src="img/icon/icon_r5c7.png" alt="호랑이투의">
+                            </div>
+                            <div class="entry-body">
+                                <div class="entry-name">호랑이투의</div>
+                                <p class="entry-desc">아타호의 일족에게 전해지는 전투복입니다.</p>
+                            </div>
+                        </div>
+                        <div class="entry">
+                            <div class="entry-icon">
+                                <img src="img/icon/icon_r6c1.png" alt="잠행복">
+                            </div>
+                            <div class="entry-body">
+                                <div class="entry-name">잠행복</div>
+                                <p class="entry-desc">실라가 성을 몰래 빠져나올 때 입는 옷입니다.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="entry-group">
+                    <h3>도구</h3>
+                    <div class="entry-list">
+                        <div class="entry">
+                            <div class="entry-icon">
+                                <img src="img/icon/icon_r0c0.png" alt="약초">
+                            </div>
+                            <div class="entry-body">
+                                <div class="entry-name">약초</div>
+                                <p class="entry-desc">잃어버린 HP를 회복합니다.</p>
+                            </div>
+                        </div>
+                        <div class="entry">
+                            <div class="entry-icon">
+                                <img src="img/icon/icon_r0c1.png" alt="해독약">
+                            </div>
+                            <div class="entry-body">
+                                <div class="entry-name">해독약</div>
+                                <p class="entry-desc">독 상태에서 회복합니다.</p>
+                            </div>
+                        </div>
+                        <div class="entry">
+                            <div class="entry-icon">
+                                <img src="img/icon/icon_r0c2.png" alt="리프레시워터">
+                            </div>
+                            <div class="entry-body">
+                                <div class="entry-name">리프레시워터</div>
+                                <p class="entry-desc">전투불능 상태에서 회복합니다.</p>
+                            </div>
+                        </div>
+                        <div class="entry">
+                            <div class="entry-icon">
+                                <img src="img/icon/icon_r1c0.png" alt="낡은열쇠">
+                            </div>
+                            <div class="entry-body">
+                                <div class="entry-name">낡은열쇠</div>
+                                <p class="entry-desc">어떤 일로 얻게 되는 열쇠입니다.</p>
+                            </div>
+                        </div>
+                        <div class="entry">
+                            <div class="entry-icon">
+                                <img src="img/icon/icon_r2c0.png" alt="화령석">
+                            </div>
+                            <div class="entry-body">
+                                <div class="entry-name">화령석</div>
+                                <p class="entry-desc">열과 불의 힘을 흡수·방출하는 돌입니다. 폭탄처럼 폭발시킬 수도 있습니다.</p>
+                            </div>
+                        </div>
+                        <div class="entry">
+                            <div class="entry-icon">
+                                <img src="img/icon/icon_r1c3.png" alt="죽마">
+                            </div>
+                            <div class="entry-body">
+                                <div class="entry-name">죽마</div>
+                                <p class="entry-desc">바로 그 죽마입니다.</p>
+                            </div>
+                        </div>
+                        <div class="entry">
+                            <div class="entry-icon">
+                                <img src="img/icon/icon_r1c4.png" alt="명주">
+                            </div>
+                            <div class="entry-body">
+                                <div class="entry-name">명주</div>
+                                <p class="entry-desc">스마슈가 들른 마을의 자랑거리 술입니다.</p>
+                            </div>
+                        </div>
+                        <div class="entry">
+                            <div class="entry-icon">
+                                <img src="img/icon/icon_r1c5.png" alt="에로책">
+                            </div>
+                            <div class="entry-body">
+                                <div class="entry-name">에로책</div>
+                                <p class="entry-desc">18금 물건입니다.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="entry-group">
+                    <h3>특기</h3>
+                    <div class="entry-list">
+                        <div class="entry">
+                            <div class="entry-icon">
+                                <img src="img/icon/icon_r0c3.png" alt="대격검">
+                            </div>
+                            <div class="entry-body">
+                                <div class="entry-name">대격검 <span class="figure-caption">스마슈</span></div>
+                                <p class="entry-desc">적 1체에게 큰 데미지를 줍니다.</p>
+                            </div>
+                        </div>
+                        <div class="entry">
+                            <div class="entry-icon">
+                                <img src="img/icon/icon_r0c4.png" alt="백인일섬">
+                            </div>
+                            <div class="entry-body">
+                                <div class="entry-name">백인일섬 <span class="figure-caption">스마슈</span></div>
+                                <p class="entry-desc">모든 적에게 데미지를 줍니다.</p>
+                            </div>
+                        </div>
+                        <div class="entry">
+                            <div class="entry-icon">
+                                <img src="img/icon/icon_r0c3.png" alt="호격권">
+                            </div>
+                            <div class="entry-body">
+                                <div class="entry-name">호격권 <span class="figure-caption">아타호</span></div>
+                                <p class="entry-desc">적 1체에게 큰 데미지를 줍니다.</p>
+                            </div>
+                        </div>
+                        <div class="entry">
+                            <div class="entry-icon">
+                                <img src="img/icon/icon_r0c4.png" alt="맹호난무">
+                            </div>
+                            <div class="entry-body">
+                                <div class="entry-name">맹호난무 <span class="figure-caption">아타호</span></div>
+                                <p class="entry-desc">모든 적에게 데미지를 줍니다.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="entry-group">
+                    <h3>마법 <span class="figure-caption">— 화린 · 키리 · 페톰 · 실라 공용</span></h3>
+                    <div class="entry-list">
+                        <div class="entry">
+                            <div class="entry-icon">
+                                <img src="img/icon/icon_r6c2.png" alt="불꽃주문">
+                            </div>
+                            <div class="entry-body">
+                                <div class="entry-name">불꽃주문</div>
+                                <p class="entry-desc">불꽃으로 적 1체 또는 전체에게 데미지를 줍니다.</p>
+                            </div>
+                        </div>
+                        <div class="entry">
+                            <div class="entry-icon">
+                                <img src="img/icon/icon_r6c5.png" alt="번개주문">
+                            </div>
+                            <div class="entry-body">
+                                <div class="entry-name">번개주문</div>
+                                <p class="entry-desc">전격으로 적 1체 또는 전체에게 데미지를 줍니다.</p>
+                            </div>
+                        </div>
+                        <div class="entry">
+                            <div class="entry-icon">
+                                <img src="img/icon/icon_r6c4.png" alt="얼음주문">
+                            </div>
+                            <div class="entry-body">
+                                <div class="entry-name">얼음주문</div>
+                                <p class="entry-desc">냉기로 적 1체 또는 전체에게 데미지를 줍니다.</p>
+                            </div>
+                        </div>
+                        <div class="entry">
+                            <div class="entry-icon">
+                                <img src="img/icon/icon_r6c6.png" alt="회복주문">
+                            </div>
+                            <div class="entry-body">
+                                <div class="entry-name">회복주문</div>
+                                <p class="entry-desc">동료 1명 또는 전원의 HP를 회복시킵니다.</p>
+                            </div>
+                        </div>
+                        <div class="entry">
+                            <div class="entry-icon">
+                                <img src="img/icon/icon_r7c0.png" alt="해독주문">
+                            </div>
+                            <div class="entry-body">
+                                <div class="entry-name">해독주문</div>
+                                <p class="entry-desc">독에 걸린 동료를 정상 상태로 되돌립니다.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- ================= 5. 오마케 ================= -->
+        <section id="extra">
+            <div class="chapter-title">
+                <div class="section-inner">
+                    <div class="pct-stage">
+                        <img class="stage-base" src="img/chapter-extra.png" alt="오마케 챕터 타이틀">
+                    </div>
+                    <h2>오마케</h2>
+                </div>
+            </div>
+
+            <div class="section-inner">
+
+                <!-- 스태프 코멘트 (PDF 24~26쪽 "開発スタッフから一言") -->
+                <div class="content-block">
+                    <h3>개발 스태프로부터 한 마디</h3>
+                    <div class="staff-comment-grid">
+                        <div class="staff-comment">
+                            <div class="staff-name">우에미조
+                                <span class="staff-name-jp">うゑみぞ</span>
+                            </div>
+                            <p class="staff-text">
+                                스태프 여러분, 수고하셨습니다.<br>
+                                자, 이제 아무 걱정 없어요. 푹 주무세요.<br>
+                                저도 지쳤어요.<br>
+                                기획 입안부터 완성까지, 해가 몇 번이나 바뀌었는지.<br>
+                                이불 좀 깔아주세요, 이불.<br>
+                                「환세」가 대박 나는 꿈이라도 꾸면서 잘게요.<br>
+                                그럼, 안녕히 주무세요.
+                            </p>
+                        </div>
+                        <div class="staff-comment">
+                            <div class="staff-name">세뇨르 카와키타
+                                <span class="staff-name-jp">セニョール河北</span>
+                            </div>
+                            <p class="staff-text">
+                                ~ 환세희담과 그 사람들 ~<br>
+                                안녕하세요, 캐릭터 디자인을 맡은 세뇨르 카와키타입니다.<br>
+                                이번엔 캐릭터 수가 좀 많아서 조금 고생했습니다만, 유저 여러분이 좋아해 주신다면 그걸로 만족입니다.<br>
+                                편지로 꼭 감상 보내주세요. 앞으로도 세뇨르 카와키타를 잘 부탁드립니다.
+                            </p>
+                        </div>
+                        <div class="staff-comment">
+                            <div class="staff-name">마츠모토 마나부
+                                <span class="staff-name-jp">松本 学</span>
+                            </div>
+                            <p class="staff-text">
+                                이거 참 정말로 오래 기다리게 해드린 것 같네요.<br>
+                                돌이켜보면 입사했을 때, 세뇨르 씨 모니터에 떠 있던 엔딩 데모를 보고 「헤에, 이게 환세희담인가」하고 유저처럼 기대에 부풀었던 것 같은 기분이 듭니다.<br>
+                                그로부터 2년인가... 제가 관여한 건 8개월 정도지만, 지금까지 펼쳐진 수많은 명장면이 제 뇌리에 박혀서 떠나질 않네요.<br>
+                                아아, 빨리 잊어버리고 싶다....
+                            </p>
+                        </div>
+                        <div class="staff-comment">
+                            <div class="staff-name">타치바나 헤이안쿄
+                                <span class="staff-name-jp">橘 平安京</span>
+                            </div>
+                            <p class="staff-text">
+                                후우.... 짧은 기간에 이만큼 많은 맵을 그리느라 지쳤다.<br>
+                                후우....
+                            </p>
+                        </div>
+                        <div class="staff-comment">
+                            <div class="staff-name">마츠시마 츠요시
+                                <span class="staff-name-jp">松島 剛史</span>
+                            </div>
+                            <p class="staff-text">
+                                <ruby><rb>환</rb><rp>(</rp><rt>C</rt><rp>)</rp></ruby>세희담으로 <ruby><rb>놀</rb><rp>(</rp><rt>Am</rt><rp>)</rp></ruby>고~<br>
+                                <ruby><rb></rb>3</rb><rp>(</rp><rt>Dm7</rt><rp>)</rp></ruby>시 간식 <ruby><rb></rb>먹</rb><rp>(</rp><rt>G7</rt><rp>)</rp></ruby>고~<br>
+                                <ruby><rb></rb>좋</rb><rp>(</rp><rt>C</rt><rp>)</rp></ruby>아하는 만화를 <ruby><rb></rb>읽</rb><rp>(</rp><rt>Am</rt><rp>)</rp></ruby>고~<br>
+                                <ruby><rb></rb>느</rb><rp>(</rp><rt>Dm7</rt><rp>)</rp></ruby>긋한 <ruby><rb></rb>일</rb><rp>(</rp><rt>G</rt><rp>)</rp></ruby>요<ruby><rb></rb>일</rb><rp>(</rp><rt>C</rt><rp>)</rp></ruby><br>
+                                <ruby><rb></rb>멋</rb><rp>(</rp><rt>Dm7</rt><rp>)</rp></ruby>진 <ruby><rb></rb>일</rb><rp>(</rp><rt>G</rt><rp>)</rp></ruby>요<ruby><rb></rb>일</rb><rp>(</rp><rt>C</rt><rp>)</rp></ruby><br>
+                                작사・작곡 마츠시마 츠요시
+                            </p>
+                        </div>
+                        <div class="staff-comment">
+                            <div class="staff-name">유메쿄 슌민
+                                <span class="staff-name-jp">夢虚 春眠</span>
+                            </div>
+                            <p class="staff-text">
+                                환세희담...<br>
+                                입사 이래 내 앞을 가로막고 서 있던 생애 최강의 적.<br>
+                                간난신고 끝에, 드디어 그 녀석과의 결판이 났다....<br>
+                                길었다....<br>
+                                환세희담이여, 편히 잠들라....
+                            </p>
+                        </div>
+                        <div class="staff-comment">
+                            <div class="staff-name">와아쿤
+                                <span class="staff-name-jp">わあくん</span>
+                            </div>
+                            <p class="staff-text">
+                                환세, 대혼란의 연속이었습니다. 도우미로 시작해서, 정신 차려보니 주요 멤버 중 한 명이 되어 있었네요.<br>
+                                그나저나, 고양이는 좋네요.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 특별부록 & 클리어 팁 (PDF 27쪽) -->
+                <div class="content-block">
+                    <h3>특별부록: 스마슈 변장 세트 사용법</h3>
+                    <div class="screenshot-frame">
+                        <!-- PDF 27쪽 코스프레 사진 -->
+                        <!-- <img src="img/extra_cosplay.png" alt="스마슈 변장 세트 사용 예"> -->
+                    </div>
+                    <p>코를 붙이고, 눈썹과 귀를 오려서 붙이면 당신도 순식간에 스마슈로 변신(웃음)! 친구들과 즐겁게 놀아보세요.</p>
+                    <p class="figure-caption">← 사용 예: 성에서 닌자 놀이. (성 관계자분들도 멋있다고 대호평!)</p>
+                    <p class="figure-caption">※ 닌자복, 칼, 머플러, 그리고 키타노 후본(디렉터)은 부록에 포함되지 않습니다.</p>
+
+                    <h4>환세희담 클리어로 가는 길</h4>
+                    <ol>
+                        <li>던전 안에는 HP 회복이나 세이브를 담당하는 특이한 캐릭터가 있습니다. 그를 찾아내서, 모험을 조금이라도 편하게 만드세요.</li>
+                        <li>모험 도중, 어떤 물건을 훔친 도적을 찾아야 하는 상황이 옵니다. 이때는 어드벤처 게임을 하는 느낌으로 플레이해서, 범인을 밝혀내세요.</li>
+                        <li>세상에는 그 방면에 정통한 전문가가 있는 법입니다. 스스로 어떻게 할 수 없다고 느껴질 때는, 그 전문가를 찾아가 도움을 청하세요.</li>
+                    </ol>
+                </div>
+
+                <!-- 크레딧 (PDF 28쪽 STAFF 롤) -->
+                <div class="content-block">
+                    <h3>크레딧</h3>
+                    <div class="credits-block">
+                        <table>
+                            <tbody>
+                                <tr>
+                                    <td class="credit-role">프로듀스</td>
+                                    <td class="credit-name">MOO仁井谷</td>
+                                </tr>
+                                <tr>
+                                    <td class="credit-role">디렉터</td>
+                                    <td class="credit-name">北野 不凡</td>
+                                </tr>
+                                <tr>
+                                    <td class="credit-role">시나리오</td>
+                                    <td class="credit-name">うゑみぞ</td>
+                                </tr>
+                                <tr>
+                                    <td class="credit-role" rowspan="4">프로그램</td>
+                                    <td class="credit-name">松本 学</td>
+                                </tr>
+                                <tr>
+                                    <td class="credit-name">夢虚 春眠</td>
+                                </tr>
+                                <tr>
+                                    <td class="credit-name">わあくん</td>
+                                </tr>
+                                <tr>
+                                    <td class="credit-name">WINNER</td>
+                                </tr>
+                                <tr>
+                                    <td class="credit-role" rowspan="5">그래픽</td>
+                                    <td class="credit-name">セニョール河北</td>
+                                </tr>
+                                <tr>
+                                    <td class="credit-name">橘 平安京</td>
+                                </tr>
+                                <tr>
+                                    <td class="credit-name">wizard</td>
+                                </tr>
+                                <tr>
+                                    <td class="credit-name">志茂田マーキュリー</td>
+                                </tr>
+                                <tr>
+                                    <td class="credit-name">ねこにゃん</td>
+                                </tr>
+                                <tr>
+                                    <td class="credit-role">사운드</td>
+                                    <td class="credit-name">松島 剛史</td>
+                                </tr>
+                                <tr>
+                                    <td class="credit-role" rowspan="5">패키지 · 매뉴얼</td>
+                                    <td class="credit-name">レインボーPaPa</td>
+                                </tr>
+                                <tr>
+                                    <td class="credit-name">姫月あやめ</td>
+                                </tr>
+                                <tr>
+                                    <td class="credit-name">水無月 彰</td>
+                                </tr>
+                                <tr>
+                                    <td class="credit-name">上人 一速</td>
+                                </tr>
+                                <tr>
+                                    <td class="credit-name">キドぴゅ〜★</td>
+                                </tr>
+                                <tr>
+                                    <td class="credit-role">영업 · 총무</td>
+                                    <td class="credit-name">駄菓子屋玩具</td>
+                                </tr>
+                                <tr>
+                                    <td class="credit-role">유저 서포트</td>
+                                    <td class="credit-name">KAZ</td>
+                                </tr>
+                                <tr>
+                                    <td class="credit-role" rowspan="5">스페셜 땡스</td>
+                                    <td class="credit-name">レモンディ佐々木</td>
+                                </tr>
+                                <tr>
+                                    <td class="credit-name">〆張鶴</td>
+                                </tr>
+                                <tr>
+                                    <td class="credit-name">おねむりゆかびひめ</td>
+                                </tr>
+                                <tr>
+                                    <td class="credit-name">阿門</td>
+                                </tr>
+                                <tr>
+                                    <td class="credit-name">むらさき朱</td>
+                                </tr>
+                                <tr>
+                                    <td class="credit-role">기획 · 제작</td>
+                                    <td class="credit-name">コンパイル</td>
+                                </tr>
+                                <tr>
+                                    <td class="credit-role">음악 제작</td>
+                                    <td class="credit-name">©LMS Music</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+    </main>
+
+    <div class="manual-info">
+        <p>
+            <!-- TODO: 원본 출처 및 수정 사항 안내 문구 -->
+        </p>
+    </div>
+
+    </div> <!-- /.page-scroll -->
+
+    <script>
+        // 상단 네비게이션 — 스크롤 위치에 따라 현재 섹션 링크 강조
+        (function () {
+            var navLinks = Array.prototype.slice.call(document.querySelectorAll('.manual-nav a[data-nav]'));
+            var sections = navLinks
+                .map(function (a) { return document.querySelector(a.getAttribute('href')); })
+                .filter(Boolean);
+
+            if (!sections.length) return;
+
+            var observer = new IntersectionObserver(function (entries) {
+                entries.forEach(function (entry) {
+                    if (!entry.isIntersecting) return;
+                    var id = '#' + entry.target.id;
+                    navLinks.forEach(function (a) {
+                        a.classList.toggle('active', a.getAttribute('href') === id);
+                    });
+                });
+            }, {
+                root: document.querySelector('.page-scroll'),
+                rootMargin: '-45% 0px -50% 0px',
+                threshold: 0
+            });
+
+            sections.forEach(function (s) { observer.observe(s); });
+        })();
+
+        // 네비 실제 높이를 --nav-height-live로 반영 — 항목이 줄바꿈되면
+        // 네비가 2줄 이상이 되면서 실제 높이가 --nav-height(1줄 기준)보다
+        // 커질 수 있어서, .page-scroll 상단 여백이 거기 가려지지 않게 동기화
+        (function () {
+            var nav = document.querySelector('.manual-nav');
+            if (!nav) return;
+
+            function syncNavHeight() {
+                document.documentElement.style.setProperty('--nav-height-live', nav.offsetHeight + 'px');
+            }
+
+            syncNavHeight();
+            window.addEventListener('load', syncNavHeight);
+            window.addEventListener('resize', syncNavHeight);
+        })();
+    </script>
+
+    <script src="../footer.js"></script>
+</body>
+
+</html>
