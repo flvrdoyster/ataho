@@ -115,11 +115,19 @@
             --f-br-w: 300;
             --f-br-h: 572;
 
-            /* 콘텐츠 좌우 인셋 = 그쪽 코너 중 더 넓은 쪽의 폭.
-               코너가 밴드보다 넓어서, 이만큼 비워야 본문이 코너에 안 가림.
-               좌 = max(tl-w, bl-w), 우 = max(tr-w, br-w) */
-            --f-content-l: 616;
-            --f-content-r: 600;
+            /* 콘텐츠 좌우 인셋.
+               코너 PNG는 파일 폭(tl 424 / bl 616 / tr 600 / br 300)만 보면
+               밴드보다 훨씬 넓지만, 실제 아트는 L자라서 넓게 벌어지는 건
+               상·하단 밴드 두께 안쪽뿐임(알파 실측: tl은 y 0~112,
+               bl은 아래에서 95, tr은 y 0~114 구간에서만 벌어지고,
+               그 밖에서는 tl 315 / bl 313 / tr 274 / br 300).
+               .page-scroll과 .manual-nav는 이미 상·하단 밴드만큼 세로로
+               비켜 있어서 그 벌어지는 구간과는 안 겹치므로, 코너 파일 폭이
+               아니라 "코너의 안 벌어진 부분 + 밴드" 기준으로 잡으면 됨.
+               좌 = 320(= --f-left-w, 실측 최대 315 이상)
+               우 = 300(= br-w, tr 274·밴드 290 이상) */
+            --f-content-l: 320;
+            --f-content-r: 300;
 
             /* 변 타일 1장의 길이(반복 단위) */
             --f-top-tile-w: 1482;
@@ -604,6 +612,22 @@
             padding: 12px 14px;
         }
 
+        /* 캐릭터 이름 색 — 원본(8~10쪽)의 손글씨 로고타입에서 실측한 값.
+           원본은 그라데이션이지만 웹에선 단색으로 옮김. 흰 배경 대비는
+           전부 4.5:1 이상(스마슈 7.5 / 화린 11.9 / 페톰 7.2 / 키리 5.8 /
+           아타호 5.8 / 실라 5.9). 아타호·실라가 서로 가까운 건 원본에서도
+           둘 다 붉은 계열이기 때문 */
+        .char-card.char-smash  { --char-color: #0e4bc0; }
+        .char-card.char-farlin { --char-color: #5d017d; }
+        .char-card.char-petum  { --char-color: #0c6352; }
+        .char-card.char-kiri   { --char-color: #c30478; }
+        .char-card.char-ataho  { --char-color: #c02d1b; }
+        .char-card.char-sheila { --char-color: #c20f2c; }
+
+        .char-card .char-name {
+            color: var(--char-color, inherit);
+        }
+
         .char-card .char-name .char-name-jp {
             display: block;
             font-size: 0.7em;
@@ -629,12 +653,34 @@
         }
 
         .screenshot-frame {
+            display: block;
+            width: fit-content;
             border: 1px solid var(--border, #ccc);
-            max-width: 560px;
-            margin: 10px 0;
+            margin: 10px auto;
         }
 
+        /* 스크린샷 표시 폭 ≈ 원본 해상도(3456px)의 20%, 10px 단위로 반올림 */
+        .screenshot-frame img {
+            width: 690px;
+        }
+
+        /* 그림·사진에 붙는 캡션 전용. 아래 .entry-owner / .h-sub 는 생김새는
+           같지만 쓰임이 달라서(항목 소유 캐릭터 표시 / 소제목 부제) 따로 둠 —
+           나중에 캡션 스타일만 손볼 때 같이 딸려 바뀌지 않게 */
         .figure-caption {
+            font-size: 0.85em;
+            color: var(--text-muted, #767676);
+        }
+
+        /* 특기·마법 항목 이름 옆의 사용 캐릭터 표시 (예: 대격검 — 스마슈) */
+        .entry-owner {
+            font-size: 0.85em;
+            color: var(--text-muted, #767676);
+        }
+
+        /* 소제목에 딸리는 부제 (예: 마법 — 화린·키리·페톰·실라 공용).
+           h3의 bold를 그대로 물려받던 기존 모양을 유지 */
+        .h-sub {
             font-size: 0.85em;
             color: var(--text-muted, #767676);
         }
@@ -676,6 +722,68 @@
 
         table.control-table td:last-child {
             text-align: center;
+        }
+
+        /* 기본 조작 표 전용 — 다른 3개 표(마을·던전/캠프모드/전투)는 화면별
+           세부 조작을 나열하지만, 이 표는 게임 전체에 공통되는 의미
+           (방향키→이동, Enter·Space→결정, ESC·Shift→취소)만 짧게 보여주면
+           되므로 배경색 구분 없이 [키캡] → [화살표] → [의미] 1줄짜리
+           3열로 단순화 (원본 12쪽의 큰 화살표만 살림) */
+        table.control-table.control-table-basic {
+            table-layout: auto;
+            width: auto;
+            /* 외곽선이 없는 표라 가운데 정렬하면 왼쪽 정렬된 본문과 따로
+               놀아서, 이 표만 본문 왼쪽 라인에 맞춤 */
+            margin-left: 0;
+        }
+
+        table.control-table.control-table-basic td {
+            border: none;
+        }
+
+        table.control-table.control-table-basic td:first-child {
+            width: auto;
+            background: none;
+            text-align: center;
+        }
+
+        table.control-table.control-table-basic td.arrow-cell {
+            width: 48px;
+            padding: 6px 4px;
+            text-align: center;
+            color: var(--accent, #0068da);
+        }
+
+        table.control-table.control-table-basic .control-arrow {
+            width: 40px;
+            height: 40px;
+            vertical-align: middle;
+        }
+
+        /* 키캡·텍스트 강조 — 다른 표(28px 키캡)보다 한 단계 크게 */
+        table.control-table.control-table-basic .kc-group {
+            gap: 8px;
+        }
+
+        table.control-table.control-table-basic .kc {
+            height: 40px;
+            width: 40px;
+            border-radius: 11px;
+            border-bottom-width: 6px;
+        }
+
+        /* 워드마크 키캡(ENTER/SPACE/ESC/SHIFT)은 글자 폭만큼 늘어나야 함.
+           위 .kc 규칙이 특정도로 기본 .kc-text{width:auto}를 이겨버려서
+           정사각형에 갇히면, 안의 가로로 긴 SVG가 눌려 작아짐 */
+        table.control-table.control-table-basic .kc-text {
+            width: auto;
+            padding: 0 12px;
+        }
+
+        table.control-table.control-table-basic td:last-child {
+            text-align: left;
+            font-size: 1.2em;
+            font-weight: var(--font-weight-bold, 700);
         }
 
         /* 조작표 1열의 키캡 — gensei-pc98 가상 게임패드(#virtual-gamepad
@@ -755,12 +863,16 @@
             gap: 8px;
         }
 
+        /* 무구·도구·특기·마법 항목 — 원본(18~22쪽)은 카키색 행 배경의
+           표라서, 그 색(#d5d3be 실측)을 카드 배경으로 옮김. 흰 종이 위에
+           놓이던 색이라 그대로 쓰면 웹에선 무거워서 옅게 깖 */
         .entry {
             display: flex;
             align-items: center;
             gap: 12px;
             padding: 8px 10px;
             border: 1px solid var(--border, #ccc);
+            background: #eeede4;
         }
 
         .entry .entry-icon {
@@ -795,9 +907,14 @@
             gap: 16px;
         }
 
+        /* 스태프 코멘트 — 원본(24~26쪽)은 라벤더색 띠 프레임 안에 흰 종이가
+           들어앉은 형태(프레임 #d2adce 실측, 안쪽 흰색). 그 구조를 그대로
+           옮겨서 테두리만 라벤더로 두껍게, 안쪽은 흰 배경 유지 */
         .staff-comment {
             padding: 12px 14px;
             border: 1px solid var(--border, #ccc);
+            border-left: 4px solid #d2adce;
+            background: #fff;
         }
 
         .staff-comment .staff-role {
@@ -908,6 +1025,15 @@
                 width: 60%;
                 align-self: center;
             }
+
+            /* 네비 항목 5개의 총 너비(16px 기준 590px)가 폰의 네비 실폭
+               (390px 화면에서 293px)의 2배를 넘어서 3줄로 넘침. 문구를
+               줄이는 대신 글자·좌우 패딩만 줄여서 총 너비를 2줄(3+2) 안에
+               들어오게 함 — 390px 이상에서 2줄로 떨어짐 */
+            .manual-nav a {
+                font-size: 14px;
+                padding: 0 5px;
+            }
         }
     </style>
 </head>
@@ -959,6 +1085,11 @@
                     d="M52.5,35h26.25v-8.75h-26.25V8.75h8.75V0h35v8.75h-26.25v8.75h26.25v17.5h-8.75v8.75h-35v-8.75Z" />
                 <path fill="currentColor"
                     d="M105,26.25V8.75h8.75V0h26.25v8.75h8.75v8.75h-17.5v-8.75h-8.75v26.25h8.75v-8.75h17.5v8.75h-8.75v8.75h-26.25v-8.75h-8.75v-8.75Z" />
+            </symbol>
+            <!-- 기본 조작 표에서 "키 → 의미"를 잇는 큰 화살표(원본 12쪽 참고,
+                 색상 구분 없이 단색 하나로 단순화) -->
+            <symbol id="big-arrow-glyph" viewBox="0 0 24 24">
+                <path fill="currentColor" d="M6 3l16 9-16 9V3z" />
             </symbol>
         </defs>
     </svg>
@@ -1094,7 +1225,7 @@
 
             <div class="section-inner">
                 <div class="char-grid">
-                    <article class="char-card">
+                    <article class="char-card char-smash">
                         <div class="char-portrait">
                             <img src="img/smsh.png" alt="스마슈">
                         </div>
@@ -1115,7 +1246,7 @@
                         </div>
                     </article>
 
-                    <article class="char-card">
+                    <article class="char-card char-farlin">
                         <div class="char-portrait">
                             <img src="img/fari.png" alt="화린">
                         </div>
@@ -1136,14 +1267,14 @@
                         </div>
                     </article>
 
-                    <article class="char-card">
+                    <article class="char-card char-petum">
                         <div class="char-portrait">
                             <img src="img/pet.png" alt="페톰">
                         </div>
                         <div class="char-body">
                             <h3 class="char-name">
                                 페톰
-                                <span class="char-name-jp">ペトウム</span>
+                                <span class="char-name-jp">ペトゥム</span>
                             </h3>
                             <div class="char-meta">(남성, 연령 미상)</div>
                             <p class="char-desc">
@@ -1155,7 +1286,7 @@
                         </div>
                     </article>
 
-                    <article class="char-card">
+                    <article class="char-card char-kiri">
                         <div class="char-portrait">
                             <img src="img/kiri.png" alt="키리">
                         </div>
@@ -1174,7 +1305,7 @@
                         </div>
                     </article>
 
-                    <article class="char-card">
+                    <article class="char-card char-ataho">
                         <div class="char-portrait">
                             <img src="img/ata.png" alt="아타호">
                         </div>
@@ -1193,7 +1324,7 @@
                         </div>
                     </article>
 
-                    <article class="char-card">
+                    <article class="char-card char-sheila">
                         <div class="char-portrait">
                             <img src="img/sila.png" alt="실라">
                         </div>
@@ -1233,23 +1364,22 @@
                 <div class="content-block">
                     <h3>기본 조작</h3>
                     <p>게임에서 사용하는 키</p>
-                    <div class="screenshot-frame">
-                        <!-- PDF 12쪽 키보드 배치도 -->
-                        <!-- <img src="img/key-layout.png" alt="사용하는 키 배치도"> -->
-                    </div>
-                    <table class="control-table">
+                    <table class="control-table control-table-basic">
                         <tbody>
                             <tr>
-                                <td>캐릭터·커서 이동</td>
                                 <td><span class="kc-group" aria-label="방향키 상하좌우"><span class="kc" aria-hidden="true"><svg class="kc-icon" aria-hidden="true" style="transform:rotate(90deg)" viewBox="0 0 21.9 38.33"><use href="#kc-arrow-glyph"></use></svg></span><span class="kc" aria-hidden="true"><svg class="kc-icon" aria-hidden="true" style="transform:rotate(270deg)" viewBox="0 0 21.9 38.33"><use href="#kc-arrow-glyph"></use></svg></span><span class="kc" aria-hidden="true"><svg class="kc-icon" aria-hidden="true" viewBox="0 0 21.9 38.33"><use href="#kc-arrow-glyph"></use></svg></span><span class="kc" aria-hidden="true"><svg class="kc-icon" aria-hidden="true" style="transform:rotate(180deg)" viewBox="0 0 21.9 38.33"><use href="#kc-arrow-glyph"></use></svg></span></span></td>
+                                <td class="arrow-cell"><svg class="control-arrow" aria-hidden="true" viewBox="0 0 24 24"><use href="#big-arrow-glyph"></use></svg></td>
+                                <td>이동</td>
                             </tr>
                             <tr>
-                                <td>커맨드 등의 결정</td>
                                 <td><span class="kc-group" aria-label="Enter, Space"><span class="kc kc-text"><svg class="kc-icon" aria-hidden="true" viewBox="0 0 253.75 43.75"><use href="#kc-enter-glyph"></use></svg></span><span class="kc kc-text"><svg class="kc-icon" aria-hidden="true" viewBox="0 0 261 45"><use href="#kc-space-glyph"></use></svg></span></span></td>
+                                <td class="arrow-cell"><svg class="control-arrow" aria-hidden="true" viewBox="0 0 24 24"><use href="#big-arrow-glyph"></use></svg></td>
+                                <td>결정</td>
                             </tr>
                             <tr>
-                                <td>커맨드 등의 취소</td>
                                 <td><span class="kc-group" aria-label="ESC, Shift"><span class="kc kc-text"><svg class="kc-icon" aria-hidden="true" viewBox="0 0 148.75 43.75"><use href="#kc-esc-glyph"></use></svg></span><span class="kc kc-text"><svg class="kc-icon" aria-hidden="true" viewBox="0 0 218.75 43.75"><use href="#kc-shift-glyph"></use></svg></span></span></td>
+                                <td class="arrow-cell"><svg class="control-arrow" aria-hidden="true" viewBox="0 0 24 24"><use href="#big-arrow-glyph"></use></svg></td>
+                                <td>취소</td>
                             </tr>
                         </tbody>
                     </table>
@@ -1259,8 +1389,7 @@
                 <div class="content-block">
                     <h3>마을 · 던전</h3>
                     <div class="screenshot-frame">
-                        <!-- PDF 13쪽 마을 화면 스크린샷 -->
-                        <!-- <img src="img/screen_town.png" alt="마을 화면"> -->
+                        <img src="img/screen-field.png" alt="마을 화면">
                     </div>
                     <table class="control-table">
                         <tbody>
@@ -1289,8 +1418,7 @@
                 <div class="content-block">
                     <h3>캠프 모드</h3>
                     <div class="screenshot-frame">
-                        <!-- PDF 14쪽 캠프 모드 화면 스크린샷 -->
-                        <!-- <img src="img/screen_camp.png" alt="캠프 모드 화면"> -->
+                        <img src="img/screen-camp-1.png" alt="캠프 모드 화면">
                     </div>
                     <p>
                         마을이나 던전에 있을 때 취소 키(ESC · Shift)를 누르면 캠프 모드에 들어갑니다.<br>
@@ -1322,7 +1450,9 @@
                         <dt>대사</dt>
                         <dd>제멋대로 말하고 있습니다. 힌트가 되는 경우가 있을지도 모릅니다.</dd>
                     </dl>
-
+                    <div class="screenshot-frame">
+                        <img src="img/screen-camp-2.png" alt="캠프 모드 화면 - 오른쪽" style="width: 360px;">
+                    </div>
                     <p>
                         화면 오른쪽에는 캐릭터가 가진 무기·방어구·특기/마법·도구가 표시됩니다. 도구 두 번째 줄에 표시되는 것은 이벤트 관련 도구로, 보통은 사용할 수 없습니다.<br>
                         무기·방어구 장비, 마법·도구 사용은 아래 순서로 할 수 있습니다.
@@ -1361,8 +1491,7 @@
                 <div class="content-block">
                     <h3>전투</h3>
                     <div class="screenshot-frame">
-                        <!-- PDF 16쪽 전투 화면 스크린샷 -->
-                        <!-- <img src="img/screen_battle.png" alt="전투 화면"> -->
+                        <img src="img/screen-battle.png" alt="전투 화면">
                     </div>
                     <table class="control-table">
                         <tbody>
@@ -1677,7 +1806,7 @@
                                 <img src="img/icon/icon_r0c3.png" alt="대격검">
                             </div>
                             <div class="entry-body">
-                                <div class="entry-name">대격검 <span class="figure-caption">스마슈</span></div>
+                                <div class="entry-name">대격검 <span class="entry-owner">스마슈</span></div>
                                 <p class="entry-desc">적 1체에게 큰 데미지를 줍니다.</p>
                             </div>
                         </div>
@@ -1686,7 +1815,7 @@
                                 <img src="img/icon/icon_r0c4.png" alt="백인일섬">
                             </div>
                             <div class="entry-body">
-                                <div class="entry-name">백인일섬 <span class="figure-caption">스마슈</span></div>
+                                <div class="entry-name">백인일섬 <span class="entry-owner">스마슈</span></div>
                                 <p class="entry-desc">모든 적에게 데미지를 줍니다.</p>
                             </div>
                         </div>
@@ -1695,7 +1824,7 @@
                                 <img src="img/icon/icon_r0c3.png" alt="호격권">
                             </div>
                             <div class="entry-body">
-                                <div class="entry-name">호격권 <span class="figure-caption">아타호</span></div>
+                                <div class="entry-name">호격권 <span class="entry-owner">아타호</span></div>
                                 <p class="entry-desc">적 1체에게 큰 데미지를 줍니다.</p>
                             </div>
                         </div>
@@ -1704,7 +1833,7 @@
                                 <img src="img/icon/icon_r0c4.png" alt="맹호난무">
                             </div>
                             <div class="entry-body">
-                                <div class="entry-name">맹호난무 <span class="figure-caption">아타호</span></div>
+                                <div class="entry-name">맹호난무 <span class="entry-owner">아타호</span></div>
                                 <p class="entry-desc">모든 적에게 데미지를 줍니다.</p>
                             </div>
                         </div>
@@ -1712,7 +1841,7 @@
                 </div>
 
                 <div class="entry-group">
-                    <h3>마법 <span class="figure-caption">— 화린 · 키리 · 페톰 · 실라 공용</span></h3>
+                    <h3>마법 <span class="h-sub">— 화린 · 키리 · 페톰 · 실라 공용</span></h3>
                     <div class="entry-list">
                         <div class="entry">
                             <div class="entry-icon">
@@ -1842,7 +1971,7 @@
                         </div>
                         <div class="staff-comment">
                             <div class="staff-name">유메쿄 슌민
-                                <span class="staff-name-jp">夢虚 春眠</span>
+                                <span class="staff-name-jp">夢虚"田"春眠</span>
                             </div>
                             <p class="staff-text">
                                 환세희담...<br>
