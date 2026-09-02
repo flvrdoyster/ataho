@@ -67,7 +67,15 @@
         }
 
         p {
-            margin: 0 0 1em;
+            margin: 0;
+        }
+
+        /* 마진은 "다음에 뭔가 더 있을 때"만 필요 — 박스 안 마지막
+           문단인 경우(entry-desc, char-desc, staff-text 등 대부분)까지
+           일괄로 밀어붙이면 그 박스 자체 패딩과 겹쳐 아래쪽만 붕 뜬다.
+           :not(:last-child)로 흐름이 이어지는 자리에서만 적용 */
+        p:not(:last-child) {
+            margin-bottom: 1em;
         }
 
         a {
@@ -337,10 +345,120 @@
             padding: 20px 0;
         }
 
-        .manual-header .header-greeting {
-            margin: 10px 0 0;
+        /* 커버 이미지 렌더 폭만큼만 차지하는 래퍼 — 가운데 정렬용 */
+        .cover-wrap {
+            position: relative;
+            display: inline-block;
+            margin: 0 auto 16px;
+        }
+
+        .manual-header .header-cover {
+            /* 뷰포트 높이 기준 스플래시. height가 아니라 max-height로 잡아야
+               가로폭이 max-width: 100%에 눌리는 좁은 화면에서도 세로가
+               따라 줄어들어서 비율이 안 깨짐(height를 직접 고정하면 폭만
+               줄어들고 높이는 그대로라 눌려 찌그러져 보임) */
+            display: block;
+            max-height: calc(100vh - (var(--f-top-h) * var(--fs) * 1px + var(--nav-height-live, var(--nav-height))) - (var(--f-bottom-h) * var(--fs) * 1px) - 60px);
+            max-width: 100%;
+            width: auto;
+            height: auto;
+        }
+
+        /* 인사말 버튼(스마슈)+툴팁 — 커버가 아니라 브라우저 창 기준으로
+           떠 있는 위젯. 스크롤해도 같은 화면 위치에 고정되고, 트리거와
+           툴팁이 이 박스 하나에 같이 들어있어서 항상 같이 움직임 */
+        .greeting-widget {
+            position: fixed;
+            top: 80vh;
+            /* 프레임 오른쪽 밴드 폭(--f-right-w * --fs)만큼은 항상 비우고
+               그 바깥에 16px 더 — 브레이크포인트마다 프레임 두께가
+               달라져도(--fs 축소) 자동으로 안 겹침 */
+            right: calc(var(--f-right-w) * var(--fs) * 1px + 16px);
+            transform: translateY(-50%);
+            z-index: 700;
+        }
+
+        /* 프롤로그를 벗어나면 스크립트가 이 클래스를 붙여서 숨김 */
+        .greeting-widget.is-hidden {
+            display: none;
+        }
+
+        .greeting-trigger {
+            display: block;
+            width: 100px;
+            padding: 0;
+            border: 0;
+            background: none;
+            cursor: pointer;
+            filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.35));
+            transition: transform 0.15s ease;
+        }
+
+        .greeting-trigger:hover,
+        .greeting-trigger:focus-visible {
+            transform: scale(1.06);
+        }
+
+        .greeting-trigger img {
+            width: 100%;
+            display: block;
+        }
+
+        /* 화면엔 안 보이지만 스크린리더·SEO엔 남겨두는 텍스트용 */
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        }
+
+        /* 인사말 툴팁 — 트리거 바로 위, 같은 .greeting-widget 안이라
+           트리거가 움직이면 같이 움직임. 말풍선처럼 꼬리(::before/::after)를
+           달아서 트리거를 가리키게 함. [hidden] 속성으로 토글 */
+        .header-greeting {
+            position: absolute;
+            bottom: 100%;
+            right: 0;
+            margin: 0 0 12px;
+            width: 260px;
+            max-width: min(70vw, 260px);
+            padding: 14px 16px;
+            background: #fff;
+            border: 1px solid #999;
+            border-radius: 8px;
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25);
             font-size: 0.85em;
+            text-align: left;
             color: var(--text-secondary, #4d4d4d);
+        }
+
+        .header-greeting[hidden] {
+            display: none;
+        }
+
+        .header-greeting::before,
+        .header-greeting::after {
+            content: "";
+            position: absolute;
+            top: 100%;
+            right: 30px;
+            border: 9px solid transparent;
+            border-bottom: none;
+        }
+
+        .header-greeting::before {
+            border-top-color: #999;
+        }
+
+        .header-greeting::after {
+            margin-right: 1px;
+            border-width: 8px;
+            border-top-color: #fff;
         }
 
         .manual-header .translator-info {
@@ -591,10 +709,7 @@
 
         .entry {
             display: flex;
-            /* center로 두면 entry-desc가 여러 줄로 꺾일 때 아이콘이
-               전체 블록 한가운데로 밀려서 이름 줄이랑 안 맞아 보임 —
-               위쪽 기준으로 맞춤 */
-            align-items: flex-start;
+            align-items: center;
             gap: 12px;
             padding: 8px 10px;
             border: 1px solid #ccc;
@@ -786,15 +901,13 @@
     <!-- ================= 헤더 ================= -->
     <header class="manual-header">
         <div class="section-inner">
-            <h1>환세희담 해설서</h1>
-            <!-- 원본 PDF 2쪽, 개발진 인사말 -->
-            <p class="header-greeting">
-                이 게임은 스마슈를 비롯한 유쾌한 캐릭터들을 조작해서,<br>
-                대륙의 남북을 관통하는 철도로 여행하며 전설의 백성 「봉인 일족」의 수수께끼를 풀어나가기도 합니다만,<br>
-                딱히 신경 쓰지 않으셔도 즐겁게 플레이하실 수 있을 거라 생각합니다. 아니, 정말로요.<br>
-                더 즐겁게 플레이하시려면 이 취급설명서와 스타팅 매뉴얼을 잘 읽어주세요.<br>
-                그러면 불필요한 트러블도 줄고, 이걸 만든 홍보 스태프의 고생도 보답받는다는 것입니다.
-            </p>
+            <div class="cover-wrap">
+                <img class="header-cover" src="img/cover.png" alt="환세희담 표지 일러스트">
+            </div>
+
+            <!-- 표지에 타이틀 로고가 그림으로 이미 들어있어서, h1은
+                 시각적으로 숨김(접근성·SEO용으로 DOM엔 유지) -->
+            <h1 class="sr-only">환세희담 해설서</h1>
             <div class="translator-info">
                 <!-- TODO: 옮긴이 정보 -->
             </div>
@@ -1807,11 +1920,29 @@
 
     <div class="manual-info">
         <p>
-            <!-- TODO: 원본 출처 및 수정 사항 안내 문구 -->
+            본 문서는 「환세희담」(幻世喜譚, ©COMPILE 1995) 취급설명서의 내용을 한국어로 옮기고,
+            이미지와 기타 자료 등을 추가해 만들어졌습니다.
         </p>
     </div>
 
     </div> <!-- /.page-scroll -->
+
+    <!-- 인사말 위젯 — 브라우저 창 기준 고정 플로팅이라 .page-scroll 바깥에 둠
+         (스크롤/프레임 인셋과 무관하게 항상 같은 화면 위치에 떠 있어야 함) -->
+    <div class="greeting-widget">
+        <!-- 원본 PDF 2쪽, 개발진 인사말 — 스마슈 캐릭터를 눌러야 뜨는 툴팁으로 -->
+        <div class="header-greeting" id="greeting-tip" role="tooltip" hidden>
+            이 게임은 스마슈를 비롯한 유쾌한 캐릭터들을 조작해서,<br>
+            대륙의 남북을 관통하는 철도로 여행하며 전설의 백성 「봉인 일족」의 수수께끼를 풀어나가기도 합니다만,<br>
+            딱히 신경 쓰지 않으셔도 즐겁게 플레이하실 수 있을 거라 생각합니다. 아니, 정말로요.<br>
+            더 즐겁게 플레이하시려면 이 취급설명서와 스타팅 매뉴얼을 잘 읽어주세요.<br>
+            그러면 불필요한 트러블도 줄고, 이걸 만든 홍보 스태프의 고생도 보답받는다는 것입니다.
+        </div>
+        <button type="button" class="greeting-trigger" id="greeting-trigger"
+            aria-expanded="false" aria-controls="greeting-tip">
+            <img src="img/greeting.png" alt="인사말 보기">
+        </button>
+    </div>
 
     <script>
         // 상단 네비게이션 — 스크롤 위치에 따라 현재 섹션 링크 강조
@@ -1840,6 +1971,35 @@
             sections.forEach(function (s) { observer.observe(s); });
         })();
 
+        // 인사말 위젯은 프롤로그 구간에서만. IntersectionObserver의 퍼센트
+        // rootMargin 방식은 섹션이 길면 스크롤 도중 순간적으로 걸치는
+        // 구간을 놓치는 경우가 있어서(위 네비 하이라이트도 같은 방식이라
+        // 똑같이 부정확함을 확인함), 대신 스크롤할 때마다 "캐릭터 소개
+        // 섹션의 위쪽 끝이 화면 위쪽 끝을 넘었는가"를 직접 재계산 — 매
+        // 스크롤 프레임마다 새로 판단하니 놓치는 구간이 없음 */
+        (function () {
+            var widget = document.querySelector('.greeting-widget');
+            var boundary = document.getElementById('characters');
+            var scrollRoot = document.querySelector('.page-scroll');
+            if (!widget || !boundary || !scrollRoot) return;
+
+            var ticking = false;
+
+            function updateWidgetVisibility() {
+                ticking = false;
+                var pastPrologue = boundary.getBoundingClientRect().top <= scrollRoot.getBoundingClientRect().top;
+                widget.classList.toggle('is-hidden', pastPrologue);
+            }
+
+            updateWidgetVisibility();
+            scrollRoot.addEventListener('scroll', function () {
+                if (ticking) return;
+                ticking = true;
+                window.requestAnimationFrame(updateWidgetVisibility);
+            }, { passive: true });
+            window.addEventListener('resize', updateWidgetVisibility);
+        })();
+
         // 네비 실제 높이를 --nav-height-live로 반영 — 항목이 줄바꿈되면
         // 네비가 2줄 이상이 되면서 실제 높이가 --nav-height(1줄 기준)보다
         // 커질 수 있어서, .page-scroll 상단 여백이 거기 가려지지 않게 동기화
@@ -1854,6 +2014,33 @@
             syncNavHeight();
             window.addEventListener('load', syncNavHeight);
             window.addEventListener('resize', syncNavHeight);
+        })();
+
+        // 커버 옆 스마슈 — 누르면 인사말 툴팁 토글, 바깥 클릭/Esc로 닫기
+        (function () {
+            var trigger = document.getElementById('greeting-trigger');
+            var tip = document.getElementById('greeting-tip');
+            if (!trigger || !tip) return;
+
+            function setOpen(open) {
+                trigger.setAttribute('aria-expanded', open ? 'true' : 'false');
+                tip.hidden = !open;
+            }
+
+            trigger.addEventListener('click', function (e) {
+                e.stopPropagation();
+                setOpen(tip.hidden);
+            });
+
+            document.addEventListener('click', function (e) {
+                if (!tip.hidden && !tip.contains(e.target) && e.target !== trigger) {
+                    setOpen(false);
+                }
+            });
+
+            document.addEventListener('keydown', function (e) {
+                if (e.key === 'Escape') setOpen(false);
+            });
         })();
     </script>
 
