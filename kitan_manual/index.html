@@ -377,12 +377,17 @@
            툴팁이 이 박스 하나에 같이 들어있어서 항상 같이 움직임 */
         .greeting-widget {
             position: fixed;
-            top: 80vh;
             /* 프레임 오른쪽 밴드 폭(--f-right-w * --fs)만큼은 항상 비우고
                그 바깥에 16px 더 — 브레이크포인트마다 프레임 두께가
                달라져도(--fs 축소) 자동으로 안 겹침 */
             right: calc(var(--f-right-w) * var(--fs) * 1px + 16px);
-            transform: translateY(-50%);
+            /* 세로도 같은 방식. top: 80vh 였을 때 모바일에서 아래가 잘렸는데,
+               vh는 주소창이 접힌 상태(large viewport) 기준이라 실제 보이는
+               높이보다 크기 때문. 실제 표시 영역을 따라가는 dvh를 쓰고,
+               위젯 '아래 모서리'를 기준으로 잡아서 넘칠 일이 없게 함.
+               하한은 가로와 동일하게 프레임 하단 밴드 + 16px */
+            bottom: max(20vh, calc(var(--f-bottom-h) * var(--fs) * 1px + 16px));
+            bottom: max(20dvh, calc(var(--f-bottom-h) * var(--fs) * 1px + 16px));
             z-index: 700;
         }
 
@@ -615,24 +620,34 @@
         /* 캐릭터 이름 색 — 원본(8~10쪽)의 손글씨 로고타입에서 실측한 값.
            원본은 그라데이션이지만 웹에선 단색으로 옮김. 흰 배경 대비는
            전부 4.5:1 이상(스마슈 7.5 / 화린 11.9 / 페톰 7.2 / 키리 5.8 /
-           아타호 5.8 / 실라 5.9). 아타호·실라가 서로 가까운 건 원본에서도
-           둘 다 붉은 계열이기 때문 */
+           아타호 6.3 / 실라 5.9).
+
+           아타호만 로고타입이 아니라 일러스트에서 색을 뽑았음. 원본 로고는
+           빨강(#ba301b)인데 실라(#bb142f)와 거의 같은 색이라, 원본에서 둘을
+           갈라주던 금색 테두리가 없는 웹에서는 구분이 안 됨. 금색 계열은
+           대비가 부족해서(로고 금테 1.73:1 / 털 2.02:1 / 꼬리 3.02:1) 이름
+           색으로 못 씀. 그래서 일러스트에서 면적이 가장 큰 도포의 올리브
+           초록(#596533, 6.3:1)을 씀 — 페톰의 초록(#0c6352)은 청록 계열이라
+           색상각이 달라 서로 안 겹침 */
         .char-card.char-smash  { --char-color: #0e4bc0; }
         .char-card.char-farlin { --char-color: #5d017d; }
         .char-card.char-petum  { --char-color: #0c6352; }
         .char-card.char-kiri   { --char-color: #c30478; }
-        .char-card.char-ataho  { --char-color: #c02d1b; }
+        .char-card.char-ataho  { --char-color: #596533; }
         .char-card.char-sheila { --char-color: #c20f2c; }
 
         .char-card .char-name {
             color: var(--char-color, inherit);
+            /* 다른 h3(18.72px)보다 한 단계 위. 본문 16 → h3 18.72 → h2 24의
+               비율(×1.17)을 따라 22px */
+            font-size: 1.375em;
         }
 
         .char-card .char-name .char-name-jp {
             display: block;
             font-size: 0.7em;
             font-weight: normal;
-            color: var(--text-secondary, #4d4d4d);
+            color: var(--char-color, var(--text-secondary, #4d4d4d));
             /* KoddiUDOnGothic이 가나 자체는 갖고 있어도(--font-ui 폴백이
                안 걸림) 일본어 폰트로서 모양이 어색해서, 빠진 글자만
                땜빵하는 대신 이 요소 전체를 Noto Sans KR로 통일 렌더링 */
@@ -732,9 +747,6 @@
         table.control-table.control-table-basic {
             table-layout: auto;
             width: auto;
-            /* 외곽선이 없는 표라 가운데 정렬하면 왼쪽 정렬된 본문과 따로
-               놀아서, 이 표만 본문 왼쪽 라인에 맞춤 */
-            margin-left: 0;
         }
 
         table.control-table.control-table-basic td {
@@ -747,29 +759,45 @@
             text-align: center;
         }
 
+        /* 화살표도 --arrow 하나에서 파생 — 키캡과 같이 줄어야 표 전체가
+           좁은 화면에서 블록 안에 들어감(이 표는 width:auto라 안 줄어듦) */
+        table.control-table.control-table-basic {
+            --arrow: 48px;
+        }
+
         table.control-table.control-table-basic td.arrow-cell {
-            width: 48px;
+            width: var(--arrow);
             padding: 6px 4px;
             text-align: center;
             color: var(--accent, #0068da);
         }
 
         table.control-table.control-table-basic .control-arrow {
-            width: 40px;
-            height: 40px;
+            width: calc(var(--arrow) * 0.83);
+            height: calc(var(--arrow) * 0.83);
             vertical-align: middle;
         }
 
-        /* 키캡·텍스트 강조 — 다른 표(28px 키캡)보다 한 단계 크게 */
-        table.control-table.control-table-basic .kc-group {
-            gap: 8px;
+        /* 삼각형 색은 원본(12쪽)에서 실측 — 원본은 행마다 다른 색이고
+           배경 띠 색과 짝을 이룸. 여기선 띠를 안 쓰므로 화살표 색만 가져옴.
+           흰 배경 대비 6.07 / 5.45 / 7.35:1 */
+        table.control-table.control-table-basic tbody tr:nth-child(1) .arrow-cell {
+            color: #bc1768;
         }
 
-        table.control-table.control-table-basic .kc {
-            height: 40px;
-            width: 40px;
-            border-radius: 11px;
-            border-bottom-width: 6px;
+        table.control-table.control-table-basic tbody tr:nth-child(2) .arrow-cell {
+            color: #c03645;
+        }
+
+        table.control-table.control-table-basic tbody tr:nth-child(3) .arrow-cell {
+            color: #135b84;
+        }
+
+        /* 키캡·텍스트 강조 — 다른 표(28px 키캡)보다 한 단계 크게 */
+        /* 기본 조작 표만 한 단계 큰 키캡. 나머지 치수는 --kc에서 파생되므로
+           이 값 하나만 바꾸면 라운드·테두리·여백·간격이 같이 따라감 */
+        table.control-table.control-table-basic .kc-group {
+            --kc: 40px;
         }
 
         /* 워드마크 키캡(ENTER/SPACE/ESC/SHIFT)은 글자 폭만큼 늘어나야 함.
@@ -777,7 +805,6 @@
            정사각형에 갇히면, 안의 가로로 긴 SVG가 눌려 작아짐 */
         table.control-table.control-table-basic .kc-text {
             width: auto;
-            padding: 0 12px;
         }
 
         table.control-table.control-table-basic td:last-child {
@@ -790,11 +817,17 @@
            button)의 "눌린 버튼" 셰이딩(안쪽 아래 그림자 + 바깥 그림자)을
            흰 배경용 밝은 톤으로 옮겨왔음. 배경(크롬)과 글리프(아이콘)를
            분리해서, 크롬은 여기 .kc가 담당하고 안의 <svg>는 도형만 그림 */
+        /* 키캡 크기는 --kc 하나에서 파생 — 좁은 화면에서 줄일 때
+           라운드·아래 테두리·좌우 여백·간격이 같은 비율로 따라오게 함.
+           비율은 기존 28px 기준값 그대로: radius 8/28, border-bottom 4/28,
+           .kc-text 좌우 여백 8/28, 그룹 간격 6/28 */
         .kc-group {
+            --kc: 28px;
             display: inline-flex;
             align-items: center;
-            flex-wrap: wrap;
-            gap: 6px;
+            /* 줄바꿈 대신 --kc를 줄여 한 줄 유지 (아래 브레이크포인트) */
+            flex-wrap: nowrap;
+            gap: calc(var(--kc) * 0.214);
         }
 
         /* 거처(사이트 루트 style.css #action-btn/#esc-btn)랑 동일한 크롬 —
@@ -807,12 +840,13 @@
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            height: 28px;
-            width: 28px;
-            border-radius: 8px;
+            flex: 0 0 auto;
+            height: var(--kc);
+            width: var(--kc);
+            border-radius: calc(var(--kc) * 0.286);
             background: #f5f5f5;
             border: 1px solid #d3d3d3;
-            border-bottom: 4px solid #bebebe;
+            border-bottom: calc(var(--kc) * 0.143) solid #bebebe;
             color: #000;
             /* SVG 글리프 쪽 fill="currentColor"가 이 color 값을 그대로 씀 */
         }
@@ -834,7 +868,7 @@
         /* Enter/Space/ESC/Shift처럼 폭이 글자수만큼 늘어나는 워드마크 키캡 */
         .kc-text {
             width: auto;
-            padding: 0 8px;
+            padding: 0 calc(var(--kc) * 0.286);
         }
 
         /* 캠프 모드 스탯 용어, 전투 커맨드 설명처럼 "용어 — 설명" 쌍이
@@ -938,12 +972,27 @@
 
         /* -------------------- 오마케: 크레딧 -------------------- */
 
+        /* 특별부록 — 원본(27쪽)은 페이지 전체가 연녹색 워시. 웹에선 배경을
+           깔면 본문 흐름이 끊겨서, 그 색(#bcc69f 실측)을 외곽선으로만 씀.
+           밝기가 기존 테두리(#ccc)와 비슷해 다른 박스들과 무게가 맞음 */
+        .extra-box {
+            border: 1px solid #bcc69f;
+            padding: 16px 18px;
+            margin-bottom: 30px;
+        }
+
+        .extra-box > :last-child {
+            margin-bottom: 0;
+        }
+
+        /* 크레딧 — 원본(28쪽)의 종이색(#eae6d1 실측)을 배경으로. 원본에도
+           테두리는 없음 */
         .credits-block {
             padding: 20px;
             /* 명단이라 본문만큼 클 필요가 없음 — 안쪽 두 열이 같이 줄어들어
                역할(0.8em)/이름 사이 크기 차는 그대로 유지됨 */
             font-size: 0.9em;
-            /* TODO: background-image: url('img/credits_bg.png'); 로 교체 예정 */
+            background: #eae6d1;
         }
 
         /* 원본(PDF 28쪽)처럼 역할 열 + 이름 열 2단 표 — 역할이 같으면
@@ -957,13 +1006,19 @@
 
         .credits-block td {
             padding: 4px 10px;
-            vertical-align: top;
+            /* 역할(0.8em)과 이름(1em)이 크기가 달라서 top 정렬로는 줄 상자
+               위쪽만 맞고 글자 아랫선이 6px 어긋났음. baseline으로 두 열의
+               글자 기준선을 맞춤(1px). rowspan 셀은 자기 구간 첫 줄의
+               기준선에 붙으므로 역할 라벨 위치도 그대로 유지됨 */
+            vertical-align: baseline;
         }
 
         .credits-block .credit-role {
             width: 35%;
             font-size: 0.8em;
-            color: var(--text-muted, #767676);
+            /* 크림색 배경(#eae6d1) 위라 --text-muted(#767676)는 3.62:1로
+               본문 기준에 미달. 한 단계 진한 --text-secondary로 6.74:1 확보 */
+            color: var(--text-secondary, #4d4d4d);
         }
 
         .credits-block .credit-name {
@@ -1034,6 +1089,40 @@
                 font-size: 14px;
                 padding: 0 5px;
             }
+        }
+
+        /* 좁은 화면에서 키캡 줄바꿈 방지 — 개행 대신 --kc를 줄여 한 줄 유지.
+           기준: 각 폭에서 가장 넓은 그룹(일반 표 Enter+Space, 기본 조작
+           표 Enter+Space)이 칸 안에 들어가는 최대 크기를 실측해서 잡음.
+           .kc의 모든 치수가 --kc 파생이라 아이콘·라운드·테두리도 같이 줄어듦 */
+        @media (max-width: 405px) {
+            .kc-group { --kc: 26px; }
+            table.control-table.control-table-basic { --arrow: 43px; }
+            table.control-table.control-table-basic .kc-group { --kc: 36px; }
+        }
+
+        @media (max-width: 380px) {
+            .kc-group { --kc: 24px; }
+            table.control-table.control-table-basic { --arrow: 39px; }
+            table.control-table.control-table-basic .kc-group { --kc: 32px; }
+        }
+
+        @media (max-width: 365px) {
+            .kc-group { --kc: 22px; }
+            table.control-table.control-table-basic { --arrow: 36px; }
+            table.control-table.control-table-basic .kc-group { --kc: 30px; }
+        }
+
+        @media (max-width: 345px) {
+            .kc-group { --kc: 20px; }
+            table.control-table.control-table-basic { --arrow: 33px; }
+            table.control-table.control-table-basic .kc-group { --kc: 27px; }
+        }
+
+        @media (max-width: 325px) {
+            .kc-group { --kc: 18px; }
+            table.control-table.control-table-basic { --arrow: 29px; }
+            table.control-table.control-table-basic .kc-group { --kc: 24px; }
         }
     </style>
 </head>
@@ -1996,20 +2085,22 @@
                 <!-- 특별부록 & 클리어 팁 (PDF 27쪽) -->
                 <div class="content-block">
                     <h3>특별부록: 스마슈 변장 세트 사용법</h3>
-                    <div class="screenshot-frame">
-                        <!-- PDF 27쪽 코스프레 사진 -->
-                        <!-- <img src="img/extra_cosplay.png" alt="스마슈 변장 세트 사용 예"> -->
-                    </div>
-                    <p>코를 붙이고, 눈썹과 귀를 오려서 붙이면 당신도 순식간에 스마슈로 변신(웃음)! 친구들과 즐겁게 놀아보세요.</p>
-                    <p class="figure-caption">← 사용 예: 성에서 닌자 놀이. (성 관계자분들도 멋있다고 대호평!)</p>
-                    <p class="figure-caption">※ 닌자복, 칼, 머플러, 그리고 키타노 후본(디렉터)은 부록에 포함되지 않습니다.</p>
+                    <div class="extra-box">
+                        <div class="screenshot-frame">
+                            <!-- PDF 27쪽 코스프레 사진 -->
+                            <!-- <img src="img/extra_cosplay.png" alt="스마슈 변장 세트 사용 예"> -->
+                        </div>
+                        <p>코를 붙이고, 눈썹과 귀를 오려서 붙이면 당신도 순식간에 스마슈로 변신(웃음)! 친구들과 즐겁게 놀아보세요.</p>
+                        <p class="figure-caption">← 사용 예: 성에서 닌자 놀이. (성 관계자분들도 멋있다고 대호평!)</p>
+                        <p class="figure-caption">※ 닌자복, 칼, 머플러, 그리고 키타노 후본(디렉터)은 부록에 포함되지 않습니다.</p>
 
-                    <h4>환세희담 클리어로 가는 길</h4>
-                    <ol>
-                        <li>던전 안에는 HP 회복이나 세이브를 담당하는 특이한 캐릭터가 있습니다. 그를 찾아내서, 모험을 조금이라도 편하게 만드세요.</li>
-                        <li>모험 도중, 어떤 물건을 훔친 도적을 찾아야 하는 상황이 옵니다. 이때는 어드벤처 게임을 하는 느낌으로 플레이해서, 범인을 밝혀내세요.</li>
-                        <li>세상에는 그 방면에 정통한 전문가가 있는 법입니다. 스스로 어떻게 할 수 없다고 느껴질 때는, 그 전문가를 찾아가 도움을 청하세요.</li>
-                    </ol>
+                        <h4>환세희담 클리어로 가는 길</h4>
+                        <ol>
+                            <li>던전 안에는 HP 회복이나 세이브를 담당하는 특이한 캐릭터가 있습니다. 그를 찾아내서, 모험을 조금이라도 편하게 만드세요.</li>
+                            <li>모험 도중, 어떤 물건을 훔친 도적을 찾아야 하는 상황이 옵니다. 이때는 어드벤처 게임을 하는 느낌으로 플레이해서, 범인을 밝혀내세요.</li>
+                            <li>세상에는 그 방면에 정통한 전문가가 있는 법입니다. 스스로 어떻게 할 수 없다고 느껴질 때는, 그 전문가를 찾아가 도움을 청하세요.</li>
+                        </ol>
+                    </div>
                 </div>
 
                 <!-- 크레딧 (PDF 28쪽 STAFF 롤) -->
@@ -2123,7 +2214,7 @@
 
     <div class="manual-info">
         <p>
-            이 문서는 「환세희담(幻世喜譚)」 취급설명서의 내용을 한국어로 옮기고, 이미지와 기타 자료 등을 추가해 만들어졌습니다.
+            이 문서는 「환세희담(<span class="jp-inline">幻世喜譚</span>)」 취급설명서의 내용을 한국어로 옮기고, 이미지와 기타 자료 등을 추가해 만들어졌습니다.
         </p>
     </div>
 
@@ -2189,8 +2280,12 @@
 
             function updateWidgetVisibility() {
                 ticking = false;
-                var pastPrologue = boundary.getBoundingClientRect().top <= scrollRoot.getBoundingClientRect().top;
-                widget.classList.toggle('is-hidden', pastPrologue);
+                // 캐릭터 소개 섹션이 화면에 '조금이라도' 들어오면 숨김.
+                // 섹션 위쪽 끝이 보이는 영역의 아래 끝에 닿는 순간이 기준
+                // (예전엔 섹션이 화면 맨 위까지 올라와야 숨겨졌음)
+                var root = scrollRoot.getBoundingClientRect();
+                var entered = boundary.getBoundingClientRect().top <= root.bottom;
+                widget.classList.toggle('is-hidden', entered);
             }
 
             updateWidgetVisibility();
