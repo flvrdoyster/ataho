@@ -5,22 +5,22 @@ window.DASHBOARD_DATA['blog'] = {
  "baseline": {
   "perUser": {
    "max": 7.714285714285714,
-   "median": 2.416666666666667,
+   "median": 2.3333333333333335,
    "min": 1.0,
-   "n": 24,
-   "q1": 2.03125,
-   "q3": 4.492424242424242,
-   "rank": 2,
-   "value": 7.0,
-   "vsMedian": 189.65517241379305,
-   "where": "high"
+   "n": 25,
+   "q1": 2.0,
+   "q3": 4.4393939393939394,
+   "rank": 24,
+   "value": 1.0,
+   "vsMedian": -57.14285714285715,
+   "where": "low"
   },
   "sessions": {
    "max": 18,
-   "median": 10.0,
+   "median": 10,
    "min": 2,
-   "n": 24,
-   "q1": 6.5,
+   "n": 25,
+   "q1": 6.0,
    "q3": 13.0,
    "rank": 23,
    "value": 4,
@@ -29,27 +29,27 @@ window.DASHBOARD_DATA['blog'] = {
   },
   "users": {
    "max": 11,
-   "median": 6.5,
+   "median": 6,
    "min": 2,
-   "n": 24,
-   "q1": 4.25,
+   "n": 25,
+   "q1": 3.5,
    "q3": 9.0,
-   "rank": 22,
-   "value": 2,
-   "vsMedian": -69.23076923076923,
+   "rank": 20,
+   "value": 3,
+   "vsMedian": -50.0,
    "where": "low"
   },
   "views": {
    "max": 54,
-   "median": 18.5,
+   "median": 17,
    "min": 2,
-   "n": 24,
-   "q1": 9.75,
-   "q3": 31.25,
-   "rank": 17,
-   "value": 14,
-   "vsMedian": -24.324324324324326,
-   "where": "usual"
+   "n": 25,
+   "q1": 9.0,
+   "q3": 29.5,
+   "rank": 24,
+   "value": 3,
+   "vsMedian": -82.35294117647058,
+   "where": "low"
   }
  },
  "confirmed": false,
@@ -196,7 +196,13 @@ window.DASHBOARD_DATA['blog'] = {
    "date": "2026-09-01",
    "sessions": 4,
    "users": 2,
-   "views": 14
+   "views": 11
+  },
+  {
+   "date": "2026-09-02",
+   "sessions": 4,
+   "users": 3,
+   "views": 3
   }
  ],
  "history": {
@@ -4841,22 +4847,22 @@ window.DASHBOARD_DATA['blog'] = {
    "baseline": {
     "perUser": {
      "max": 7.714285714285714,
-     "median": 2.416666666666667,
+     "median": 2.3333333333333335,
      "min": 1.0,
-     "n": 24,
-     "q1": 2.03125,
-     "q3": 4.492424242424242,
-     "rank": 2,
-     "value": 7.0,
-     "vsMedian": 189.65517241379305,
-     "where": "high"
+     "n": 25,
+     "q1": 2.0,
+     "q3": 4.4393939393939394,
+     "rank": 24,
+     "value": 1.0,
+     "vsMedian": -57.14285714285715,
+     "where": "low"
     },
     "sessions": {
      "max": 18,
-     "median": 10.0,
+     "median": 10,
      "min": 2,
-     "n": 24,
-     "q1": 6.5,
+     "n": 25,
+     "q1": 6.0,
      "q3": 13.0,
      "rank": 23,
      "value": 4,
@@ -4865,45 +4871,52 @@ window.DASHBOARD_DATA['blog'] = {
     },
     "users": {
      "max": 11,
-     "median": 6.5,
+     "median": 6,
      "min": 2,
-     "n": 24,
-     "q1": 4.25,
+     "n": 25,
+     "q1": 3.5,
      "q3": 9.0,
-     "rank": 22,
+     "rank": 23,
      "value": 2,
-     "vsMedian": -69.23076923076923,
+     "vsMedian": -66.66666666666666,
      "where": "low"
     },
     "views": {
      "max": 54,
-     "median": 18.5,
+     "median": 17,
      "min": 2,
-     "n": 24,
-     "q1": 9.75,
-     "q3": 31.25,
-     "rank": 17,
-     "value": 14,
-     "vsMedian": -24.324324324324326,
+     "n": 25,
+     "q1": 9.0,
+     "q3": 29.5,
+     "rank": 18,
+     "value": 11,
+     "vsMedian": -35.294117647058826,
      "where": "usual"
     }
    },
-   "confirmed": false,
+   "confirmed": true,
    "insights": [
     {
-     "text": "어제 한 사람이 평균 7.0장을 봤습니다 — 평소 2.4장이니 깊게 본 날입니다(28일 최대 7.7장).",
+     "text": "09.01 한 사람이 평균 1.0장을 봤습니다 — 평소 2.3장이니 얕게 본 날입니다(28일 최소 1.0장).",
      "tone": "flat"
     },
     {
-     "text": "최근 28일 동안 없던 유입원이 어제 생겼습니다 — pc98.atah.io.",
+     "text": "최근 28일 동안 없던 유입원이 09.01에 생겼습니다 — pc98.atah.io.",
      "tone": "up"
     },
     {
-     "text": "어제 방문자 2명 — 평소(6명)보다 적은 편으로, 24일 중 22번째입니다.",
+     "text": "09.01 방문자 2명 — 평소(6명)보다 적은 편으로, 25일 중 23번째입니다.",
      "tone": "down"
     }
    ],
-   "longest": null,
+   "longest": {
+    "device": "모바일",
+    "engagementSeconds": 118,
+    "landing": "/",
+    "pageViews": 5,
+    "seconds": 209,
+    "source": "직접 방문"
+   },
    "ydayHours": [
     0,
     0,
@@ -4934,27 +4947,17 @@ window.DASHBOARD_DATA['blog'] = {
     {
      "host": "",
      "name": "OYSTER BAY",
-     "priorAvg": 3.5217391304347827,
+     "priorAvg": 3.375,
      "section": "",
      "spike": false,
      "title": "",
      "users": 2,
-     "views": 7
+     "views": 6
     },
     {
      "host": "",
      "name": "PC98 환세 시리즈 한글화",
-     "priorAvg": 5.6521739130434785,
-     "section": "",
-     "spike": false,
-     "title": "",
-     "users": 1,
-     "views": 3
-    },
-    {
-     "host": "",
-     "name": "환세취호전 웹 에뮬레이터",
-     "priorAvg": 1.2608695652173914,
+     "priorAvg": 5.416666666666667,
      "section": "",
      "spike": false,
      "title": "",
@@ -4964,7 +4967,17 @@ window.DASHBOARD_DATA['blog'] = {
     {
      "host": "",
      "name": "환세취호전 스태프 인터뷰 (from 일본판 DS 14호)",
-     "priorAvg": 0.34782608695652173,
+     "priorAvg": 0.3333333333333333,
+     "section": "",
+     "spike": false,
+     "title": "",
+     "users": 1,
+     "views": 1
+    },
+    {
+     "host": "",
+     "name": "환세취호전 웹 에뮬레이터",
+     "priorAvg": 1.2083333333333333,
      "section": "",
      "spike": false,
      "title": "",
@@ -4983,27 +4996,164 @@ window.DASHBOARD_DATA['blog'] = {
      "sessions": 2
     }
    ],
-   "ydayUnresolved": 2,
+   "ydayUnresolved": 0,
    "yesterday": {
     "date": "2026-09-01",
     "newUsers": 3,
     "sessions": 4,
     "users": 2,
-    "views": 14
+    "views": 11
+   }
+  },
+  "2026-09-02": {
+   "baseline": {
+    "perUser": {
+     "max": 7.714285714285714,
+     "median": 2.3333333333333335,
+     "min": 1.0,
+     "n": 25,
+     "q1": 2.0,
+     "q3": 4.4393939393939394,
+     "rank": 24,
+     "value": 1.0,
+     "vsMedian": -57.14285714285715,
+     "where": "low"
+    },
+    "sessions": {
+     "max": 18,
+     "median": 10,
+     "min": 2,
+     "n": 25,
+     "q1": 6.0,
+     "q3": 13.0,
+     "rank": 23,
+     "value": 4,
+     "vsMedian": -60.0,
+     "where": "low"
+    },
+    "users": {
+     "max": 11,
+     "median": 6,
+     "min": 2,
+     "n": 25,
+     "q1": 3.5,
+     "q3": 9.0,
+     "rank": 20,
+     "value": 3,
+     "vsMedian": -50.0,
+     "where": "low"
+    },
+    "views": {
+     "max": 54,
+     "median": 17,
+     "min": 2,
+     "n": 25,
+     "q1": 9.0,
+     "q3": 29.5,
+     "rank": 24,
+     "value": 3,
+     "vsMedian": -82.35294117647058,
+     "where": "low"
+    }
+   },
+   "confirmed": false,
+   "insights": [
+    {
+     "text": "어제 한 사람이 평균 1.0장을 봤습니다 — 평소 2.3장이니 얕게 본 날입니다(28일 최소 1.0장).",
+     "tone": "flat"
+    },
+    {
+     "text": "어제 방문자 3명 — 평소(6명)보다 적은 편으로, 25일 중 20번째입니다.",
+     "tone": "down"
+    }
+   ],
+   "longest": null,
+   "ydayHours": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    1,
+    1,
+    0,
+    0,
+    2,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   "ydayPages": [
+    {
+     "host": "",
+     "name": "PC98 환세 시리즈 한글화",
+     "priorAvg": 5.541666666666667,
+     "section": "",
+     "spike": false,
+     "title": "",
+     "users": 1,
+     "views": 2
+    },
+    {
+     "host": "",
+     "name": "환세패유기 소개",
+     "priorAvg": 0.8333333333333334,
+     "section": "",
+     "spike": false,
+     "title": "",
+     "users": 1,
+     "views": 1
+    },
+    {
+     "host": "",
+     "name": "태그 목록",
+     "priorAvg": 0.0,
+     "section": "",
+     "spike": false,
+     "title": "",
+     "users": 1,
+     "views": 0
+    }
+   ],
+   "ydaySites": [],
+   "ydaySources": [
+    {
+     "name": "직접 방문",
+     "sessions": 2
+    },
+    {
+     "name": "google",
+     "sessions": 1
+    }
+   ],
+   "ydayUnresolved": 2,
+   "yesterday": {
+    "date": "2026-09-02",
+    "newUsers": 2,
+    "sessions": 4,
+    "users": 3,
+    "views": 3
    }
   }
  },
  "insights": [
   {
-   "text": "어제 한 사람이 평균 7.0장을 봤습니다 — 평소 2.4장이니 깊게 본 날입니다(28일 최대 7.7장).",
+   "text": "어제 한 사람이 평균 1.0장을 봤습니다 — 평소 2.3장이니 얕게 본 날입니다(28일 최소 1.0장).",
    "tone": "flat"
   },
   {
-   "text": "최근 28일 동안 없던 유입원이 어제 생겼습니다 — pc98.atah.io.",
-   "tone": "up"
-  },
-  {
-   "text": "어제 방문자 2명 — 평소(6명)보다 적은 편으로, 24일 중 22번째입니다.",
+   "text": "어제 방문자 3명 — 평소(6명)보다 적은 편으로, 25일 중 20번째입니다.",
    "tone": "down"
   }
  ],
@@ -5014,13 +5164,13 @@ window.DASHBOARD_DATA['blog'] = {
   "propertyId": "549191220",
   "settledDays": 7,
   "trendDays": 28,
-  "updatedAt": "2026-09-02 08:43"
+  "updatedAt": "2026-09-03 08:45"
  },
  "settled": {
-  "avgDuration": 296.8537015,
-  "engagementRate": 0.4852941176470588,
+  "avgDuration": 120.85464537288135,
+  "engagementRate": 0.4406779661016949,
   "from": "8daysAgo",
-  "sessions": 68,
+  "sessions": 59,
   "to": "2daysAgo"
  },
  "ydayHours": [
@@ -5033,13 +5183,13 @@ window.DASHBOARD_DATA['blog'] = {
   0,
   0,
   0,
-  3,
   0,
   0,
   1,
+  1,
   0,
   0,
-  0,
+  2,
   0,
   0,
   0,
@@ -5052,43 +5202,33 @@ window.DASHBOARD_DATA['blog'] = {
  "ydayPages": [
   {
    "host": "",
-   "name": "OYSTER BAY",
-   "priorAvg": 3.5217391304347827,
-   "section": "",
-   "spike": false,
-   "title": "",
-   "users": 2,
-   "views": 7
-  },
-  {
-   "host": "",
    "name": "PC98 환세 시리즈 한글화",
-   "priorAvg": 5.6521739130434785,
+   "priorAvg": 5.541666666666667,
    "section": "",
    "spike": false,
    "title": "",
    "users": 1,
-   "views": 3
+   "views": 2
   },
   {
    "host": "",
-   "name": "환세취호전 웹 에뮬레이터",
-   "priorAvg": 1.2608695652173914,
-   "section": "",
-   "spike": false,
-   "title": "",
-   "users": 1,
-   "views": 3
-  },
-  {
-   "host": "",
-   "name": "환세취호전 스태프 인터뷰 (from 일본판 DS 14호)",
-   "priorAvg": 0.34782608695652173,
+   "name": "환세패유기 소개",
+   "priorAvg": 0.8333333333333334,
    "section": "",
    "spike": false,
    "title": "",
    "users": 1,
    "views": 1
+  },
+  {
+   "host": "",
+   "name": "태그 목록",
+   "priorAvg": 0.0,
+   "section": "",
+   "spike": false,
+   "title": "",
+   "users": 1,
+   "views": 0
   }
  ],
  "ydaySites": [],
@@ -5098,16 +5238,16 @@ window.DASHBOARD_DATA['blog'] = {
    "sessions": 2
   },
   {
-   "name": "pc98.atah.io",
-   "sessions": 2
+   "name": "google",
+   "sessions": 1
   }
  ],
  "ydayUnresolved": 2,
  "yesterday": {
-  "date": "2026-09-01",
-  "newUsers": 3,
+  "date": "2026-09-02",
+  "newUsers": 2,
   "sessions": 4,
-  "users": 2,
-  "views": 14
+  "users": 3,
+  "views": 3
  }
 };
