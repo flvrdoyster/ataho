@@ -5,61 +5,55 @@ window.DASHBOARD_DATA['ga4'] = {
  "baseline": {
   "perUser": {
    "max": 7.285714285714286,
-   "median": 3.038095238095238,
+   "median": 3.158385093167702,
    "min": 1.6842105263157894,
    "n": 28,
-   "q1": 2.289285714285714,
-   "q3": 3.696428571428571,
-   "rank": 27,
-   "value": 1.8125,
-   "vsMedian": -40.340909090909086,
-   "where": "low"
+   "q1": 2.3249999999999997,
+   "q3": 3.792207792207792,
+   "rank": 6,
+   "value": 4.0,
+   "vsMedian": 26.647000983284165,
+   "where": "high"
   },
   "sessions": {
    "max": 36,
-   "median": 22.0,
+   "median": 22.5,
    "min": 10,
    "n": 28,
    "q1": 17.5,
-   "q3": 24.0,
-   "rank": 10,
-   "value": 23,
-   "vsMedian": 4.545454545454546,
-   "where": "usual"
+   "q3": 24.75,
+   "rank": 5,
+   "value": 26,
+   "vsMedian": 15.555555555555555,
+   "where": "high"
   },
   "users": {
    "max": 23,
    "median": 14.0,
    "min": 7,
    "n": 28,
-   "q1": 11.25,
+   "q1": 11.0,
    "q3": 16.0,
-   "rank": 7,
-   "value": 16,
-   "vsMedian": 14.285714285714285,
-   "where": "usual"
+   "rank": 26,
+   "value": 9,
+   "vsMedian": -35.714285714285715,
+   "where": "low"
   },
   "views": {
    "max": 85,
    "median": 44.0,
    "min": 19,
    "n": 28,
-   "q1": 32.5,
+   "q1": 34.0,
    "q3": 51.75,
-   "rank": 24,
-   "value": 29,
-   "vsMedian": -34.090909090909086,
-   "where": "low"
+   "rank": 18,
+   "value": 36,
+   "vsMedian": -18.181818181818183,
+   "where": "usual"
   }
  },
  "confirmed": false,
  "daily": [
-  {
-   "date": "2026-08-04",
-   "sessions": 20,
-   "users": 14,
-   "views": 32
-  },
   {
    "date": "2026-08-05",
    "sessions": 27,
@@ -220,237 +214,16 @@ window.DASHBOARD_DATA['ga4'] = {
    "date": "2026-08-31",
    "sessions": 23,
    "users": 16,
-   "views": 29
+   "views": 31
+  },
+  {
+   "date": "2026-09-01",
+   "sessions": 26,
+   "users": 9,
+   "views": 36
   }
  ],
  "history": {
-  "2026-08-04": {
-   "baseline": {
-    "perUser": {
-     "max": 7.285714285714286,
-     "median": 2.8825910931174086,
-     "min": 1.4285714285714286,
-     "n": 28,
-     "q1": 2.308333333333333,
-     "q3": 3.293269230769231,
-     "rank": 1,
-     "value": 7.285714285714286,
-     "vsMedian": 152.74879614767258,
-     "where": "high"
-    },
-    "sessions": {
-     "max": 36,
-     "median": 22.5,
-     "min": 8,
-     "n": 28,
-     "q1": 16.0,
-     "q3": 26.0,
-     "rank": 17,
-     "value": 20,
-     "vsMedian": -11.11111111111111,
-     "where": "usual"
-    },
-    "users": {
-     "max": 25,
-     "median": 15.0,
-     "min": 7,
-     "n": 28,
-     "q1": 13.0,
-     "q3": 19.0,
-     "rank": 17,
-     "value": 14,
-     "vsMedian": -6.666666666666667,
-     "where": "usual"
-    },
-    "views": {
-     "max": 100,
-     "median": 43.5,
-     "min": 10,
-     "n": 28,
-     "q1": 32.25,
-     "q3": 53.5,
-     "rank": 22,
-     "value": 32,
-     "vsMedian": -26.436781609195403,
-     "where": "low"
-    }
-   },
-   "confirmed": true,
-   "insights": [
-    {
-     "text": "환세쾌도전이 08.04 7회 — 평소 하루 3.0회 보던 페이지라 2.3배로 뛰었습니다. 나머지 4곳은 평소보다 조용했습니다.",
-     "tone": "up"
-    },
-    {
-     "text": "08.04 한 사람이 평균 7.3장을 봤습니다 — 평소 2.9장이니 깊게 본 날입니다(28일 최대 7.3장).",
-     "tone": "flat"
-    },
-    {
-     "text": "08.04 조회 32회 가운데 19회(59%)가 재방문 쪽입니다 — 5명이 1인당 4장씩 봤습니다(신규는 1.4장).",
-     "tone": "flat"
-    }
-   ],
-   "longest": {
-    "device": "모바일",
-    "engagementSeconds": 640,
-    "landing": "/torimono.html",
-    "pageViews": 3,
-    "seconds": 1784,
-    "source": "namu.wiki"
-   },
-   "ydayHours": [
-    1,
-    0,
-    1,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    1,
-    0,
-    0,
-    1,
-    0,
-    1,
-    1,
-    2,
-    3,
-    1,
-    1,
-    1,
-    2,
-    2,
-    3
-   ],
-   "ydayPages": [
-    {
-     "host": "pc98.atah.io",
-     "name": "/kaitou.html",
-     "priorAvg": 3.037037037037037,
-     "section": "",
-     "spike": true,
-     "title": "환세쾌도전",
-     "users": 3,
-     "views": 7
-    },
-    {
-     "host": "pc98.atah.io",
-     "name": "/hukyou.html",
-     "priorAvg": 5.2592592592592595,
-     "section": "",
-     "spike": false,
-     "title": "환세풍광전",
-     "users": 5,
-     "views": 6
-    },
-    {
-     "host": "pc98.atah.io",
-     "name": "/kitan.html",
-     "priorAvg": 7.814814814814815,
-     "section": "",
-     "spike": false,
-     "title": "환세희담",
-     "users": 5,
-     "views": 5
-    },
-    {
-     "host": "pc98.atah.io",
-     "name": "/torimono.html",
-     "priorAvg": 4.111111111111111,
-     "section": "",
-     "spike": false,
-     "title": "환세포물장",
-     "users": 3,
-     "views": 5
-    },
-    {
-     "host": "atah.io",
-     "name": "/sweep/index.html",
-     "priorAvg": 3.5925925925925926,
-     "section": "미니게임 · 술창고 청소",
-     "spike": false,
-     "title": "술창고 청소",
-     "users": 3,
-     "views": 3
-    },
-    {
-     "host": "suiko.atah.io",
-     "name": "/kr.html",
-     "priorAvg": 4.185185185185185,
-     "section": "",
-     "spike": false,
-     "title": "환세취호전",
-     "users": 2,
-     "views": 3
-    },
-    {
-     "host": "pc98.atah.io",
-     "name": "/",
-     "priorAvg": 3.5555555555555554,
-     "section": "",
-     "spike": false,
-     "title": "PC98 웹 에뮬레이터",
-     "users": 2,
-     "views": 2
-    },
-    {
-     "host": "suiko.atah.io",
-     "name": "/jp.html",
-     "priorAvg": 0.037037037037037035,
-     "section": "",
-     "spike": false,
-     "title": "환세취호전",
-     "users": 1,
-     "views": 1
-    }
-   ],
-   "ydaySites": [
-    {
-     "name": "pc98.atah.io",
-     "views": 25
-    },
-    {
-     "name": "suiko.atah.io",
-     "views": 4
-    },
-    {
-     "name": "atah.io",
-     "views": 3
-    }
-   ],
-   "ydaySources": [
-    {
-     "name": "namu.wiki",
-     "sessions": 10
-    },
-    {
-     "name": "직접 방문",
-     "sessions": 4
-    },
-    {
-     "name": "oysterbay.tistory.com",
-     "sessions": 4
-    },
-    {
-     "name": "cafe.naver.com",
-     "sessions": 1
-    },
-    {
-     "name": "naver",
-     "sessions": 1
-    }
-   ],
-   "ydayUnresolved": 0,
-   "yesterday": {
-    "date": "2026-08-04",
-    "newUsers": 9,
-    "sessions": 20,
-    "users": 14,
-    "views": 32
-   }
-  },
   "2026-08-05": {
    "baseline": {
     "perUser": {
@@ -6641,26 +6414,26 @@ window.DASHBOARD_DATA['ga4'] = {
    "baseline": {
     "perUser": {
      "max": 7.285714285714286,
-     "median": 3.038095238095238,
+     "median": 3.158385093167702,
      "min": 1.6842105263157894,
      "n": 28,
-     "q1": 2.289285714285714,
-     "q3": 3.696428571428571,
-     "rank": 27,
-     "value": 1.8125,
-     "vsMedian": -40.340909090909086,
-     "where": "low"
+     "q1": 2.3249999999999997,
+     "q3": 3.792207792207792,
+     "rank": 6,
+     "value": 4.0,
+     "vsMedian": 26.647000983284165,
+     "where": "high"
     },
     "sessions": {
      "max": 36,
-     "median": 22.0,
+     "median": 22.5,
      "min": 10,
      "n": 28,
      "q1": 17.5,
-     "q3": 24.0,
-     "rank": 10,
+     "q3": 24.75,
+     "rank": 11,
      "value": 23,
-     "vsMedian": 4.545454545454546,
+     "vsMedian": 2.2222222222222223,
      "where": "usual"
     },
     "users": {
@@ -6668,7 +6441,7 @@ window.DASHBOARD_DATA['ga4'] = {
      "median": 14.0,
      "min": 7,
      "n": 28,
-     "q1": 11.25,
+     "q1": 11.0,
      "q3": 16.0,
      "rank": 7,
      "value": 16,
@@ -6680,22 +6453,18 @@ window.DASHBOARD_DATA['ga4'] = {
      "median": 44.0,
      "min": 19,
      "n": 28,
-     "q1": 32.5,
+     "q1": 34.0,
      "q3": 51.75,
      "rank": 24,
-     "value": 29,
-     "vsMedian": -34.090909090909086,
+     "value": 31,
+     "vsMedian": -29.545454545454547,
      "where": "low"
     }
    },
-   "confirmed": false,
+   "confirmed": true,
    "insights": [
     {
-     "text": "어제 한 사람이 평균 1.8장을 봤습니다 — 평소 3.0장이니 얕게 본 날입니다(28일 최소 1.7장).",
-     "tone": "flat"
-    },
-    {
-     "text": "어제 조회 29회 가운데 8회(28%)가 재방문 쪽입니다 — 2명이 1인당 4장씩 봤습니다(신규는 1.1장).",
+     "text": "08.31 한 사람이 평균 4.0장을 봤습니다 — 평소 3.2장이니 깊게 본 날입니다(28일 최대 7.3장).",
      "tone": "flat"
     }
    ],
@@ -6735,7 +6504,7 @@ window.DASHBOARD_DATA['ga4'] = {
      "spike": false,
      "title": "환세희담",
      "users": 11,
-     "views": 13
+     "views": 15
     },
     {
      "host": "suiko.atah.io",
@@ -6801,7 +6570,7 @@ window.DASHBOARD_DATA['ga4'] = {
    "ydaySites": [
     {
      "name": "pc98.atah.io",
-     "views": 21
+     "views": 23
     },
     {
      "name": "suiko.atah.io",
@@ -6834,24 +6603,244 @@ window.DASHBOARD_DATA['ga4'] = {
      "sessions": 1
     }
    ],
-   "ydayUnresolved": 15,
+   "ydayUnresolved": 0,
    "yesterday": {
     "date": "2026-08-31",
-    "newUsers": 15,
+    "newUsers": 14,
     "sessions": 23,
     "users": 16,
-    "views": 29
+    "views": 31
+   }
+  },
+  "2026-09-01": {
+   "baseline": {
+    "perUser": {
+     "max": 7.285714285714286,
+     "median": 3.158385093167702,
+     "min": 1.6842105263157894,
+     "n": 28,
+     "q1": 2.3249999999999997,
+     "q3": 3.792207792207792,
+     "rank": 6,
+     "value": 4.0,
+     "vsMedian": 26.647000983284165,
+     "where": "high"
+    },
+    "sessions": {
+     "max": 36,
+     "median": 22.5,
+     "min": 10,
+     "n": 28,
+     "q1": 17.5,
+     "q3": 24.75,
+     "rank": 5,
+     "value": 26,
+     "vsMedian": 15.555555555555555,
+     "where": "high"
+    },
+    "users": {
+     "max": 23,
+     "median": 14.0,
+     "min": 7,
+     "n": 28,
+     "q1": 11.0,
+     "q3": 16.0,
+     "rank": 26,
+     "value": 9,
+     "vsMedian": -35.714285714285715,
+     "where": "low"
+    },
+    "views": {
+     "max": 85,
+     "median": 44.0,
+     "min": 19,
+     "n": 28,
+     "q1": 34.0,
+     "q3": 51.75,
+     "rank": 18,
+     "value": 36,
+     "vsMedian": -18.181818181818183,
+     "where": "usual"
+    }
+   },
+   "confirmed": false,
+   "insights": [
+    {
+     "text": "어제 한 사람이 평균 4.0장을 봤습니다 — 평소 3.2장이니 깊게 본 날입니다(28일 최대 7.3장).",
+     "tone": "flat"
+    },
+    {
+     "text": "어제 조회 36회 가운데 22회(61%)가 재방문 쪽입니다 — 4명이 1인당 6장씩 봤습니다(신규는 1.6장).",
+     "tone": "flat"
+    },
+    {
+     "text": "어제 방문자 9명 — 평소(14명)보다 적은 편으로, 28일 중 26번째입니다.",
+     "tone": "down"
+    }
+   ],
+   "longest": null,
+   "ydayHours": [
+    0,
+    0,
+    1,
+    0,
+    0,
+    0,
+    0,
+    0,
+    1,
+    3,
+    1,
+    0,
+    2,
+    1,
+    0,
+    2,
+    4,
+    4,
+    1,
+    3,
+    1,
+    1,
+    0,
+    2
+   ],
+   "ydayPages": [
+    {
+     "host": "pc98.atah.io",
+     "name": "/kitan.html",
+     "priorAvg": 9.518518518518519,
+     "section": "",
+     "spike": false,
+     "title": "환세희담",
+     "users": 5,
+     "views": 16
+    },
+    {
+     "host": "suiko.atah.io",
+     "name": "/kr.html",
+     "priorAvg": 6.814814814814815,
+     "section": "",
+     "spike": false,
+     "title": "환세취호전",
+     "users": 3,
+     "views": 9
+    },
+    {
+     "host": "atah.io",
+     "name": "/",
+     "priorAvg": 1.2222222222222223,
+     "section": "메인 (아타호의 거처)",
+     "spike": false,
+     "title": "아타호의 거처",
+     "users": 3,
+     "views": 4
+    },
+    {
+     "host": "atah.io",
+     "name": "/kitan_manual/",
+     "priorAvg": 0.0,
+     "section": "기타",
+     "spike": false,
+     "title": "환세희담 해설서",
+     "users": 1,
+     "views": 2
+    },
+    {
+     "host": "pc98.atah.io",
+     "name": "/",
+     "priorAvg": 3.111111111111111,
+     "section": "",
+     "spike": false,
+     "title": "PC98 웹 에뮬레이터",
+     "users": 2,
+     "views": 2
+    },
+    {
+     "host": "atah.io",
+     "name": "/haiyuki_manual/index.html",
+     "priorAvg": 2.259259259259259,
+     "section": "환세패유기 해설서",
+     "spike": false,
+     "title": "환세패유기 해설서",
+     "users": 1,
+     "views": 1
+    },
+    {
+     "host": "atah.io",
+     "name": "/kitan_manual/index.html",
+     "priorAvg": 0.0,
+     "section": "기타",
+     "spike": false,
+     "title": "환세희담 해설서",
+     "users": 1,
+     "views": 1
+    },
+    {
+     "host": "pc98.atah.io",
+     "name": "/kitan-opening.html",
+     "priorAvg": 1.1111111111111112,
+     "section": "",
+     "spike": false,
+     "title": "환세희담 오프닝",
+     "users": 1,
+     "views": 1
+    }
+   ],
+   "ydaySites": [
+    {
+     "name": "pc98.atah.io",
+     "views": 19
+    },
+    {
+     "name": "suiko.atah.io",
+     "views": 9
+    },
+    {
+     "name": "atah.io",
+     "views": 8
+    }
+   ],
+   "ydaySources": [
+    {
+     "name": "oysterbay.tistory.com",
+     "sessions": 10
+    },
+    {
+     "name": "namu.wiki",
+     "sessions": 7
+    },
+    {
+     "name": "직접 방문",
+     "sessions": 4
+    },
+    {
+     "name": "google",
+     "sessions": 2
+    }
+   ],
+   "ydayUnresolved": 15,
+   "yesterday": {
+    "date": "2026-09-01",
+    "newUsers": 5,
+    "sessions": 26,
+    "users": 9,
+    "views": 36
    }
   }
  },
  "insights": [
   {
-   "text": "어제 한 사람이 평균 1.8장을 봤습니다 — 평소 3.0장이니 얕게 본 날입니다(28일 최소 1.7장).",
+   "text": "어제 한 사람이 평균 4.0장을 봤습니다 — 평소 3.2장이니 깊게 본 날입니다(28일 최대 7.3장).",
    "tone": "flat"
   },
   {
-   "text": "어제 조회 29회 가운데 8회(28%)가 재방문 쪽입니다 — 2명이 1인당 4장씩 봤습니다(신규는 1.1장).",
+   "text": "어제 조회 36회 가운데 22회(61%)가 재방문 쪽입니다 — 4명이 1인당 6장씩 봤습니다(신규는 1.6장).",
    "tone": "flat"
+  },
+  {
+   "text": "어제 방문자 9명 — 평소(14명)보다 적은 편으로, 28일 중 26번째입니다.",
+   "tone": "down"
   }
  ],
  "longest": null,
@@ -6861,28 +6850,21 @@ window.DASHBOARD_DATA['ga4'] = {
   "propertyId": "516513119",
   "settledDays": 7,
   "trendDays": 28,
-  "updatedAt": "2026-09-01 09:56"
+  "updatedAt": "2026-09-02 08:43"
  },
  "settled": {
-  "avgDuration": 307.8176091937984,
-  "engagementRate": 0.5968992248062015,
+  "avgDuration": 289.3394773181818,
+  "engagementRate": 0.5833333333333334,
   "from": "8daysAgo",
-  "sessions": 129,
+  "sessions": 132,
   "to": "2daysAgo"
  },
  "ydayHours": [
-  1,
   0,
   0,
   1,
-  1,
   0,
   0,
-  1,
-  1,
-  1,
-  0,
-  1,
   0,
   0,
   0,
@@ -6890,77 +6872,94 @@ window.DASHBOARD_DATA['ga4'] = {
   3,
   1,
   0,
-  4,
-  3,
   2,
+  1,
+  0,
+  2,
+  4,
+  4,
+  1,
   3,
-  1
+  1,
+  1,
+  0,
+  2
  ],
  "ydayPages": [
   {
    "host": "pc98.atah.io",
    "name": "/kitan.html",
-   "priorAvg": 9.148148148148149,
+   "priorAvg": 9.518518518518519,
    "section": "",
    "spike": false,
    "title": "환세희담",
-   "users": 11,
-   "views": 13
+   "users": 5,
+   "views": 16
   },
   {
    "host": "suiko.atah.io",
    "name": "/kr.html",
-   "priorAvg": 6.703703703703703,
+   "priorAvg": 6.814814814814815,
    "section": "",
    "spike": false,
    "title": "환세취호전",
    "users": 3,
-   "views": 6
-  },
-  {
-   "host": "pc98.atah.io",
-   "name": "/",
-   "priorAvg": 3.074074074074074,
-   "section": "",
-   "spike": false,
-   "title": "PC98 웹 에뮬레이터",
-   "users": 3,
-   "views": 3
-  },
-  {
-   "host": "pc98.atah.io",
-   "name": "/torimono.html",
-   "priorAvg": 4.074074074074074,
-   "section": "",
-   "spike": false,
-   "title": "환세포물장",
-   "users": 2,
-   "views": 3
+   "views": 9
   },
   {
    "host": "atah.io",
    "name": "/",
-   "priorAvg": 1.1481481481481481,
+   "priorAvg": 1.2222222222222223,
    "section": "메인 (아타호의 거처)",
    "spike": false,
    "title": "아타호의 거처",
+   "users": 3,
+   "views": 4
+  },
+  {
+   "host": "atah.io",
+   "name": "/kitan_manual/",
+   "priorAvg": 0.0,
+   "section": "기타",
+   "spike": false,
+   "title": "환세희담 해설서",
    "users": 1,
    "views": 2
   },
   {
    "host": "pc98.atah.io",
-   "name": "/hukyou.html",
-   "priorAvg": 5.814814814814815,
+   "name": "/",
+   "priorAvg": 3.111111111111111,
    "section": "",
    "spike": false,
-   "title": "환세풍광전",
+   "title": "PC98 웹 에뮬레이터",
+   "users": 2,
+   "views": 2
+  },
+  {
+   "host": "atah.io",
+   "name": "/haiyuki_manual/index.html",
+   "priorAvg": 2.259259259259259,
+   "section": "환세패유기 해설서",
+   "spike": false,
+   "title": "환세패유기 해설서",
+   "users": 1,
+   "views": 1
+  },
+  {
+   "host": "atah.io",
+   "name": "/kitan_manual/index.html",
+   "priorAvg": 0.0,
+   "section": "기타",
+   "spike": false,
+   "title": "환세희담 해설서",
    "users": 1,
    "views": 1
   },
   {
    "host": "pc98.atah.io",
    "name": "/kitan-opening.html",
-   "priorAvg": 1.0740740740740742,
+   "priorAvg": 1.1111111111111112,
    "section": "",
    "spike": false,
    "title": "환세희담 오프닝",
@@ -6971,45 +6970,41 @@ window.DASHBOARD_DATA['ga4'] = {
  "ydaySites": [
   {
    "name": "pc98.atah.io",
-   "views": 21
+   "views": 19
   },
   {
    "name": "suiko.atah.io",
-   "views": 6
+   "views": 9
   },
   {
    "name": "atah.io",
-   "views": 2
+   "views": 8
   }
  ],
  "ydaySources": [
   {
-   "name": "namu.wiki",
-   "sessions": 11
+   "name": "oysterbay.tistory.com",
+   "sessions": 10
   },
   {
-   "name": "직접 방문",
+   "name": "namu.wiki",
    "sessions": 7
   },
   {
-   "name": "oysterbay.tistory.com",
-   "sessions": 3
+   "name": "직접 방문",
+   "sessions": 4
   },
   {
-   "name": "m.cafe.naver.com",
-   "sessions": 1
-  },
-  {
-   "name": "naver",
-   "sessions": 1
+   "name": "google",
+   "sessions": 2
   }
  ],
  "ydayUnresolved": 15,
  "yesterday": {
-  "date": "2026-08-31",
-  "newUsers": 15,
-  "sessions": 23,
-  "users": 16,
-  "views": 29
+  "date": "2026-09-01",
+  "newUsers": 5,
+  "sessions": 26,
+  "users": 9,
+  "views": 36
  }
 };
