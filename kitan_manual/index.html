@@ -899,6 +899,14 @@
             margin-bottom: 0.5em;
         }
 
+        /* p였을 때 물려받던 "다음에 뭔가 더 있으면 아래 여백" 규칙
+           (위 73번째 줄 주석 참고)을 목록 자체에도 그대로 적용 —
+           안 그러면 뒤따르는 h4·표와 목록이 바로 붙어버림 */
+        .char-desc:not(:last-child),
+        .bullet-list:not(:last-child) {
+            margin-bottom: 1em;
+        }
+
         /* -------------------- 무구·도구·특기·마법 -------------------- */
 
         .entry-group {
