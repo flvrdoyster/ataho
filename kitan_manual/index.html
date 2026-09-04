@@ -84,14 +84,6 @@
             margin: 0;
         }
 
-        /* 마진은 "다음에 뭔가 더 있을 때"만 필요 — 박스 안 마지막
-           문단인 경우(entry-desc, char-desc, staff-text 등 대부분)까지
-           일괄로 밀어붙이면 그 박스 자체 패딩과 겹쳐 아래쪽만 붕 뜬다.
-           :not(:last-child)로 흐름이 이어지는 자리에서만 적용 */
-        p:not(:last-child) {
-            margin-bottom: 1em;
-        }
-
         a {
             color: var(--link, #0068da);
             text-decoration: none;
@@ -1086,6 +1078,14 @@
             font-family: 'Noto Sans KR', sans-serif;
         }
 
+        /* 스태프 코멘트 삽화 — 원본(24~26쪽)에서 코멘트마다 곁들여진 캐릭터
+           그림 7개 중 5개가 남아 있어 그만큼만 넣음. 크기는 기존 규칙대로
+           원본 해상도의 20%. 텍스트 뒤 카드 오른쪽 아래에 배치 */
+        .staff-comment .staff-art {
+            display: block;
+            margin: 12px 0 0 auto;
+        }
+
         /* -------------------- 오마케: 크레딧 -------------------- */
 
         /* 특별부록 — 원본(27쪽)은 페이지 전체가 연녹색 워시. 웹에선 배경을
@@ -1101,9 +1101,112 @@
             margin-bottom: 0;
         }
 
+        /* 특별부록 페이지 — 원본(27쪽)은 삽화 자체가 페이지 하나를 통째로
+           덮는 콜라주라, 사진 몇 장을 오려붙이는 대신 그 전체 이미지를
+           그대로 쓰고 그 위에 텍스트만 원본 위치(실측 %)에 맞춰 올림.
+           % 좌표·cqw 글자크기 둘 다 이미지 자체 폭 기준이라(뷰포트 아님)
+           이미지가 반응형으로 커지고 작아져도 같이 따라감.
+           cqw는 vw와 달리 "이 컨테이너의 폭 1%" — 콘텐츠 컬럼이
+           content-max(800px)에서 막히는 넓은 데스크톱에서 vw를 썼다면
+           이미지 실제 폭과 무관하게 글자만 계속 커졌을 것 */
+        .hubon-page {
+            position: relative;
+            width: 100%;
+            margin: 6px 0 0;
+            container-type: inline-size;
+        }
+
+        .hubon-page img {
+            display: block;
+            width: 100%;
+            height: auto;
+        }
+
+        .hubon-text {
+            position: absolute;
+            margin: 0;
+            color: #2a2015;
+            line-height: 1.25;
+            font-size: 2cqw;
+        }
+
+        .hubon-title {
+            left: 12%;
+            top: 8%;
+            width: 76%;
+            text-align: center;
+            color: #1a2f8f;
+            font-weight: var(--font-weight-bold, 700);
+            font-size: 5cqw;
+        }
+
+        .hubon-body {
+            left: 3%;
+            top: 25%;
+            width: 32%;
+        }
+
+        .hubon-caption {
+            left: 24%;
+            top: 55%;
+            width: 31%;
+        }
+
+        .hubon-note {
+            left: 60%;
+            top: 56%;
+            width: 36%;
+            font-size: 1.8cqw;
+        }
+
+        .hubon-banner-sub {
+            left: 6%;
+            top: 70.7%;
+            width: 14%;
+            color: #fff;
+            font-size: 2cqw;
+            font-weight: var(--font-weight-bold, 700);
+            line-height: 1.15;
+        }
+
+        .hubon-banner-title {
+            left: 17%;
+            top: 71.4%;
+            width: 52%;
+            color: #fff;
+            font-weight: var(--font-weight-bold, 700);
+            font-size: 4.4cqw;
+            white-space: nowrap;
+        }
+
+        /* 클리어 팁 — 배너 아래 남는 여백에. 원본은 이 자리에서도
+           오른쪽에 닌자 캐릭터가 있어서 폭을 넉넉히 잡진 않음 */
+        .hubon-tips {
+            left: 8%;
+            top: 80%;
+            width: 68%;
+        }
+
+        .hubon-tips ol {
+            margin: 0;
+            padding-left: 1.1em;
+        }
+
+        .hubon-tips li:not(:last-child) {
+            margin-bottom: 0.5em;
+        }
+
         /* 크레딧 — 원본(28쪽)의 종이색(#eae6d1 실측)을 배경으로. 원본에도
            테두리는 없음 */
         .credits-block {
+            display: flex;
+            align-items: flex-start;
+            /* center였던 걸 flex-start로 — 박스 자체는 다른 섹션(h3, 특별부록
+               박스, 스태프 코멘트 그리드 전부 왼쪽 x가 동일)과 정렬이
+               맞는데, 안의 STAFF 로고+표만 center 때문에 61px 밀려서 시작해
+               페이지에서 유독 오른쪽으로 치우쳐 보였음 */
+            justify-content: flex-start;
+            gap: 18px;
             padding: 20px;
             /* 명단이라 본문만큼 클 필요가 없음 — 안쪽 두 열이 같이 줄어들어
                역할(0.8em)/이름 사이 크기 차는 그대로 유지됨 */
@@ -1111,13 +1214,56 @@
             background: #eae6d1;
         }
 
+        /* 원본(28쪽)의 세로 "STAFF" 로고타입 — 사용자가 벡터로 그려준 SVG
+           (글자 도형만, 구분선은 없음). 구분선은 별도 .credits-divider가
+           맡음 — 이미지 크기와 선 길이를 서로 독립적으로 제어하기 위함
+           (모바일에서 이미지는 작게·상단에만, 선은 표 전체 높이로) */
+        .credits-staff {
+            /* 폭을 .credits-block 너비 기준 %로 — 박스가 넓어지면 로고도
+               같이 커짐. 480px 이하는 %가 너무 작아져서(64px 안팎) 표
+               역할열이 두 줄로 깨지므로 고정값으로 전환.
+               16%였을 때 로고 높이가 표 높이의 61%뿐이라 로고 아래
+               빈 공간이 크게 남았음 — 22%로 키워서 그 공백을 줄임 */
+            flex: 0 0 22%;
+            max-width: 220px;
+        }
+
+        .credits-staff img {
+            display: block;
+            width: 100%;
+            height: auto;
+        }
+
+        /* 원본 실측 색(#6b0548). 두께는 원본 대비 강조(기존 2px의 3배
+           이상인 7px). 높이는 JS가 항상 표 높이로 맞춤 — 이미지 크기와
+           무관하게 항상 표 전체 길이만큼 길게 그려짐 */
+        .credits-divider {
+            flex: 0 0 auto;
+            width: 7px;
+            background: #6b0548;
+        }
+
         /* 원본(PDF 28쪽)처럼 역할 열 + 이름 열 2단 표 — 역할이 같으면
            rowspan으로 한 번만 쓰고 아래 이름들만 이어짐 */
         .credits-block table {
-            width: 100%;
-            max-width: 480px;
-            margin: 0 auto;
+            flex: 1 1 auto;
+            width: auto;
+            /* 480px이던 걸 560px로 — 로고+선을 키운 뒤에도 오른쪽에 102px가
+               남아서 표까지 같이 늘려 그 공백을 줄임 */
+            max-width: 560px;
             border-collapse: collapse;
+        }
+
+        /* 모바일 — STAFF를 아예 숨기는 대신 작게 줄여서 표 상단에만 걸치게.
+           %폭 대신 고정 24px로 전환(표에 폭을 최대한 양보) */
+        /* 480px가 아니라 580px — 로고를 22%로 키운 뒤로 481~579px 구간에서
+           %값이 표를 눌러 역할 라벨이 줄바꿈됐음(실측). 그 구간까지
+           고정값으로 커버 */
+        @media (max-width: 580px) {
+            .credits-staff {
+                flex-basis: 24px;
+                max-width: 24px;
+            }
         }
 
         .credits-block td {
@@ -2190,6 +2336,7 @@
                                 「환세」가 대박 나는 꿈이라도 꾸면서 잘게요.<br>
                                 그럼, 안녕히 주무세요.
                             </p>
+                            <img class="staff-art" src="img/omake-01.png" alt="" width="174">
                         </div>
                         <div class="staff-comment">
                             <div class="staff-name">세뇨르 카와키타
@@ -2201,6 +2348,7 @@
                                 이번엔 캐릭터 수가 좀 많아서 조금 고생했습니다만, 유저 여러분이 좋아해 주신다면 그걸로 만족입니다.<br>
                                 편지로 꼭 감상 보내주세요. 앞으로도 세뇨르 카와키타를 잘 부탁드립니다.
                             </p>
+                            <img class="staff-art" src="img/omake-02.png" alt="" width="221">
                         </div>
                         <div class="staff-comment">
                             <div class="staff-name">마츠모토 마나부
@@ -2212,6 +2360,7 @@
                                 그로부터 2년인가... 제가 관여한 건 8개월 정도지만, 지금까지 펼쳐진 수많은 명장면이 제 뇌리에 박혀서 떠나질 않네요.<br>
                                 아아, 빨리 잊어버리고 싶다....
                             </p>
+                            <img class="staff-art" src="img/omake-03.png" alt="" width="184">
                         </div>
                         <div class="staff-comment">
                             <div class="staff-name">타치바나 헤이안쿄
@@ -2221,6 +2370,7 @@
                                 후우.... 짧은 기간에 이만큼 많은 맵을 그리느라 지쳤다.<br>
                                 후우....
                             </p>
+                            <img class="staff-art" src="img/omake-04.png" alt="" width="194">
                         </div>
                         <div class="staff-comment">
                             <div class="staff-name">마츠시마 츠요시
@@ -2255,28 +2405,32 @@
                                 환세, 대혼란의 연속이었습니다. 도우미로 시작해서, 정신 차려보니 주요 멤버 중 한 명이 되어 있었네요.<br>
                                 그나저나, 고양이는 좋네요.
                             </p>
+                            <img class="staff-art" src="img/omake-05.png" alt="" width="197">
                         </div>
                     </div>
                 </div>
 
                 <!-- 특별부록 & 클리어 팁 (PDF 27쪽) -->
                 <div class="content-block">
-                    <h3>특별부록: 스마슈 변장 세트 사용법</h3>
+                    <h3 class="sr-only">특별부록: 스마슈 변장 세트 사용법</h3>
                     <div class="extra-box">
-                        <div class="screenshot-frame">
-                            <!-- PDF 27쪽 코스프레 사진 -->
-                            <!-- <img src="img/extra_cosplay.png" alt="스마슈 변장 세트 사용 예"> -->
+                        <div class="hubon-page">
+                            <img src="img/omake-hubon.png" alt="스마슈 변장 세트 사용법 — 코스프레 사진과 사용 예">
+                            <p class="hubon-text hubon-title">특별부록:<br>스마슈 변장 세트 사용법</p>
+                            <p class="hubon-text hubon-body">코를 붙이고, 눈썹과 귀를 오려서 붙이면 당신도 순식간에 스마슈로 변신(웃음)! 친구들과 즐겁게 놀아보세요.</p>
+                            <p class="hubon-text hubon-caption">← 사용 예:<br>성에서 닌자 놀이.<br>(성 관계자분들도 멋있다고 대호평!)</p>
+                            <p class="hubon-text hubon-note">※ 닌자복, 칼, 머플러, 그리고 키타노 후본(디렉터)은 부록에 포함되지 않습니다.</p>
+                            <p class="hubon-text hubon-banner-sub">당신에게만<br>알려주는</p>
+                            <p class="hubon-text hubon-banner-title">환세희담 클리어로 가는 길</p>
+                            <div class="hubon-text hubon-tips">
+                                <h4 class="sr-only">환세희담 클리어로 가는 길</h4>
+                                <ol>
+                                    <li>던전 안에는 HP 회복이나 세이브를 담당하는 특이한 캐릭터가 있습니다. 그를 찾아내서, 모험을 조금이라도 편하게 만드세요.</li>
+                                    <li>모험 도중, 어떤 물건을 훔친 도적을 찾아야 하는 상황이 옵니다. 이때는 어드벤처 게임을 하는 느낌으로 플레이해서, 범인을 밝혀내세요.</li>
+                                    <li>세상에는 그 방면에 정통한 전문가가 있는 법입니다. 스스로 어떻게 할 수 없다고 느껴질 때는, 그 전문가를 찾아가 도움을 청하세요.</li>
+                                </ol>
+                            </div>
                         </div>
-                        <p>코를 붙이고, 눈썹과 귀를 오려서 붙이면 당신도 순식간에 스마슈로 변신(웃음)! 친구들과 즐겁게 놀아보세요.</p>
-                        <p class="figure-caption">← 사용 예: 성에서 닌자 놀이. (성 관계자분들도 멋있다고 대호평!)</p>
-                        <p class="figure-caption">※ 닌자복, 칼, 머플러, 그리고 키타노 후본(디렉터)은 부록에 포함되지 않습니다.</p>
-
-                        <h4>환세희담 클리어로 가는 길</h4>
-                        <ol>
-                            <li>던전 안에는 HP 회복이나 세이브를 담당하는 특이한 캐릭터가 있습니다. 그를 찾아내서, 모험을 조금이라도 편하게 만드세요.</li>
-                            <li>모험 도중, 어떤 물건을 훔친 도적을 찾아야 하는 상황이 옵니다. 이때는 어드벤처 게임을 하는 느낌으로 플레이해서, 범인을 밝혀내세요.</li>
-                            <li>세상에는 그 방면에 정통한 전문가가 있는 법입니다. 스스로 어떻게 할 수 없다고 느껴질 때는, 그 전문가를 찾아가 도움을 청하세요.</li>
-                        </ol>
                     </div>
                 </div>
 
@@ -2284,6 +2438,10 @@
                 <div class="content-block">
                     <h3>크레딧</h3>
                     <div class="credits-block">
+                        <div class="credits-staff" aria-hidden="true">
+                            <img src="img/staff.svg" alt="">
+                        </div>
+                        <span class="credits-divider" aria-hidden="true"></span>
                         <table>
                             <tbody>
                                 <tr>
@@ -2495,6 +2653,24 @@
             syncNavHeight();
             window.addEventListener('load', syncNavHeight);
             window.addEventListener('resize', syncNavHeight);
+        })();
+
+        // 크레딧의 구분선(.credits-divider)을 표 실제 높이에 맞춤 — CSS만으로는
+        // 안 됨(flex stretch를 쓰면 자기 자신의 height:auto 콘텐츠가 없어
+        // 0이 되거나, 형제 요소 높이 계산과 얽혀 예측하기 어려움).
+        // 로고 이미지는 이제 폭 기준(%, 모바일은 고정값)이라 따로 안 건드림
+        (function () {
+            var divider = document.querySelector('.credits-divider');
+            var table = document.querySelector('.credits-block table');
+            if (!divider || !table) return;
+
+            function syncDividerHeight() {
+                divider.style.height = table.offsetHeight + 'px';
+            }
+
+            syncDividerHeight();
+            window.addEventListener('load', syncDividerHeight);
+            window.addEventListener('resize', syncDividerHeight);
         })();
 
         // 커버 옆 스마슈 — 누르면 인사말 툴팁 토글, 바깥 클릭/Esc로 닫기
