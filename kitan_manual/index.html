@@ -676,7 +676,7 @@
         .screenshot-frame {
             display: block;
             width: fit-content;
-            border: 1px solid var(--border, #ccc);
+            border: 1px solid #000;
             margin: 10px auto;
         }
 
@@ -1091,14 +1091,10 @@
         /* 특별부록 — 원본(27쪽)은 페이지 전체가 연녹색 워시. 웹에선 배경을
            깔면 본문 흐름이 끊겨서, 그 색(#bcc69f 실측)을 외곽선으로만 씀.
            밝기가 기존 테두리(#ccc)와 비슷해 다른 박스들과 무게가 맞음 */
+        /* .hubon-page 하나만 담는 래퍼 — 콜라주 이미지 자체가 이미
+           "박스"라 테두리·패딩을 두면 이중으로 감싸는 꼴이라 뺌 */
         .extra-box {
-            border: 1px solid #bcc69f;
-            padding: 16px 18px;
             margin-bottom: 30px;
-        }
-
-        .extra-box > :last-child {
-            margin-bottom: 0;
         }
 
         /* 특별부록 페이지 — 원본(27쪽)은 삽화 자체가 페이지 하나를 통째로
@@ -2020,7 +2016,7 @@
                         <div class="item-bg" style="top: 90px;" aria-hidden="true">
                             <img src="img/item-03.png" alt="" width="65">
                         </div>
-                        <div class="item-bg" style="top: 400px;" aria-hidden="true">
+                        <div class="item-bg" style="top: 520px;" aria-hidden="true">
                             <img src="img/item-04.png" alt="" width="124">
                         </div>
                         <div class="entry">
