@@ -35,6 +35,7 @@ class VideoPlayer {
         this.subtitleBtn = null;
         this.subtitlesOn = true;   // 챕터를 넘어가도 유지되는 자막 표시 여부
         this.seekEl = null;
+        this.seeking = false;   // 재생 바를 잡고 있는 중인지
         this.timeEl = null;
         this.chapterButtonsEl = null;
         this.muteBtn = null;
@@ -190,9 +191,9 @@ class VideoPlayer {
                 + ` transparent calc(${tickPct}% - 1px),`
                 + ` var(--bar-tick) calc(${tickPct}% - 1px), var(--bar-tick) ${tickPct}%,`
                 + ` transparent ${tickPct}%)`;
-            this.volumeEl.style.background = `${tickLayer}, ${fillLayer}`;
+            this.volumeEl.style.backgroundImage = `${tickLayer}, ${fillLayer}`;
         } else {
-            this.volumeEl.style.background = fillLayer;
+            this.volumeEl.style.backgroundImage = fillLayer;
         }
 
         if (this.volumeValueEl) this.volumeValueEl.textContent = `${Math.round(pct)}%`;
@@ -283,12 +284,19 @@ class VideoPlayer {
         seek.min = 0;
         seek.max = 1000;
         seek.value = 0;
+        // 잡고 있는 동안 timeupdate가 손잡이를 되돌리지 못하게 표시해 둔다.
+        // 놓는 지점이 슬라이더 밖일 수 있어 해제는 window에서 받는다.
+        seek.addEventListener('pointerdown', () => { this.seeking = true; });
+        window.addEventListener('pointerup', () => { this.seeking = false; });
+        seek.addEventListener('change', () => { this.seeking = false; });
+
         seek.addEventListener('input', () => {
             if (!this.video) return;
             const span = this.getChapterEnd() - this.chapterStart;
             if (!(span > 0)) return;
             const frac = Number(seek.value) / 1000;
             this.video.currentTime = this.chapterStart + frac * span;
+            this.updateSeekUI();   // 탐색이 끝나기 전에도 막대가 즉시 따라오게
         });
         this.seekEl = seek;
 
@@ -387,10 +395,13 @@ class VideoPlayer {
         if (!(span > 0)) return;
 
         const pos = Math.min(Math.max(this.video.currentTime - this.chapterStart, 0), span);
-        const pct = (pos / span) * 100;
 
-        this.seekEl.value = Math.round((pos / span) * 1000);
-        this.seekEl.style.background =
+        // 잡고 있는 동안엔 손잡이를 사용자가 둔 자리에 그대로 둔다 — 탐색이 끝나기
+        // 전에 timeupdate가 먼저 오면 이전 위치로 되돌려서 손잡이가 튕긴다.
+        if (!this.seeking) this.seekEl.value = Math.round((pos / span) * 1000);
+
+        const pct = (Number(this.seekEl.value) / 1000) * 100;
+        this.seekEl.style.backgroundImage =
             `linear-gradient(to right, var(--bar-fill) ${pct}%, var(--bar-track) ${pct}%)`;
 
         this.timeEl.textContent = `${formatTime(pos)} / ${formatTime(span)}`;

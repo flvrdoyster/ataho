@@ -99,12 +99,23 @@
     --bar-fill: white;
     --bar-track: rgba(0, 0, 0, 0.45);
     --bar-tick: rgba(255, 255, 255, 0.9);   /* 볼륨바의 100% 기준 눈금 */
-    height: 6px;
+
+    /* 요소 자체는 집을 수 있을 만큼 두껍게 두고, 눈에 보이는 막대는
+       background-size로 가운데 6px 띠만 그린다 — 6px짜리 요소는 마우스로도
+       손가락으로도 정확히 짚기가 어렵다.
+       JS는 style.backgroundImage만 건드리므로 아래 size/position/repeat가 살아남는다
+       (background 단축 속성을 쓰면 전부 초기화돼 버린다). */
+    height: 20px;
+    background-color: transparent;
+    background-image: linear-gradient(to right, var(--bar-track) 0%, var(--bar-track) 100%);
+    background-repeat: no-repeat;
+    background-size: 100% 6px;
+    background-position: center;
+
+    border: none;
     border-radius: 0;
     appearance: none;
     -webkit-appearance: none;
-    background: var(--bar-track);
-    border: var(--ui-border-w, 1px) solid rgba(255, 255, 255, 0.45);
     outline: none;
     cursor: pointer;
 }
