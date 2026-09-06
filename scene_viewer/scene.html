@@ -38,12 +38,16 @@
     </div>
 
     <!-- Scripts -->
-    <script src="scene_viewer.js"></script>
+    <!-- 자막(VTT) 파싱/동기화는 두 엔진이 공유하므로 항상 로드한다. -->
+    <script src="subtitles.js"></script>
     <script>
+        // type: 'scene'(기본) = 분기 비주얼노벨, SceneViewer가 처리.
+        // type: 'video' = 챕터 있는 단일 영상, VideoPlayer가 처리 (분기/선택지/
+        // 스프라이트 없음 — 그 기능이 필요 없는 스토리를 SceneViewer에 얹지 않기 위함).
         const STORY_MAP = {
-            kaisin: { script: 'kaisin/kaisin.js', css: 'kaisin/kaisin.css' },
-            gaiden: { script: 'gaiden/gaiden.js', css: 'gaiden/gaiden.css' },
-            ani:    { script: 'ani/ani.js', css: 'ani/ani.css' },
+            kaisin: { type: 'scene', script: 'kaisin/kaisin.js', css: 'kaisin/kaisin.css' },
+            gaiden: { type: 'scene', script: 'gaiden/gaiden.js', css: 'gaiden/gaiden.css' },
+            ani:    { type: 'video', script: 'ani/ani.js',       css: 'ani/ani.css' },
         };
 
         const storyId = new URLSearchParams(location.search).get('story') || 'kaisin';
@@ -58,19 +62,55 @@
                 link.href = entry.css;
                 document.head.appendChild(link);
             }
+            // 동영상 플레이어의 컨트롤은 미니게임(balance/sweep)과 같은 공용 픽셀 UI
+            // 키트(world/ui.css + ui.js)를 쓴다 — 뮤트 버튼은 UIMuteButton을 그대로 씀.
+            if (entry.type === 'video') {
+                window.WORLD_BASE = '../world/';
+                ['../world/ui.css', 'video_player.css'].forEach(href => {
+                    const link = document.createElement('link');
+                    link.rel = 'stylesheet';
+                    link.href = href;
+                    document.head.appendChild(link);
+                });
+            }
 
-            const script = document.createElement('script');
-            script.src = entry.script;
-            script.onload = () => {
-                const story = SceneViewer.stories[storyId];
-                if (!story) {
-                    console.error(`Story registered but not found: ${storyId}`);
+            // 스크립트를 순서대로 불러온다: (동영상이면 공용 UI 키트 →) 엔진 →
+            // 그 엔진에 .register()하는 스토리/영상 데이터.
+            const chain = entry.type === 'video'
+                ? ['../world/ui.js', 'video_player.js', entry.script]
+                : ['scene_viewer.js', entry.script];
+
+            const loadNext = (i) => {
+                if (i >= chain.length) {
+                    if (entry.type === 'video') {
+                        const config = VideoPlayer.players[storyId];
+                        if (!config) {
+                            console.error(`Video registered but not found: ${storyId}`);
+                            return;
+                        }
+                        new VideoPlayer('#stage', '#controls').load(config);
+                    } else {
+                        const story = SceneViewer.stories[storyId];
+                        if (!story) {
+                            console.error(`Story registered but not found: ${storyId}`);
+                            return;
+                        }
+                        new SceneViewer('#stage').loadStory(story);
+                    }
                     return;
                 }
-                const viewer = new SceneViewer('#stage');
-                viewer.loadStory(story);
+                const s = document.createElement('script');
+                s.src = chain[i];
+                s.onload = () => loadNext(i + 1);
+                s.onerror = () => {
+                    // 안 그러면 "Loading..."에서 멈춘 채 아무 설명이 없다.
+                    console.error(`Failed to load: ${chain[i]}`);
+                    const el = document.getElementById('loading');
+                    if (el) el.textContent = `불러오지 못했습니다: ${chain[i]}`;
+                };
+                document.head.appendChild(s);
             };
-            document.head.appendChild(script);
+            loadNext(0);
         }
     </script>
     <script src="../footer.js"></script>
