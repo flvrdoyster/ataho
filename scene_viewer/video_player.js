@@ -14,6 +14,14 @@
 // 자막(VTT) 파싱/동기화는 subtitles.js를 공유한다 (SceneViewer도 같은 걸 쓴다).
 // 컨트롤 외형은 미니게임과 같은 공용 픽셀 UI 키트(world/ui.css)를 따르고, 음소거
 // 버튼은 그 키트의 UIMuteButton(world/ui.js)을 그대로 쓴다 — 아이콘을 따로 만들지 않는다.
+// 재생/일시정지 아이콘은 사이트 어디에도 관례가 없어 여기서 새로 두되, 다른
+// 아이콘들과 같은 방식(인라인 SVG, fill="currentColor")으로 맞춘다.
+const PLAY_PAUSE_ICONS = {
+    play: '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><polygon points="7,4 20,12 7,20"/></svg>',
+    pause: '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">'
+        + '<rect x="5" y="4" width="5" height="16"/><rect x="14" y="4" width="5" height="16"/></svg>',
+};
+
 class VideoPlayer {
     static players = {};
 
@@ -43,6 +51,7 @@ class VideoPlayer {
         this.volumeValueEl = null;
         this.audioCtx = null;
         this.gainNode = null; // WebAudio 연결에 성공했을 때만 존재 — 100% 너머 증폭용
+        this.playOverlayBtn = null;
 
         this.onKeydown = (e) => {
             if (e.repeat) return;
@@ -72,12 +81,36 @@ class VideoPlayer {
         video.addEventListener('click', () => this.togglePlay());
         video.addEventListener('timeupdate', () => this.updateSeekUI());
         video.addEventListener('ended', () => this.onChapterEnded());
+        video.addEventListener('play', () => this.updatePlayOverlay());
+        video.addEventListener('pause', () => this.updatePlayOverlay());
         this.stage.appendChild(video);
         this.video = video;
+
+        // 마우스를 올리거나(데스크탑) 일시정지 상태일 때(항상) 뜨는 재생/일시정지
+        // 버튼. 켜짐/꺼짐 표시는 CSS(.stage:hover, .paused)가 맡고, 여기선 아이콘과
+        // 클릭만 담당한다. 영상 위가 아니라 스테이지의 별도 요소라 클릭이 video의
+        // 자체 토글 리스너와 안 겹친다.
+        const playOverlay = document.createElement('button');
+        playOverlay.className = 'video-play-overlay paused';
+        playOverlay.innerHTML = PLAY_PAUSE_ICONS.play;
+        playOverlay.setAttribute('aria-label', '재생/일시정지');
+        playOverlay.addEventListener('click', (e) => {
+            e.stopPropagation();
+            this.togglePlay();
+        });
+        this.stage.appendChild(playOverlay);
+        this.playOverlayBtn = playOverlay;
 
         this.setupAudioBoost(video);
         this.buildControls();
         this.loadChapter(0);
+    }
+
+    updatePlayOverlay() {
+        if (!this.playOverlayBtn || !this.video) return;
+        const paused = this.video.paused;
+        this.playOverlayBtn.classList.toggle('paused', paused);
+        this.playOverlayBtn.innerHTML = paused ? PLAY_PAUSE_ICONS.play : PLAY_PAUSE_ICONS.pause;
     }
 
     // <video>를 WebAudio 그래프에 물려 GainNode로 100%(원본 볼륨) 너머까지 증폭할

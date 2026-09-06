@@ -6,6 +6,54 @@
 
    페이지 골격(body/#app/#controls/.stage/.scene-video)은 page.css를 쓴다. */
 
+/* ── 재생/일시정지 오버레이 ────────────────────────────────────────────────
+   스테이지 위(.scene-video z-index:0, .video-subtitle z-index:50 사이) 가운데.
+   평소엔 투명·클릭 통과 상태로 있다가, 마우스를 올리거나(데스크탑) 영상이
+   일시정지 상태면(모든 기기) 드러난다. 자막 박스처럼 각진 픽셀 톤 유지 —
+   원형 버튼은 이 사이트의 다른 어떤 UI와도 다른 언어라 쓰지 않는다. */
+.video-play-overlay {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 30;
+    width: clamp(48px, 16cqw, 88px);
+    height: clamp(48px, 16cqw, 88px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.5);
+    border: none;
+    border-radius: 0;
+    color: white;
+    cursor: pointer;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.15s, background 0.1s;
+}
+
+.video-play-overlay svg {
+    width: 84%;
+    height: 84%;
+}
+
+/* 재생 삼각형은 무게중심이 왼쪽으로 쏠려 보여 살짝 오른쪽으로 밀어 광학 보정한다
+   — 일시정지(막대 두 개)는 이미 좌우 대칭이라 필요 없다. 아이콘이 84%로 커져
+   여백이 양쪽 8%씩뿐이라, 그 안에서만 밀 수 있다(넘으면 버튼 밖으로 삐져나감). */
+.video-play-overlay.paused svg {
+    margin-left: 2%;
+}
+
+.video-play-overlay:hover {
+    background: rgba(0, 0, 0, 0.7);
+}
+
+.stage:hover .video-play-overlay,
+.video-play-overlay.paused {
+    opacity: 1;
+    pointer-events: auto;
+}
+
 .video-controls {
     box-sizing: border-box;
     width: 100%;
