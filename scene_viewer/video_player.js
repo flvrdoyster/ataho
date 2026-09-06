@@ -233,9 +233,7 @@ class VideoPlayer {
         if (this.detachSubtitles) { this.detachSubtitles(); this.detachSubtitles = null; }
         if (this.subtitleEl) this.subtitleEl.remove();
         const subtitleEl = document.createElement('div');
-        // video-subtitle: 이 플레이어 전용 표시(폰트·반투명 박스). scene_viewer.css의
-        // .subtitle-overlay는 kaisin/gaiden도 함께 쓰므로 거기선 건드리지 않는다.
-        subtitleEl.className = 'subtitle-overlay video-subtitle';
+        subtitleEl.className = 'video-subtitle';
         subtitleEl.hidden = !this.subtitlesOn;   // 챕터를 넘어가도 껐던 상태를 유지
         this.stage.appendChild(subtitleEl);
         this.subtitleEl = subtitleEl;

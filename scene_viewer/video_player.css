@@ -4,7 +4,7 @@
    .ui-icon-btn(뮤트 버튼, UIMuteButton이 생성). 여기엔 그 키트에 없는 것,
    즉 컨트롤 배치와 슬라이더(탐색바·볼륨바)만 정의한다.
 
-   스테이지/자막(.stage, .subtitle-overlay)은 scene_viewer.css를 그대로 쓴다. */
+   페이지 골격(body/#app/#controls/.stage/.scene-video)은 page.css를 쓴다. */
 
 .video-controls {
     box-sizing: border-box;
@@ -60,16 +60,24 @@
 }
 
 /* ── 자막 ────────────────────────────────────────────────────────────────
-   scene_viewer.css의 .subtitle-overlay를 이 플레이어에서만 덮어쓴다
-   (그 규칙은 kaisin/gaiden도 함께 써서 거기까진 안 건드림).
-   외곽선(text-shadow) 대신 반투명 박스를 깔고, 글꼴은 컨트롤과 같은 키트 폰트로. */
-.subtitle-overlay.video-subtitle {
+   외곽선 대신 반투명 박스를 깔고, 글꼴은 컨트롤과 같은 키트 폰트를 쓴다.
+   (장면 뷰어 쪽 자막은 외곽선 방식 그대로 — scene_viewer.css의 .subtitle-overlay) */
+.video-subtitle {
+    position: absolute;
+    bottom: 8%;
+    z-index: 50;
+    pointer-events: none;
+    text-align: center;
+    white-space: pre-line;
+    box-sizing: border-box;
+    color: rgba(255, 255, 255, 1);
+    font-size: clamp(12px, 3.75cqw, 24px);
+
     font-family: var(--ui-font);
     /* 컨트롤(HUD)은 --ui-font-weight(bold)를 쓰지만 자막은 레귤러 — 볼드는 짧은
        라벨이 배경 위에서 버티라고 쓰는 것이고, 자막은 박스가 대비를 만들어준다.
        (Dokkaebi DNR Gothic은 fonts.css에 400/700 두 굵기가 다 등록돼 있음) */
     font-weight: 400;
-    text-shadow: none;
 
     /* 박스가 글자만 감싸도록 — 폭을 내용에 맞추고 좌우 auto 여백으로 가운데 정렬 */
     left: 0;
@@ -80,14 +88,13 @@
     padding: 2px 10px;
     background: rgba(0, 0, 0, 0.6);
 
-    /* 공용 .subtitle-overlay의 1.5는 글자 위아래로 0.25em씩 빈 줄 높이를 남겨서,
-       외곽선 자막일 땐 안 보이지만 박스를 깔면 그대로 여백으로 드러난다.
+    /* 1.5쯤 되면 글자 위아래로 빈 줄 높이가 남아 박스가 헐렁해 보인다.
        (두 줄 자막의 줄 간격은 유지돼야 하므로 1까지 줄이진 않음) */
     line-height: 1.25;
 }
 
 /* 대사가 없는 구간에선 빈 박스만 남으므로 숨긴다 */
-.subtitle-overlay.video-subtitle:empty {
+.video-subtitle:empty {
     display: none;
 }
 
@@ -153,9 +160,7 @@
     background: var(--bar-fill);
 }
 
-/* scene_viewer.css의 input[type=range]{width:100%}가 클래스만으론 안 눌려서
-   (0,1,1 > 0,1,0) 요소 선택자를 붙여 특이도를 올린다. */
-input[type=range].video-seek {
+.video-seek {
     flex: 1 1 160px;
     width: auto;
     min-width: 120px;
@@ -175,7 +180,7 @@ input[type=range].video-seek {
     gap: 8px;
 }
 
-input[type=range].video-volume {
+.video-volume {
     width: 84px;
 }
 

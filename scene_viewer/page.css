@@ -1,0 +1,77 @@
+/* scene_viewer/ 아래 페이지들의 공용 골격.
+   scene.html(장면 뷰어, 분기 비주얼노벨)과 ani.html(동영상 플레이어)이 함께 쓴다 —
+   둘은 내용물도 UI 톤도 완전히 다르지만, "가운데 정렬된 무대 + 그 아래 컨트롤 줄"
+   이라는 페이지 뼈대는 같다.
+
+   각자의 내용물 스타일은 scene_viewer.css / video_player.css에 있다. */
+
+:root {
+    --bg-color: rgba(0, 0, 0, 1);
+    /* 무대 비율 — 각 페이지/스토리가 자기 값으로 덮어쓴다 (예: ani는 1280x720) */
+    --stage-w: 640;
+    --stage-h: 480;
+    --stage-width: calc(var(--stage-w) * 1px);
+    --stage-height: calc(var(--stage-h) * 1px);
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    background-color: rgba(26, 26, 26, 1);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    font-family: 'KoddiUDOnGothic', 'Gulim', 'Malgun Gothic', sans-serif;
+    color: rgba(255, 255, 255, 1);
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+}
+
+img {
+    -webkit-user-drag: none;
+    pointer-events: none;
+}
+
+#app {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    max-width: var(--stage-width);
+}
+
+/* container-type: 컨트롤 폭 기준의 @container 질의(좁은 화면에서 요소 생략 등)에 필요 */
+#controls {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    container-type: inline-size;
+}
+
+.stage {
+    width: 100%;
+    aspect-ratio: var(--stage-w) / var(--stage-h);
+    container-type: inline-size;
+    background-color: var(--bg-color);
+    position: relative;
+    overflow: hidden;
+}
+
+/* 무대를 가득 채우는 영상 — 두 페이지 모두 <video>에 이 클래스를 쓴다 */
+.scene-video {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: 0;
+}
+
+.hidden {
+    display: none !important;
+}
