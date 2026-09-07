@@ -18,7 +18,6 @@ class SceneViewer {
         this.currentSceneIndex = -1;
 
         this.scrubber = document.getElementById('scene-scrubber');
-        this.controls = document.getElementById('controls');
 
         // Bind input
         this.stage.addEventListener('click', () => {
@@ -31,17 +30,13 @@ class SceneViewer {
             }
         });
 
+        // 스크러버는 씬 그래프의 체크포인트(분기가 합류하는 지점)를 오간다 — 영상 하나
+        // 안의 챕터 이동은 VideoPlayer의 몫(video_player.js)이라 여기엔 없다.
         if (this.scrubber) {
             this.scrubber.addEventListener('input', (e) => {
                 const val = parseInt(e.target.value, 10);
-                const scene = this.currentStory?.scenes[this.currentSceneIndex];
-                if (this.currentVideo && scene?.chapters) {
-                    this.currentVideo.currentTime = scene.chapters[val];
-                    this.currentVideo.play().catch(() => {});
-                } else {
-                    this.currentSceneIndex = this.checkpoints[val];
-                    this.renderScene();
-                }
+                this.currentSceneIndex = this.checkpoints[val];
+                this.renderScene();
             });
         }
 
@@ -54,7 +49,6 @@ class SceneViewer {
         this.subLang = null;
         this.checkpoints = [];
         this.sceneToCheckpoint = new Map();
-        this.chapterButtonsEl = null;
     }
 
     cleanup() {
@@ -71,10 +65,6 @@ class SceneViewer {
         if (this.choiceKeyHandler) {
             document.removeEventListener('keydown', this.choiceKeyHandler);
             this.choiceKeyHandler = null;
-        }
-        if (this.chapterButtonsEl) {
-            this.chapterButtonsEl.remove();
-            this.chapterButtonsEl = null;
         }
     }
 
@@ -321,37 +311,13 @@ class SceneViewer {
         this.stage.appendChild(video);
         this.currentVideo = video;
 
-        if (this.scrubber && scene.chapters?.length) {
-            this.scrubber.max   = scene.chapters.length - 1;
-            this.scrubber.step  = 1;
-            this.scrubber.value = 0;
-
-            video.addEventListener('timeupdate', () => {
-                const t = video.currentTime;
-                let activeIdx = 0;
-                for (let i = scene.chapters.length - 1; i >= 0; i--) {
-                    if (t >= scene.chapters[i]) { activeIdx = i; break; }
-                }
-                if (this.scrubber) this.scrubber.value = activeIdx;
-                this.chapterButtonsEl?.querySelectorAll('.chapter-btn').forEach((btn, i) => {
-                    btn.classList.toggle('active', i === activeIdx);
-                });
-            });
-        }
-
-        this.renderChapterButtons(scene);
-
         const subtitleEl = document.createElement('div');
         subtitleEl.className = 'subtitle-overlay';
         this.stage.appendChild(subtitleEl);
 
         if (this.subLang) {
-            const vttSrc = videoSrc.replace(/\/([^/]+)\.[^.]+$/, `/${this.subLang}/$1.vtt`);
-            // Drive subtitles ourselves instead of relying on a <track>: iOS
-            // Safari never fires `cuechange` for a 'hidden' track, so the native
-            // API leaves the overlay empty on mobile (works on desktop). Parsing
-            // the VTT and syncing on timeupdate behaves the same on every platform.
-            this.loadSubtitles(vttSrc, video, subtitleEl);
+            // See subtitles.js for why this drives the overlay itself instead of a <track>.
+            driveSubtitles(video, deriveSubtitleSrc(videoSrc, this.subLang), subtitleEl);
         }
 
         const autoAdvance = scene.autoAdvance !== false;
@@ -364,97 +330,6 @@ class SceneViewer {
         if (scene.text) {
             this.renderTextScene(scene);
         }
-    }
-
-    // Fetch + parse a WebVTT file and drive `overlayEl` off the video's
-    // currentTime. Replaces the native <track>/cuechange path so subtitles
-    // work on iOS Safari too (see renderVideoScene).
-    loadSubtitles(vttSrc, video, overlayEl) {
-        fetch(vttSrc)
-            .then(r => (r.ok ? r.text() : Promise.reject(r.status)))
-            .then(text => {
-                const cues = this.parseVtt(text);
-                if (!cues.length) return;
-                let lastIdx = -1;
-                video.addEventListener('timeupdate', () => {
-                    const t = video.currentTime;
-                    let idx = -1;
-                    for (let i = 0; i < cues.length; i++) {
-                        if (t >= cues[i].start && t < cues[i].end) { idx = i; break; }
-                    }
-                    if (idx === lastIdx) return; // only touch the DOM on change
-                    lastIdx = idx;
-                    overlayEl.textContent = idx >= 0 ? cues[idx].text : '';
-                });
-            })
-            .catch(() => { /* no subtitle file for this scene/lang */ });
-    }
-
-    parseVtt(text) {
-        const toSec = (ts) => ts.trim().split(':').reduce((acc, p) => acc * 60 + parseFloat(p), 0);
-        const cues = [];
-        const blocks = text.replace(/\r/g, '').split(/\n\n+/);
-        for (const block of blocks) {
-            const lines = block.split('\n').filter(l => l.length);
-            const tIdx = lines.findIndex(l => l.includes('-->'));
-            if (tIdx === -1) continue; // header / NOTE / empty block
-            const [rawStart, rest] = lines[tIdx].split('-->');
-            if (rest === undefined) continue;
-            const start = toSec(rawStart);
-            const end = toSec(rest.trim().split(/\s/)[0]); // drop cue settings after end ts
-            const textLines = lines.slice(tIdx + 1);
-            if (!textLines.length) continue;
-            cues.push({ start, end, text: textLines.join('\n') });
-        }
-        return cues;
-    }
-
-    renderChapterButtons(scene) {
-        if (!this.controls || !scene.chapterLabels?.length) return;
-
-        const n = scene.chapterLabels.length;
-        const container = document.createElement('div');
-        container.className = 'chapter-buttons';
-
-        scene.chapterLabels.forEach((label, i) => {
-            const btn = document.createElement('button');
-            btn.className = 'chapter-btn';
-            if (i === 0) btn.classList.add('active');
-
-            if (typeof label === 'string') {
-                btn.textContent = label;
-            } else {
-                if (label.title) {
-                    const t = document.createElement('span');
-                    t.className = 'chapter-title';
-                    t.textContent = label.title;
-                    btn.appendChild(t);
-                }
-                if (label.body) {
-                    const b = document.createElement('span');
-                    b.className = 'chapter-body';
-                    b.textContent = label.body;
-                    btn.appendChild(b);
-                }
-            }
-
-            // Align with actual scrubber thumb center (thumb ≈ 16px wide)
-            const pct = n > 1 ? i / (n - 1) : 0.5;
-            btn.style.left = `calc(${pct.toFixed(4)} * (100% - 16px) + 8px)`;
-            if (i === 0)          btn.classList.add('chapter-btn--left');
-            else if (i === n - 1) btn.classList.add('chapter-btn--right');
-
-            btn.addEventListener('click', () => {
-                if (!this.currentVideo || scene.chapters?.[i] === undefined) return;
-                this.currentVideo.currentTime = scene.chapters[i];
-                if (this.scrubber) this.scrubber.value = i;
-                this.currentVideo.play().catch(() => {});
-            });
-            container.appendChild(btn);
-        });
-
-        this.controls.appendChild(container);
-        this.chapterButtonsEl = container;
     }
 
     renderChoiceScene(scene) {

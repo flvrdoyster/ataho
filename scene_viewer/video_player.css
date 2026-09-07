@@ -1,0 +1,304 @@
+/* VideoPlayer 전용 스타일.
+   외형은 미니게임(balance/sweep)과 같은 공용 픽셀 UI 키트(world/ui.css)를 따른다 —
+   .frame-box(9-슬라이스 픽셀 테두리 + 남색 배경), --ui-font(Dokkaebi DNR Gothic),
+   .ui-icon-btn(뮤트 버튼, UIMuteButton이 생성). 여기엔 그 키트에 없는 것,
+   즉 컨트롤 배치와 슬라이더(탐색바·볼륨바)만 정의한다.
+
+   페이지 골격(body/#app/#controls/.stage/.scene-video)은 page.css를 쓴다. */
+
+/* ── 재생/일시정지 오버레이 ────────────────────────────────────────────────
+   스테이지 위(.scene-video z-index:0, .video-subtitle z-index:50 사이) 가운데.
+   평소엔 투명·클릭 통과 상태로 있다가, 마우스를 올리거나(데스크탑) 영상이
+   일시정지 상태면(모든 기기) 드러난다. 자막 박스처럼 각진 픽셀 톤 유지 —
+   원형 버튼은 이 사이트의 다른 어떤 UI와도 다른 언어라 쓰지 않는다. */
+.video-play-overlay {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 30;
+    width: clamp(48px, 16cqw, 88px);
+    height: clamp(48px, 16cqw, 88px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.5);
+    border: none;
+    border-radius: 0;
+    color: white;
+    cursor: pointer;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.15s, background 0.1s;
+}
+
+.video-play-overlay svg {
+    width: 84%;
+    height: 84%;
+}
+
+/* 재생 삼각형은 무게중심이 왼쪽으로 쏠려 보여 살짝 오른쪽으로 밀어 광학 보정한다
+   — 일시정지(막대 두 개)는 이미 좌우 대칭이라 필요 없다. 아이콘이 84%로 커져
+   여백이 양쪽 8%씩뿐이라, 그 안에서만 밀 수 있다(넘으면 버튼 밖으로 삐져나감). */
+.video-play-overlay.paused svg {
+    margin-left: 2%;
+}
+
+.video-play-overlay:hover {
+    background: rgba(0, 0, 0, 0.7);
+}
+
+.stage:hover .video-play-overlay,
+.video-play-overlay.paused {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.video-controls {
+    box-sizing: border-box;
+    width: 100%;
+    padding: 4px 12px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    color: white;
+    font-family: var(--ui-font);
+    font-weight: var(--ui-font-weight);
+    font-size: var(--ui-font-size);
+}
+
+.video-controls-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px;
+}
+
+/* 키트에 인라인 텍스트 버튼이 없어(.ui-panel-actions button은 패널 하단 전용)
+   여기서 정의 — 테두리 없이 글자만 두고(컨트롤 줄에 선이 많으면 지저분해진다),
+   눌리는 느낌은 배경 틴트로만 준다. 키트의 .ui-panel-actions button과 같은 방식. */
+.video-skip-btn {
+    flex: 0 0 auto;
+    font-family: var(--ui-font);
+    font-weight: var(--ui-font-weight);
+    font-size: inherit;
+    color: white;
+    background: transparent;
+    border: none;
+    border-radius: 0;
+    padding: 4px 10px;
+    cursor: pointer;
+    outline: none;
+    white-space: nowrap;
+    transition: background 0.1s, color 0.1s;
+}
+
+.video-skip-btn:hover {
+    background: rgba(255, 255, 255, 0.15);
+}
+
+.video-skip-btn:active {
+    background: rgba(255, 255, 255, 0.28);
+}
+
+/* 켜고 끄는 버튼(자막)은 테두리가 없어졌으니 글자 밝기로 상태를 알린다 —
+   꺼지면 흐리게. -10/+10처럼 토글이 아닌 버튼은 항상 밝은 상태 그대로다. */
+.video-subtitle-btn:not(.active) {
+    color: rgba(255, 255, 255, 0.4);
+}
+
+/* ── 자막 ────────────────────────────────────────────────────────────────
+   외곽선 대신 반투명 박스를 깔고, 글꼴은 컨트롤과 같은 키트 폰트를 쓴다.
+   (장면 뷰어 쪽 자막은 외곽선 방식 그대로 — scene_viewer.css의 .subtitle-overlay) */
+.video-subtitle {
+    position: absolute;
+    bottom: 8%;
+    z-index: 50;
+    pointer-events: none;
+    text-align: center;
+    white-space: pre-line;
+    box-sizing: border-box;
+    color: rgba(255, 255, 255, 1);
+    font-size: clamp(12px, 3.75cqw, 24px);
+
+    font-family: var(--ui-font);
+    /* 컨트롤(HUD)은 --ui-font-weight(bold)를 쓰지만 자막은 레귤러 — 볼드는 짧은
+       라벨이 배경 위에서 버티라고 쓰는 것이고, 자막은 박스가 대비를 만들어준다.
+       (Dokkaebi DNR Gothic은 fonts.css에 400/700 두 굵기가 다 등록돼 있음) */
+    font-weight: 400;
+
+    /* 박스가 글자만 감싸도록 — 폭을 내용에 맞추고 좌우 auto 여백으로 가운데 정렬 */
+    left: 0;
+    right: 0;
+    width: fit-content;
+    max-width: 84%;
+    margin: 0 auto;
+    padding: 2px 10px;
+    background: rgba(0, 0, 0, 0.6);
+
+    /* 1.5쯤 되면 글자 위아래로 빈 줄 높이가 남아 박스가 헐렁해 보인다.
+       (두 줄 자막의 줄 간격은 유지돼야 하므로 1까지 줄이진 않음) */
+    line-height: 1.25;
+}
+
+/* 대사가 없는 구간에선 빈 박스만 남으므로 숨긴다 */
+.video-subtitle:empty {
+    display: none;
+}
+
+/* ── 슬라이더 공통(탐색바·볼륨바) ────────────────────────────────────────
+   채워진 구간은 JS가 background 그라디언트로 칠한다(updateSeekUI/updateVolumeUI).
+   Firefox는 ::-moz-range-progress로 따로 그린다. 픽셀 톤이라 각지게 유지. */
+.video-seek,
+.video-volume {
+    --bar-fill: white;
+    --bar-track: rgba(0, 0, 0, 0.45);
+    --bar-tick: rgba(255, 255, 255, 0.9);   /* 볼륨바의 100% 기준 눈금 */
+
+    /* 요소 자체는 집을 수 있을 만큼 두껍게 두고, 눈에 보이는 막대는
+       background-size로 가운데 6px 띠만 그린다 — 6px짜리 요소는 마우스로도
+       손가락으로도 정확히 짚기가 어렵다.
+       JS는 style.backgroundImage만 건드리므로 아래 size/position/repeat가 살아남는다
+       (background 단축 속성을 쓰면 전부 초기화돼 버린다). */
+    height: 20px;
+    background-color: transparent;
+    background-image: linear-gradient(to right, var(--bar-track) 0%, var(--bar-track) 100%);
+    background-repeat: no-repeat;
+    background-size: 100% 6px;
+    background-position: center;
+
+    border: none;
+    border-radius: 0;
+    appearance: none;
+    -webkit-appearance: none;
+    outline: none;
+    cursor: pointer;
+}
+
+.video-seek::-webkit-slider-thumb,
+.video-volume::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 8px;
+    height: 14px;
+    border-radius: 0;
+    background: white;
+    border: var(--ui-border-w, 1px) solid rgba(0, 0, 0, 0.6);
+    cursor: pointer;
+}
+
+.video-seek::-moz-range-thumb,
+.video-volume::-moz-range-thumb {
+    width: 8px;
+    height: 14px;
+    border-radius: 0;
+    background: white;
+    border: var(--ui-border-w, 1px) solid rgba(0, 0, 0, 0.6);
+    cursor: pointer;
+}
+
+.video-seek::-moz-range-track,
+.video-volume::-moz-range-track {
+    height: 6px;
+    background: var(--bar-track);
+}
+
+.video-seek::-moz-range-progress,
+.video-volume::-moz-range-progress {
+    height: 6px;
+    background: var(--bar-fill);
+}
+
+.video-seek {
+    flex: 1 1 160px;
+    width: auto;
+    min-width: 120px;
+}
+
+.video-time {
+    flex: 0 0 auto;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+}
+
+/* ── 볼륨 묶음: 뮤트 버튼(.ui-icon-btn) + 볼륨 바 + 현재 값 ── */
+.video-volume-group {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.video-volume {
+    width: 84px;
+}
+
+.video-volume-value {
+    flex: 0 0 auto;
+    font-variant-numeric: tabular-nums;
+    min-width: 3.2em;   /* "100%"~"200%" 폭 고정 — 값이 바뀔 때 옆 요소가 안 밀리게 */
+    text-align: right;
+    white-space: nowrap;
+}
+
+/* ── 챕터 탭 ── */
+.chapter-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+}
+
+.chapter-btn {
+    font-family: var(--ui-font);
+    font-weight: var(--ui-font-weight);
+    font-size: inherit;
+    color: rgba(255, 255, 255, 0.65);
+    background: transparent;
+    border: var(--ui-border-w, 1px) solid rgba(255, 255, 255, 0.3);
+    border-radius: 0;
+    padding: 6px 10px;
+    cursor: pointer;
+    outline: none;
+    text-align: center;
+    line-height: 1.5;
+    transition: background 0.1s, color 0.1s, border-color 0.1s;
+}
+
+.chapter-title {
+    display: block;
+}
+
+.chapter-body {
+    display: block;
+    font-size: 0.8em;
+    opacity: 0.7;
+}
+
+.chapter-btn:hover {
+    color: white;
+    border-color: rgba(255, 255, 255, 0.7);
+    background: rgba(255, 255, 255, 0.12);
+}
+
+.chapter-btn.active {
+    color: white;
+    border-color: white;
+    background: rgba(255, 255, 255, 0.22);
+}
+
+/* ── 좁은 화면 ───────────────────────────────────────────────────────────
+   컨트롤 한 줄에 다 넣으면 눌릴 수 없을 만큼 좁아지므로, 손가락으로 꼭 필요한
+   것만 남기고 덜어낸다: 재생 바 · 음소거 · 자막은 남기고, ±10초 이동과 볼륨
+   조절(음소거로 갈음)은 감춘다. 챕터는 제목만 남기고 출연진 줄을 감춘다.
+   기준 컨테이너는 #controls(scene_viewer.css에서 container-type: inline-size). */
+@container (max-width: 600px) {
+    .video-jump-btn,
+    .video-volume,
+    .video-volume-value {
+        display: none;
+    }
+
+    .chapter-body {
+        display: none;
+    }
+}

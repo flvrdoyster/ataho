@@ -157,7 +157,7 @@ window.MAP_DATA.triggers = [
     "items": [
       {
         "label": "DS 아니메 총집편 '98\n환세 시리즈 부분",
-        "href": "scene_viewer/scene.html?story=ani",
+        "href": "scene_viewer/ani.html",
         "target": "_blank"
       }
     ]

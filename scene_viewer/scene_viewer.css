@@ -1,62 +1,12 @@
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP&display=swap');
 
-:root {
-    --bg-color: rgba(0, 0, 0, 1);
-    --stage-w: 640;
-    --stage-h: 480;
-    --stage-width: calc(var(--stage-w) * 1px);
-    --stage-height: calc(var(--stage-h) * 1px);
-}
+/* 장면 뷰어(scene.html) 전용 — 분기 비주얼노벨의 내용물 스타일.
+   페이지 골격(body/#app/#controls/.stage/.scene-video)은 page.css에 있다. */
 
-body {
-    margin: 0;
-    padding: 0;
-    background-color: rgba(26, 26, 26, 1);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
-    font-family: 'KoddiUDOnGothic', 'Gulim', 'Malgun Gothic', sans-serif;
-    color: rgba(255, 255, 255, 1);
-    user-select: none;
-    -webkit-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-}
-
-img {
-    -webkit-user-drag: none;
-    pointer-events: none;
-}
-
-#app {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 10px;
-    width: 100%;
-    max-width: var(--stage-width);
-}
-
-#controls {
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    container-type: inline-size;
-}
-
+/* 씬 스크러버(체크포인트 이동) — 이 페이지에만 있는 컨트롤 */
 input[type=range] {
     width: 100%;
     cursor: pointer;
-}
-
-.stage {
-    width: 100%;
-    aspect-ratio: var(--stage-w) / var(--stage-h);
-    container-type: inline-size;
-    background-color: var(--bg-color);
-    position: relative;
-    overflow: hidden;
 }
 
 /* Layer Management */
@@ -79,10 +29,6 @@ input[type=range] {
 
 .layer.ui {
     z-index: 20;
-}
-
-.hidden {
-    display: none !important;
 }
 
 img.fit-cover {
@@ -145,17 +91,6 @@ img.fit-cover {
     padding-bottom: 15%;
 }
 
-/* Video Scene */
-.scene-video {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    z-index: 0;
-}
-
 /* Choice UI - structure only, visual styling per story */
 .choice-container {
     position: absolute;
@@ -194,98 +129,5 @@ img.fit-cover {
     background: rgba(255, 255, 255, 0.8);
 }
 
-/* Chapter Tooltip Buttons */
-.chapter-buttons {
-    position: relative;
-    width: 100%;
-    height: 56px;
-}
-
-.chapter-btn {
-    position: absolute;
-    top: 8px;
-    transform: translateX(-50%);
-    width: max-content; /* 가용공간이 아닌 콘텐츠 기준 — 엣지 버튼 줄바꿈 방지 */
-    background: rgba(40, 40, 40, 1);
-    border: none;
-    border-radius: 6px;
-    color: rgba(180, 180, 180, 1);
-    font-family: inherit;
-    font-size: clamp(9px, 1.75cqw, 11px);
-    padding: 3px 8px;
-    cursor: pointer;
-    text-align: center;
-    white-space: normal;
-    transition: background 0.15s, color 0.15s;
-    pointer-events: auto;
-    line-height: 1.4;
-    /* drop-shadow가 ::before 포함 전체 윤곽에 적용됨 */
-    filter: drop-shadow(0 0 1px rgba(110, 110, 110, 0.9));
-}
-
-.chapter-title {
-    display: block;
-    font-weight: bold;
-}
-
-.chapter-body {
-    display: block;
-    font-size: 0.85em;
-    opacity: 0.7;
-}
-
-/* 위쪽 꼬리 — CSS 삼각형 트릭 (width/height: 0, border로 모양 결정) */
-.chapter-btn::before {
-    content: '';
-    position: absolute;
-    top: -8px;
-    left: calc(50% - 8px);
-    width: 0;
-    height: 0;
-    border-bottom: 9px solid rgba(40, 40, 40, 1); /* 채울 색 + 높이 */
-    border-left: 8px solid transparent;            /* 왼쪽 빈 공간 + 너비 절반 */
-    border-right: 8px solid transparent;           /* 오른쪽 빈 공간 + 너비 절반 */
-    transition: border-bottom-color 0.15s;
-}
-
-.chapter-btn:hover {
-    background: rgba(70, 70, 70, 1);
-    color: rgba(255, 255, 255, 1);
-    filter: drop-shadow(0 0 1px rgba(180, 180, 180, 0.7));
-}
-.chapter-btn:hover::before { border-bottom-color: rgba(70, 70, 70, 1); }
-
-.chapter-btn.active {
-    background: rgba(75, 75, 75, 1);
-    color: rgba(255, 255, 255, 1);
-    font-weight: bold;
-    filter: drop-shadow(0 0 1.5px rgba(200, 200, 200, 0.8));
-}
-.chapter-btn.active::before { border-bottom-color: rgba(75, 75, 75, 1); }
-
-.chapter-btn.chapter-btn--left {
-    transform: translateX(0%);
-    border-radius: 0 6px 6px 6px;
-}
-.chapter-btn.chapter-btn--left::before {
-    left: 0;
-    border-left-width: 0;    /* 왼쪽 없애면 오른쪽으로 기운 직각삼각형 */
-    border-right-width: 8px;
-}
-.chapter-btn.chapter-btn--right {
-    transform: translateX(-100%);
-    border-radius: 6px 0 6px 6px;
-}
-.chapter-btn.chapter-btn--right::before {
-    left: auto;
-    right: 0;
-    border-right-width: 0;   /* 오른쪽 없애면 왼쪽으로 기운 직각삼각형 */
-    border-left-width: 8px;
-}
-
-/* 좁은 화면: 툴팁이 겹치므로 active만 표시 */
-@container (max-width: 768px) {
-    .chapter-btn:not(.active) {
-        display: none;
-    }
-}
+/* 동영상 플레이어(챕터 탭·재생 바·자막 박스)는 별도 페이지 ani.html로 분리됐다 —
+   video_player.css 참고. */
