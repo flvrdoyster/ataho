@@ -10,9 +10,9 @@ window.DASHBOARD_DATA['ga4'] = {
    "n": 28,
    "q1": 2.0555555555555554,
    "q3": 3.792207792207792,
-   "rank": 19,
-   "value": 2.2857142857142856,
-   "vsMedian": -29.125138427464016,
+   "rank": 18,
+   "value": 2.4285714285714284,
+   "vsMedian": -24.69545957918052,
    "where": "usual"
   },
   "sessions": {
@@ -46,9 +46,9 @@ window.DASHBOARD_DATA['ga4'] = {
    "n": 28,
    "q1": 20.5,
    "q3": 50.75,
-   "rank": 27,
-   "value": 16,
-   "vsMedian": -58.44155844155844,
+   "rank": 26,
+   "value": 17,
+   "vsMedian": -55.84415584415584,
    "where": "low"
   }
  },
@@ -220,7 +220,7 @@ window.DASHBOARD_DATA['ga4'] = {
    "date": "2026-09-09",
    "sessions": 11,
    "users": 7,
-   "views": 16
+   "views": 17
   }
  ],
  "history": {
@@ -6270,9 +6270,9 @@ window.DASHBOARD_DATA['ga4'] = {
      "n": 28,
      "q1": 2.0555555555555554,
      "q3": 3.792207792207792,
-     "rank": 19,
-     "value": 2.2857142857142856,
-     "vsMedian": -29.125138427464016,
+     "rank": 18,
+     "value": 2.4285714285714284,
+     "vsMedian": -24.69545957918052,
      "where": "usual"
     },
     "sessions": {
@@ -6461,9 +6461,9 @@ window.DASHBOARD_DATA['ga4'] = {
      "n": 28,
      "q1": 2.0555555555555554,
      "q3": 3.792207792207792,
-     "rank": 19,
-     "value": 2.2857142857142856,
-     "vsMedian": -29.125138427464016,
+     "rank": 18,
+     "value": 2.4285714285714284,
+     "vsMedian": -24.69545957918052,
      "where": "usual"
     },
     "sessions": {
@@ -6497,20 +6497,20 @@ window.DASHBOARD_DATA['ga4'] = {
      "n": 28,
      "q1": 20.5,
      "q3": 50.75,
-     "rank": 27,
-     "value": 16,
-     "vsMedian": -58.44155844155844,
+     "rank": 26,
+     "value": 17,
+     "vsMedian": -55.84415584415584,
      "where": "low"
     }
    },
    "confirmed": false,
    "insights": [
     {
-     "text": "어제 방문자 7명 — 평소(11명)보다 적은 편으로, 28일 중 27번째입니다.",
-     "tone": "down"
+     "text": "어제 조회 17회 가운데 14회(82%)가 신규 쪽입니다 — 7명이 1인당 2장씩 봤습니다(재방문는 0.5장).",
+     "tone": "flat"
     },
     {
-     "text": "어제 유입 가운데 10건은 출처가 아직 분류되지 않았습니다(분류된 것은 8건) — GA4가 세션 속성을 확정하는 데 하루 이상 걸립니다. 이 값은 내일 자동으로 다시 확인됩니다.",
+     "text": "어제 방문자 7명 — 평소(11명)보다 적은 편으로, 28일 중 27번째입니다.",
      "tone": "down"
     }
    ],
@@ -6580,7 +6580,7 @@ window.DASHBOARD_DATA['ga4'] = {
      "spike": false,
      "title": "PC98 웹 에뮬레이터",
      "users": 2,
-     "views": 1
+     "views": 2
     },
     {
      "host": "pc98.atah.io",
@@ -6606,7 +6606,7 @@ window.DASHBOARD_DATA['ga4'] = {
    "ydaySites": [
     {
      "name": "pc98.atah.io",
-     "views": 13
+     "views": 14
     },
     {
      "name": "suiko.atah.io",
@@ -6619,35 +6619,35 @@ window.DASHBOARD_DATA['ga4'] = {
      "sessions": 5
     },
     {
+     "name": "oysterbay.tistory.com",
+     "sessions": 3
+    },
+    {
      "name": "직접 방문",
-     "sessions": 1
+     "sessions": 2
     },
     {
      "name": "m.search.naver.com",
      "sessions": 1
-    },
-    {
-     "name": "oysterbay.tistory.com",
-     "sessions": 1
     }
    ],
-   "ydayUnresolved": 10,
+   "ydayUnresolved": 0,
    "yesterday": {
     "date": "2026-09-09",
-    "newUsers": 6,
+    "newUsers": 7,
     "sessions": 11,
     "users": 7,
-    "views": 16
+    "views": 17
    }
   }
  },
  "insights": [
   {
-   "text": "어제 방문자 7명 — 평소(11명)보다 적은 편으로, 28일 중 27번째입니다.",
-   "tone": "down"
+   "text": "어제 조회 17회 가운데 14회(82%)가 신규 쪽입니다 — 7명이 1인당 2장씩 봤습니다(재방문는 0.5장).",
+   "tone": "flat"
   },
   {
-   "text": "어제 유입 가운데 10건은 출처가 아직 분류되지 않았습니다(분류된 것은 8건) — GA4가 세션 속성을 확정하는 데 하루 이상 걸립니다. 이 값은 내일 자동으로 다시 확인됩니다.",
+   "text": "어제 방문자 7명 — 평소(11명)보다 적은 편으로, 28일 중 27번째입니다.",
    "tone": "down"
   }
  ],
@@ -6658,7 +6658,7 @@ window.DASHBOARD_DATA['ga4'] = {
   "propertyId": "516513119",
   "settledDays": 7,
   "trendDays": 28,
-  "updatedAt": "2026-09-10 08:44"
+  "updatedAt": "2026-09-10 18:19"
  },
  "settled": {
   "avgDuration": 308.2950824587156,
@@ -6732,7 +6732,7 @@ window.DASHBOARD_DATA['ga4'] = {
    "spike": false,
    "title": "PC98 웹 에뮬레이터",
    "users": 2,
-   "views": 1
+   "views": 2
   },
   {
    "host": "pc98.atah.io",
@@ -6758,7 +6758,7 @@ window.DASHBOARD_DATA['ga4'] = {
  "ydaySites": [
   {
    "name": "pc98.atah.io",
-   "views": 13
+   "views": 14
   },
   {
    "name": "suiko.atah.io",
@@ -6771,24 +6771,24 @@ window.DASHBOARD_DATA['ga4'] = {
    "sessions": 5
   },
   {
+   "name": "oysterbay.tistory.com",
+   "sessions": 3
+  },
+  {
    "name": "직접 방문",
-   "sessions": 1
+   "sessions": 2
   },
   {
    "name": "m.search.naver.com",
    "sessions": 1
-  },
-  {
-   "name": "oysterbay.tistory.com",
-   "sessions": 1
   }
  ],
- "ydayUnresolved": 10,
+ "ydayUnresolved": 0,
  "yesterday": {
   "date": "2026-09-09",
-  "newUsers": 6,
+  "newUsers": 7,
   "sessions": 11,
   "users": 7,
-  "views": 16
+  "views": 17
  }
 };

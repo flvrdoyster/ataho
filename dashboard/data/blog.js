@@ -9,10 +9,10 @@ window.DASHBOARD_DATA['blog'] = {
    "min": 1.3333333333333333,
    "n": 28,
    "q1": 2.03125,
-   "q3": 5.075,
-   "rank": 7,
-   "value": 5.166666666666667,
-   "vsMedian": 79.71014492753625,
+   "q3": 5.325,
+   "rank": 6,
+   "value": 5.5,
+   "vsMedian": 91.30434782608695,
    "where": "high"
   },
   "sessions": {
@@ -45,10 +45,10 @@ window.DASHBOARD_DATA['blog'] = {
    "min": 4,
    "n": 28,
    "q1": 11.0,
-   "q3": 32.5,
-   "rank": 8,
-   "value": 31,
-   "vsMedian": 67.56756756756756,
+   "q3": 33.0,
+   "rank": 7,
+   "value": 33,
+   "vsMedian": 78.37837837837837,
    "where": "usual"
   }
  },
@@ -220,7 +220,7 @@ window.DASHBOARD_DATA['blog'] = {
    "date": "2026-09-09",
    "sessions": 8,
    "users": 6,
-   "views": 31
+   "views": 33
   }
  ],
  "history": {
@@ -5491,10 +5491,10 @@ window.DASHBOARD_DATA['blog'] = {
      "min": 1.3333333333333333,
      "n": 28,
      "q1": 2.03125,
-     "q3": 5.075,
-     "rank": 7,
-     "value": 5.166666666666667,
-     "vsMedian": 79.71014492753625,
+     "q3": 5.325,
+     "rank": 6,
+     "value": 5.5,
+     "vsMedian": 91.30434782608695,
      "where": "high"
     },
     "sessions": {
@@ -5527,7 +5527,7 @@ window.DASHBOARD_DATA['blog'] = {
      "min": 4,
      "n": 28,
      "q1": 11.0,
-     "q3": 32.5,
+     "q3": 33.0,
      "rank": 23,
      "value": 9,
      "vsMedian": -51.35135135135135,
@@ -5537,7 +5537,7 @@ window.DASHBOARD_DATA['blog'] = {
    "confirmed": true,
    "insights": [
     {
-     "text": "09.08 한 사람이 평균 5.2장을 봤습니다 — 평소 2.9장이니 깊게 본 날입니다(28일 최대 7.7장).",
+     "text": "09.08 한 사람이 평균 5.5장을 봤습니다 — 평소 2.9장이니 깊게 본 날입니다(28일 최대 7.7장).",
      "tone": "flat"
     },
     {
@@ -5651,10 +5651,10 @@ window.DASHBOARD_DATA['blog'] = {
      "min": 1.3333333333333333,
      "n": 28,
      "q1": 2.03125,
-     "q3": 5.075,
-     "rank": 7,
-     "value": 5.166666666666667,
-     "vsMedian": 79.71014492753625,
+     "q3": 5.325,
+     "rank": 6,
+     "value": 5.5,
+     "vsMedian": 91.30434782608695,
      "where": "high"
     },
     "sessions": {
@@ -5687,10 +5687,10 @@ window.DASHBOARD_DATA['blog'] = {
      "min": 4,
      "n": 28,
      "q1": 11.0,
-     "q3": 32.5,
-     "rank": 8,
-     "value": 31,
-     "vsMedian": 67.56756756756756,
+     "q3": 33.0,
+     "rank": 7,
+     "value": 33,
+     "vsMedian": 78.37837837837837,
      "where": "usual"
     }
    },
@@ -5701,12 +5701,8 @@ window.DASHBOARD_DATA['blog'] = {
      "tone": "up"
     },
     {
-     "text": "어제 한 사람이 평균 5.2장을 봤습니다 — 평소 2.9장이니 깊게 본 날입니다(28일 최대 7.7장).",
+     "text": "어제 한 사람이 평균 5.5장을 봤습니다 — 평소 2.9장이니 깊게 본 날입니다(28일 최대 7.7장).",
      "tone": "flat"
-    },
-    {
-     "text": "어제 유입 가운데 9건은 출처가 아직 분류되지 않았습니다(분류된 것은 6건) — GA4가 세션 속성을 확정하는 데 하루 이상 걸립니다. 이 값은 내일 자동으로 다시 확인됩니다.",
-     "tone": "down"
     }
    ],
    "longest": null,
@@ -5772,10 +5768,10 @@ window.DASHBOARD_DATA['blog'] = {
      "name": "환세취호전 웹 에뮬레이터",
      "priorAvg": 1.0740740740740742,
      "section": "",
-     "spike": false,
+     "spike": true,
      "title": "",
      "users": 2,
-     "views": 4
+     "views": 5
     },
     {
      "host": "",
@@ -5785,7 +5781,7 @@ window.DASHBOARD_DATA['blog'] = {
      "spike": false,
      "title": "",
      "users": 1,
-     "views": 2
+     "views": 3
     },
     {
      "host": "",
@@ -5822,20 +5818,20 @@ window.DASHBOARD_DATA['blog'] = {
    "ydaySources": [
     {
      "name": "google",
-     "sessions": 4
+     "sessions": 6
     },
     {
      "name": "직접 방문",
      "sessions": 2
     }
    ],
-   "ydayUnresolved": 9,
+   "ydayUnresolved": 0,
    "yesterday": {
     "date": "2026-09-09",
     "newUsers": 4,
     "sessions": 8,
     "users": 6,
-    "views": 31
+    "views": 33
    }
   }
  },
@@ -5845,12 +5841,8 @@ window.DASHBOARD_DATA['blog'] = {
    "tone": "up"
   },
   {
-   "text": "어제 한 사람이 평균 5.2장을 봤습니다 — 평소 2.9장이니 깊게 본 날입니다(28일 최대 7.7장).",
+   "text": "어제 한 사람이 평균 5.5장을 봤습니다 — 평소 2.9장이니 깊게 본 날입니다(28일 최대 7.7장).",
    "tone": "flat"
-  },
-  {
-   "text": "어제 유입 가운데 9건은 출처가 아직 분류되지 않았습니다(분류된 것은 6건) — GA4가 세션 속성을 확정하는 데 하루 이상 걸립니다. 이 값은 내일 자동으로 다시 확인됩니다.",
-   "tone": "down"
   }
  ],
  "longest": null,
@@ -5860,7 +5852,7 @@ window.DASHBOARD_DATA['blog'] = {
   "propertyId": "549191220",
   "settledDays": 7,
   "trendDays": 28,
-  "updatedAt": "2026-09-10 08:44"
+  "updatedAt": "2026-09-10 18:19"
  },
  "settled": {
   "avgDuration": 191.22020056097563,
@@ -5931,10 +5923,10 @@ window.DASHBOARD_DATA['blog'] = {
    "name": "환세취호전 웹 에뮬레이터",
    "priorAvg": 1.0740740740740742,
    "section": "",
-   "spike": false,
+   "spike": true,
    "title": "",
    "users": 2,
-   "views": 4
+   "views": 5
   },
   {
    "host": "",
@@ -5944,7 +5936,7 @@ window.DASHBOARD_DATA['blog'] = {
    "spike": false,
    "title": "",
    "users": 1,
-   "views": 2
+   "views": 3
   },
   {
    "host": "",
@@ -5981,19 +5973,19 @@ window.DASHBOARD_DATA['blog'] = {
  "ydaySources": [
   {
    "name": "google",
-   "sessions": 4
+   "sessions": 6
   },
   {
    "name": "직접 방문",
    "sessions": 2
   }
  ],
- "ydayUnresolved": 9,
+ "ydayUnresolved": 0,
  "yesterday": {
   "date": "2026-09-09",
   "newUsers": 4,
   "sessions": 8,
   "users": 6,
-  "views": 31
+  "views": 33
  }
 };
