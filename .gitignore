@@ -10,3 +10,4 @@ haiyuki_web/tests/
 # Python
 __pycache__/
 *.pyc
+.venv/
