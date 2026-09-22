@@ -108,11 +108,10 @@
     color: rgba(255, 255, 255, 0.4);
 }
 
-/* 더빙 음원이 없는 챕터 — 켜둔 상태(.active)와 무관하게 더 흐리게, 커서도 끈다 */
-.video-dub-btn:disabled {
-    color: rgba(255, 255, 255, 0.2);
-    background: transparent;
-    cursor: default;
+/* 더빙 음원이 없는 챕터 — 흐리게 두면 "끈 상태"와 구분이 안 돼 아예 안 보이게 하되,
+   자리는 남긴다(display: none이면 챕터를 넘길 때마다 재생 바 폭이 바뀐다). */
+.video-dub-btn.empty {
+    visibility: hidden;
 }
 
 /* ── 자막 ────────────────────────────────────────────────────────────────
@@ -129,11 +128,9 @@
     color: rgba(255, 255, 255, 1);
     font-size: clamp(12px, 3.75cqw, 24px);
 
-    font-family: var(--ui-font);
-    /* 컨트롤(HUD)은 --ui-font-weight(bold)를 쓰지만 자막은 레귤러 — 볼드는 짧은
-       라벨이 배경 위에서 버티라고 쓰는 것이고, 자막은 박스가 대비를 만들어준다.
-       (Dokkaebi DNR Gothic은 fonts.css에 400/700 두 굵기가 다 등록돼 있음) */
-    font-weight: 400;
+    /* 자막은 읽는 글이라 본문 폰트를 그대로 쓴다 — 픽셀 폰트(--ui-font)는 컨트롤의
+       짧은 라벨 전용. 장면 뷰어 자막(.subtitle-overlay)과도 같은 폰트가 된다. */
+    font-family: 'KoddiUDOnGothic', 'Noto Sans JP', sans-serif;
 
     /* 박스가 글자만 감싸도록 — 폭을 내용에 맞추고 좌우 auto 여백으로 가운데 정렬 */
     left: 0;
@@ -302,17 +299,17 @@
 @container (max-width: 600px) {
     .video-jump-btn,
     .video-volume,
-    .video-volume-value {
+    .video-volume-value,
+    .video-time {
         display: none;
     }
 
-    /* 항상 두 줄로 고정: 첫 줄은 재생 바 + 시간, 둘째 줄은 음소거 · 자막 · 더빙.
-       줄바꿈은 flex-basis 합으로 정해지므로, 재생 바가 시간 표시만 남기고 첫 줄을
-       다 차지하게 해 버튼들이 폭에 따라 어중간하게 나뉘지 않게 한다 (그대로 두면
-       더빙 버튼 하나만 다음 줄로 떨어지는 폭이 생긴다). 116px = 시간(100px) + 간격 + 여유. */
+    /* 재생 바 · 음소거 · 자막 · 더빙을 항상 한 줄에 둔다. 줄바꿈은 flex-basis 합으로
+       정해지므로, 재생 바는 기본 폭을 0으로 두고 버튼들을 뺀 나머지를 flex-grow로
+       다 차지하게 한다 — 어떤 폭에서도 버튼이 다음 줄로 밀리지 않는다. */
     .video-seek {
-        flex-basis: calc(100% - 116px);
-        min-width: 0;   /* 기본 min-width(120px)가 아주 좁은 폭에서 시간을 밀어내지 않게 */
+        flex-basis: 0;
+        min-width: 0;   /* 기본 min-width(120px)는 좁은 폭에서 버튼을 밀어낸다 */
     }
 
     .chapter-body {

@@ -206,13 +206,15 @@ class VideoPlayer {
         this.applyDub();
     }
 
-    // 켜짐(.active)은 사용자가 고른 상태, disabled는 이 챕터에 음원이 없다는 뜻 —
-    // 둘은 별개라, 더빙 없는 챕터를 지나 다시 더빙 챕터로 오면 켜둔 상태가 돌아온다.
+    // 음원이 없는 챕터에서는 버튼을 감춘다 — 흐리게만 두면 "끈 상태"와 구분이 안 된다.
+    // 자리는 남겨 둬야(.empty = visibility: hidden) 챕터를 넘길 때 재생 바 폭이 안 바뀐다.
+    // 켜둔 상태(dubOn)는 그대로 남아, 더빙 있는 챕터로 돌아오면 켜진 채로 다시 나타난다.
     updateDubButton() {
         if (!this.dubBtn) return;
         this.dubBtn.classList.toggle('active', this.dubOn);
         this.dubBtn.setAttribute('aria-pressed', String(this.dubOn));
-        this.dubBtn.disabled = !this.dubAvailable;
+        this.dubBtn.classList.toggle('empty', !this.dubAvailable);
+        this.dubBtn.disabled = !this.dubAvailable;   // 안 보이는 버튼이 탭 이동·클릭에 안 걸리게
     }
 
     // 더빙 켜짐·현재 챕터 음원 유무·뮤트를 합쳐 두 미디어의 소리 상태를 결정한다.
@@ -332,7 +334,7 @@ class VideoPlayer {
         };
 
         // 더빙 음원은 챕터(=파일)마다 다르니 src가 바뀔 때 같이 갈아끼운다. 없는
-        // 챕터에서는 src를 비워 두고 버튼만 disabled — 켜둔 상태(dubOn)는 남긴다.
+        // 챕터에서는 src를 비워 두고 버튼을 자리만 남긴 채 감춘다 — 켜둔 상태(dubOn)는 남긴다.
         const dubSrc = typeof chapter.dub === 'string' ? chapter.dub
             : (chapter.dub && this.audioLang ? deriveDubSrc(chapter.src, this.audioLang) : null);
         this.dubAvailable = !!dubSrc;
@@ -483,7 +485,7 @@ class VideoPlayer {
             row.appendChild(subBtn);
         }
 
-        // 더빙 켜기/끄기. 자막 버튼과 같은 글자 토글. 음원이 없는 챕터에서는 disabled.
+        // 더빙 켜기/끄기. 자막 버튼과 같은 글자 토글. 음원이 없는 챕터에서는 자리만 남기고 감춘다.
         if (this.hasDub()) {
             const dubBtn = document.createElement('button');
             dubBtn.className = 'video-skip-btn video-dub-btn';
