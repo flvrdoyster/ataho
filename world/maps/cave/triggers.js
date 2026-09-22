@@ -65,7 +65,7 @@ window.MAP_DATA.triggers = [
     "items": [
       {
         "label": "환세희담 외전\n~궁극의 에로문서 전설~",
-        "href": "scene_viewer/scene.html?story=gaiden",
+        "href": "viewer/scene.html?story=gaiden",
         "target": "_blank"
       }
     ]
@@ -157,7 +157,7 @@ window.MAP_DATA.triggers = [
     "items": [
       {
         "label": "DS 아니메 총집편 '98\n환세 시리즈 부분",
-        "href": "scene_viewer/ani.html",
+        "href": "viewer/ani.html",
         "target": "_blank"
       }
     ]
@@ -177,7 +177,7 @@ window.MAP_DATA.triggers = [
     "items": [
       {
         "label": "환세쾌진극 엔딩",
-        "href": "scene_viewer/scene.html?story=kaisin",
+        "href": "viewer/scene.html?story=kaisin",
         "target": "_blank"
       }
     ]

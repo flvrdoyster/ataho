@@ -1,60 +1,20 @@
 <!DOCTYPE html>
 <html lang="ko">
+<!-- 옛 경로(/scene_viewer/)로 들어온 북마크·외부 링크를 새 경로(/viewer/)로 보낸다.
+     GitHub Pages는 서버 리다이렉트가 없어 이 스텁이 유일한 방법이다.
+     유입이 끊기면 지워도 된다. -->
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>환세 시리즈 부분 컷 : atah.io</title>
-    <link rel="icon" href="https://atah.io/favicon.ico">
-    <link rel="stylesheet" href="../fonts.css">
-    <link rel="stylesheet" href="page.css">
-    <link rel="stylesheet" href="../world/ui.css">
-    <link rel="stylesheet" href="video_player.css">
-    <!-- 무대 비율(1280x720) — page.css의 기본값(640x480)을 덮어쓴다 -->
-    <link rel="stylesheet" href="ani/ani.css">
-    <!-- Google Tag Manager -->
-    <script>(function (w, d, s, l, i) {
-            w[l] = w[l] || []; w[l].push({
-                'gtm.start':
-                    new Date().getTime(), event: 'gtm.js'
-            }); var f = d.getElementsByTagName(s)[0],
-                j = d.createElement(s), dl = l != 'dataLayer' ? '&l=' + l : ''; j.async = true; j.src =
-                    'https://www.googletagmanager.com/gtm.js?id=' + i + dl; f.parentNode.insertBefore(j, f);
-        })(window, document, 'script', 'dataLayer', 'GTM-PR4S897C');</script>
-    <!-- End Google Tag Manager -->
-    <link rel="stylesheet" href="../footer.css">
+    <link rel="canonical" href="https://atah.io/viewer/ani.html">
+    <meta name="robots" content="noindex">
+    <meta http-equiv="refresh" content="0; url=/viewer/ani.html">
+    <script>location.replace('/viewer/ani.html' + location.search + location.hash);</script>
 </head>
 
-<body class="footer-fixed">
-    <!-- Google Tag Manager (noscript) -->
-    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-PR4S897C" height="0" width="0"
-            style="display:none;visibility:hidden"></iframe></noscript>
-    <!-- End Google Tag Manager (noscript) -->
-    <div id="app">
-        <div id="stage" class="stage">
-            <div id="loading">Loading...</div>
-        </div>
-        <div id="controls"></div>
-    </div>
-
-    <!-- world/ui.js가 자기 이미지 자산(커서·프레임)을 찾는 기준 -->
-    <script>window.WORLD_BASE = '../world/';</script>
-
-    <!-- 자막(VTT) 파싱·동기화 — scene.html의 장면 뷰어와 공유 -->
-    <script src="subtitles.js"></script>
-    <!-- 공용 픽셀 UI 키트 — 미니게임(balance/sweep)과 같은 것. UIMuteButton을 쓴다 -->
-    <script src="../world/ui.js"></script>
-    <script src="video_player.js"></script>
-    <script src="ani/ani.js"></script>
-    <script>
-        const config = VideoPlayer.players.ani;
-        if (!config) {
-            document.getElementById('loading').textContent = '영상 정보를 불러오지 못했습니다.';
-        } else {
-            new VideoPlayer('#stage', '#controls').load(config);
-        }
-    </script>
-    <script src="../footer.js"></script>
+<body>
+    <p><a href="/viewer/ani.html">새 주소로 이동합니다 — /viewer/ani.html</a></p>
 </body>
 
 </html>

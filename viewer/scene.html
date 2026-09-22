@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>장면 뷰어 : atah.io</title>
+    <link rel="icon" href="https://atah.io/favicon.ico">
+    <link rel="stylesheet" href="../fonts.css">
+    <link rel="stylesheet" href="page.css">
+    <link rel="stylesheet" href="scene_viewer.css">
+    <!-- Google Tag Manager -->
+    <script>(function (w, d, s, l, i) {
+            w[l] = w[l] || []; w[l].push({
+                'gtm.start':
+                    new Date().getTime(), event: 'gtm.js'
+            }); var f = d.getElementsByTagName(s)[0],
+                j = d.createElement(s), dl = l != 'dataLayer' ? '&l=' + l : ''; j.async = true; j.src =
+                    'https://www.googletagmanager.com/gtm.js?id=' + i + dl; f.parentNode.insertBefore(j, f);
+        })(window, document, 'script', 'dataLayer', 'GTM-PR4S897C');</script>
+    <!-- End Google Tag Manager -->
+    <link rel="stylesheet" href="../footer.css">
+</head>
+
+<body class="footer-fixed">
+    <!-- Google Tag Manager (noscript) -->
+    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-PR4S897C" height="0" width="0"
+            style="display:none;visibility:hidden"></iframe></noscript>
+    <!-- End Google Tag Manager (noscript) -->
+    <div id="app">
+        <div id="stage" class="stage">
+            <!-- Scene content will be injected here -->
+            <div id="loading">Loading...</div>
+        </div>
+        <div id="controls">
+            <input type="range" id="scene-scrubber" min="0" max="0" value="0" style="width: 100%;">
+
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <!-- 자막(VTT) 파싱·동기화 — 동영상 플레이어(ani.html)와 공유 -->
+    <script src="subtitles.js"></script>
+    <script src="scene_viewer.js"></script>
+    <script>
+        const STORY_MAP = {
+            kaisin: { script: 'kaisin/kaisin.js', css: 'kaisin/kaisin.css' },
+            gaiden: { script: 'gaiden/gaiden.js', css: 'gaiden/gaiden.css' },
+        };
+
+        const storyId = new URLSearchParams(location.search).get('story') || 'kaisin';
+
+        // 'ani'는 분기 없는 영상 재생이라 전용 페이지로 분리됐다. 예전 주소로 들어온
+        // 링크(외부 공유분 포함)를 그쪽으로 넘긴다 — replace라 뒤로 가기가 여기로
+        // 되돌아와 무한히 튕기지 않는다.
+        if (storyId === 'ani') {
+            location.replace('ani.html' + location.hash);
+        } else {
+            const entry = STORY_MAP[storyId];
+            if (!entry) {
+                document.getElementById('loading').textContent = `스토리를 찾을 수 없습니다: ${storyId}`;
+            } else {
+                if (entry.css) {
+                    const link = document.createElement('link');
+                    link.rel = 'stylesheet';
+                    link.href = entry.css;
+                    document.head.appendChild(link);
+                }
+
+                const data = document.createElement('script');
+                data.src = entry.script;
+                data.onload = () => {
+                    const story = SceneViewer.stories[storyId];
+                    if (!story) {
+                        console.error(`Story registered but not found: ${storyId}`);
+                        return;
+                    }
+                    new SceneViewer('#stage').loadStory(story);
+                };
+                data.onerror = () => {
+                    // 안 그러면 "Loading..."에서 멈춘 채 아무 설명이 없다.
+                    console.error(`Failed to load: ${entry.script}`);
+                    const el = document.getElementById('loading');
+                    if (el) el.textContent = `불러오지 못했습니다: ${entry.script}`;
+                };
+                document.head.appendChild(data);
+            }
+        }
+    </script>
+    <script src="../footer.js"></script>
+</body>
+
+</html>
