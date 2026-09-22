@@ -101,10 +101,18 @@
     background: rgba(255, 255, 255, 0.28);
 }
 
-/* 켜고 끄는 버튼(자막)은 테두리가 없어졌으니 글자 밝기로 상태를 알린다 —
+/* 켜고 끄는 버튼(자막·더빙)은 테두리가 없어졌으니 글자 밝기로 상태를 알린다 —
    꺼지면 흐리게. -10/+10처럼 토글이 아닌 버튼은 항상 밝은 상태 그대로다. */
-.video-subtitle-btn:not(.active) {
+.video-subtitle-btn:not(.active),
+.video-dub-btn:not(.active) {
     color: rgba(255, 255, 255, 0.4);
+}
+
+/* 더빙 음원이 없는 챕터 — 켜둔 상태(.active)와 무관하게 더 흐리게, 커서도 끈다 */
+.video-dub-btn:disabled {
+    color: rgba(255, 255, 255, 0.2);
+    background: transparent;
+    cursor: default;
 }
 
 /* ── 자막 ────────────────────────────────────────────────────────────────
