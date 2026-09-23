@@ -13,17 +13,27 @@
 //
 // 자막(VTT) 파싱/동기화는 subtitles.js를 공유한다 (SceneViewer도 같은 걸 쓴다).
 //
-// 더빙 음원은 영상과 별개의 <audio>로 같이 돌린다 — mp4에 오디오 트랙을 하나 더
-// 심어 고르는 audioTracks API는 사파리 말고는 못 쓴다. 더빙이 켜지면 <video>는
-// 음소거하고 <audio>가 소리를 내며, 시각은 항상 <video>를 기준으로 맞춘다
-// (play/pause/seek를 따라가고, 흘러가다 어긋나면 되돌린다). 음원 파일은 영상과
-// 길이를 똑같이 맞춰 두는 게 전제다. 경로는 자막처럼 audioLang 관례로 유도한다
-// (dub: true) — 챕터에 dub: "경로"를 직접 줄 수도 있다(subtitle과 같은 방식).
+// 더빙 음원은 WebAudio로 디코딩해 AudioBufferSourceNode로 돌린다. <audio>를 하나 더
+// 두는 쪽이 간단하지만 iOS에서 소리가 뚝뚝 끊겼다 — 미디어 요소 둘을 동시에
+// 디코딩하는 것도, preload를 무시하고 30MB 영상과 같은 회선을 두고 경쟁하며 받아오는
+// 것도 iOS에선 버티지 못한다. 버퍼로 올려 두면 재생 중 받아올 게 없고 미디어 요소도
+// <video> 하나뿐이라 둘 다 사라진다. (mp4에 트랙을 더 심어 고르는 audioTracks API는
+// 사파리 전용이라 안 쓴다.) file://은 fetch가 막혀 <audio>로 떨어진다 — 아래 참고.
+//
+// 시각은 항상 <video>가 쥔다: play/pause/seek를 따라가고, 오디오 클럭이 흘러가다
+// 어긋나면 소스를 그 지점에서 다시 띄운다. 원음은 더빙을 켠 순간 끊는다 — 음원을
+// 받는 동안 잠깐 조용해지는 편이, 준비되는 순간 두 소리가 겹치는 것보다 낫다. 음원 파일은 영상과 길이를 똑같이 맞춰
+// 두는 게 전제다. 경로는 자막처럼 audioLang 관례로 유도한다 (dub: true) — 챕터에
+// dub: "경로"를 직접 줄 수도 있다(subtitle과 같은 방식).
 //
 // 컨트롤 외형은 미니게임과 같은 공용 픽셀 UI 키트(world/ui.css)를 따르고, 음소거
 // 버튼은 그 키트의 UIMuteButton(world/ui.js)을 그대로 쓴다 — 아이콘을 따로 만들지 않는다.
 // 재생/일시정지 아이콘은 사이트 어디에도 관례가 없어 여기서 새로 두되, 다른
 // 아이콘들과 같은 방식(인라인 SVG, fill="currentColor")으로 맞춘다.
+// 오디오 클럭(WebAudio)과 영상 클럭은 따로 흐르므로 조금씩 어긋난다. 이보다 벌어지면
+// 소스를 다시 띄워 맞추는데, 그때 소리가 한 번 끊기므로 귀로 잡을 수 있는 선까지 둔다.
+const DUB_DRIFT_LIMIT = 0.25;
+
 const PLAY_PAUSE_ICONS = {
     play: '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><polygon points="7,4 20,12 7,20"/></svg>',
     pause: '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">'
@@ -49,11 +59,18 @@ class VideoPlayer {
         this.subtitleEl = null;
         this.detachSubtitles = null;
         this.subtitleBtn = null;
-        this.subtitlesOn = true;   // 챕터를 넘어가도 유지되는 자막 표시 여부
+        this.subtitlesOn = true;   // 더빙이 없는 설정에서만 쓰는 자막 표시 여부 (subtitlesVisible 참고)
         this.audioLang = null;
-        this.dubAudio = null;      // 더빙 음원용 <audio> — 더빙 챕터가 하나라도 있을 때만 만든다
         this.dubOn = false;        // 더빙 켜짐 여부 — 자막처럼 챕터를 넘어가도 유지
         this.dubAvailable = false; // 현재 챕터에 더빙 음원이 있는지
+        this.dubSrc = null;        // 현재 챕터의 더빙 음원 경로
+        this.dubBuffer = null;     // 디코딩해 둔 현재 챕터 음원 — 넘어가면 버린다
+        this.dubSource = null;     // 재생 중인 AudioBufferSourceNode (일회용 — 멈추면 버린다)
+        this.dubGain = null;       // 더빙 전용 게인 — 음소거를 여기서 건다
+        this.videoGain = null;     // 원음 전용 게인 — 더빙이 켜지면 여기를 0으로 내린다
+        this.dubBase = 0;          // 소스를 띄운 시점의 (음원 오프셋, 그때의 ctx.currentTime)
+        this.dubBaseCtxTime = 0;
+        this.dubAudio = null;      // WebAudio를 못 쓸 때(file:// 등)만 쓰는 <audio> 대체 경로
         this.dubBtn = null;
         this.userMuted = false;    // 뮤트 버튼 상태 — video.muted는 더빙 때문에 따로 켜질 수 있어 분리
         this.seekEl = null;
@@ -93,7 +110,7 @@ class VideoPlayer {
         const video = document.createElement('video');
         video.className = 'scene-video';
         video.playsInline = true;
-        video.addEventListener('click', () => this.togglePlay());
+        video.addEventListener('click', (e) => this.onVideoClick(e));
         video.addEventListener('timeupdate', () => this.updateSeekUI());
         video.addEventListener('ended', () => this.onChapterEnded());
         video.addEventListener('play', () => this.updatePlayOverlay());
@@ -102,17 +119,17 @@ class VideoPlayer {
         this.video = video;
 
         if (this.hasDub()) {
+            // WebAudio를 못 쓰는 환경(file://)을 위한 대체 경로. 쓰이지 않으면 src가
+            // 비어 있는 빈 요소로 남는다.
             const audio = document.createElement('audio');
             audio.preload = 'auto';
             this.stage.appendChild(audio);
             this.dubAudio = audio;
-            // <video>가 시계다 — 재생/정지/탐색을 그대로 따라가고, 재생 중 어긋나면
-            // (버퍼링으로 영상만 멈췄다 풀리는 경우 등) 되돌린다. 0.1초는 timeupdate
-            // 간격보다 짧고 귀로는 못 잡는 수준.
+
             video.addEventListener('play', () => this.applyDub());
             video.addEventListener('pause', () => this.applyDub());
-            video.addEventListener('seeking', () => this.syncDub(true));
-            video.addEventListener('timeupdate', () => this.syncDub(false));
+            video.addEventListener('seeking', () => this.applyDub());
+            video.addEventListener('timeupdate', () => this.syncDub());
         }
 
         // 마우스를 올리거나(데스크탑) 일시정지 상태일 때(항상) 뜨는 재생/일시정지
@@ -130,7 +147,7 @@ class VideoPlayer {
         this.stage.appendChild(playOverlay);
         this.playOverlayBtn = playOverlay;
 
-        this.setupAudioBoost(video, this.dubAudio);
+        this.setupAudioBoost(video);
         this.buildControls();
         this.loadChapter(0);
     }
@@ -147,7 +164,7 @@ class VideoPlayer {
     // (네이티브 volume은 0~1, 즉 최대 100%가 한계라) 못 키우는 문제 대응.
     // 실패하면(구형 브라우저 등) this.gainNode가 없는 채로 그냥 <video>의 기본
     // 오디오 출력이 그대로 살아있으니, 슬라이더는 0~100%로만 동작한다.
-    setupAudioBoost(video, audio) {
+    setupAudioBoost(video) {
         // file://로 열면 미디어가 불투명 출처로 취급돼, WebAudio 그래프를 타는 순간
         // 소리가 통째로 무음이 된다 — 예외도 안 던지므로 아래 try/catch로도 못 잡는다.
         // 이 사이트는 서버 없이 파일을 직접 열어 확인하는 걸 원칙으로 하므로, 그
@@ -158,12 +175,21 @@ class VideoPlayer {
             const AudioContextClass = window.AudioContext || window.webkitAudioContext;
             const ctx = new AudioContextClass();
             const gain = ctx.createGain();
-            ctx.createMediaElementSource(video).connect(gain);
-            // 더빙 <audio>도 같은 GainNode를 타야 볼륨 슬라이더·증폭이 똑같이 먹는다
-            if (audio) ctx.createMediaElementSource(audio).connect(gain);
             gain.connect(ctx.destination);
             this.audioCtx = ctx;
             this.gainNode = gain;
+
+            // 원음과 더빙에 각자의 게인을 두고 둘 다 이 마스터 게인(볼륨 슬라이더·증폭)에
+            // 물린다. 원음을 끄는 걸 <video>의 muted에 맡기지 않는 이유 — 요소가 이미
+            // WebAudio 그래프에 물려 있으면 muted가 그래프로 흘러드는 소리까지 막아준다는
+            // 보장이 없다(사파리에서 더빙과 원음이 겹쳐 들렸다). 이득을 0으로 내리는 건
+            // 어디서나 확실하다.
+            this.videoGain = ctx.createGain();
+            ctx.createMediaElementSource(video).connect(this.videoGain);
+            this.videoGain.connect(gain);
+
+            this.dubGain = ctx.createGain();
+            this.dubGain.connect(gain);
         } catch (e) {
             this.audioCtx = null;
             this.gainNode = null;
@@ -176,6 +202,19 @@ class VideoPlayer {
         if (this.audioCtx && this.audioCtx.state === 'suspended') {
             this.audioCtx.resume().catch(() => {});
         }
+    }
+
+    // 화면 좌우 1/3을 누르면 ±10초, 가운데는 재생/일시정지. 표시는 두지 않는다 —
+    // 영상 위에 뭘 얹으면 정작 봐야 할 화면을 가리고, 컨트롤 줄에 같은 기능의
+    // 버튼(-10/+10)이 이미 있어 발견하지 못해도 잃는 게 없다. 좁은 화면에서는 그
+    // 버튼이 숨겨지므로(@container 규칙) 여기가 유일한 ±10초 수단이 된다.
+    onVideoClick(e) {
+        const rect = this.video.getBoundingClientRect();
+        if (!rect.width) return;
+        const x = (e.clientX - rect.left) / rect.width;
+        if (x < 1 / 3) { this.resumeAudio(); this.seekBy(-10); }
+        else if (x > 2 / 3) { this.resumeAudio(); this.seekBy(10); }
+        else this.togglePlay();
     }
 
     togglePlay() {
@@ -194,52 +233,142 @@ class VideoPlayer {
         this.applyDub();
     }
 
-    // 더빙 챕터가 하나도 없으면 <audio>도 버튼도 만들 이유가 없다.
+    // 더빙 챕터가 하나도 없으면 오디오도 버튼도 만들 이유가 없다.
     hasDub() {
         return this.chapters.some(ch => ch.dub);
+    }
+
+    // WebAudio 경로를 쓸 수 있는지 — 못 쓰면 <audio> 대체 경로로 간다.
+    // file://은 setupAudioBoost가 audioCtx를 아예 안 만들므로 여기서 같이 걸러진다
+    // (fetch도 로컬 파일에는 막혀 있어 어차피 버퍼를 못 만든다).
+    canBufferDub() {
+        return !!(this.audioCtx && this.dubGain);
     }
 
     toggleDub() {
         this.resumeAudio();
         this.dubOn = !this.dubOn;
         this.updateDubButton();
+        this.updateSubtitleUI();
+        if (this.dubOn) this.loadDubBuffer();
         this.applyDub();
     }
 
-    // 음원이 없는 챕터에서는 버튼을 감춘다 — 흐리게만 두면 "끈 상태"와 구분이 안 된다.
-    // 자리는 남겨 둬야(.empty = visibility: hidden) 챕터를 넘길 때 재생 바 폭이 안 바뀐다.
-    // 켜둔 상태(dubOn)는 그대로 남아, 더빙 있는 챕터로 돌아오면 켜진 채로 다시 나타난다.
-    updateDubButton() {
-        if (!this.dubBtn) return;
-        this.dubBtn.classList.toggle('active', this.dubOn);
-        this.dubBtn.setAttribute('aria-pressed', String(this.dubOn));
-        this.dubBtn.classList.toggle('empty', !this.dubAvailable);
-        this.dubBtn.disabled = !this.dubAvailable;   // 안 보이는 버튼이 탭 이동·클릭에 안 걸리게
+    // 음원을 통째로 받아 디코딩해 둔다. 받는 동안에도 영상은 원음으로 계속 재생되고,
+    // 준비되는 순간 applyDub가 더빙으로 갈아탄다 — 토글하자마자 무음이 되지 않게.
+    // 챕터가 바뀌면 뒤늦게 도착한 응답은 버린다(dubSrc로 확인).
+    loadDubBuffer() {
+        const src = this.dubSrc;
+        if (!src || !this.canBufferDub() || this.dubBuffer || this.dubLoading === src) return;
+        this.dubLoading = src;
+        fetch(src)
+            .then(res => res.arrayBuffer())
+            .then(buf => this.audioCtx.decodeAudioData(buf))
+            .then(decoded => {
+                if (this.dubSrc !== src) return;   // 그 사이 챕터가 바뀌었다
+                this.dubBuffer = decoded;
+                this.applyDub();
+            })
+            .catch(() => {})
+            .finally(() => { if (this.dubLoading === src) this.dubLoading = null; });
     }
 
-    // 더빙 켜짐·현재 챕터 음원 유무·뮤트를 합쳐 두 미디어의 소리 상태를 결정한다.
-    // 더빙이 실제로 나갈 때만 <video>를 음소거하고 <audio>를 영상에 맞춰 돌린다.
+    // 소스는 한 번 멈추면 다시 못 쓰는 일회용이라, 재생을 이어갈 때마다 새로 만든다.
+    startDubSource(offset) {
+        this.stopDubSource();
+        if (!this.dubBuffer || offset >= this.dubBuffer.duration) return;
+        const source = this.audioCtx.createBufferSource();
+        source.buffer = this.dubBuffer;
+        source.connect(this.dubGain);
+        source.onended = () => { if (this.dubSource === source) this.dubSource = null; };
+        source.start(0, Math.max(offset, 0));
+        this.dubSource = source;
+        this.dubBase = Math.max(offset, 0);
+        this.dubBaseCtxTime = this.audioCtx.currentTime;
+    }
+
+    stopDubSource() {
+        if (!this.dubSource) return;
+        try { this.dubSource.stop(); } catch (e) { /* 이미 끝난 소스 */ }
+        this.dubSource.disconnect();
+        this.dubSource = null;
+    }
+
+    // 지금 더빙 음원이 어디를 지나고 있는지 — 소스에는 currentTime이 없으니
+    // 띄운 지점에 그 뒤로 흐른 오디오 클럭을 더해 구한다.
+    dubPosition() {
+        if (!this.dubSource) return null;
+        return this.dubBase + (this.audioCtx.currentTime - this.dubBaseCtxTime);
+    }
+
+    // 음원이 없는 챕터에서도 버튼은 그대로 두고 누를 수만 없게 한다 — 상태를 자막
+    // 버튼과 나란히 보여주는 역할은 그대로 하고, 고를 수 있는 상태가 하나뿐이라
+    // 누를 것이 없을 뿐이다. 켜둔 상태(dubOn)는 남아, 더빙 있는 챕터로 돌아오면 이어진다.
+    updateDubButton() {
+        if (!this.dubBtn) return;
+        const on = this.dubOn && this.dubAvailable;
+        this.dubBtn.classList.toggle('active', on);
+        this.dubBtn.setAttribute('aria-pressed', String(on));
+        this.dubBtn.disabled = !this.dubAvailable;
+    }
+
+    // 더빙 켜짐·현재 챕터 음원 유무·준비 상태·뮤트를 합쳐 소리 상태를 결정한다.
+    //
+    // 원음은 더빙을 켠 순간 끊는다 — 음원을 받는 동안(1~2초) 잠깐 조용해지지만, 그
+    // 사이 원음을 계속 틀면 준비되는 순간 두 소리가 겹친다. 조용한 편이 낫다.
     applyDub() {
         if (!this.video) return;
-        const active = this.dubOn && this.dubAvailable && !!this.dubAudio;
-        this.video.muted = this.userMuted || active;
+        const buffered = this.canBufferDub();
+        const ready = buffered ? !!this.dubBuffer : !!(this.dubAudio && this.dubAudio.getAttribute('src'));
+        const wanted = this.dubOn && this.dubAvailable;   // 원음을 끌지
+        const active = wanted && ready;                   // 더빙을 실제로 낼지
+        this.video.muted = this.userMuted || wanted;
+
+        if (buffered) {
+            if (this.videoGain) this.videoGain.gain.value = (this.userMuted || wanted) ? 0 : 1;
+            if (this.dubGain) this.dubGain.gain.value = this.userMuted ? 0 : 1;
+            if (active && !this.video.paused) {
+                // 이미 제자리에서 돌고 있으면 그대로 둔다 — 음소거를 껐다 켤 때마다
+                // 다시 띄우면 그때마다 소리가 끊긴다. 탐색 뒤엔 크게 어긋나 있으니 잡힌다.
+                const pos = this.dubPosition();
+                if (pos === null || Math.abs(pos - this.video.currentTime) > DUB_DRIFT_LIMIT) {
+                    this.startDubSource(this.video.currentTime);
+                }
+            } else {
+                this.stopDubSource();
+            }
+            return;
+        }
+
         if (!this.dubAudio) return;
         this.dubAudio.muted = this.userMuted;
         if (active && !this.video.paused) {
-            this.syncDub(true);
+            this.dubAudio.currentTime = this.video.currentTime;
             this.dubAudio.play().catch(() => {});
         } else {
             this.dubAudio.pause();
         }
     }
 
-    // force: 탐색처럼 무조건 맞춰야 할 때. 아니면 재생 중 어긋난 경우에만 되돌린다 —
-    // currentTime을 매번 쓰면 그때마다 소리가 살짝 끊긴다.
-    syncDub(force) {
+    // 재생 중 두 클럭이 어긋났는지 보고, 벌어졌을 때만 그 지점에서 소스를 다시 띄운다.
+    // 매번 맞추면 그때마다 소리가 끊기므로 DUB_DRIFT_LIMIT 안쪽은 그냥 둔다.
+    syncDub() {
+        if (!this.video || this.video.paused) return;
+
+        if (this.canBufferDub()) {
+            const pos = this.dubPosition();
+            if (pos === null) return;
+            if (Math.abs(pos - this.video.currentTime) > DUB_DRIFT_LIMIT) {
+                this.startDubSource(this.video.currentTime);
+            }
+            return;
+        }
+
         const audio = this.dubAudio;
-        if (!audio || !this.video || (audio.paused && !force)) return;
-        const drift = Math.abs(audio.currentTime - this.video.currentTime);
-        if (force || drift > 0.1) audio.currentTime = this.video.currentTime;
+        if (!audio || audio.paused) return;
+        if (Math.abs(audio.currentTime - this.video.currentTime) > DUB_DRIFT_LIMIT) {
+            audio.currentTime = this.video.currentTime;
+        }
     }
 
     // 챕터가 파일별로 쪼개지면 각 클립이 따로 끝나므로, 다음 챕터로 이어 재생한다 —
@@ -251,12 +380,30 @@ class VideoPlayer {
         }
     }
 
+    // 더빙이 있는 설정에서 재생 상태는 둘뿐이다 — '원음 + 자막'과 '더빙 + 자막 없음'.
+    // 두 버튼은 그 하나의 스위치를 양쪽에서 누르는 것이라, 자막을 끄면 더빙이 켜진다.
+    // 더빙이 아예 없는 설정에서는 자막이 예전처럼 단독 토글로 남는다.
     toggleSubtitles() {
+        if (this.hasDub()) { this.toggleDub(); return; }
         this.subtitlesOn = !this.subtitlesOn;
-        if (this.subtitleEl) this.subtitleEl.hidden = !this.subtitlesOn;
+        this.updateSubtitleUI();
+    }
+
+    // 지금 자막을 보여줄지. 더빙이 실제로 나가는 중이면 감추고, 그 밖에는 보여준다 —
+    // 더빙을 켜 둔 채 음원이 없는 챕터로 넘어가면 원음이 나오므로 자막도 같이 돌아온다.
+    subtitlesVisible() {
+        if (!this.hasDub()) return this.subtitlesOn;
+        return !(this.dubOn && this.dubAvailable);
+    }
+
+    updateSubtitleUI() {
+        const on = this.subtitlesVisible();
+        if (this.subtitleEl) this.subtitleEl.hidden = !on;
         if (this.subtitleBtn) {
-            this.subtitleBtn.classList.toggle('active', this.subtitlesOn);
-            this.subtitleBtn.setAttribute('aria-pressed', String(this.subtitlesOn));
+            this.subtitleBtn.classList.toggle('active', on);
+            this.subtitleBtn.setAttribute('aria-pressed', String(on));
+            // 더빙 음원이 없는 챕터에는 고를 상태가 하나뿐이라 누를 것도 없다.
+            this.subtitleBtn.disabled = this.hasDub() && !this.dubAvailable;
         }
     }
 
@@ -333,21 +480,30 @@ class VideoPlayer {
             this.updateSeekUI();
         };
 
-        // 더빙 음원은 챕터(=파일)마다 다르니 src가 바뀔 때 같이 갈아끼운다. 없는
-        // 챕터에서는 src를 비워 두고 버튼을 자리만 남긴 채 감춘다 — 켜둔 상태(dubOn)는 남긴다.
+        // 더빙 음원은 챕터(=파일)마다 다르니 함께 갈아끼운다. 없는 챕터에서는 비워 두고
+        // 버튼을 자리만 남긴 채 감춘다 — 켜둔 상태(dubOn)는 남긴다.
         const dubSrc = typeof chapter.dub === 'string' ? chapter.dub
             : (chapter.dub && this.audioLang ? deriveDubSrc(chapter.src, this.audioLang) : null);
         this.dubAvailable = !!dubSrc;
-        if (this.dubAudio && dubSrc !== this.dubAudio.getAttribute('src')) {
-            this.dubAudio.pause();
-            if (dubSrc) {
-                this.dubAudio.src = dubSrc;
-                this.dubAudio.load();
-            } else {
-                this.dubAudio.removeAttribute('src');
+        if (dubSrc !== this.dubSrc) {
+            this.dubSrc = dubSrc;
+            // 디코딩한 버퍼는 클립당 20MB가 넘으므로 현재 챕터 것만 들고 있는다.
+            this.stopDubSource();
+            this.dubBuffer = null;
+            this.dubLoading = null;
+            if (this.dubAudio) {
+                this.dubAudio.pause();
+                if (dubSrc && !this.canBufferDub()) {
+                    this.dubAudio.src = dubSrc;
+                    this.dubAudio.load();
+                } else {
+                    this.dubAudio.removeAttribute('src');
+                }
             }
+            if (dubSrc && this.dubOn) this.loadDubBuffer();
         }
         this.updateDubButton();
+        this.updateSubtitleUI();
 
         if (chapter.src !== this.chapterSrc) {
             this.chapterSrc = chapter.src;
@@ -367,7 +523,7 @@ class VideoPlayer {
         if (this.subtitleEl) this.subtitleEl.remove();
         const subtitleEl = document.createElement('div');
         subtitleEl.className = 'video-subtitle';
-        subtitleEl.hidden = !this.subtitlesOn;   // 챕터를 넘어가도 껐던 상태를 유지
+        subtitleEl.hidden = !this.subtitlesVisible();   // 챕터를 넘어가도 고른 상태를 유지
         this.stage.appendChild(subtitleEl);
         this.subtitleEl = subtitleEl;
 
