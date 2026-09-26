@@ -14,10 +14,6 @@
     <link rel="stylesheet" href="../design-tokens.css">
     <link rel="stylesheet" href="../footer.css">
 
-    <!-- design-tokens.css의 --font-ui가 KoddiUDOnGothic 뒤에 'Noto Sans KR'을
-         폴백으로 물고 있음(한자·가타카나 장음부호 등 KoddiUDOnGothic에 없는
-         글자용) — 폰트 이름만 걸려있고 실제 로드는 여기서 해야 먹힘.
-         원어 표기, 스태프/크레딧 명단 등에서 씀 (blog/skin.html과 동일 방식) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400&display=swap" rel="stylesheet">
 
@@ -44,7 +40,6 @@
             margin: 0;
             padding: 0;
             overflow: hidden;
-            /* 문서는 스크롤하지 않는다. 스크롤은 .page-scroll 안에서만 */
         }
 
         body {
@@ -66,16 +61,11 @@
             font-weight: var(--font-weight-bold, 700);
         }
 
-        /* h4는 브라우저 기본이 1em이라 본문(16px)과 크기가 같았고, 굵기만
-           달라서 제목으로 안 읽혔음. 게다가 .term-list dt(용어)도 16px 굵게라
-           「화면 설명」 제목과 그 아래 용어가 구분이 안 됐음.
-           크기를 한 칸 올리고 위쪽 간격을 줘서 앞 내용과도 끊어줌 */
         h4 {
             font-size: 1.1em;
             margin-top: 1.2em;
         }
 
-        /* 소제목 바로 아래 첫 h4는 위 간격 불필요 */
         h3 + h4 {
             margin-top: 0;
         }
@@ -97,21 +87,13 @@
             --nav-height: 50px;
             --content-max: 800px;
 
-            /* ---- 프레임 스케일: 원본 아트 1px → 화면 몇 px 인가 ----
-               이 값 하나만 바꾸면 프레임 전체가 비율 유지한 채 커지고 작아짐.
-               0.168 → 좌측 밴드 320px 아트가 화면 약 54px 로 그려짐. */
             --fs: 0.168;
 
-            /* ---- 원본 아트 실측 치수(px). 아래 좌표는 전부 여기서 파생 ----
-               img/frame/ 의 PNG 8장을 실측한 값. 조각을 교체하면
-               여기 숫자만 실제 파일 크기로 맞춰주면 됨. */
-            /* 밴드 두께 */
             --f-left-w: 320;
             --f-right-w: 290;
             --f-top-h: 114;
             --f-bottom-h: 100;
 
-            /* 코너 4장 크기 */
             --f-tl-w: 424;
             --f-tl-h: 620;
             --f-tr-w: 600;
@@ -121,44 +103,17 @@
             --f-br-w: 300;
             --f-br-h: 572;
 
-            /* 콘텐츠 좌우 인셋.
-               코너 PNG는 파일 폭(tl 424 / bl 616 / tr 600 / br 300)만 보면
-               밴드보다 훨씬 넓지만, 실제 아트는 L자라서 넓게 벌어지는 건
-               상·하단 밴드 두께 안쪽뿐임(알파 실측: tl은 y 0~112,
-               bl은 아래에서 95, tr은 y 0~114 구간에서만 벌어지고,
-               그 밖에서는 tl 315 / bl 313 / tr 274 / br 300).
-               .page-scroll과 .manual-nav는 이미 상·하단 밴드만큼 세로로
-               비켜 있어서 그 벌어지는 구간과는 안 겹치므로, 코너 파일 폭이
-               아니라 "코너의 안 벌어진 부분 + 밴드" 기준으로 잡으면 됨.
-               좌 = 320(= --f-left-w, 실측 최대 315 이상)
-               우 = 300(= br-w, tr 274·밴드 290 이상) */
             --f-content-l: 320;
             --f-content-r: 300;
 
-            /* 변 타일 1장의 길이(반복 단위) */
             --f-top-tile-w: 1482;
             --f-bottom-tile-w: 1160;
             --f-left-tile-h: 1342;
             --f-right-tile-h: 1350;
         }
 
-        /* ================= 4면 프레임 =================
-           border-image(9-slice)를 쓰지 않는다. 이 아트는 코너 모티프
-           (좌우 밴드의 미로 패턴 / 하단 포트홀)가 밴드 두께보다 훨씬 커서,
-           9-slice로 넣으면 코너가 border-width 안으로 눌려 찌그러진다.
+        /* ================= 4면 프레임 ================= */
 
-           대신 8조각으로 나눠 깔았다:
-             · 코너 4장 — 고정 크기, 원본 비율 그대로 (안 늘어남)
-             · 변 4장   — 코너 사이를 반복해서 채움 (background-repeat: round)
-
-           변 조각은 원본에서 "잘라 이어붙여도 티가 안 나는" 구간을 찾아서
-           떴다. 각 조각의 시작/끝 단면이 서로 거의 같아(픽셀 단면 비교로
-           탐색) 반복 이음매가 보이지 않고, 코너와 만나는 지점도 원본에서
-           실제로 붙어 있던 위치라 위상이 어긋나지 않는다.
-           그래서 위/아래가 서로 다른 그림이어도 각자 자기 조각으로 반복된다.
-           ============================================= */
-
-        /* 프레임은 브라우저 창에 고정되어 테두리를 두른다. 스크롤되지 않는다. */
         .frame-deco {
             position: fixed;
             inset: 0;
@@ -166,13 +121,8 @@
             z-index: 600;
         }
 
-        /* 스크롤되는 건 이 컨테이너 안쪽뿐.
-           좌우는 코너 폭만큼, 위는 상단바+네비, 아래는 하단바만큼 비운다. */
         .page-scroll {
             position: fixed;
-            /* --nav-height-live: 네비가 줄바꿈돼서 실제 높이가 커지면 JS가
-               갱신하는 값(맨 아래 스크립트). 로드 전 첫 페인트엔 폴백으로
-               --nav-height(1줄 기준) 사용 */
             top: calc(var(--f-top-h) * var(--fs) * 1px + var(--nav-height-live, var(--nav-height)));
             bottom: calc(var(--f-bottom-h) * var(--fs) * 1px);
             left: calc(var(--f-content-l) * var(--fs) * 1px);
@@ -182,8 +132,6 @@
             scroll-behavior: smooth;
             overscroll-behavior: contain;
 
-            /* 커스텀 스크롤바 — 트랙(바 뒤 배경)은 안 깔고 막대만 얇게 보이게.
-               Firefox는 scrollbar-color, 나머지는 ::-webkit-scrollbar 계열 */
             scrollbar-width: thin;
             scrollbar-color: rgba(0, 0, 0, 0.25) transparent;
         }
@@ -205,15 +153,12 @@
             background-color: rgba(0, 0, 0, 0.4);
         }
 
-        /* 주의: 여기에 background-repeat 를 두면 특정도(0-1-1)가 아래
-           .f-top 같은 클래스 단일 선택자(0-1-0)를 이겨서 변의 반복이 죽는다.
-           배경 관련 속성은 각 조각 규칙에서만 지정할 것. */
         .frame-deco i {
             position: absolute;
             display: block;
         }
 
-        /* ---- 코너 4장: 고정 크기, 반복 없음 ---- */
+        /* ---- 코너 4장 ---- */
 
         .f-tl,
         .f-tr,
@@ -255,9 +200,7 @@
             background-image: url('img/frame/corner-br.png');
         }
 
-        /* ---- 변 4장: 코너 사이를 반복해서 채움 ----
-           round = 정수 개가 딱 맞게 들어가도록 타일을 미세 조정.
-           덕분에 끝에서 타일이 반쯤 잘리지 않는다. */
+        /* ---- 변 4장 ---- */
 
         .f-top {
             top: 0;
@@ -313,9 +256,6 @@
             background: #fff;
         }
 
-        /* 좌우 스크롤 대신 줄바꿈 — 자리가 모자란 항목은 아래 줄로 떨어짐.
-           그만큼 네비 실제 높이가 늘어날 수 있어서 JS가 --nav-height-live로
-           .page-scroll 상단 여백을 맞춰줌(아래 스크립트). */
         .manual-nav ul {
             display: flex;
             flex-wrap: wrap;
@@ -359,7 +299,6 @@
             padding: 20px 0;
         }
 
-        /* 커버 이미지 렌더 폭만큼만 차지하는 래퍼 — 가운데 정렬용 */
         .cover-wrap {
             position: relative;
             display: inline-block;
@@ -367,10 +306,6 @@
         }
 
         .manual-header .header-cover {
-            /* 뷰포트 높이 기준 스플래시. height가 아니라 max-height로 잡아야
-               가로폭이 max-width: 100%에 눌리는 좁은 화면에서도 세로가
-               따라 줄어들어서 비율이 안 깨짐(height를 직접 고정하면 폭만
-               줄어들고 높이는 그대로라 눌려 찌그러져 보임) */
             display: block;
             max-height: calc(100vh - (var(--f-top-h) * var(--fs) * 1px + var(--nav-height-live, var(--nav-height))) - (var(--f-bottom-h) * var(--fs) * 1px) - 60px);
             max-width: 100%;
@@ -378,26 +313,14 @@
             height: auto;
         }
 
-        /* 인사말 버튼(스마슈)+툴팁 — 커버가 아니라 브라우저 창 기준으로
-           떠 있는 위젯. 스크롤해도 같은 화면 위치에 고정되고, 트리거와
-           툴팁이 이 박스 하나에 같이 들어있어서 항상 같이 움직임 */
         .greeting-widget {
             position: fixed;
-            /* 프레임 오른쪽 밴드 폭(--f-right-w * --fs)만큼은 항상 비우고
-               그 바깥에 16px 더 — 브레이크포인트마다 프레임 두께가
-               달라져도(--fs 축소) 자동으로 안 겹침 */
             right: calc(var(--f-right-w) * var(--fs) * 1px + 16px);
-            /* 세로도 같은 방식. top: 80vh 였을 때 모바일에서 아래가 잘렸는데,
-               vh는 주소창이 접힌 상태(large viewport) 기준이라 실제 보이는
-               높이보다 크기 때문. 실제 표시 영역을 따라가는 dvh를 쓰고,
-               위젯 '아래 모서리'를 기준으로 잡아서 넘칠 일이 없게 함.
-               하한은 가로와 동일하게 프레임 하단 밴드 + 16px */
             bottom: max(20vh, calc(var(--f-bottom-h) * var(--fs) * 1px + 16px));
             bottom: max(20dvh, calc(var(--f-bottom-h) * var(--fs) * 1px + 16px));
             z-index: 700;
         }
 
-        /* 프롤로그를 벗어나면 스크립트가 이 클래스를 붙여서 숨김 */
         .greeting-widget.is-hidden {
             display: none;
         }
@@ -423,7 +346,6 @@
             display: block;
         }
 
-        /* 화면엔 안 보이지만 스크린리더·SEO엔 남겨두는 텍스트용 */
         .sr-only {
             position: absolute;
             width: 1px;
@@ -436,9 +358,6 @@
             border: 0;
         }
 
-        /* 인사말 툴팁 — 트리거 바로 위, 같은 .greeting-widget 안이라
-           트리거가 움직이면 같이 움직임. 말풍선처럼 꼬리(::before/::after)를
-           달아서 트리거를 가리키게 함. [hidden] 속성으로 토글 */
         .header-greeting {
             position: absolute;
             bottom: 100%;
@@ -494,10 +413,7 @@
             padding: 0 20px;
         }
 
-        /* -------------------- 챕터 타이틀 (섹션 헤더) --------------------
-           섹션 사이 간격은 section 자체가 아니라 이 구분선(border-top)이
-           들고 있음: margin-top = 이전 섹션 내용과 선 사이 간격,
-           padding = 선과 이 섹션 타이틀 텍스트 사이 간격. 위아래 대칭. */
+        /* -------------------- 챕터 타이틀 (섹션 헤더) -------------------- */
 
         .chapter-title {
             margin-top: 40px;
@@ -512,19 +428,13 @@
         }
 
         .chapter-title .pct-stage {
-            /* 챕터 배너 실제 원본이 1400×900(14:9)이라 그 비율로 맞춤.
-               본문 폭(800px)에 꽉 채우지 않고 살짝 줄여서 중앙 배치 —
-               원본 해상도 이상으로 늘리지 않는 선에서 여백을 둠 */
             aspect-ratio: 14 / 9;
             width: 90%;
             max-width: 600px;
             margin: 10px auto 0;
         }
 
-        /* -------------------- % 포지셔닝 유틸 --------------------
-           원본 이미지를 통짜로 쓰지 않고, 배경 이미지 위에 개별 요소를
-           % 좌표로 얹을 때 쓰는 공용 패턴(챕터 타이틀 소컷 일러스트,
-           키 다이어그램 라벨 등). 구조만 있고 위치값은 채워 써야 함. */
+        /* -------------------- % 포지셔닝 유틸 -------------------- */
 
         .pct-stage {
             position: relative;
@@ -534,13 +444,9 @@
 
         .pct-elem {
             position: absolute;
-            /* 사용 예: style="top: 12%; left: 60%; width: 18%;" */
         }
 
-        /* -------------------- 프롤로그 (도입부 내레이션) --------------------
-           PDF 4~5쪽(스마슈의 독백 + 서술)에 대응. 「」로 묶인 독백은
-           살짝 기울이고 톤을 낮춰서, 뒤이은 서술문(narration-desc)과
-           목소리를 구분함. */
+        /* -------------------- 프롤로그 (도입부 내레이션) -------------------- */
 
         .prologue-narration {
             margin-bottom: 30px;
@@ -561,8 +467,6 @@
         /* -------------------- 프롤로그 (만화) -------------------- */
 
         .comic-pages {
-            /* .section-inner 바깥에 있어서 좌우 패딩이 없음. 그래도 본문
-               폭(800px) 이상으로 퍼지진 않게 여기서 직접 상한만 잡음 */
             max-width: var(--content-max);
             margin: 0 auto;
             display: flex;
@@ -576,12 +480,7 @@
             margin: 0;
         }
 
-        /* -------------------- 메인 캐릭터 소개 --------------------
-           원본(PDF 10~12쪽)은 카드 그리드가 아니라 한 캐릭터당 이미지+설명이
-           나란히 붙는 한 줄이고, 그 줄 안에서 이미지/설명 좌우 순서가
-           캐릭터마다(짝수 번째마다) 뒤집힘 — 스마슈(이미지-왼쪽) / 화린
-           (이미지-오른쪽) 식. char.md 순서가 곧 원본 페이지 순서라
-           nth-child(even)만으로 그 교차를 그대로 재현. */
+        /* -------------------- 메인 캐릭터 소개 -------------------- */
 
         .char-grid {
             display: flex;
@@ -601,15 +500,8 @@
             flex: 0 0 42%;
             aspect-ratio: 3 / 4;
             position: relative;
-            /* width%만 주고 height는 aspect-ratio가 계산해주길 기대하면
-               flex(특히 세로 스택 column 컨테이너) 안에서 브라우저마다
-               제각각 어긋남 — img를 position:absolute + inset:0으로
-               박스에 못박아서, 박스 크기가 어떻게 나오든(42%든 60%든)
-               가로세로 항상 같은 비율로 줄어들게 함 */
         }
 
-        /* 초상은 배경 없는 컷아웃이라 인물마다 실제 비율이 제각각(카드 프레임
-           3:4와 안 맞음) — 잘리거나 늘어나지 않게 contain으로 통일 */
         .char-card .char-portrait img {
             position: absolute;
             inset: 0;
@@ -623,18 +515,6 @@
             padding: 12px 14px;
         }
 
-        /* 캐릭터 이름 색 — 원본(8~10쪽)의 손글씨 로고타입에서 실측한 값.
-           원본은 그라데이션이지만 웹에선 단색으로 옮김. 흰 배경 대비는
-           전부 4.5:1 이상(스마슈 7.5 / 화린 11.9 / 페톰 7.2 / 키리 5.8 /
-           아타호 6.3 / 실라 5.9).
-
-           아타호만 로고타입이 아니라 일러스트에서 색을 뽑았음. 원본 로고는
-           빨강(#ba301b)인데 실라(#bb142f)와 거의 같은 색이라, 원본에서 둘을
-           갈라주던 금색 테두리가 없는 웹에서는 구분이 안 됨. 금색 계열은
-           대비가 부족해서(로고 금테 1.73:1 / 털 2.02:1 / 꼬리 3.02:1) 이름
-           색으로 못 씀. 그래서 일러스트에서 면적이 가장 큰 도포의 올리브
-           초록(#596533, 6.3:1)을 씀 — 페톰의 초록(#0c6352)은 청록 계열이라
-           색상각이 달라 서로 안 겹침 */
         .char-card.char-smash  { --char-color: #0e4bc0; }
         .char-card.char-farlin { --char-color: #5d017d; }
         .char-card.char-petum  { --char-color: #0c6352; }
@@ -644,8 +524,6 @@
 
         .char-card .char-name {
             color: var(--char-color, inherit);
-            /* 다른 h3(18.72px)보다 한 단계 위. 본문 16 → h3 18.72 → h2 24의
-               비율(×1.17)을 따라 22px */
             font-size: 1.375em;
         }
 
@@ -654,9 +532,6 @@
             font-size: 0.7em;
             font-weight: normal;
             color: var(--char-color, var(--text-secondary, #4d4d4d));
-            /* KoddiUDOnGothic이 가나 자체는 갖고 있어도(--font-ui 폴백이
-               안 걸림) 일본어 폰트로서 모양이 어색해서, 빠진 글자만
-               땜빵하는 대신 이 요소 전체를 Noto Sans KR로 통일 렌더링 */
             font-family: 'Noto Sans KR', sans-serif;
         }
 
@@ -666,8 +541,7 @@
             margin-bottom: 0.5em;
         }
 
-        /* -------------------- 소제목 있는 콘텐츠 블록 (공용) --------------------
-           게임 진행뿐 아니라 오마케(스태프 코멘트/특별부록/크레딧)에서도 씀 */
+        /* -------------------- 소제목 있는 콘텐츠 블록 (공용) -------------------- */
 
         .content-block {
             margin-bottom: 30px;
@@ -680,35 +554,26 @@
             margin: 10px auto;
         }
 
-        /* 스크린샷 표시 폭 ≈ 원본 해상도(3456px)의 20%, 10px 단위로 반올림 */
         .screenshot-frame img {
             width: 690px;
         }
 
-        /* 그림·사진에 붙는 캡션 전용. 아래 .entry-owner / .h-sub 는 생김새는
-           같지만 쓰임이 달라서(항목 소유 캐릭터 표시 / 소제목 부제) 따로 둠 —
-           나중에 캡션 스타일만 손볼 때 같이 딸려 바뀌지 않게 */
         .figure-caption {
             font-size: 0.85em;
             color: var(--text-muted, #767676);
         }
 
-        /* 특기·마법 항목 이름 옆의 사용 캐릭터 표시 (예: 대격검 — 스마슈) */
         .entry-owner {
             font-size: 0.85em;
             color: var(--text-muted, #767676);
         }
 
-        /* 소제목에 딸리는 부제 (예: 마법 — 화린·키리·페톰·실라 공용).
-           제목 본체와 위계를 가르려고 일반 굵기로 둠 */
         .h-sub {
             font-size: 0.85em;
             font-weight: normal;
             color: var(--text-muted, #767676);
         }
 
-        /* 옮긴이 주 — 원문에 없는, 번역/판본에 대한 부연을 다는 콜아웃.
-           haiyuki_manual과 같은 스타일로 두 매뉴얼의 주석 모양을 맞춤 */
         .note {
             display: block;
             margin: 10px 15px;
@@ -724,9 +589,6 @@
             width: 100%;
             max-width: 560px;
             border-collapse: collapse;
-            /* table-layout: fixed + 1열 고정폭 — 안 그러면 표마다 내용
-               길이에 따라 열 비율이 제각각으로 잡혀서 게임 진행 안의
-               표 4개가 서로 다른 모양으로 보임 */
             table-layout: fixed;
             margin: 10px auto;
         }
@@ -746,11 +608,6 @@
             text-align: center;
         }
 
-        /* 기본 조작 표 전용 — 다른 3개 표(마을·던전/캠프모드/전투)는 화면별
-           세부 조작을 나열하지만, 이 표는 게임 전체에 공통되는 의미
-           (방향키→이동, Enter·Space→결정, ESC·Shift→취소)만 짧게 보여주면
-           되므로 배경색 구분 없이 [키캡] → [화살표] → [의미] 1줄짜리
-           3열로 단순화 (원본 12쪽의 큰 화살표만 살림) */
         table.control-table.control-table-basic {
             table-layout: auto;
             width: auto;
@@ -766,8 +623,6 @@
             text-align: center;
         }
 
-        /* 화살표도 --arrow 하나에서 파생 — 키캡과 같이 줄어야 표 전체가
-           좁은 화면에서 블록 안에 들어감(이 표는 width:auto라 안 줄어듦) */
         table.control-table.control-table-basic {
             --arrow: 48px;
         }
@@ -785,9 +640,6 @@
             vertical-align: middle;
         }
 
-        /* 삼각형 색은 원본(12쪽)에서 실측 — 원본은 행마다 다른 색이고
-           배경 띠 색과 짝을 이룸. 여기선 띠를 안 쓰므로 화살표 색만 가져옴.
-           흰 배경 대비 6.07 / 5.45 / 7.35:1 */
         table.control-table.control-table-basic tbody tr:nth-child(1) .arrow-cell {
             color: #bc1768;
         }
@@ -800,16 +652,10 @@
             color: #135b84;
         }
 
-        /* 키캡·텍스트 강조 — 다른 표(28px 키캡)보다 한 단계 크게 */
-        /* 기본 조작 표만 한 단계 큰 키캡. 나머지 치수는 --kc에서 파생되므로
-           이 값 하나만 바꾸면 라운드·테두리·여백·간격이 같이 따라감 */
         table.control-table.control-table-basic .kc-group {
             --kc: 40px;
         }
 
-        /* 워드마크 키캡(ENTER/SPACE/ESC/SHIFT)은 글자 폭만큼 늘어나야 함.
-           위 .kc 규칙이 특정도로 기본 .kc-text{width:auto}를 이겨버려서
-           정사각형에 갇히면, 안의 가로로 긴 SVG가 눌려 작아짐 */
         table.control-table.control-table-basic .kc-text {
             width: auto;
         }
@@ -820,29 +666,14 @@
             font-weight: var(--font-weight-bold, 700);
         }
 
-        /* 조작표 1열의 키캡 — gensei-pc98 가상 게임패드(#virtual-gamepad
-           button)의 "눌린 버튼" 셰이딩(안쪽 아래 그림자 + 바깥 그림자)을
-           흰 배경용 밝은 톤으로 옮겨왔음. 배경(크롬)과 글리프(아이콘)를
-           분리해서, 크롬은 여기 .kc가 담당하고 안의 <svg>는 도형만 그림 */
-        /* 키캡 크기는 --kc 하나에서 파생 — 좁은 화면에서 줄일 때
-           라운드·아래 테두리·좌우 여백·간격이 같은 비율로 따라오게 함.
-           비율은 기존 28px 기준값 그대로: radius 8/28, border-bottom 4/28,
-           .kc-text 좌우 여백 8/28, 그룹 간격 6/28 */
         .kc-group {
             --kc: 28px;
             display: inline-flex;
             align-items: center;
-            /* 줄바꿈 대신 --kc를 줄여 한 줄 유지 (아래 브레이크포인트) */
             flex-wrap: nowrap;
             gap: calc(var(--kc) * 0.214);
         }
 
-        /* 거처(사이트 루트 style.css #action-btn/#esc-btn)랑 동일한 크롬 —
-           inset 그림자로 눌린 느낌을 내던 것 대신, 거처처럼 두꺼운
-           border-bottom으로 3D 느낌을 내는 방식. 크기만 버튼(80x34)이
-           아니라 표 안에 맞게 축소, 그 비율(6px/34px)에 맞춰 border-bottom도
-           같이 줄임 */
-        /* 거처 스타일 크롬(색·radius·border-bottom)은 유지하되 그림자는 뺌 */
         .kc {
             display: inline-flex;
             align-items: center;
@@ -855,14 +686,8 @@
             border: 1px solid #d3d3d3;
             border-bottom: calc(var(--kc) * 0.143) solid #bebebe;
             color: #000;
-            /* SVG 글리프 쪽 fill="currentColor"가 이 color 값을 그대로 씀 */
         }
 
-        /* 아이콘 비율도 거처 것 그대로 — height %만 주고 width: auto로
-           원본 종횡비대로 계산되게(원본과 동일 기법). 방향키는 gensei-pc98
-           가상 게임패드(48px 버튼 기준 dpad 40%), Enter/Space/ESC/Shift는
-           world/engine.js #action-btn(34px 버튼 기준 35%) 비율을 그대로 씀 —
-           버튼 자체가 더 작아도 "버튼 대비 아이콘 크기" 비율은 같음 */
         .kc-icon {
             height: 40%;
             width: auto;
@@ -872,21 +697,11 @@
             height: 35%;
         }
 
-        /* Enter/Space/ESC/Shift처럼 폭이 글자수만큼 늘어나는 워드마크 키캡 */
         .kc-text {
             width: auto;
             padding: 0 calc(var(--kc) * 0.286);
         }
 
-        /* 캠프 모드 스탯 용어, 전투 커맨드 설명처럼 "용어 — 설명" 쌍이
-           나열되는 곳에 공용으로 씀 */
-        /* 용어–설명 쌍. dt를 한 줄 위, dd를 그 아래 두면 둘의 x가 같아져서
-           설명이 별도 본문 줄처럼 읽혔음(쌍 안 간격 25.6px vs 쌍 사이 33.6px로
-           묶임이 약했음). 2열 그리드로 바꿔 한 항목 = 한 줄로 만듦.
-           구분은 불렛이 아니라 원본(캠프모드 16쪽·전투 18쪽)처럼 용어 색으로.
-           실측 평균(#4f7366)이 탁하다는 피드백으로, 같은 색상각에서 더
-           화사한 톤(H166 S21%)으로 재조정하되 밝기(L)만 4.5:1을 넘는
-           선까지 낮춤 — #517b72, 흰 배경 대비 4.74:1 */
         .term-list {
             display: grid;
             grid-template-columns: max-content 1fr;
@@ -904,8 +719,6 @@
             margin: 0;
         }
 
-        /* 폰에서는 용어 열이 너무 좁아지므로 위아래로 쌓되, 설명을 들여써서
-           용어에 딸린 것으로 읽히게 함 */
         @media (max-width: 480px) {
             .term-list {
                 grid-template-columns: 1fr;
@@ -921,9 +734,6 @@
             }
         }
 
-        /* 한 단락 안에 <br>로 여러 문장을 늘어놓던 자리(게임 진행 안내)를
-           항목별로 끊어 가독성을 높일 때 씀. 캐릭터 소개는 인물 설명이라
-           산문 그대로 두므로 여기 해당 없음 */
         .bullet-list {
             margin: 0;
             padding-left: 1.2em;
@@ -933,9 +743,6 @@
             margin-bottom: 0.5em;
         }
 
-        /* p였을 때 물려받던 "다음에 뭔가 더 있으면 아래 여백" 규칙
-           (위 73번째 줄 주석 참고)을 목록 자체에도 그대로 적용 —
-           안 그러면 뒤따르는 h4·표와 목록이 바로 붙어버림 */
         .char-desc:not(:last-child),
         .bullet-list:not(:last-child) {
             margin-bottom: 1em;
@@ -954,11 +761,6 @@
             position: relative;
         }
 
-        /* 원본(18~24쪽)에 있던 개별 아이템 큰 그림 — 목록 전체를 감싼
-           entry-list를 기준으로, 항목 설명 텍스트가 짧아 오른쪽에 비는
-           자리(실측상 최소 160px)를 찾아 고정 좌표로 얹음. 항목 배경색
-           (#eeede4)이 이미 불투명이라 알파 조정 없이 원본 그대로 사용.
-           반응형으로 재배치하지 않고 좁은 화면에서는 아예 숨김(아래 media) */
         .item-bg {
             position: absolute;
             right: 10px;
@@ -975,9 +777,6 @@
             }
         }
 
-        /* 무구·도구·특기·마법 항목 — 원본(18~22쪽)은 카키색 행 배경의
-           표라서, 그 색(#d5d3be 실측)을 카드 배경으로 옮김. 흰 종이 위에
-           놓이던 색이라 그대로 쓰면 웹에선 무거워서 옅게 깖 */
         .entry {
             display: flex;
             align-items: center;
@@ -991,7 +790,6 @@
             flex: 0 0 auto;
             width: 40px;
             height: 40px;
-            /* 원본 게임 UI는 검정 배경이지만 그대로 쓰면 너무 세서 진한 회색으로 */
             background: #333;
             border-radius: var(--radius-sm, 4px);
             display: flex;
@@ -1001,9 +799,6 @@
 
         .entry .entry-body {
             flex: 1 1 auto;
-            /* min-width 기본값(auto)은 내용 기준 최소폭이라, 설명 텍스트
-               길이·띄어쓰기 위치에 따라 줄바꿈 여부가 항목마다 달라짐 —
-               0으로 풀어서 폭에 맞춰 항상 동일하게 줄바꿈되게 함 */
             min-width: 0;
         }
 
@@ -1011,8 +806,6 @@
             font-weight: var(--font-weight-bold, 700);
         }
 
-        /* 원본 페이지 하단에 있던 캐릭터 삽화. 설명이 아니라 장식이라
-           캡션 없이 이미지만. 크기는 img의 인라인 width(원본 20%)가 결정 */
         .section-art {
             margin: 22px auto 0;
             text-align: center;
@@ -1022,9 +815,6 @@
             display: inline-block;
         }
 
-        /* 게임의 진행 방법 챕터 하단에 반복되던 얼굴 낙서. 문단 옆에
-           작게 곁들이는 장식이라 본문 폭을 침범하지 않게 오른쪽 정렬.
-           크기는 img의 인라인 width(원본 20%)가 결정 */
         .corner-doodle {
             text-align: right;
             margin: 10px 0;
@@ -1034,8 +824,6 @@
             display: inline-block;
         }
 
-        /* 뒤표지 — 오마케 챕터 맨 끝, 크레딧 다음에 오는 마무리 일러스트.
-           크기는 img의 인라인 width(원본 20%)가 결정 */
         .cover-end-block {
             margin-bottom: 0;
         }
@@ -1057,9 +845,6 @@
             gap: 16px;
         }
 
-        /* 스태프 코멘트 — 원본(24~26쪽)은 라벤더색 띠 프레임 안에 흰 종이가
-           들어앉은 형태(프레임 #d2adce 실측, 안쪽 흰색). 그 구조를 그대로
-           옮겨서 테두리만 라벤더로 두껍게, 안쪽은 흰 배경 유지 */
         .staff-comment {
             padding: 12px 14px;
             border: 1px solid var(--border, #ccc);
@@ -1077,7 +862,6 @@
             margin-bottom: 4px;
         }
 
-        /* 원어(일본어 필명) 표기 — .char-name-jp와 동일 패턴 */
         .staff-comment .staff-name .staff-name-jp {
             display: block;
             font-size: 0.7em;
@@ -1086,33 +870,31 @@
             font-family: 'Noto Sans KR', sans-serif;
         }
 
-        /* 스태프 코멘트 삽화 — 원본(24~26쪽)에서 코멘트마다 곁들여진 캐릭터
-           그림 7개 중 5개가 남아 있어 그만큼만 넣음. 크기는 기존 규칙대로
-           원본 해상도의 20%. 텍스트 뒤 카드 오른쪽 아래에 배치 */
         .staff-comment .staff-art {
             display: block;
             margin: 12px 0 0 auto;
         }
 
+        .staff-comment-guitar {
+            position: relative;
+            isolation: isolate;
+        }
+
+        .staff-comment-guitar::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            z-index: -1;
+            background: url("img/omake-guitar.png") center / cover no-repeat;
+            opacity: 0.2;
+        }
+
         /* -------------------- 오마케: 크레딧 -------------------- */
 
-        /* 특별부록 — 원본(27쪽)은 페이지 전체가 연녹색 워시. 웹에선 배경을
-           깔면 본문 흐름이 끊겨서, 그 색(#bcc69f 실측)을 외곽선으로만 씀.
-           밝기가 기존 테두리(#ccc)와 비슷해 다른 박스들과 무게가 맞음 */
-        /* .hubon-page 하나만 담는 래퍼 — 콜라주 이미지 자체가 이미
-           "박스"라 테두리·패딩을 두면 이중으로 감싸는 꼴이라 뺌 */
         .extra-box {
             margin-bottom: 30px;
         }
 
-        /* 특별부록 페이지 — 원본(27쪽)은 삽화 자체가 페이지 하나를 통째로
-           덮는 콜라주라, 사진 몇 장을 오려붙이는 대신 그 전체 이미지를
-           그대로 쓰고 그 위에 텍스트만 원본 위치(실측 %)에 맞춰 올림.
-           % 좌표·cqw 글자크기 둘 다 이미지 자체 폭 기준이라(뷰포트 아님)
-           이미지가 반응형으로 커지고 작아져도 같이 따라감.
-           cqw는 vw와 달리 "이 컨테이너의 폭 1%" — 콘텐츠 컬럼이
-           content-max(800px)에서 막히는 넓은 데스크톱에서 vw를 썼다면
-           이미지 실제 폭과 무관하게 글자만 계속 커졌을 것 */
         .hubon-page {
             position: relative;
             width: 100%;
@@ -1183,8 +965,6 @@
             white-space: nowrap;
         }
 
-        /* 클리어 팁 — 배너 아래 남는 여백에. 원본은 이 자리에서도
-           오른쪽에 닌자 캐릭터가 있어서 폭을 넉넉히 잡진 않음 */
         .hubon-tips {
             left: 8%;
             top: 80%;
@@ -1200,34 +980,17 @@
             margin-bottom: 0.5em;
         }
 
-        /* 크레딧 — 원본(28쪽)의 종이색(#eae6d1 실측)을 배경으로. 원본에도
-           테두리는 없음 */
         .credits-block {
             display: flex;
             align-items: flex-start;
-            /* center였던 걸 flex-start로 — 박스 자체는 다른 섹션(h3, 특별부록
-               박스, 스태프 코멘트 그리드 전부 왼쪽 x가 동일)과 정렬이
-               맞는데, 안의 STAFF 로고+표만 center 때문에 61px 밀려서 시작해
-               페이지에서 유독 오른쪽으로 치우쳐 보였음 */
             justify-content: flex-start;
             gap: 18px;
             padding: 20px;
-            /* 명단이라 본문만큼 클 필요가 없음 — 안쪽 두 열이 같이 줄어들어
-               역할(0.8em)/이름 사이 크기 차는 그대로 유지됨 */
             font-size: 0.9em;
             background: #eae6d1;
         }
 
-        /* 원본(28쪽)의 세로 "STAFF" 로고타입 — 사용자가 벡터로 그려준 SVG
-           (글자 도형만, 구분선은 없음). 구분선은 별도 .credits-divider가
-           맡음 — 이미지 크기와 선 길이를 서로 독립적으로 제어하기 위함
-           (모바일에서 이미지는 작게·상단에만, 선은 표 전체 높이로) */
         .credits-staff {
-            /* 폭을 .credits-block 너비 기준 %로 — 박스가 넓어지면 로고도
-               같이 커짐. 480px 이하는 %가 너무 작아져서(64px 안팎) 표
-               역할열이 두 줄로 깨지므로 고정값으로 전환.
-               16%였을 때 로고 높이가 표 높이의 61%뿐이라 로고 아래
-               빈 공간이 크게 남았음 — 22%로 키워서 그 공백을 줄임 */
             flex: 0 0 22%;
             max-width: 220px;
         }
@@ -1238,31 +1001,19 @@
             height: auto;
         }
 
-        /* 원본 실측 색(#6b0548). 두께는 원본 대비 강조(기존 2px의 3배
-           이상인 7px). 높이는 JS가 항상 표 높이로 맞춤 — 이미지 크기와
-           무관하게 항상 표 전체 길이만큼 길게 그려짐 */
         .credits-divider {
             flex: 0 0 auto;
             width: 7px;
             background: #6b0548;
         }
 
-        /* 원본(PDF 28쪽)처럼 역할 열 + 이름 열 2단 표 — 역할이 같으면
-           rowspan으로 한 번만 쓰고 아래 이름들만 이어짐 */
         .credits-block table {
             flex: 1 1 auto;
             width: auto;
-            /* 480px이던 걸 560px로 — 로고+선을 키운 뒤에도 오른쪽에 102px가
-               남아서 표까지 같이 늘려 그 공백을 줄임 */
             max-width: 560px;
             border-collapse: collapse;
         }
 
-        /* 모바일 — STAFF를 아예 숨기는 대신 작게 줄여서 표 상단에만 걸치게.
-           %폭 대신 고정 24px로 전환(표에 폭을 최대한 양보) */
-        /* 480px가 아니라 580px — 로고를 22%로 키운 뒤로 481~579px 구간에서
-           %값이 표를 눌러 역할 라벨이 줄바꿈됐음(실측). 그 구간까지
-           고정값으로 커버 */
         @media (max-width: 580px) {
             .credits-staff {
                 flex-basis: 24px;
@@ -1272,27 +1023,19 @@
 
         .credits-block td {
             padding: 4px 10px;
-            /* 역할(0.8em)과 이름(1em)이 크기가 달라서 top 정렬로는 줄 상자
-               위쪽만 맞고 글자 아랫선이 6px 어긋났음. baseline으로 두 열의
-               글자 기준선을 맞춤(1px). rowspan 셀은 자기 구간 첫 줄의
-               기준선에 붙으므로 역할 라벨 위치도 그대로 유지됨 */
             vertical-align: baseline;
         }
 
         .credits-block .credit-role {
             width: 35%;
             font-size: 0.8em;
-            /* 크림색 배경(#eae6d1) 위라 --text-muted(#767676)는 3.62:1로
-               본문 기준에 미달. 한 단계 진한 --text-secondary로 6.74:1 확보 */
             color: var(--text-secondary, #4d4d4d);
         }
 
         .credits-block .credit-name {
-            /* 이름 대부분이 일본어 — 위 .char-name-jp와 같은 이유 */
             font-family: 'Noto Sans KR', sans-serif;
         }
 
-        /* 본문 문장 속에 일본어 고유명사가 한두 개 섞일 때 감싸는 인라인 유틸 */
         .jp-inline {
             font-family: 'Noto Sans KR', sans-serif;
         }
@@ -1311,7 +1054,6 @@
 
         @media (max-width: 800px) {
             :root {
-                /* 프레임 전체를 비율 유지한 채 축소 — 값 하나만 바꾸면 됨 */
                 --fs: 0.105;
             }
 
@@ -1329,38 +1071,23 @@
                 --fs: 0.08;
             }
 
-            /* 폰(480px 이하)부터는 이미지-왼쪽/오른쪽 좌우 2단이 너무 좁아져서,
-               둘 다 세로 스택(이미지 위, 설명 아래)으로 통일 */
             .char-card,
             .char-card:nth-child(even) {
                 flex-direction: column;
             }
 
-            /* 박스+contain 방식은 유지하되, 세로 스택에서 박스가 카드 폭
-               100%까지 늘어나 커 보이는 것만 줄임 — aspect-ratio: 3/4는
-               위 기본 규칙에서 그대로 상속되니 박스 자체가 원래 크기(42%
-               기준 박스)의 60%로 축소되는 효과, 안의 이미지는 여전히
-               object-fit: contain으로 그 박스에 맞춰짐 */
             .char-card .char-portrait {
                 flex-basis: auto;
                 width: 60%;
                 align-self: center;
             }
 
-            /* 네비 항목 5개의 총 너비(16px 기준 590px)가 폰의 네비 실폭
-               (390px 화면에서 293px)의 2배를 넘어서 3줄로 넘침. 문구를
-               줄이는 대신 글자·좌우 패딩만 줄여서 총 너비를 2줄(3+2) 안에
-               들어오게 함 — 390px 이상에서 2줄로 떨어짐 */
             .manual-nav a {
                 font-size: 14px;
                 padding: 0 5px;
             }
         }
 
-        /* 좁은 화면에서 키캡 줄바꿈 방지 — 개행 대신 --kc를 줄여 한 줄 유지.
-           기준: 각 폭에서 가장 넓은 그룹(일반 표 Enter+Space, 기본 조작
-           표 Enter+Space)이 칸 안에 들어가는 최대 크기를 실측해서 잡음.
-           .kc의 모든 치수가 --kc 파생이라 아이콘·라운드·테두리도 같이 줄어듦 */
         @media (max-width: 405px) {
             .kc-group { --kc: 26px; }
             table.control-table.control-table-basic { --arrow: 43px; }
@@ -1394,23 +1121,13 @@
 </head>
 
 <body class="footer-static">
-    <!-- 조작표 키캡 화살표 글리프 스프라이트 — gensei-pc98(자매 에뮬레이터)
-         docs/icons.js의 dpad*를 그대로 가져옴(같은 게임을 다루는
-         프로젝트라 아이콘을 통일). Enter/Space/ESC/Shift는 알파벳
-         텍스트 키캡(.kc-text)이라 별도 글리프 필요 없음.
-         화면엔 안 그려지고(display:none) 참조될 때만 렌더링됨 -->
     <svg style="display:none" aria-hidden="true">
         <defs>
-            <!-- 방향키 글리프(21.9x38.33) — 기본은 왼쪽을 향함, 다른 방향은
-                 .kc-icon에 rotate 걸어서 재사용 (원본과 동일한 회전 값) -->
             <symbol id="kc-arrow-glyph" viewBox="0 0 21.9 38.33">
                 <polygon fill="currentColor"
                     points="16.43 0 16.43 5.48 10.95 5.48 10.95 10.95 5.48 10.95 5.48 16.43 0 16.43 0 21.9 5.48 21.9 5.48 27.38 10.95 27.38 10.95 32.86 16.43 32.86 16.43 38.33 21.9 38.33 21.9 32.86 21.9 27.38 21.9 21.9 21.9 16.43 21.9 10.95 21.9 0 16.43 0" />
             </symbol>
 
-            <!-- Enter/Space/ESC/Shift 워드마크 — 전부 "거처"(사이트 루트,
-                 world/engine.js의 ACTION_ICONS) 픽셀 폰트 글자를 그대로 가져옴.
-                 Enter/Shift는 같은 스타일로 새로 그려서 받은 것 -->
             <symbol id="kc-enter-glyph" viewBox="0 0 253.75 43.75">
                 <path fill="currentColor" d="M0,35V0h43.75v8.75h-26.25v8.75h17.5v8.75h-17.5v8.75h26.25v8.75H0v-8.75Z" />
                 <path fill="currentColor"
@@ -1441,8 +1158,6 @@
                 <path fill="currentColor"
                     d="M105,26.25V8.75h8.75V0h26.25v8.75h8.75v8.75h-17.5v-8.75h-8.75v26.25h8.75v-8.75h17.5v8.75h-8.75v8.75h-26.25v-8.75h-8.75v-8.75Z" />
             </symbol>
-            <!-- 기본 조작 표에서 "키 → 의미"를 잇는 큰 화살표(원본 12쪽 참고,
-                 색상 구분 없이 단색 하나로 단순화) -->
             <symbol id="big-arrow-glyph" viewBox="0 0 24 24">
                 <path fill="currentColor" d="M6 3l16 9-16 9V3z" />
             </symbol>
@@ -1454,7 +1169,6 @@
             style="display:none;visibility:hidden"></iframe></noscript>
     <!-- End Google Tag Manager (noscript) -->
 
-    <!-- 프레임 장식: 브라우저 창에 고정. 코너 4 + 변 4, 순수 장식이라 aria-hidden -->
     <div class="frame-deco" aria-hidden="true">
         <i class="f-top"></i>
         <i class="f-bottom"></i>
@@ -1477,7 +1191,6 @@
         </ul>
     </nav>
 
-    <!-- 프레임 안쪽: 여기만 스크롤된다 (id는 footer.js가 푸터를 넣는 자리) -->
     <div class="page-scroll" id="main-wrapper">
 
 
@@ -1489,11 +1202,8 @@
                 <img class="header-cover" src="img/cover.jpg" alt="환세희담 표지 일러스트">
             </div>
 
-            <!-- 표지에 타이틀 로고가 그림으로 이미 들어있어서, h1은
-                 시각적으로 숨김(접근성·SEO용으로 DOM엔 유지) -->
             <h1 class="sr-only">환세희담 취급설명서</h1>
             <div class="translator-info">
-                <!-- TODO: 옮긴이 정보 -->
             </div>
         </div>
     </header>
@@ -1553,7 +1263,6 @@
                 </div>
             </div>
 
-            <!-- .section-inner 바깥에 둬서 좌우 여백(20px 패딩) 없이 꽉 차게 표시 -->
             <div class="comic-pages">
                 <figure class="comic-page">
                     <img src="img/comic-01.jpg" alt="프롤로그 만화 1페이지">
@@ -1674,7 +1383,7 @@
                                 보이는 그대로인 호랑이민족 아저씨입니다.<br>
                                 나이에 비해서 정정하며, 외딴 산속에서 혼자 살고 있습니다.<br>
                                 수상쩍은 권법의 명수로, 그 단련하고 단련한 주먹은 바위조차도 일격에 부수기도 한다고 본인은 호언장담하고 있었습니다만 진상은 어떨까요?<br>
-                                자기 전에 한 잔하는 것을 무척이나 좋아합니다.
+                                자기 전에 한잔하는 것을 무척이나 좋아합니다.
                             </p>
                         </div>
                     </article>
@@ -2245,7 +1954,7 @@
                 </div>
 
                 <div class="entry-group">
-                    <h3>마법 <span class="h-sub">— 화린 · 키리 · 페톰 · 실라 공용</span></h3>
+                    <h3>마법</h3>
                     <div class="entry-list">
                         <div class="item-bg" style="top: 10px;" aria-hidden="true">
                             <img src="img/item-07.png" alt="" width="96">
@@ -2258,7 +1967,7 @@
                                 <img src="img/icon/icon_r6c2.png" alt="불꽃주문">
                             </div>
                             <div class="entry-body">
-                                <div class="entry-name">불꽃주문</div>
+                                <div class="entry-name">불꽃주문 <span class="entry-owner">화린 · 키리 · 페톰 · 실라</span></div>
                                 <p class="entry-desc">불꽃으로 적 1체 또는 전체에게 데미지를 줍니다.</p>
                             </div>
                         </div>
@@ -2267,7 +1976,7 @@
                                 <img src="img/icon/icon_r6c5.png" alt="번개주문">
                             </div>
                             <div class="entry-body">
-                                <div class="entry-name">번개주문</div>
+                                <div class="entry-name">번개주문 <span class="entry-owner">화린 · 키리 · 페톰 · 실라</span></div>
                                 <p class="entry-desc">전격으로 적 1체 또는 전체에게 데미지를 줍니다.</p>
                             </div>
                         </div>
@@ -2276,7 +1985,7 @@
                                 <img src="img/icon/icon_r6c4.png" alt="얼음주문">
                             </div>
                             <div class="entry-body">
-                                <div class="entry-name">얼음주문</div>
+                                <div class="entry-name">얼음주문 <span class="entry-owner">화린 · 키리 · 페톰 · 실라</span></div>
                                 <p class="entry-desc">냉기로 적 1체 또는 전체에게 데미지를 줍니다.</p>
                             </div>
                         </div>
@@ -2285,7 +1994,7 @@
                                 <img src="img/icon/icon_r6c6.png" alt="회복주문">
                             </div>
                             <div class="entry-body">
-                                <div class="entry-name">회복주문</div>
+                                <div class="entry-name">회복주문 <span class="entry-owner">화린 · 키리 · 페톰 · 실라</span></div>
                                 <p class="entry-desc">동료 1명 또는 전원의 HP를 회복시킵니다.</p>
                             </div>
                         </div>
@@ -2294,7 +2003,7 @@
                                 <img src="img/icon/icon_r7c0.png" alt="해독주문">
                             </div>
                             <div class="entry-body">
-                                <div class="entry-name">해독주문</div>
+                                <div class="entry-name">해독주문 <span class="entry-owner">화린 · 키리 · 페톰 · 실라</span></div>
                                 <p class="entry-desc">독에 걸린 동료를 정상 상태로 되돌립니다.</p>
                             </div>
                         </div>
@@ -2376,16 +2085,16 @@
                             </p>
                             <img class="staff-art" src="img/omake-04.png" alt="" width="194">
                         </div>
-                        <div class="staff-comment">
+                        <div class="staff-comment staff-comment-guitar">
                             <div class="staff-name">마츠시마 츠요시
                                 <span class="staff-name-jp">松島 剛史</span>
                             </div>
                             <p class="staff-text">
                                 <ruby><rb>환</rb><rp>(</rp><rt>C</rt><rp>)</rp></ruby>세희담으로 <ruby><rb>놀</rb><rp>(</rp><rt>Am</rt><rp>)</rp></ruby>고~<br>
-                                <ruby><rb>3</rb><rp>(</rp><rt>Dm7</rt><rp>)</rp></ruby>시 간식 <ruby><rb>먹</rb><rp>(</rp><rt>G7</rt><rp>)</rp></ruby>고~<br>
+                                <ruby><rb>3시</rb><rp>(</rp><rt>Dm7</rt><rp>)</rp></ruby>의 간식 <ruby><rb>먹</rb><rp>(</rp><rt>G7</rt><rp>)</rp></ruby>고~<br>
                                 <ruby><rb>좋</rb><rp>(</rp><rt>C</rt><rp>)</rp></ruby>아하는 만화를 <ruby><rb>읽</rb><rp>(</rp><rt>Am</rt><rp>)</rp></ruby>고~<br>
-                                <ruby><rb>느</rb><rp>(</rp><rt>Dm7</rt><rp>)</rp></ruby>긋한 <ruby><rb>일</rb><rp>(</rp><rt>G</rt><rp>)</rp></ruby>요<ruby><rb>일</rb><rp>(</rp><rt>C</rt><rp>)</rp></ruby><br>
-                                <ruby><rb>멋</rb><rp>(</rp><rt>Dm7</rt><rp>)</rp></ruby>진 <ruby><rb>일</rb><rp>(</rp><rt>G</rt><rp>)</rp></ruby>요<ruby><rb>일</rb><rp>(</rp><rt>C</rt><rp>)</rp></ruby><br>
+                                <ruby><rb>느긋</rb><rp>(</rp><rt>Dm7</rt><rp>)</rp></ruby>한 <ruby><rb>일</rb><rp>(</rp><rt>G</rt><rp>)</rp></ruby>요<ruby><rb>일</rb><rp>(</rp><rt>C</rt><rp>)</rp></ruby><br>
+                                <ruby><rb>근사</rb><rp>(</rp><rt>Dm7</rt><rp>)</rp></ruby>한 <ruby><rb>일</rb><rp>(</rp><rt>G</rt><rp>)</rp></ruby>요<ruby><rb>일</rb><rp>(</rp><rt>C</rt><rp>)</rp></ruby><br>
                                 작사・작곡 마츠시마 츠요시
                             </p>
                         </div>
@@ -2565,12 +2274,9 @@
         </p>
     </div>
 
-    </div> <!-- /.page-scroll -->
+    </div>
 
-    <!-- 인사말 위젯 — 브라우저 창 기준 고정 플로팅이라 .page-scroll 바깥에 둠
-         (스크롤/프레임 인셋과 무관하게 항상 같은 화면 위치에 떠 있어야 함) -->
     <div class="greeting-widget">
-        <!-- 원본 PDF 2쪽, 개발진 인사말 — 스마슈 캐릭터를 눌러야 뜨는 툴팁으로 -->
         <div class="header-greeting" id="greeting-tip" role="tooltip" hidden>
             이 게임은 스마슈를 비롯한 유쾌한 캐릭터들을 조작해서,<br>
             대륙의 남북을 관통하는 철도로 여행하며 전설의 백성 「봉인 일족」의 수수께끼를 풀어나가기도 합니다만,<br>
@@ -2585,7 +2291,6 @@
     </div>
 
     <script>
-        // 상단 네비게이션 — 스크롤 위치에 따라 현재 섹션 링크 강조
         (function () {
             var navLinks = Array.prototype.slice.call(document.querySelectorAll('.manual-nav a[data-nav]'));
             var sections = navLinks
@@ -2611,12 +2316,6 @@
             sections.forEach(function (s) { observer.observe(s); });
         })();
 
-        // 인사말 위젯은 프롤로그 구간에서만. IntersectionObserver의 퍼센트
-        // rootMargin 방식은 섹션이 길면 스크롤 도중 순간적으로 걸치는
-        // 구간을 놓치는 경우가 있어서(위 네비 하이라이트도 같은 방식이라
-        // 똑같이 부정확함을 확인함), 대신 스크롤할 때마다 "캐릭터 소개
-        // 섹션의 위쪽 끝이 화면 위쪽 끝을 넘었는가"를 직접 재계산 — 매
-        // 스크롤 프레임마다 새로 판단하니 놓치는 구간이 없음 */
         (function () {
             var widget = document.querySelector('.greeting-widget');
             var boundary = document.getElementById('characters');
@@ -2627,9 +2326,6 @@
 
             function updateWidgetVisibility() {
                 ticking = false;
-                // 캐릭터 소개 섹션이 화면에 '조금이라도' 들어오면 숨김.
-                // 섹션 위쪽 끝이 보이는 영역의 아래 끝에 닿는 순간이 기준
-                // (예전엔 섹션이 화면 맨 위까지 올라와야 숨겨졌음)
                 var root = scrollRoot.getBoundingClientRect();
                 var entered = boundary.getBoundingClientRect().top <= root.bottom;
                 widget.classList.toggle('is-hidden', entered);
@@ -2644,9 +2340,6 @@
             window.addEventListener('resize', updateWidgetVisibility);
         })();
 
-        // 네비 실제 높이를 --nav-height-live로 반영 — 항목이 줄바꿈되면
-        // 네비가 2줄 이상이 되면서 실제 높이가 --nav-height(1줄 기준)보다
-        // 커질 수 있어서, .page-scroll 상단 여백이 거기 가려지지 않게 동기화
         (function () {
             var nav = document.querySelector('.manual-nav');
             if (!nav) return;
@@ -2660,10 +2353,6 @@
             window.addEventListener('resize', syncNavHeight);
         })();
 
-        // 크레딧의 구분선(.credits-divider)을 표 실제 높이에 맞춤 — CSS만으로는
-        // 안 됨(flex stretch를 쓰면 자기 자신의 height:auto 콘텐츠가 없어
-        // 0이 되거나, 형제 요소 높이 계산과 얽혀 예측하기 어려움).
-        // 로고 이미지는 이제 폭 기준(%, 모바일은 고정값)이라 따로 안 건드림
         (function () {
             var divider = document.querySelector('.credits-divider');
             var table = document.querySelector('.credits-block table');
@@ -2678,7 +2367,6 @@
             window.addEventListener('resize', syncDividerHeight);
         })();
 
-        // 커버 옆 스마슈 — 누르면 인사말 툴팁 토글, 바깥 클릭/Esc로 닫기
         (function () {
             var trigger = document.getElementById('greeting-trigger');
             var tip = document.getElementById('greeting-tip');
