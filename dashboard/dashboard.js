@@ -406,6 +406,11 @@
 
     // 1) 어제 스탯 네 칸
     const pu = base.perUser;
+    /* "방문자"는 GA4 활성 사용자, "새로 온 사람"은 전체 사용자 기준이라 드물게
+       신규가 방문자보다 많게 나온다(실측 블로그 09-01: 활성 2 · 전체 3 · 신규 3).
+       "방문자 2명 · 새로 온 사람 3명"은 읽는 사람에게 모순이므로 그런 날은 보조줄을
+       뺀다 — 값을 깎아 맞추면 없는 숫자를 만드는 셈이다. */
+    const newSub = y.newUsers <= y.users ? `새로 온 사람 ${fmt(y.newUsers)}명` : '';
     parts.push(mod(5, '', '', `
         <div class="yday-title">
             <button type="button" class="date-nav" data-nav="prev" aria-label="이전 날짜">◀</button>
@@ -415,7 +420,7 @@
         <p class="meta-line">마지막 갱신 ${esc(data.meta.updatedAt)} KST ·
             매일 아침 07:00 KST에 어제 하루치를 모읍니다.</p>
         <div class="stat-grid">
-            ${stat('방문자', base.users, '명', fmt, `새로 온 사람 ${fmt(y.newUsers)}명`)}
+            ${stat('방문자', base.users, '명', fmt, newSub)}
             ${stat('페이지 조회', base.views, '회', fmt)}
             ${stat('세션', base.sessions, '', fmt)}
             ${stat('한 사람당', pu, '장', dec1)}
@@ -579,8 +584,12 @@
     const hourTicks = hours.map((_, hh) =>
         `<div class="collabel">${hh % 6 === 0 ? `${hh}시` : ''}</div>`).join('');
 
+    /* GA4는 여러 시간에 걸친 세션을 그 시간마다 한 번씩 센다 — 그래서 24칸의
+       합이 그날 세션 수보다 크다(실측 1~4건). 시작 시각(session_start)으로 세면
+       합이 맞지만, 재처리 전인 어제치는 오히려 크게 틀려(44 대 32) 값은 그대로
+       두고 설명을 사실대로 적는다. */
     parts.push(mod(12, `${dayLabel} 시간대`,
-        '시각별 세션 · 속성 시간대 기준 · 높이는 그날 최댓값 기준',
+        '시각별 세션 · 여러 시간에 걸친 세션은 시간마다 셉니다 · 높이는 그날 최댓값 기준',
         `<div class="hour-chart">${cols}</div>
          <div class="hour-ticks">${hourTicks}</div>`));
 

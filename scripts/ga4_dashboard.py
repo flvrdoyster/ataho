@@ -353,12 +353,11 @@ DEVICE_LABELS = {"mobile": "모바일", "desktop": "데스크톱", "tablet": "�
 # 문턱이 낮으면 매일 "몇 배 뛰었다"가 나와 아무 뜻이 없어진다.
 SPIKE_MIN_VIEWS = 5    # 이보다 적게 본 페이지는 몇 배가 됐든 말하지 않는다
 SPIKE_RATIO = 2.0      # 평소 하루 평균의 몇 배부터 "튀었다"고 할지
-DEPTH_RATIO = 2.0      # 신규/재방문의 1인당 조회수가 몇 배 차이부터 말할지
 MIN_DAYS_FOR_NORMAL = 14   # 이만큼은 쌓여야 "평소와 같았다"고 말할 수 있다
 # 한 사람당 몇 장·신규/재방문 같은 "소비 깊이" 문장은 사람 수가 적으면 한두 명의
 # 습관을 그날의 성격처럼 말하게 된다(블로그: 방문자 2명인 날에 "얕게 본 날").
 MIN_USERS_FOR_DEPTH = 5    # 그날 방문자가 이보다 적으면 깊이 문장을 내지 않는다
-MIN_GROUP_USERS = 2        # 신규/재방문 비교에서 각 쪽 최소 인원 — 1명의 "1인당"은 평균이 아니다
+MIN_GROUP_USERS = 2        # 신규·재방문 각 쪽 최소 인원 — 한 명의 습관이 "몫"을 좌우하지 않게
 
 
 def josa(word, with_final, without_final):
@@ -493,6 +492,11 @@ def fetch(client, target, age=1, include_settled=True):
     page_rows = report(client, target, dimensions=page_dims,
                        metrics=["screenPageViews", "activeUsers"],
                        date_range=day_range(age), order_by=("screenPageViews", True), limit=15)
+    # 같은 경로가 제목별로 갈라지면 조회 없이 참여 이벤트만 있는 조각 행이 끼어
+    # 든다 — 에뮬레이터 페이지는 실행 중에 제목이 "Neko Project II kai"로 바뀐다
+    # (실측 09-13 /kitan-opening.html: 조회 5회 행 옆에 "조회 0 · 사람 1" 행이
+    # 따로 나왔다). "본 페이지" 표에 조회 0은 뜻이 없으므로 뺀다.
+    page_rows = [r for r in page_rows if r["screenPageViews"] > 0]
 
     # 같은 페이지를 어제 이전 구간에서도 세어 "평소 하루 몇 번 보던 페이지인가"를
     # 낸다. 어제 23회가 많은 건지 적은 건지는 그 페이지의 평소를 알아야 말할 수
@@ -530,30 +534,32 @@ def fetch(client, target, age=1, include_settled=True):
         p["spike"] = bool(p["priorAvg"] > 0 and p["views"] >= SPIKE_MIN_VIEWS
                           and p["views"] / p["priorAvg"] >= SPIKE_RATIO)
 
-    # --- 3-1) 어제 신규 vs 재방문 -----------------------------------------
+    # --- 3-1) 신규 vs 재방문 — 날짜별 28일치 ------------------------------
     # 조회수를 기준으로 본다 — 사용자 수는 구간마다 중복 제외라 합이 총계와 안 맞고
     # (실측: new 11 + returning 4 + 미분류 6 = 21 ≠ 총 15), 세션도 넘친다.
     # 조회수는 정확히 떨어진다(22 + 36 + 2 = 60 = 어제 총 조회).
     #
+    # 하루치가 아니라 daily 와 같은 28일 창을 날짜별로 받는다 — "재방문자 몫"이
+    # 평소와 견줘 기록적인지 말하려면 다른 날의 값이 있어야 한다(인사이트 3번).
     # newVsReturning 은 세션 속성이라 재처리 지연군이다 — 어제치에는 빈 문자열로
-    # 남는 몫이 있다. 그 몫을 따로 담아 두고, 화면에서 크면 입을 다물게 한다.
-    visitors, unclassified_views = [], 0
-    for r in report(client, target, dimensions=["newVsReturning"],
-                    metrics=["screenPageViews", "activeUsers", "sessions"],
-                    date_range=day_range(age), order_by=("screenPageViews", True)):
+    # 남는 몫(other)이 있어, 그게 큰 날은 인사이트가 비교에서 뺀다.
+    by_day = {}
+    for r in report(client, target, dimensions=["date", "newVsReturning"],
+                    metrics=["screenPageViews", "activeUsers"],
+                    date_range=TREND, limit=500):
+        day = by_day.setdefault(date_key(r["date"]), {
+            "newViews": 0, "newUsers": 0, "retViews": 0, "retUsers": 0, "otherViews": 0})
         kind = r["newVsReturning"]
-        if kind not in ("new", "returning"):
-            unclassified_views += int(r["screenPageViews"])
-            continue
-        visitors.append({"name": "신규" if kind == "new" else "재방문",
-                         "kind": kind,
-                         "views": int(r["screenPageViews"]),
-                         "users": int(r["activeUsers"]),
-                         "sessions": int(r["sessions"])})
-    # ydayVisitors 도 _priorSources 와 같은 처지다 — 인사이트 문장(3번)에만 쓰이고
-    # 화면(dashboard.js)은 읽지 않는다. 밑줄을 붙여 main()이 파일에서 걸러내게 한다.
-    data["_ydayVisitors"] = visitors
-    data["_ydayVisitorsUnclassified"] = unclassified_views
+        if kind == "new":
+            day["newViews"] += int(r["screenPageViews"])
+            day["newUsers"] += int(r["activeUsers"])
+        elif kind == "returning":
+            day["retViews"] += int(r["screenPageViews"])
+            day["retUsers"] += int(r["activeUsers"])
+        else:
+            day["otherViews"] += int(r["screenPageViews"])
+    # 인사이트 문장(3번)에만 쓰이고 화면은 읽지 않는다 — 밑줄을 붙여 파일에서 뺀다.
+    data["_visitorsByDay"] = by_day
 
     data["ydaySites"] = []
     if target.split_hosts:
@@ -674,43 +680,69 @@ def build_insights(data, day_label="어제", confirmed=False):
                     f"뛰었습니다.{tail}",
         })
 
-    # 2) 한 사람이 몇 장을 보고 갔나 — 28일 중 가장 깊거나 얕은 날일 때만.
-    #    "평소 범위(q1~q3) 밖"을 조건으로 두면 정의상 절반의 날이 걸려 격일로
-    #    나온다(실측: 28일 중 15일). 범위 밖이라는 사실은 히어로 배지가 이미 말한다.
-    pu = data["baseline"].get("perUser")
-    enough = y["users"] >= MIN_USERS_FOR_DEPTH
-    if pu and enough and (pu["value"] >= pu["max"] or pu["value"] <= pu["min"]):
-        deeper = pu["value"] >= pu["max"]
+    # 규칙 2·3·5는 같은 원칙을 따른다: 그날이 최근 28일의 **기록**일 때만 말한다.
+    # "평소 범위(q1~q3) 밖"을 조건으로 두면 정의상 절반의 날이 걸려 격일로 나오고
+    # (실측 28일 중 14~15일), 범위 밖이라는 사실은 히어로 배지가 이미 말한다.
+    # 비교 상대는 그날을 뺀 나머지 날이고, 같은 값인 날이 있으면 기록이 아니므로
+    # 침묵한다(블로그는 방문자 2명인 날이 4일이라 "가장 적은 날"이 넘쳐났다).
+    def record(value, others):
+        """나머지 날보다 엄밀히 크면 "high", 작으면 "low", 아니면 None."""
+        if not others:
+            return None
+        if value > max(others):
+            return "high"
+        if value < min(others):
+            return "low"
+        return None
+
+    # 2) 한 사람이 몇 장을 보고 갔나
+    pu_others = [d["views"] / d["users"] for d in data["daily"]
+                 if d["date"] != y["date"] and d["users"]]
+    pu_value = y["views"] / y["users"] if y["users"] else 0.0
+    rec = record(pu_value, pu_others) if y["users"] >= MIN_USERS_FOR_DEPTH else None
+    if rec:
+        deeper = rec == "high"
+        edge = max(pu_others) if deeper else min(pu_others)
         out.append({
             "tone": "flat",
-            "text": f"{day_label} 한 사람이 평균 **{pu['value']:.1f}장**을 봤습니다 — 최근 "
-                    f"{pu['n']}일 중 가장 {'깊게' if deeper else '얕게'} 본 날입니다"
-                    f"(평소 {pu['median']:.1f}장).",
+            "text": f"{day_label} 한 사람이 평균 **{pu_value:.1f}장**을 봤습니다 — 최근 "
+                    f"{len(pu_others) + 1}일 중 가장 {'깊게' if deeper else '얕게'} 본 날입니다"
+                    f"(다른 날 {'최고' if deeper else '최저'} {edge:.1f}장).",
         })
 
-    # 3) 그 조회수를 누가 만들었나 — 신규와 재방문의 소비량은 대개 크게 다르다.
-    #    미분류(재처리 전)가 많이 섞인 날은 비율이 흔들리므로 말하지 않는다.
-    vis = {v["kind"]: v for v in data.get("_ydayVisitors", [])}
-    total_views = sum(v["views"] for v in data.get("_ydayVisitors", [])) \
-        + data.get("_ydayVisitorsUnclassified", 0)
-    unclassified_ok = (total_views and
-                       data.get("_ydayVisitorsUnclassified", 0) / total_views < 0.2)
-    groups_ok = (len(vis) == 2 and y["users"] >= MIN_USERS_FOR_DEPTH
-                 and all(v["users"] >= MIN_GROUP_USERS for v in vis.values()))
-    if unclassified_ok and groups_ok:
-        depth = {k: (v["views"] / v["users"] if v["users"] else 0.0) for k, v in vis.items()}
-        heavy = max(depth, key=depth.get)
-        light = "returning" if heavy == "new" else "new"
-        if depth[light] and depth[heavy] / depth[light] >= DEPTH_RATIO:
-            v = vis[heavy]
-            other = vis[light]["name"]
-            out.append({
-                "tone": "flat",
-                "text": f"{day_label} 조회 {total_views:,}회 가운데 {v['views']:,}회"
-                        f"(**{v['views'] / total_views * 100:.0f}%**)가 {v['name']} 쪽입니다 — "
-                        f"{v['users']:,}명이 1인당 **{depth[heavy]:.0f}장**씩 봤습니다"
-                        f"({other}{josa(other, '은', '는')} {depth[light]:.1f}장).",
-            })
+    # 3) 그 조회수를 누가 만들었나 — 재방문자 몫(조회 비중)이 기록일 때만.
+    #    평소엔 재방문자가 더 깊게 본다(실측: 사이트 28일 중 22일) — 그걸 매일
+    #    "재방문 쪽입니다"라고 말하던 게 옛 규칙이었다. 1인당 장수로 견주지 않는
+    #    이유: 조회 없이 참여만 잡힌 사람 때문에 "재방문 0.5장" 같은 착시가 생긴다.
+    #    미분류(재처리 전)가 20% 넘게 섞인 날은 비율이 흔들려 비교에서 뺀다.
+    def ret_share(v):
+        total = v["newViews"] + v["retViews"] + v["otherViews"]
+        if not total or v["otherViews"] / total >= 0.2 or not (v["newViews"] + v["retViews"]):
+            return None
+        return v["retViews"] / total
+
+    vbd = data.get("_visitorsByDay", {})
+    today = vbd.get(y["date"])
+    share = ret_share(today) if today else None
+    groups_ok = (today and y["users"] >= MIN_USERS_FOR_DEPTH
+                 and today["newUsers"] >= MIN_GROUP_USERS
+                 and today["retUsers"] >= MIN_GROUP_USERS)
+    others = [s for d, v in vbd.items() if d != y["date"]
+              for s in [ret_share(v)] if s is not None]
+    rec = record(share, others) if share is not None and groups_ok else None
+    if rec:
+        high = rec == "high"
+        edge = max(others) if high else min(others)
+        # 분류가 덜 끝나 빠진 날이 있으면 "27일 중"처럼 숫자만 줄어 이상하게 읽힌다.
+        span = (f"최근 {len(others) + 1}일" if len(others) + 1 >= len(data["daily"])
+                else f"최근 {len(data['daily'])}일 가운데 분류가 끝난 {len(others) + 1}일")
+        out.append({
+            "tone": "flat",
+            "text": f"{day_label} 조회 가운데 재방문자 몫이 **{share * 100:.0f}%**입니다 — "
+                    f"{span} 중 가장 {'높습니다' if high else '낮습니다'}"
+                    f"(다른 날 {'최고' if high else '최저'} {edge * 100:.0f}%)."
+                    + ("" if high else " 새로 온 사람들이 대부분을 봤습니다."),
+        })
 
     # 4) 28일 동안 없다가 어제 처음 나타난 유입원
     prior = set(data.get("_priorSources", []))
@@ -723,22 +755,20 @@ def build_insights(data, day_label="어제", confirmed=False):
             "text": f"최근 {TREND_DAYS}일 동안 없던 유입원이 {day_at} 생겼습니다 — {names}.",
         })
 
-    # 5) 어제가 정말 평소를 벗어난 날일 때만 방문자 수를 짚는다.
-    #    평소 범위면 히어로의 "평소 범위" 배지가 이미 말하고 있으니 침묵한다.
-    users = data["baseline"]["users"]
-    if users and users["where"] != "usual":
-        if users["rank"] == 1:
-            out.append({"tone": "up",
-                        "text": f"{day_label} 방문자 {y['users']:,}명은 최근 {users['n']}일 중 "
-                                f"**가장 많습니다**(그 전 최고 {users['max']:,}명)."})
-        else:
-            many = users["where"] == "high"
-            out.append({
-                "tone": "up" if many else "down",
-                "text": f"{day_label} 방문자 {y['users']:,}명 — 평소({users['median']:.0f}명)보다 "
-                        f"{'많은' if many else '적은'} 편으로, {users['n']}일 중 "
-                        f"**{users['rank']}번째**입니다.",
-            })
+    # 5) 방문자 수 — 기록일 때만(위 규칙 2·3과 같은 원칙). 비교 상대에서 그날을
+    #    빼는 게 특히 중요했다: 분포의 max 에는 그날도 들어 있어, 새 기록인 날
+    #    "그 전 최고"가 제 숫자로 나왔다.
+    others = [d["users"] for d in data["daily"] if d["date"] != y["date"]]
+    rec = record(y["users"], others)
+    if rec:
+        many = rec == "high"
+        edge = max(others) if many else min(others)
+        out.append({
+            "tone": "up" if many else "down",
+            "text": f"{day_label} 방문자 **{y['users']:,}명** — 최근 {len(others) + 1}일 중 "
+                    f"가장 {'많습니다' if many else '적습니다'}(다른 날 {'최고' if many else '최저'} "
+                    f"{edge:,}명).",
+        })
 
     # 6) 미분류가 절반을 넘으면 수치를 곧이곧대로 읽지 말라고 말해 준다.
     #    여기서 합계를 "{day_label} 세션 수"라고 부르지 않는 이유: GA4는 한
