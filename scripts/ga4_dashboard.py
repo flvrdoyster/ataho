@@ -35,6 +35,7 @@ import os
 import re
 import statistics
 import sys
+import urllib.error
 import urllib.request
 from collections import Counter
 from datetime import date, datetime, timedelta, timezone
@@ -354,6 +355,10 @@ SPIKE_MIN_VIEWS = 5    # 이보다 적게 본 페이지는 몇 배가 됐든 말
 SPIKE_RATIO = 2.0      # 평소 하루 평균의 몇 배부터 "튀었다"고 할지
 DEPTH_RATIO = 2.0      # 신규/재방문의 1인당 조회수가 몇 배 차이부터 말할지
 MIN_DAYS_FOR_NORMAL = 14   # 이만큼은 쌓여야 "평소와 같았다"고 말할 수 있다
+# 한 사람당 몇 장·신규/재방문 같은 "소비 깊이" 문장은 사람 수가 적으면 한두 명의
+# 습관을 그날의 성격처럼 말하게 된다(블로그: 방문자 2명인 날에 "얕게 본 날").
+MIN_USERS_FOR_DEPTH = 5    # 그날 방문자가 이보다 적으면 깊이 문장을 내지 않는다
+MIN_GROUP_USERS = 2        # 신규/재방문 비교에서 각 쪽 최소 인원 — 1명의 "1인당"은 평균이 아니다
 
 
 def josa(word, with_final, without_final):
@@ -452,6 +457,9 @@ def fetch(client, target, age=1, include_settled=True):
     # 위치를 사용자와 조회수 양쪽으로 낸다 — 둘의 방향이 갈리는 날이 있다
     # (사람 수는 평소인데 조회수만 높은 날 = 적은 사람이 깊게 본 날).
     per_user = [(d["views"] / d["users"] if d["users"] else 0.0) for d in data["daily"]]
+    # 대상 날짜의 값은 창의 마지막이 아니라 뒤에서 age번째다(yday_date 와 같은 규칙).
+    # daily 는 age 와 무관하게 늘 어제로 끝나는 28일 창이다.
+    pu_value = per_user[-age] if len(per_user) >= age else 0.0
     data["baseline"] = {
         "users": distribution([d["users"] for d in data["daily"]],
                               data["yesterday"]["users"]),
@@ -461,7 +469,7 @@ def fetch(client, target, age=1, include_settled=True):
                                  data["yesterday"]["sessions"]),
         # 한 사람이 몇 장을 보고 갔나. 방문자 수와 조회수를 따로 보면 "사람은
         # 평소인데 조회수만 많은 날"이 눈에 안 들어오는데, 이 값 하나면 잡힌다.
-        "perUser": distribution(per_user, per_user[-1] if per_user else 0.0),
+        "perUser": distribution(per_user, pu_value),
     }
 
     # --- 3) 어제 본 페이지 / 사이트별 -------------------------------------
@@ -627,6 +635,9 @@ def build_insights(data, day_label="어제", confirmed=False):
     그래서 여기서는 비교(평소 그 페이지는 몇 회였나)와 분해(누가 그 조회수를
     만들었나)만 말한다. 할 말이 없으면 줄 수가 줄어드는 게 정상이다.
 
+    문장마다 눈이 먼저 가야 할 숫자 하나를 **…** 로 감싼다. 화면(dashboard.js)이
+    문장을 이스케이프한 뒤 이 표시만 <b> 로 바꾼다 — HTML을 여기서 만들지 않는다.
+
     day_label — 문장 속에서 "어제"를 대신할 말. 최신(age=1) 스냅샷을 만들 때는
     기본값 "어제"를 그대로 쓰고, 히스토리에 얼려 둘 스냅샷(그저께 갱신 포함)은
     호출부가 mmdd(날짜)("08.15")를 넘긴다 — "어제"는 상대적인 말이라 얼려서
@@ -659,19 +670,22 @@ def build_insights(data, day_label="어제", confirmed=False):
         out.append({
             "tone": "up",
             "text": f"{label}{josa(label, '이', '가')} {day_label} {top['views']:,}회 — 평소 하루 "
-                    f"{top['priorAvg']:.1f}회 보던 페이지라 {top['views'] / top['priorAvg']:.1f}배로 "
+                    f"{top['priorAvg']:.1f}회 보던 페이지라 **{top['views'] / top['priorAvg']:.1f}배**로 "
                     f"뛰었습니다.{tail}",
         })
 
-    # 2) 한 사람이 몇 장을 보고 갔나 — 평소 범위를 벗어날 때만
+    # 2) 한 사람이 몇 장을 보고 갔나 — 28일 중 가장 깊거나 얕은 날일 때만.
+    #    "평소 범위(q1~q3) 밖"을 조건으로 두면 정의상 절반의 날이 걸려 격일로
+    #    나온다(실측: 28일 중 15일). 범위 밖이라는 사실은 히어로 배지가 이미 말한다.
     pu = data["baseline"].get("perUser")
-    if pu and pu["where"] != "usual":
-        deeper = pu["where"] == "high"
+    enough = y["users"] >= MIN_USERS_FOR_DEPTH
+    if pu and enough and (pu["value"] >= pu["max"] or pu["value"] <= pu["min"]):
+        deeper = pu["value"] >= pu["max"]
         out.append({
             "tone": "flat",
-            "text": f"{day_label} 한 사람이 평균 {pu['value']:.1f}장을 봤습니다 — 평소 "
-                    f"{pu['median']:.1f}장이니 {'깊게 본' if deeper else '얕게 본'} 날입니다"
-                    f"(28일 {'최대' if deeper else '최소'} {pu['max' if deeper else 'min']:.1f}장).",
+            "text": f"{day_label} 한 사람이 평균 **{pu['value']:.1f}장**을 봤습니다 — 최근 "
+                    f"{pu['n']}일 중 가장 {'깊게' if deeper else '얕게'} 본 날입니다"
+                    f"(평소 {pu['median']:.1f}장).",
         })
 
     # 3) 그 조회수를 누가 만들었나 — 신규와 재방문의 소비량은 대개 크게 다르다.
@@ -681,18 +695,21 @@ def build_insights(data, day_label="어제", confirmed=False):
         + data.get("_ydayVisitorsUnclassified", 0)
     unclassified_ok = (total_views and
                        data.get("_ydayVisitorsUnclassified", 0) / total_views < 0.2)
-    if unclassified_ok and len(vis) == 2:
+    groups_ok = (len(vis) == 2 and y["users"] >= MIN_USERS_FOR_DEPTH
+                 and all(v["users"] >= MIN_GROUP_USERS for v in vis.values()))
+    if unclassified_ok and groups_ok:
         depth = {k: (v["views"] / v["users"] if v["users"] else 0.0) for k, v in vis.items()}
         heavy = max(depth, key=depth.get)
         light = "returning" if heavy == "new" else "new"
         if depth[light] and depth[heavy] / depth[light] >= DEPTH_RATIO:
             v = vis[heavy]
+            other = vis[light]["name"]
             out.append({
                 "tone": "flat",
                 "text": f"{day_label} 조회 {total_views:,}회 가운데 {v['views']:,}회"
-                        f"({v['views'] / total_views * 100:.0f}%)가 {v['name']} 쪽입니다 — "
-                        f"{v['users']:,}명이 1인당 {depth[heavy]:.0f}장씩 봤습니다"
-                        f"({vis[light]['name']}는 {depth[light]:.1f}장).",
+                        f"(**{v['views'] / total_views * 100:.0f}%**)가 {v['name']} 쪽입니다 — "
+                        f"{v['users']:,}명이 1인당 **{depth[heavy]:.0f}장**씩 봤습니다"
+                        f"({other}{josa(other, '은', '는')} {depth[light]:.1f}장).",
             })
 
     # 4) 28일 동안 없다가 어제 처음 나타난 유입원
@@ -713,14 +730,14 @@ def build_insights(data, day_label="어제", confirmed=False):
         if users["rank"] == 1:
             out.append({"tone": "up",
                         "text": f"{day_label} 방문자 {y['users']:,}명은 최근 {users['n']}일 중 "
-                                f"가장 많습니다(그 전 최고 {users['max']:,}명)."})
+                                f"**가장 많습니다**(그 전 최고 {users['max']:,}명)."})
         else:
             many = users["where"] == "high"
             out.append({
                 "tone": "up" if many else "down",
                 "text": f"{day_label} 방문자 {y['users']:,}명 — 평소({users['median']:.0f}명)보다 "
                         f"{'많은' if many else '적은'} 편으로, {users['n']}일 중 "
-                        f"{users['rank']}번째입니다.",
+                        f"**{users['rank']}번째**입니다.",
             })
 
     # 6) 미분류가 절반을 넘으면 수치를 곧이곧대로 읽지 말라고 말해 준다.
@@ -740,14 +757,14 @@ def build_insights(data, day_label="어제", confirmed=False):
         if confirmed:
             out.append({
                 "tone": "down",
-                "text": f"{day_label} 유입 가운데 {data['ydayUnresolved']:,}건은 GA4가 재처리를 "
+                "text": f"{day_label} 유입 가운데 **{data['ydayUnresolved']:,}건**은 GA4가 재처리를 "
                         f"마친 뒤에도 출처가 끝내 분류되지 않았습니다(분류된 것은 {resolved:,}건) — "
                         f"흔치 않은 일이니 계측(GTM) 설정을 점검해 볼 만합니다.",
             })
         else:
             out.append({
                 "tone": "down",
-                "text": f"{day_label} 유입 가운데 {data['ydayUnresolved']:,}건은 출처가 아직 "
+                "text": f"{day_label} 유입 가운데 **{data['ydayUnresolved']:,}건**은 출처가 아직 "
                         f"분류되지 않았습니다(분류된 것은 {resolved:,}건) — GA4가 세션 속성을 "
                         f"확정하는 데 하루 이상 걸립니다. 이 값은 내일 자동으로 다시 확인됩니다.",
             })
@@ -821,7 +838,19 @@ def fetch_feedback(creds, sheet_id):
         rows = _sheet_values(creds, sheet_id, FEEDBACK_RANGE)
     except Exception as err:                      # noqa: BLE001 — 어떤 실패든 건너뛴다
         out["error"] = f"{type(err).__name__}"
-        print(f"  피드백 시트를 읽지 못해 건너뜁니다: {err}", file=sys.stderr)
+        # 403 하나로는 "시트가 공유 안 됨"과 "Sheets API가 꺼짐"이 구분되지 않아
+        # 몇 달째 원인을 모른 채 실패했다. Google 응답의 열거값만 옮겨 적는다 —
+        # message 같은 자유 문구엔 프로젝트 번호 등이 섞일 수 있어 공개 파일에 안 싣는다.
+        if isinstance(err, urllib.error.HTTPError):
+            out["status"] = err.code
+            try:
+                body = json.loads(err.read().decode("utf-8")).get("error", {})
+                reasons = [d.get("reason") for d in body.get("details", []) if d.get("reason")]
+                out["reason"] = reasons[0] if reasons else body.get("status")
+            except Exception:                     # noqa: BLE001 — 원인 파악 실패는 무시
+                pass
+        print(f"  피드백 시트를 읽지 못해 건너뜁니다: {err} "
+              f"({out.get('reason') or '원인 미상'})", file=sys.stderr)
         return out
 
     # 헤더 줄을 찾아서 쓴다 — 행 번호를 박아 두면 시트 맨 위에 제목 줄이 하나

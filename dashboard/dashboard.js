@@ -40,6 +40,16 @@
     const fb = window.DASHBOARD_FEEDBACK || {};
     const fbPending = (fb.available && fb.pending && fb.pending.count > 0)
         ? fb.pending : null;
+    /* 시트를 못 읽은 날은 "미확인 0건"과 겉보기가 같아서, 조용히 두면 고장을 모른
+       채 지나간다(실제로 몇 달 그랬다). 시트 ID를 안 준 경우(no-sheet-id)는 일부러
+       끈 것이라 말하지 않는다. 원인은 수집기가 Google 응답의 열거값만 옮겨 온다. */
+    const FB_REASON = {
+        SERVICE_DISABLED: 'Sheets API가 꺼져 있습니다',
+        PERMISSION_DENIED: '시트가 서비스 계정에 공유되지 않았습니다',
+    };
+    const fbFailed = !fb.available && fb.error && fb.error !== 'no-sheet-id'
+        ? (FB_REASON[fb.reason] || (fb.status ? `HTTP ${fb.status}` : fb.error))
+        : null;
 
     // --- 토큰 & 포맷 -------------------------------------------------
     /* 캔버스(Chart.js·스파크라인 SVG)는 CSS가 닿지 않는 그림이라, 색·서체·굵기를
@@ -139,6 +149,23 @@
                 `rel="noopener noreferrer">시트 열기</a>` : '') + '</p>');
     }
 
+    /* 데이터가 멈췄을 때의 경고 — 워크플로우가 실패하면 옛 숫자가 그대로 남아
+       화면만 봐서는 모른다. 매일 아침 한 번 도니, 마지막 갱신일이 KST 오늘보다
+       2일 이상 전이면 적어도 하루치가 빠진 것이다(07시 실행 전엔 1일 차라
+       오탐이 없다). 대상이 여럿이면 가장 오래된 쪽 기준. */
+    const kstToday = new Date(Date.now() + 9 * 3600000).toISOString().slice(0, 10);
+    const updatedDays = views
+        .map((v) => (v.data.meta && v.data.meta.updatedAt || '').slice(0, 10))
+        .filter((d) => /^\d{4}-\d{2}-\d{2}$/.test(d))
+        .map((d) => Math.round((Date.parse(`${kstToday}T00:00:00Z`) -
+            Date.parse(`${d}T00:00:00Z`)) / 86400000));
+    const staleDays = updatedDays.length ? Math.max(...updatedDays) : 0;
+    if (staleDays >= 2) {
+        nav.insertAdjacentHTML('beforebegin',
+            `<p class="reminder"><b>데이터가 ${fmt(staleDays)}일째 갱신되지 않았습니다</b>` +
+            '<span class="dim">GitHub Actions의 GA4 Daily Dashboard 실행 기록을 확인하세요</span></p>');
+    }
+
     if (!views.length) {
         panelRoot.innerHTML = '<p class="empty">아직 수집된 데이터가 없습니다.' +
             '<br>GitHub Actions의 <b>GA4 Daily Dashboard</b> 워크플로우가 한 번 돌면 채워집니다.</p>';
@@ -146,10 +173,16 @@
     }
 
     // --- Chart.js 공통 ------------------------------------------------
-    Chart.defaults.font.family = FONT;
-    Chart.defaults.font.size = G.fontSize;
-    Chart.defaults.color = C.muted;
-    Chart.defaults.maintainAspectRatio = false;
+    /* Chart.js 는 CDN에서 온다. 못 불러오면 Chart 가 없는데, 여기서 그대로
+       Chart.defaults 를 건드리면 ReferenceError 로 이 파일 전체가 멈춰 화면이
+       통째로 빈다. 차트만 포기하고 나머지는 그린다(makeCharts 참조). */
+    const hasChart = typeof window.Chart === 'function';
+    if (hasChart) {
+        Chart.defaults.font.family = FONT;
+        Chart.defaults.font.size = G.fontSize;
+        Chart.defaults.color = C.muted;
+        Chart.defaults.maintainAspectRatio = false;
+    }
 
     const gridStyle = { color: C.grid, drawTicks: false, borderDash: [] };
     const axisStyle = { color: C.axis };
@@ -401,11 +434,14 @@
              data.daily.slice().reverse().map((d) => [
                  d.date, fmt(d.users), fmt(d.sessions), fmt(d.views)]))}`, 'stretch'));
 
-    // 3) 인사이트
+    // 3) 인사이트 — 수집기가 **…** 로 감싼 숫자만 굵게. 이스케이프를 먼저 하고
+    // 표시를 바꾸므로 문장 속 데이터(페이지 이름 등)가 태그로 해석될 일은 없다.
+    // 이 표시가 생기기 전에 얼린 과거 문장은 그냥 평문으로 나온다.
     if (data.insights && data.insights.length) {
+        const emph = (t) => esc(t).replace(/\*\*(.+?)\*\*/g, '<b>$1</b>');
         parts.push(mod(12, '', '',
             `<ul class="insights">${data.insights
-                .map((i) => `<li>${esc(i.text)}</li>`).join('')}</ul>`));
+                .map((i) => `<li>${emph(i.text)}</li>`).join('')}</ul>`));
     }
 
     /* 3-1) 미확인 피드백 — 첫 탭의 최신 화면에만. 어제 지표가 아니라 "지금
@@ -431,6 +467,10 @@
              <p class="note-line">${oldest}${oldest && fb.sheetUrl ? ' · ' : ''}` +
             (fb.sheetUrl ? `<a href="${esc(fb.sheetUrl)}" target="_blank" ` +
                 `rel="noopener noreferrer">시트에서 확인하기</a>` : '') + '</p>'));
+    } else if (primary && isLatest && fbFailed) {
+        parts.push(mod(12, '확인 안 한 피드백', '',
+            `<p class="note-line">시트를 읽지 못해 미확인 건수를 셀 수 없습니다 — ` +
+            `${esc(fbFailed)}.</p>`));
     }
 
     // 4) 어제 본 페이지 — 사이트별 소계를 위에 한 줄로
@@ -439,6 +479,10 @@
        한 경우에만 그 경로를 작게 보조줄로 남긴다 — "환세풍광전" 아래 "/hukyou.html".
        「평소/일」 칸의 배율은 수집 스크립트가 튀었다고 판정한 행에만 붙인다 —
        문턱을 여기서 다시 재면 표와 인사이트 문장이 언젠가 어긋난다. */
+    /* 순위 표의 이름 칸 뒤에 옅은 막대 — 숫자만으론 크기 차가 늦게 읽힌다.
+       길이는 그 표의 1위를 100%로 둔 상대값. */
+    const barW = (v, max) => `--w:${max > 0 ? (v / max * 100).toFixed(1) : 0}%`;
+    const pageMax = Math.max(0, ...data.ydayPages.map((p) => p.views));
     const pageRows = data.ydayPages.map((p) => {
         const label = p.section || p.title || p.name;
         const sub = label !== p.name ? p.name : '';
@@ -448,7 +492,7 @@
             : `<span class="dim" title="${esc(dayLabel)} 이전 구간에는 조회가 없던 페이지">처음</span>`;
         /* 호스트는 이름 옆에 작게 붙인다 — 제 줄을 차지하면 한 행이 3줄이 되고
            같은 호스트가 아홉 번 반복된다. 위의 점유율 막대가 이미 비중을 말한다. */
-        return `<tr><td class="page">` +
+        return `<tr><td class="page bar" style="${barW(p.views, pageMax)}">` +
             `<span class="name">${esc(label)}</span>` +
             (p.host ? `<span class="host">${esc(p.host)}</span>` : '') +
             (sub ? `<div class="path">${esc(sub)}</div>` : '') +
@@ -480,8 +524,9 @@
          </tbody></table></div>`));
 
     // 5) 어제 온 곳
+    const srcMax = Math.max(0, ...data.ydaySources.map((s) => s.sessions));
     const srcRows = data.ydaySources.map((s) =>
-        `<tr><td class="name">${esc(s.name)}</td>` +
+        `<tr><td class="name bar" style="${barW(s.sessions, srcMax)}">${esc(s.name)}</td>` +
         `<td class="num">${fmt(s.sessions)}</td></tr>`).join('');
 
     /* 미분류를 목록에 섞지 않는 이유는 수집 스크립트 주석 참조 — 어제치는
@@ -581,6 +626,16 @@
     function makeCharts(data, key) {
         const at = (id) => document.getElementById(`${id}-${key}`);
         if (!at('c-trend')) return;   // 데이터가 없어 빈 화면을 그린 경우
+
+        // 차트를 못 그리면 빈 칸 대신 그 사실을 적고, 같은 값을 담은 표를 펼쳐 둔다.
+        if (!hasChart) {
+            const box = at('c-trend').parentElement;
+            box.outerHTML = '<p class="note-line">차트를 불러오지 못했습니다 — ' +
+                '아래 표에 같은 값이 있습니다.</p>';
+            const tv = document.querySelector(`.panel[data-key="${key}"] .table-view`);
+            if (tv) tv.open = true;
+            return;
+        }
 
         /* 보고 있는 날짜의 점만 크게 — 선 위에서 "지금 말하는 날"이 어디인지
            바로 짚이게. 예전엔 늘 마지막 점(최신)이었지만, 히스토리를 눌러

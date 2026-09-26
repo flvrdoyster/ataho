@@ -3,6 +3,8 @@
 window.DASHBOARD_FEEDBACK = {
  "available": false,
  "error": "HTTPError",
+ "reason": "PERMISSION_DENIED",
  "sheetUrl": "https://docs.google.com/spreadsheets/d/10IdRL3n0wKav9TvPbS0kkm5Pq6fAaMxDNWauTNYy5cE/edit",
- "updatedAt": "2026-09-26 09:19"
+ "status": 403,
+ "updatedAt": "2026-09-26 15:03"
 };

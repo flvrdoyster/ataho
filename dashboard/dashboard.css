@@ -411,6 +411,11 @@ svg {
     border-bottom: none;
 }
 
+/* 이름 칸 뒤 비중 막대 — 길이(--w)는 dashboard.js 가 그 표의 1위 대비로 넣는다 */
+.rank td.bar {
+    background: linear-gradient(to right, var(--rank-bar) var(--w, 0%), transparent var(--w, 0%));
+}
+
 .rank td.num,
 .rank th.num {
     text-align: right;

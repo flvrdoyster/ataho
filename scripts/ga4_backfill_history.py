@@ -16,11 +16,16 @@ TREND_DAYS(28일) 보존 정책은 안 건드린다 — 그 이상 긁어와 봐
 백필한 날짜는 전부 confirmed=True 로 저장한다 — HISTORY_REFRESH_AGE(2일)보다
 훨씬 오래된 날짜라 재처리 지연 걱정 없이 이미 확정된 값이다.
 
+--refresh 를 주면 이미 있는 날짜도 age 2~TREND_DAYS 전부 다시 조회해 덮어쓴다.
+수집 로직의 버그를 고친 뒤, 틀린 값으로 얼어 버린 과거 항목을 한 번에 바로잡을 때
+쓴다(값·인사이트·최장 방문이 전부 지금 코드로 다시 계산된다).
+
 실행:
   GA4_SERVICE_ACCOUNT_FILE=... [GA4_BLOG_PROPERTY_ID=... FEEDBACK_SHEET_ID=...] \\
-      python scripts/ga4_backfill_history.py
+      python scripts/ga4_backfill_history.py [--refresh]
 (자격 증명·환경변수는 ga4_dashboard.py 와 동일)
 """
+import argparse
 import json
 import sys
 from pathlib import Path
@@ -29,7 +34,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 import ga4_dashboard as ga4  # noqa: E402
 
 
-def backfill_target(client, target):
+def backfill_target(client, target, refresh=False):
     path = ga4.OUTPUT_DIR / f"{target.key}.js"
     if not path.exists():
         print(f"  {target.key}: 데이터 파일이 없어 건너뜁니다 "
@@ -42,14 +47,15 @@ def backfill_target(client, target):
     history = on_disk.get("history", {})
 
     filled, skipped = 0, 0
-    for age in range(3, ga4.TREND_DAYS + 1):
+    # 갱신 모드는 그저께(age=2)도 포함한다 — 어제(age=1)는 main() 몫이다.
+    for age in range(2 if refresh else 3, ga4.TREND_DAYS + 1):
         d = ga4.fetch(client, target, age=age, include_settled=False)
         date = d["yesterday"]["date"]
         if not date:
             print(f"  {target.key}: age={age}부터 실 데이터가 없어 멈춥니다 "
                   f"(속성이 그만큼 안 됐거나 daily 트렌드가 그만큼 안 돎)")
             break
-        if date in history:
+        if date in history and not refresh:
             skipped += 1
             continue
         day_label = ga4.mmdd(date)
@@ -57,7 +63,7 @@ def backfill_target(client, target):
         d["insights"] = ga4.build_insights(d, day_label=day_label, confirmed=True)
         history[date] = ga4.snapshot_shape(d)
         filled += 1
-        print(f"  {target.key}: {date} 채움 (age={age})")
+        print(f"  {target.key}: {date} {'다시 씀' if refresh else '채움'} (age={age})")
 
     # main() 과 같은 정리 규칙 — 여기서도 지켜야 다음 날 워크플로우와 결과가 같다.
     cutoff = (ga4.datetime.now(ga4.KST).date()
@@ -74,11 +80,16 @@ def backfill_target(client, target):
 
 
 def main():
+    parser = argparse.ArgumentParser(description="GA4 대시보드 히스토리 일괄 채우기")
+    parser.add_argument("--refresh", action="store_true",
+                        help="이미 있는 날짜도 age 2~TREND_DAYS 전부 다시 조회해 덮어쓴다")
+    args = parser.parse_args()
+
     creds = ga4.load_credentials()
     client = ga4.BetaAnalyticsDataClient(credentials=creds)
     for target in ga4.build_targets():
         print(f"=== {target.label} ({target.key}) ===")
-        backfill_target(client, target)
+        backfill_target(client, target, refresh=args.refresh)
 
 
 if __name__ == "__main__":
