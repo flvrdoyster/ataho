@@ -66,6 +66,60 @@ hr {
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
 }
 
+/* 홈의 "모든 페이지" — 헤더는 월드 조작을 막지 않으려고 pointer-events 를 꺼 뒀으므로
+   이 목록만 다시 켠다. 접혀 있을 땐 제목 줄 하나 크기라 월드를 가리지 않는다. */
+#site-index {
+    display: inline-block;
+    margin-top: 6px;
+    pointer-events: auto;
+    font-size: 0.75rem;
+    color: rgba(238, 238, 238, 1);
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+}
+
+#site-index summary {
+    cursor: pointer;
+    opacity: 0.75;
+}
+
+#site-index summary:hover,
+#site-index[open] summary {
+    opacity: 1;
+}
+
+#site-index nav {
+    margin-top: 6px;
+    padding: 10px 14px;
+    max-height: 60vh;
+    overflow-y: auto;
+    text-align: left;
+    background: rgba(0, 0, 0, 0.75);
+    border-radius: 6px;
+    text-shadow: none;
+}
+
+#site-index ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+#site-index li + li {
+    margin-top: 6px;
+}
+
+#site-index li b {
+    display: inline-block;
+    min-width: 6.5em;
+    color: rgba(238, 238, 238, 0.6);
+    font-weight: normal;
+}
+
+#site-index a {
+    margin-right: 10px;
+    color: rgba(238, 238, 238, 1);
+}
+
 #content {
     width: 100%;
     text-align: center;
