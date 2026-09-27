@@ -1,15 +1,5 @@
-# atah.io — 검색엔진 안내
-#
-# 공개 페이지 목록은 sitemap.xml 에 있다. 여기서는 사람이 볼 페이지가 아닌 곳만 막는다.
-# 개발 도구(맵 에디터, 스테이지 에디터 등)는 막지 않고 페이지 안의
-# <meta name="robots" content="noindex"> 로 뺀다 — robots.txt 로 막으면 크롤러가
-# 그 noindex 를 읽지 못해, 다른 곳에 링크가 걸렸을 때 제목 없는 주소로 색인될 수 있다.
-
 User-agent: *
-# 티스토리 스킨 원본(치환 전 템플릿)과 로컬 미리보기 — 페이지 자체에 태그를 넣으면
-# 그대로 블로그 스킨에 실려 나가므로 여기서 막는다.
 Disallow: /blog/
-# 자동 생성 데이터 파일과 수집 스크립트
 Disallow: /dashboard/data/
 Disallow: /scripts/
 

@@ -66,20 +66,31 @@ hr {
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
 }
 
-/* 홈의 "모든 페이지" — 헤더는 월드 조작을 막지 않으려고 pointer-events 를 꺼 뒀으므로
-   이 목록만 다시 켠다. 접혀 있을 땐 제목 줄 하나 크기라 월드를 가리지 않는다. */
 #site-index {
-    display: inline-block;
-    margin-top: 6px;
+    position: absolute;
+    top: 18px;
+    left: 20px;
     pointer-events: auto;
-    font-size: 0.75rem;
-    color: rgba(238, 238, 238, 1);
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
 }
 
 #site-index summary {
+    display: flex;
+    width: 28px;
+    height: 28px;
+    align-items: center;
+    justify-content: center;
     cursor: pointer;
-    opacity: 0.75;
+    color: rgba(238, 238, 238, 1);
+    opacity: 0.8;
+}
+
+#site-index summary::marker { content: ""; }
+#site-index summary::-webkit-details-marker { display: none; }
+
+#site-index summary svg {
+    width: 100%;
+    height: 100%;
+    filter: drop-shadow(1px 1px 2px rgba(0, 0, 0, 0.8));
 }
 
 #site-index summary:hover,
@@ -88,13 +99,19 @@ hr {
 }
 
 #site-index nav {
-    margin-top: 6px;
+    position: fixed;
+    top: 76px;
+    left: 20px;
+    max-width: calc(100vw - 40px);
+    box-sizing: border-box;
     padding: 10px 14px;
     max-height: 60vh;
     overflow-y: auto;
     text-align: left;
+    font-size: 0.75rem;
     background: rgba(0, 0, 0, 0.75);
     border-radius: 6px;
+    color: rgba(238, 238, 238, 1);
     text-shadow: none;
 }
 
@@ -102,21 +119,29 @@ hr {
     margin: 0;
     padding: 0;
     list-style: none;
+    display: grid;
+    grid-template-columns: max-content 1fr;
+    column-gap: 14px;
+    row-gap: 8px;
 }
 
-#site-index li + li {
-    margin-top: 6px;
+#site-index li {
+    display: contents;
 }
 
 #site-index li b {
-    display: inline-block;
-    min-width: 6.5em;
     color: rgba(238, 238, 238, 0.6);
     font-weight: normal;
+    white-space: nowrap;
+}
+
+#site-index .links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 14px;
 }
 
 #site-index a {
-    margin-right: 10px;
     color: rgba(238, 238, 238, 1);
 }
 

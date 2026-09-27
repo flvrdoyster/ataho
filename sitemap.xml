@@ -1,8 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- atah.io 공개 페이지 목록 — 손으로 관리한다. 페이지를 새로 공개하면 여기에도 한 줄.
-     주소는 각 페이지의 <link rel="canonical"> 과 같은 모양이어야 한다(폴더는 끝에 /).
-     pc98.atah.io·suiko.atah.io 는 다른 호스트라 여기 넣을 수 없다 — 각자 사이트맵이 필요하다.
-     개발 도구·대시보드·해설서 안에 끼워 쓰는 조각(char.html)은 뺐다. -->
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url><loc>https://atah.io/</loc></url>
   <url><loc>https://atah.io/haiyuki_web/</loc></url>

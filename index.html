@@ -13,8 +13,6 @@
     <link rel="stylesheet" href="fonts.css">
     <link rel="stylesheet" href="style.css">
     <title>아타호의 거처 : atah.io</title>
-    <!-- 검색 결과 요약문과 공유 미리보기 카드. 네이버가 검색 유입의 대부분이라
-         og 태그까지 채운다(pc98.atah.io 페이지들과 같은 구성). -->
     <meta name="description" content="환세 시리즈 팬 아카이브입니다. 환세패유기 웹 버전과 해설서, PC-98 환세 시리즈 한글화 웹 에뮬레이터, 미니게임과 장면 뷰어를 한곳에 모았습니다.">
     <link rel="canonical" href="https://atah.io/">
     <meta property="og:title" content="아타호의 거처 : atah.io">
@@ -47,141 +45,75 @@
     <div id="header">
         <h1>아타호의 거처</h1>
         <p><b>A</b>ll <b>T</b>hings <b>A</b>rchived <b>H</b>ere</p>
-        <!-- 월드의 모든 이동은 캔버스 안(world/maps/cave/triggers.js)에 있어서 검색엔진과
-             키보드 사용자는 여기서 다른 페이지로 갈 길이 없었다. 같은 목적지를 진짜 링크로
-             한 번 더 둔다 — 평소엔 접혀 있어 월드 화면은 그대로다. 월드에 새 목적지를
-             걸면 여기에도 한 줄(sitemap.xml 도). -->
         <details id="site-index">
-            <summary>모든 페이지</summary>
+            <summary aria-label="모든 페이지">
+                <svg viewBox="0 0 800 800" fill="currentColor" aria-hidden="true">
+                    <path
+                        d="M359.1,89.6c24.1-18.7,57.8-18.7,81.9,0l279.5,217.4c25.1,19.5,11.2,59.7-20.5,59.7h-33.2v266.7c0,36.8-29.8,66.7-66.7,66.7H200c-36.8,0-66.7-29.8-66.7-66.7v-266.7h-33.2c-31.8,0-45.6-40.2-20.5-59.7L359.1,89.6Z" />
+                </svg>
+            </summary>
             <nav aria-label="사이트 전체 목록">
+                <!-- site-index:begin -->
                 <ul>
-                    <li><b>환세패유기</b>
-                        <a href="haiyuki_web/">웹 버전</a>
-                        <a href="haiyuki_manual/">해설서</a></li>
-                    <li><b>PC-98 한글화</b>
-                        <a href="https://pc98.atah.io/hukyou.html">환세풍광전</a>
-                        <a href="https://pc98.atah.io/kaitou.html">환세쾌도전</a>
-                        <a href="https://pc98.atah.io/kitan.html">환세희담</a>
-                        <a href="https://pc98.atah.io/torimono.html">환세포물장</a></li>
-                    <li><b>Windows</b>
-                        <a href="https://suiko.atah.io/kr.html">환세취호전</a></li>
-                    <li><b>설명서</b>
-                        <a href="kitan_manual/">환세희담 취급설명서</a></li>
-                    <li><b>미니게임</b>
-                        <a href="balance/">평균대 동작수련</a>
-                        <a href="sweep/">술창고 청소</a>
-                        <a href="swim/">헤엄치기</a></li>
+                    <li><b>PC-98 웹 에뮬</b>
+                        <span class="links">
+                            <a href="https://pc98.atah.io/hukyou.html">환세풍광전</a>
+                            <a href="https://pc98.atah.io/kitan.html">환세희담</a>
+                            <a href="https://pc98.atah.io/kaitou.html">환세쾌도전</a>
+                            <a href="https://pc98.atah.io/torimono.html">환세포물장</a>
+                        </span></li>
+                    <li><b>Windows 웹 에뮬</b>
+                        <span class="links">
+                            <a href="https://suiko.atah.io/kr.html">환세취호전</a>
+                        </span></li>
+                    <li><b>웹 포팅</b>
+                        <span class="links">
+                            <a href="haiyuki_web/">환세패유기</a>
+                        </span></li>
+                    <li><b>매뉴얼</b>
+                        <span class="links">
+                            <a href="kitan_manual/">환세희담 취급설명서</a>
+                            <a href="haiyuki_manual/">환세패유기 해설서</a>
+                        </span></li>
+                    <li><b>취호전 미니게임</b>
+                        <span class="links">
+                            <a href="balance/">평균대 동작수련</a>
+                            <a href="sweep/">술창고 청소</a>
+                            <a href="swim/">헤엄치기</a>
+                        </span></li>
                     <li><b>장면 뷰어</b>
-                        <a href="viewer/scene.html?story=kaisin">환세쾌진극 엔딩</a>
-                        <a href="viewer/scene.html?story=gaiden">환세희담 외전</a>
-                        <a href="viewer/ani.html">DS 아니메 총집편 '98</a></li>
+                        <span class="links">
+                            <a href="viewer/scene.html?story=kaisin">엔딩: 환세쾌진극</a>
+                            <a href="viewer/scene.html?story=gaiden">애니메이션: 환세희담 외전 ~궁극의 에로문서 전설~</a>
+                            <a href="viewer/ani.html">애니메이션: DS 아니메 총집편 '98</a>
+                        </span></li>
                 </ul>
+                <!-- site-index:end -->
             </nav>
         </details>
     </div>
+
+    <div id="lightbox">
+        <span class="close">&times;</span>
+        <button id="lightbox-prev" class="lightbox-nav prev" aria-label="이전 이미지">&larr;</button>
+        <button id="lightbox-next" class="lightbox-nav next" aria-label="다음 이미지">&rarr;</button>
+        <img id="lightbox-img" src="" alt="">
+        <div id="lightbox-caption" class="caption"></div>
+        <div id="lightbox-meta" class="meta"></div>
+    </div>
+
+    <script>window.MAP_NAME = 'cave'; window.MAP_BASE = 'world/';</script>
+    <script src="resource/img/manifest.js"></script>
+    <script src="world/maps/cave/data.js"></script>
+    <script src="world/maps/cave/triggers.js"></script>
+    <script src="world/engine.js"></script>
+    <script src="world/char/char_free.js"></script>
+    <script>window.onload = initGame;</script>
+    <script src="lightbox.js"></script>
     <script>
-        // 목록 안에서 누른 키가 월드로 넘어가 캐릭터가 같이 움직이지 않게 한다
-        // (월드는 window 에서 keydown 을 받는다 — world/engine.js).
         document.getElementById('site-index').addEventListener('keydown', (e) => e.stopPropagation());
     </script>
-
-
-
+    <script src="footer.js"></script>
 </body>
-
-<script>window.MAP_NAME = 'cave'; window.MAP_BASE = 'world/';</script>
-<!-- Game Data & Logic -->
-<script src="resource/img/manifest.js"></script>
-<script src="world/maps/cave/data.js"></script>
-<script src="world/maps/cave/triggers.js"></script>
-<script src="world/engine.js"></script>
-<script src="world/char/char_free.js"></script>
-<script>window.onload = initGame;</script>
-
-<div id="lightbox">
-    <span class="close">&times;</span>
-    <button id="lightbox-prev" class="lightbox-nav prev" aria-label="이전 이미지">&larr;</button>
-    <button id="lightbox-next" class="lightbox-nav next" aria-label="다음 이미지">&rarr;</button>
-    <img id="lightbox-img" src="" alt="">
-    <div id="lightbox-caption" class="caption"></div>
-    <div id="lightbox-meta" class="meta"></div>
-</div>
-
-<script>
-const lightbox = document.getElementById('lightbox');
-const lightboxImg = document.getElementById('lightbox-img');
-const lightboxCaption = document.getElementById('lightbox-caption');
-const lightboxMeta = document.getElementById('lightbox-meta');
-const closeBtn = document.querySelector('#lightbox .close');
-const prevBtn = document.getElementById('lightbox-prev');
-const nextBtn = document.getElementById('lightbox-next');
-
-function galleryFiles() {
-    const manifest = window.RESOURCE_IMG_MANIFEST || {};
-    return Object.keys(manifest);
-}
-
-function galleryIndex(hash) {
-    const file = hash.replace(/^resource\/img\//, '');
-    return galleryFiles().indexOf(file);
-}
-
-function navigateGallery(delta) {
-    const files = galleryFiles();
-    const idx = galleryIndex(window.location.hash.substring(1));
-    if (idx === -1 || files.length === 0) return;
-    const nextIdx = (idx + delta + files.length) % files.length;
-    window.location.hash = 'resource/img/' + files[nextIdx];
-}
-
-function updateView() {
-    const hash = window.location.hash.substring(1);
-    if (hash && hash.startsWith('resource/img/') &&
-        (hash.endsWith('.png') || hash.endsWith('.jpg') || hash.endsWith('.gif'))) {
-        const activeLink = document.querySelector(`a[href="#${hash}"]`);
-        lightboxImg.src = hash;
-        lightboxCaption.textContent = activeLink ? activeLink.getAttribute('data-caption') : hash.split('/').pop();
-
-        if (activeLink && activeLink.hasAttribute('data-source')) {
-            const source = activeLink.getAttribute('data-source');
-            const modified = activeLink.getAttribute('data-modified');
-            const metaParts = [];
-            if (source) metaParts.push(`출처: ${source}`);
-            if (modified) metaParts.push(modified);
-            lightboxMeta.textContent = metaParts.join(' · ');
-        } else {
-            lightboxMeta.textContent = '';
-        }
-
-        const showNav = galleryFiles().length > 1 && galleryIndex(hash) !== -1;
-        prevBtn.classList.toggle('hidden', !showNav);
-        nextBtn.classList.toggle('hidden', !showNav);
-
-        lightbox.classList.add('active');
-    } else {
-        lightbox.classList.remove('active');
-    }
-}
-
-function closeLightbox() {
-    history.pushState("", document.title, window.location.pathname + window.location.search);
-    updateView();
-}
-
-if (closeBtn) closeBtn.addEventListener('click', closeLightbox);
-if (prevBtn) prevBtn.addEventListener('click', () => navigateGallery(-1));
-if (nextBtn) nextBtn.addEventListener('click', () => navigateGallery(1));
-if (lightbox) lightbox.addEventListener('click', (e) => { if (e.target === lightbox) closeLightbox(); });
-document.addEventListener('keydown', (e) => {
-    if (!lightbox.classList.contains('active')) return;
-    if (e.key === 'Escape') closeLightbox();
-    if (e.key === 'ArrowLeft') navigateGallery(-1);
-    if (e.key === 'ArrowRight') navigateGallery(1);
-});
-window.addEventListener('hashchange', updateView);
-window.addEventListener('DOMContentLoaded', updateView);
-updateView();
-</script>
-<script src="footer.js"></script>
 
 </html>

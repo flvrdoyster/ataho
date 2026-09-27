@@ -1,33 +1,171 @@
-/**
- * 맵의 트리거(상호작용 오브젝트) 데이터를 정의합니다.
- * 
- * [트리거 속성]
- * - x, y: 좌표 (타일 단위)
- * - w, h: 상호작용 영역 크기
- * - id: 트리거 식별자
- * - type: 'dialog' (대사만) 또는 'menu' (선택지 메뉴)
- * - sprite: 표시할 오브젝트 이미지 경로
- * - title: 모달 제목 (생략 시 제목 영역 숨김)
- * - text: 상호작용 시 출력될 기본 대사 (배열 시 순차 출력)
- * 
- * [items (메뉴) 속성]
- * - label: 선택지 텍스트
- * - action: 실행할 액션 키 (eat, drink, sit, lie, yawn)
- * - count: 실행할 횟수
- * - text: 선택 시 출력될 캐릭터 대사 (말풍선)
- * - href: 링크 이동 주소 (action/text가 없을 때 사용)
- *
- * [트리거 items 속성 대안]
- * - itemsFrom: items를 직접 나열하는 대신, 이 이름의 전역 변수(예: window.RESOURCE_IMG_MANIFEST,
- *   resource/img/manifest.js가 정의하는 { 파일명 -> { caption, source, modified, group } } 객체)에서
- *   resource/img/ 안의 항목들을 읽어와 메뉴 항목으로 변환한다.
- *   group이 있는 항목들이 연달아 나오면 그 위에 섹션 헤더가 붙는다 (같은 group끼리
- *   떨어져 있으면 헤더가 여러 번 생기므로 manifest.js에서 서로 붙여 둘 것).
- */
-
-if (!window.MAP_DATA.triggers) window.MAP_DATA.triggers = [];
-
 window.MAP_DATA.triggers = [
+  {
+    "x": 16,
+    "y": 2,
+    "id": "emulator",
+    "type": "menu",
+    "w": 5,
+    "h": 2,
+    "text": [
+      "상자를 치웠으니 호수로 갈 수 있어."
+    ],
+    "bubbleOffsetY": 0,
+    "collision": false,
+    "items": [
+      {
+        "label": "환세풍광전",
+        "href": "https://pc98.atah.io/hukyou.html",
+        "target": "_blank",
+        "group": "PC-98 웹 에뮬"
+      },
+      {
+        "label": "환세희담",
+        "href": "https://pc98.atah.io/kitan.html",
+        "target": "_blank",
+        "group": "PC-98 웹 에뮬"
+      },
+      {
+        "label": "환세쾌도전",
+        "href": "https://pc98.atah.io/kaitou.html",
+        "target": "_blank",
+        "group": "PC-98 웹 에뮬"
+      },
+      {
+        "label": "환세포물장",
+        "href": "https://pc98.atah.io/torimono.html",
+        "target": "_blank",
+        "group": "PC-98 웹 에뮬"
+      },
+      {
+        "label": "환세취호전",
+        "href": "https://suiko.atah.io/kr.html",
+        "target": "_blank",
+        "group": "Windows 웹 에뮬"
+      }
+    ]
+  },
+  {
+    "x": 15,
+    "y": 18,
+    "w": 4,
+    "h": 3,
+    "id": "haiyuki",
+    "type": "menu",
+    "text": [
+      "여기다 밧줄을 태울 생각을 하다니..."
+    ],
+    "sprite": "object/object_irori.png",
+    "animW": 64,
+    "animH": 48,
+    "frames": 4,
+    "speed": 200,
+    "items": [
+      {
+        "label": "환세패유기",
+        "href": "haiyuki_web/index.html",
+        "target": "_blank",
+        "group": "웹 포팅"
+      },
+      {
+        "label": "환세희담 취급설명서",
+        "href": "kitan_manual/index.html",
+        "target": "_blank",
+        "group": "매뉴얼"
+      },
+      {
+        "label": "환세패유기 해설서",
+        "href": "haiyuki_manual/index.html",
+        "target": "_blank",
+        "group": "매뉴얼"
+      }
+    ]
+  },
+  {
+    "x": 15,
+    "y": 46,
+    "w": 3,
+    "h": 2,
+    "id": "minigame",
+    "title": "취호전 미니게임",
+    "type": "menu",
+    "text": [
+      "해변 마을에 쇼핑이나 가볼까?"
+    ],
+    "items": [
+      {
+        "label": "평균대 동작수련",
+        "href": "balance/index.html",
+        "target": ""
+      },
+      {
+        "label": "술창고 청소",
+        "href": "sweep/index.html",
+        "target": "_blank"
+      },
+      {
+        "label": "헤엄치기",
+        "href": "swim/index.html",
+        "target": "_blank"
+      }
+    ]
+  },
+  {
+    "id": "jar-2",
+    "sprite": "object/object_jar.png",
+    "text": [
+      "그러고보니 스마슈 녀석이 수상한 책을 줬었지."
+    ],
+    "title": "장면 뷰어",
+    "type": "menu",
+    "x": 28,
+    "y": 16,
+    "w": 2,
+    "h": 1,
+    "items": [
+      {
+        "label": "엔딩: 환세쾌진극",
+        "href": "viewer/scene.html?story=kaisin",
+        "target": "_blank"
+      }
+    ]
+  },
+  {
+    "x": 31,
+    "y": 19,
+    "w": 2,
+    "h": 1,
+    "id": "jar-3",
+    "sprite": "object/object_jar.png",
+    "type": "menu",
+    "title": "장면 뷰어",
+    "items": [
+      {
+        "label": "애니메이션: 환세희담 외전\n~궁극의 에로문서 전설~",
+        "href": "viewer/scene.html?story=gaiden",
+        "target": "_blank"
+      }
+    ]
+  },
+  {
+    "x": 31,
+    "y": 22,
+    "w": 2,
+    "h": 1,
+    "id": "jar-4",
+    "sprite": "object/object_jar.png",
+    "title": "장면 뷰어",
+    "type": "menu",
+    "text": [
+      "이런 것도 있었나?"
+    ],
+    "items": [
+      {
+        "label": "애니메이션: DS 아니메 총집편 '98",
+        "href": "viewer/ani.html",
+        "target": "_blank"
+      }
+    ]
+  },
   {
     "x": 11,
     "y": 10,
@@ -54,81 +192,6 @@ window.MAP_DATA.triggers = [
     ]
   },
   {
-    "x": 31,
-    "y": 19,
-    "w": 2,
-    "h": 1,
-    "id": "jar-3",
-    "sprite": "object/object_jar.png",
-    "type": "menu",
-    "title": "장면 뷰어",
-    "items": [
-      {
-        "label": "환세희담 외전\n~궁극의 에로문서 전설~",
-        "href": "viewer/scene.html?story=gaiden",
-        "target": "_blank"
-      }
-    ]
-  },
-  {
-    "x": 15,
-    "y": 46,
-    "w": 3,
-    "h": 2,
-    "id": "minigame",
-    "title": "미니게임",
-    "type": "menu",
-    "text": [
-      "해변 마을에 쇼핑이나 가볼까?"
-    ],
-    "items": [
-      {
-        "label": "헤엄치기",
-        "href": "swim/index.html",
-        "target": "_blank"
-      },
-      {
-        "label": "평균대 동작수련",
-        "href": "balance/index.html",
-        "target": ""
-      },
-      {
-        "label": "술창고 청소",
-        "href": "sweep/index.html",
-        "target": "_blank"
-      }
-    ]
-  },
-  {
-    "x": 15,
-    "y": 18,
-    "w": 4,
-    "h": 3,
-    "id": "haiyuki",
-    "title": "환세패유기",
-    "type": "menu",
-    "text": [
-      "여기다 밧줄을 태울 생각을 하다니..."
-    ],
-    "sprite": "object/object_irori.png",
-    "animW": 64,
-    "animH": 48,
-    "frames": 4,
-    "speed": 200,
-    "items": [
-      {
-        "label": "환세패유기 웹 버전",
-        "href": "haiyuki_web/index.html",
-        "target": "_blank"
-      },
-      {
-        "label": "매뉴얼",
-        "href": "haiyuki_manual/index.html",
-        "target": "_blank"
-      }
-    ]
-  },
-  {
     "x": 3,
     "y": 18,
     "w": 2,
@@ -141,86 +204,5 @@ window.MAP_DATA.triggers = [
       "종이 쓰레기는 모아서 버려야겠다."
     ],
     "itemsFrom": "RESOURCE_IMG_MANIFEST"
-  },
-  {
-    "x": 31,
-    "y": 22,
-    "w": 2,
-    "h": 1,
-    "id": "jar-4",
-    "sprite": "object/object_jar.png",
-    "title": "장면 뷰어",
-    "type": "menu",
-    "text": [
-      "이런 것도 있었나?"
-    ],
-    "items": [
-      {
-        "label": "DS 아니메 총집편 '98\n환세 시리즈 부분",
-        "href": "viewer/ani.html",
-        "target": "_blank"
-      }
-    ]
-  },
-  {
-    "id": "jar-2",
-    "sprite": "object/object_jar.png",
-    "text": [
-      "그러고보니 스마슈 녀석이 수상한 책을 줬었지."
-    ],
-    "title": "장면 뷰어",
-    "type": "menu",
-    "x": 28,
-    "y": 16,
-    "w": 2,
-    "h": 1,
-    "items": [
-      {
-        "label": "환세쾌진극 엔딩",
-        "href": "viewer/scene.html?story=kaisin",
-        "target": "_blank"
-      }
-    ]
-  },
-  {
-    "x": 16,
-    "y": 2,
-    "title": "에뮬레이터",
-    "id": "emulator",
-    "type": "menu",
-    "w": 5,
-    "h": 2,
-    "text": [
-      "상자를 치웠으니 호수로 갈 수 있어."
-    ],
-    "bubbleOffsetY": 0,
-    "collision": false,
-    "items": [
-      {
-        "label": "환세풍광전 (PC-98)",
-        "href": "https://pc98.atah.io/hukyou.html",
-        "target": "_blank"
-      },
-      {
-        "label": "환세희담 (PC-98)",
-        "href": "https://pc98.atah.io/kitan.html",
-        "target": "_blank"
-      },
-      {
-        "label": "환세쾌도전 (PC-98)",
-        "href": "https://pc98.atah.io/kaitou.html",
-        "target": "_blank"
-      },
-      {
-        "label": "환세포물장 (PC-98)",
-        "href": "https://pc98.atah.io/torimono.html",
-        "target": "_blank"
-      },
-      {
-        "label": "환세취호전 (Windows)",
-        "href": "https://suiko.atah.io/kr.html",
-        "target": "_blank"
-      }
-    ]
   }
 ]

@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+
+command -v node >/dev/null 2>&1 || exit 0
+cd "$(git rev-parse --show-toplevel)" || exit 0
+
+if ! git diff --quiet -- index.html; then
+  node scripts/gen_site_index.js --check || exit 1
+  exit 0
+fi
+
+node scripts/gen_site_index.js || exit 1
+if ! git diff --quiet -- index.html; then
+  git add index.html
+fi
