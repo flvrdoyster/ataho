@@ -88,6 +88,23 @@ node scripts/gen_site_index.js --check  # 어긋나면 exit 1
 - pc98·suiko 서브도메인의 robots.txt·sitemap.xml(`gensei-pc98`, `suiko-web-v2` 레포)
 - 평균대 동작수련·헤엄치기는 원작을 코드에서 확인하지 못해 설명을 짧게만 썼다
 
+## 파비콘
+
+- `favicon.ico`·`favicon.svg` — 사이트 파비콘(원본 픽셀 아트는 `_asset/suiko-demo_refine.svg`). pc98·suiko도 `https://atah.io/favicon.ico`를 가져다 쓴다
+- `favicon-mono.svg` — 같은 그림을 다른 인라인 SVG처럼 `fill="currentColor"` 한 색으로 바꾼 것(2026-09-28). 아직 어디에도 쓰지 않는다. 원래 색의 밝기 순서대로 불투명도를 줬다:
+
+  | 부분 | 원래 색 | 불투명도 |
+  |---|---|---|
+  | 눈 흰자·눈꼬리(20~23행) | 흰색·살구 | 1 |
+  | 상처 심지 | 흰색 | 0.85 |
+  | 상처 가장자리 | 살구 | 0.75 |
+  | 얼굴 바탕 | 노랑 | 0.65 |
+  | 그늘 | 주황 | 0.43 |
+  | 윤곽 | 갈색 | 0.22 |
+  | 머리카락·눈썹 | 검정 | 비움 |
+
+  검정을 비워 두므로 어두운 바탕 위에서 원본처럼 보이고, 밝은 바탕에서는 명암이 뒤집힌다. 픽셀 모서리가 흐려지지 않게 `shape-rendering="crispEdges"`를 둔다
+
 ## 개발 도구
 
 - `world/editor.html`에는 doctype이 없다. 넣으면 호환 모드(quirks)에서 표준 모드로 바뀌어 에디터 레이아웃이 달라질 수 있어, charset·lang만 넣었다(2026-09-27). 넣으려면 에디터 화면을 직접 확인하면서 할 것
