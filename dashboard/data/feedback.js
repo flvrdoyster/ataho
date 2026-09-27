@@ -3,13 +3,23 @@
 window.DASHBOARD_FEEDBACK = {
  "available": true,
  "pending": {
-  "byCategory": [],
-  "byGame": [],
-  "count": 0,
-  "oldest": null,
-  "oldestDays": null
+  "byCategory": [
+   {
+    "count": 1,
+    "name": "bug"
+   }
+  ],
+  "byGame": [
+   {
+    "count": 1,
+    "name": "kitan"
+   }
+  ],
+  "count": 1,
+  "oldest": "2026-09-27",
+  "oldestDays": 0
  },
  "sheetUrl": "https://docs.google.com/spreadsheets/d/10IdRL3n0wKav9TvPbS0kkm5Pq6fAaMxDNWauTNYy5cE/edit",
- "total": 2,
- "updatedAt": "2026-09-26 15:49"
+ "total": 3,
+ "updatedAt": "2026-09-27 09:06"
 };
