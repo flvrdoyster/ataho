@@ -137,21 +137,24 @@
        패널 밖(탭바 앞)에 둔다. 0건이면 아무것도 만들지 않는다: 평소엔 화면이
        예전과 똑같고, 남아 있을 때만 시끄럽다. */
     const tally = (items) => items.map((i) => `${esc(i.name)} ${fmt(i.count)}`).join(' · ');
+    const fbAsOf = /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}$/.test(fb.updatedAt || '')
+        ? `${mmdd(fb.updatedAt.slice(0, 10))} ${fb.updatedAt.slice(11)} 기준` : '';
 
     if (fbPending) {
         const age = fbPending.oldestDays === null || fbPending.oldestDays === undefined ? ''
-            : fbPending.oldestDays === 0 ? ' · 가장 오래된 건 오늘'
-            : ` · 가장 오래된 건 ${fmt(fbPending.oldestDays)}일 전`;
+            : fbPending.oldestDays === 0 ? '가장 오래된 건 오늘'
+            : `가장 오래된 건 ${fmt(fbPending.oldestDays)}일 전`;
+        const detail = [tally(fbPending.byCategory), age, fbAsOf].filter(Boolean).join(' · ');
         nav.insertAdjacentHTML('beforebegin',
             `<p class="reminder"><b>확인 안 한 피드백 ${fmt(fbPending.count)}건</b>` +
-            `<span class="dim">${tally(fbPending.byCategory)}${age}</span>` +
+            `<span class="dim">${detail}</span>` +
             (fb.sheetUrl ? ` <a href="${esc(fb.sheetUrl)}" target="_blank" ` +
                 `rel="noopener noreferrer">시트 열기</a>` : '') + '</p>');
     }
 
     /* 데이터가 멈췄을 때의 경고 — 워크플로우가 실패하면 옛 숫자가 그대로 남아
        화면만 봐서는 모른다. 매일 아침 한 번 도니, 마지막 갱신일이 KST 오늘보다
-       2일 이상 전이면 적어도 하루치가 빠진 것이다(07시 실행 전엔 1일 차라
+       2일 이상 전이면 적어도 하루치가 빠진 것이다(그날 실행 전엔 1일 차라
        오탐이 없다). 대상이 여럿이면 가장 오래된 쪽 기준. */
     const kstToday = new Date(Date.now() + 9 * 3600000).toISOString().slice(0, 10);
     const updatedDays = views
@@ -418,7 +421,7 @@
             <button type="button" class="date-nav" data-nav="next" aria-label="다음 날짜"${isLatest ? ' disabled' : ''}>▶</button>
         </div>
         <p class="meta-line">마지막 갱신 ${esc(data.meta.updatedAt)} KST ·
-            매일 아침 07:00 KST에 어제 하루치를 모읍니다.</p>
+            매일 아침 어제 하루치를 모읍니다.</p>
         <div class="stat-grid">
             ${stat('방문자', base.users, '명', fmt, newSub)}
             ${stat('페이지 조회', base.views, '회', fmt)}
@@ -469,13 +472,13 @@
                 <div><div class="label">게임</div>
                      <div class="value">${tally(fbPending.byGame) || '—'}</div></div>
              </div>
-             <p class="note-line">${oldest}${oldest && fb.sheetUrl ? ' · ' : ''}` +
-            (fb.sheetUrl ? `<a href="${esc(fb.sheetUrl)}" target="_blank" ` +
-                `rel="noopener noreferrer">시트에서 확인하기</a>` : '') + '</p>'));
+             <p class="note-line">${[oldest, fbAsOf, fb.sheetUrl
+                ? `<a href="${esc(fb.sheetUrl)}" target="_blank" rel="noopener noreferrer">시트에서 확인하기</a>`
+                : ''].filter(Boolean).join(' · ')}</p>`));
     } else if (primary && isLatest && fbFailed) {
         parts.push(mod(12, '확인 안 한 피드백', '',
             `<p class="note-line">시트를 읽지 못해 미확인 건수를 셀 수 없습니다 — ` +
-            `${esc(fbFailed)}.</p>`));
+            `${esc(fbFailed)}.${fbAsOf ? ` (${fbAsOf})` : ''}</p>`));
     }
 
     // 4) 어제 본 페이지 — 사이트별 소계를 위에 한 줄로
@@ -625,7 +628,7 @@
     }
 
     parts.push(`<p class="meta-line span-12">GA4 속성 ${esc(data.meta.propertyId)} · ` +
-        `Google Analytics Data API · GitHub Actions가 매일 07:00 KST에 갱신</p>`);
+        `Google Analytics Data API · GitHub Actions가 매일 아침 갱신</p>`);
 
     return parts.join('');
     }
