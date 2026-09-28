@@ -46,10 +46,12 @@
         <h1>아타호의 거처</h1>
         <p><b>A</b>ll <b>T</b>hings <b>A</b>rchived <b>H</b>ere</p>
         <details id="site-index">
-            <summary aria-label="모든 페이지">
-                <svg viewBox="0 0 800 800" fill="currentColor" aria-hidden="true">
-                    <path
-                        d="M359.1,89.6c24.1-18.7,57.8-18.7,81.9,0l279.5,217.4c25.1,19.5,11.2,59.7-20.5,59.7h-33.2v266.7c0,36.8-29.8,66.7-66.7,66.7H200c-36.8,0-66.7-29.8-66.7-66.7v-266.7h-33.2c-31.8,0-45.6-40.2-20.5-59.7L359.1,89.6Z" />
+            <summary aria-label="모든 페이지" tabindex="-1">
+                <svg viewBox="6 6 12 12" fill="currentColor" aria-hidden="true">
+                    <circle cx="9" cy="9" r="2" />
+                    <circle cx="15" cy="9" r="2" />
+                    <circle cx="9" cy="15" r="2" />
+                    <circle cx="15" cy="15" r="2" />
                 </svg>
             </summary>
             <nav aria-label="사이트 전체 목록">
@@ -57,35 +59,35 @@
                 <ul>
                     <li><b>PC-98 웹 에뮬</b>
                         <span class="links">
-                            <a href="https://pc98.atah.io/hukyou.html">환세풍광전</a>
-                            <a href="https://pc98.atah.io/kitan.html">환세희담</a>
-                            <a href="https://pc98.atah.io/kaitou.html">환세쾌도전</a>
-                            <a href="https://pc98.atah.io/torimono.html">환세포물장</a>
+                            <a href="https://pc98.atah.io/hukyou.html" tabindex="-1">환세풍광전</a>
+                            <a href="https://pc98.atah.io/kitan.html" tabindex="-1">환세희담</a>
+                            <a href="https://pc98.atah.io/kaitou.html" tabindex="-1">환세쾌도전</a>
+                            <a href="https://pc98.atah.io/torimono.html" tabindex="-1">환세포물장</a>
                         </span></li>
                     <li><b>Windows 웹 에뮬</b>
                         <span class="links">
-                            <a href="https://suiko.atah.io/kr.html">환세취호전</a>
+                            <a href="https://suiko.atah.io/kr.html" tabindex="-1">환세취호전</a>
                         </span></li>
                     <li><b>웹 포팅</b>
                         <span class="links">
-                            <a href="haiyuki_web/">환세패유기</a>
+                            <a href="haiyuki_web/" tabindex="-1">환세패유기</a>
                         </span></li>
                     <li><b>매뉴얼</b>
                         <span class="links">
-                            <a href="kitan_manual/">환세희담 취급설명서</a>
-                            <a href="haiyuki_manual/">환세패유기 해설서</a>
+                            <a href="kitan_manual/" tabindex="-1">환세희담 취급설명서</a>
+                            <a href="haiyuki_manual/" tabindex="-1">환세패유기 해설서</a>
                         </span></li>
                     <li><b>취호전 미니게임</b>
                         <span class="links">
-                            <a href="balance/">평균대 동작수련</a>
-                            <a href="sweep/">술창고 청소</a>
-                            <a href="swim/">헤엄치기</a>
+                            <a href="balance/" tabindex="-1">평균대 동작수련</a>
+                            <a href="sweep/" tabindex="-1">술창고 청소</a>
+                            <a href="swim/" tabindex="-1">헤엄치기</a>
                         </span></li>
                     <li><b>장면 뷰어</b>
                         <span class="links">
-                            <a href="viewer/scene.html?story=kaisin">엔딩: 환세쾌진극</a>
-                            <a href="viewer/scene.html?story=gaiden">애니메이션: 환세희담 외전 ~궁극의 에로문서 전설~</a>
-                            <a href="viewer/ani.html">애니메이션: DS 아니메 총집편 '98</a>
+                            <a href="viewer/scene.html?story=kaisin" tabindex="-1">엔딩: 환세쾌진극</a>
+                            <a href="viewer/scene.html?story=gaiden" tabindex="-1">애니메이션: 환세희담 외전 ~궁극의 에로문서 전설~</a>
+                            <a href="viewer/ani.html" tabindex="-1">애니메이션: DS 아니메 총집편 '98</a>
                         </span></li>
                 </ul>
                 <!-- site-index:end -->
@@ -111,7 +113,10 @@
     <script>window.onload = initGame;</script>
     <script src="lightbox.js"></script>
     <script>
-        document.getElementById('site-index').addEventListener('keydown', (e) => e.stopPropagation());
+        document.getElementById('site-index').addEventListener('mousedown', (e) => e.preventDefault());
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') document.getElementById('site-index').open = false;
+        });
     </script>
     <script src="footer.js"></script>
 </body>

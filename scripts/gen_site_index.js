@@ -42,7 +42,7 @@ function render(categories, indent) {
     for (const [name, links] of categories) {
         lines.push(`${i2}<li><b>${esc(name)}</b>`);
         lines.push(`${i3}<span class="links">`);
-        for (const l of links) lines.push(`${i4}<a href="${esc(l.href)}">${esc(l.label)}</a>`);
+        for (const l of links) lines.push(`${i4}<a href="${esc(l.href)}" tabindex="-1">${esc(l.label)}</a>`);
         lines.push(`${i3}</span></li>`);
     }
     lines.push(`${i1}</ul>`);

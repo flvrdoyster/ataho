@@ -359,7 +359,7 @@ video:fullscreen::cue {
     position: absolute;
     top: 0;
     left: 0;
-    width: auto;
+    width: max-content;
     height: auto;
     background: none;
     z-index: 1000;
@@ -491,7 +491,7 @@ video:fullscreen::cue {
     }
 
     .modal-content {
-        max-width: 80%;
+        max-width: 80vw;
         padding: 10px 15px;
         font-size: 1rem;
     }

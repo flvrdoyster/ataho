@@ -2,7 +2,7 @@ window.MAP_DATA.triggers = [
   {
     "x": 16,
     "y": 2,
-    "id": "emulator",
+    "id": "upward",
     "type": "menu",
     "w": 5,
     "h": 2,
@@ -11,6 +11,7 @@ window.MAP_DATA.triggers = [
     ],
     "bubbleOffsetY": 0,
     "collision": false,
+    "title": "게임 플레이",
     "items": [
       {
         "label": "환세풍광전",
@@ -49,7 +50,7 @@ window.MAP_DATA.triggers = [
     "y": 18,
     "w": 4,
     "h": 3,
-    "id": "haiyuki",
+    "id": "irori",
     "type": "menu",
     "text": [
       "여기다 밧줄을 태울 생각을 하다니..."
@@ -59,13 +60,25 @@ window.MAP_DATA.triggers = [
     "animH": 48,
     "frames": 4,
     "speed": 200,
+    "title": "게임 플레이",
     "items": [
       {
         "label": "환세패유기",
         "href": "haiyuki_web/index.html",
         "target": "_blank",
         "group": "웹 포팅"
-      },
+      }
+    ]
+  },
+  {
+    "x": 3,
+    "y": 18,
+    "w": 2,
+    "h": 2,
+    "id": "jar-1",
+    "sprite": "object/object_jar.png",
+    "type": "menu",
+    "items": [
       {
         "label": "환세희담 취급설명서",
         "href": "kitan_manual/index.html",
@@ -85,8 +98,7 @@ window.MAP_DATA.triggers = [
     "y": 46,
     "w": 3,
     "h": 2,
-    "id": "minigame",
-    "title": "취호전 미니게임",
+    "id": "downward",
     "type": "menu",
     "text": [
       "해변 마을에 쇼핑이나 가볼까?"
@@ -95,17 +107,20 @@ window.MAP_DATA.triggers = [
       {
         "label": "평균대 동작수련",
         "href": "balance/index.html",
-        "target": ""
+        "target": "",
+        "group": "취호전 미니게임"
       },
       {
         "label": "술창고 청소",
         "href": "sweep/index.html",
-        "target": "_blank"
+        "target": "_blank",
+        "group": "취호전 미니게임"
       },
       {
         "label": "헤엄치기",
         "href": "swim/index.html",
-        "target": "_blank"
+        "target": "_blank",
+        "group": "취호전 미니게임"
       }
     ]
   },
@@ -115,7 +130,6 @@ window.MAP_DATA.triggers = [
     "text": [
       "그러고보니 스마슈 녀석이 수상한 책을 줬었지."
     ],
-    "title": "장면 뷰어",
     "type": "menu",
     "x": 28,
     "y": 16,
@@ -125,7 +139,20 @@ window.MAP_DATA.triggers = [
       {
         "label": "엔딩: 환세쾌진극",
         "href": "viewer/scene.html?story=kaisin",
-        "target": "_blank"
+        "target": "_blank",
+        "group": "장면 뷰어"
+      },
+      {
+        "label": "애니메이션: 환세희담 외전\n~궁극의 에로문서 전설~",
+        "href": "viewer/scene.html?story=gaiden",
+        "target": "_blank",
+        "group": "장면 뷰어"
+      },
+      {
+        "label": "애니메이션: DS 아니메 총집편 '98",
+        "href": "viewer/ani.html",
+        "target": "_blank",
+        "group": "장면 뷰어"
       }
     ]
   },
@@ -136,15 +163,12 @@ window.MAP_DATA.triggers = [
     "h": 1,
     "id": "jar-3",
     "sprite": "object/object_jar.png",
+    "title": "공식 일러스트",
     "type": "menu",
-    "title": "장면 뷰어",
-    "items": [
-      {
-        "label": "애니메이션: 환세희담 외전\n~궁극의 에로문서 전설~",
-        "href": "viewer/scene.html?story=gaiden",
-        "target": "_blank"
-      }
-    ]
+    "text": [
+      "종이 쓰레기는 모아서 버려야겠다."
+    ],
+    "itemsFrom": "RESOURCE_IMG_MANIFEST"
   },
   {
     "x": 31,
@@ -153,17 +177,9 @@ window.MAP_DATA.triggers = [
     "h": 1,
     "id": "jar-4",
     "sprite": "object/object_jar.png",
-    "title": "장면 뷰어",
-    "type": "menu",
+    "type": "dialog",
     "text": [
-      "이런 것도 있었나?"
-    ],
-    "items": [
-      {
-        "label": "애니메이션: DS 아니메 총집편 '98",
-        "href": "viewer/ani.html",
-        "target": "_blank"
-      }
+      "텅 비어 있구먼."
     ]
   },
   {
@@ -175,7 +191,7 @@ window.MAP_DATA.triggers = [
     "type": "menu",
     "sprite": "object/object_sake.png",
     "text": [
-      "호랑이 마을, 내 집에 있던 화주다.",
+      "호랑이 마을, 내 집에 있던 화주일세.",
       "내 팬이 준 선물인데 아직도 누가 보낸 건지 모르겠어.",
       "한 모금만 마실까?"
     ],
@@ -190,19 +206,5 @@ window.MAP_DATA.triggers = [
         "text": "한 잔 하긴 아직 이른 시간이야."
       }
     ]
-  },
-  {
-    "x": 3,
-    "y": 18,
-    "w": 2,
-    "h": 2,
-    "id": "jar-1",
-    "sprite": "object/object_jar.png",
-    "title": "공식 일러스트",
-    "type": "menu",
-    "text": [
-      "종이 쓰레기는 모아서 버려야겠다."
-    ],
-    "itemsFrom": "RESOURCE_IMG_MANIFEST"
   }
 ]
