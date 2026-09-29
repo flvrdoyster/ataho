@@ -6305,10 +6305,10 @@ window.DASHBOARD_DATA['ga4'] = {
   "propertyId": "516513119",
   "settledDays": 7,
   "trendDays": 28,
-  "updatedAt": "2026-09-29 09:34"
+  "updatedAt": "2026-09-29 09:57"
  },
  "settled": {
-  "avgDuration": 382.64801813529414,
+  "avgDuration": 382.6480181352941,
   "engagementRate": 0.5647058823529412,
   "from": "8daysAgo",
   "sessions": 170,
