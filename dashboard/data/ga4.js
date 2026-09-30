@@ -6130,8 +6130,8 @@ window.DASHBOARD_DATA['ga4'] = {
      "tone": "up"
     },
     {
-     "text": "어제 유입 가운데 **20건**은 출처가 아직 분류되지 않았습니다(분류된 것은 16건) — GA4가 세션 속성을 확정하는 데 하루 이상 걸립니다. 이 값은 내일 자동으로 다시 확인됩니다.",
-     "tone": "down"
+     "text": "최근 28일 동안 없던 유입원이 어제 생겼습니다 — chatgpt.com.",
+     "tone": "up"
     }
    ],
    "longest": null,
@@ -6300,7 +6300,7 @@ window.DASHBOARD_DATA['ga4'] = {
    "ydaySources": [
     {
      "name": "namu.wiki",
-     "sessions": 8
+     "sessions": 11
     },
     {
      "name": "직접 방문",
@@ -6308,14 +6308,22 @@ window.DASHBOARD_DATA['ga4'] = {
     },
     {
      "name": "oysterbay.tistory.com",
-     "sessions": 3
+     "sessions": 2
+    },
+    {
+     "name": "chatgpt.com",
+     "sessions": 1
+    },
+    {
+     "name": "daum",
+     "sessions": 1
     },
     {
      "name": "naver",
      "sessions": 1
     }
    ],
-   "ydayUnresolved": 20,
+   "ydayUnresolved": 0,
    "yesterday": {
     "date": "2026-09-29",
     "newUsers": 10,
@@ -6331,8 +6339,8 @@ window.DASHBOARD_DATA['ga4'] = {
    "tone": "up"
   },
   {
-   "text": "어제 유입 가운데 **20건**은 출처가 아직 분류되지 않았습니다(분류된 것은 16건) — GA4가 세션 속성을 확정하는 데 하루 이상 걸립니다. 이 값은 내일 자동으로 다시 확인됩니다.",
-   "tone": "down"
+   "text": "최근 28일 동안 없던 유입원이 어제 생겼습니다 — chatgpt.com.",
+   "tone": "up"
   }
  ],
  "longest": null,
@@ -6342,7 +6350,7 @@ window.DASHBOARD_DATA['ga4'] = {
   "propertyId": "516513119",
   "settledDays": 7,
   "trendDays": 28,
-  "updatedAt": "2026-09-30 09:23"
+  "updatedAt": "2026-09-30 13:55"
  },
  "settled": {
   "avgDuration": 396.29961518085105,
@@ -6516,7 +6524,7 @@ window.DASHBOARD_DATA['ga4'] = {
  "ydaySources": [
   {
    "name": "namu.wiki",
-   "sessions": 8
+   "sessions": 11
   },
   {
    "name": "직접 방문",
@@ -6524,14 +6532,22 @@ window.DASHBOARD_DATA['ga4'] = {
   },
   {
    "name": "oysterbay.tistory.com",
-   "sessions": 3
+   "sessions": 2
+  },
+  {
+   "name": "chatgpt.com",
+   "sessions": 1
+  },
+  {
+   "name": "daum",
+   "sessions": 1
   },
   {
    "name": "naver",
    "sessions": 1
   }
  ],
- "ydayUnresolved": 20,
+ "ydayUnresolved": 0,
  "yesterday": {
   "date": "2026-09-29",
   "newUsers": 10,

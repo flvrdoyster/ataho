@@ -5438,7 +5438,7 @@ window.DASHBOARD_DATA['blog'] = {
   "propertyId": "549191220",
   "settledDays": 7,
   "trendDays": 28,
-  "updatedAt": "2026-09-30 09:23"
+  "updatedAt": "2026-09-30 13:55"
  },
  "settled": {
   "avgDuration": 189.86642079545456,
