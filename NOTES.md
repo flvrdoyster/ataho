@@ -82,12 +82,11 @@ node scripts/gen_site_index.js --check  # 어긋나면 exit 1
   - 패유기 웹의 canonical·`og:url`은 끝에 `/`까지. `/haiyuki_web`은 서버가 `/haiyuki_web/`로 301 돌려보낸다
 - 패유기 해설서의 패 이미지 337개에 alt. 이름은 게임의 `haiyuki_web/js/data/paiData.js`에서 가져왔다
 - 희담 취급설명서 머리 부분(`translator-info`)에 pc98 환세희담 링크
+- 검색엔진 등록 — 네이버 서치어드바이저는 atah.io·pc98·suiko 세 사이트를 따로 등록하고 HTML 파일 방식으로 소유 확인했다(확인 파일 `naver6ecd505c49bf822cb1185ddef5bce20b.html`은 레포 루트, 사이트맵에는 넣지 않는다). 구글 서치콘솔은 도메인 속성(`atah.io`)을 Route 53 TXT 레코드로 확인했고 사이트맵 세 개를 모두 제출했다
 
 ### 남은 것
 
-- 네이버 서치어드바이저·구글 서치콘솔 등록과 사이트맵 제출(계정 필요)
 - 썸네일 없는 페이지의 `og:image`(1200×630)
-- pc98·suiko 서브도메인의 robots.txt·sitemap.xml(`gensei-pc98`, `suiko-web-v2` 레포)
 - 평균대 동작수련·헤엄치기는 원작을 코드에서 확인하지 못해 설명을 짧게만 썼다
 
 ## 파비콘
