@@ -87,7 +87,7 @@ node scripts/gen_site_index.js --check  # 어긋나면 exit 1
 ### 남은 것
 
 - 썸네일 없는 페이지의 `og:image`(1200×630)
-- 평균대 동작수련·헤엄치기는 원작을 코드에서 확인하지 못해 설명을 짧게만 썼다
+- `https://www.atah.io` 인증서 — 인증서에 `atah.io`만 있어 www는 https에서 경고가 뜬다. www CNAME이 apex(`atah.io`)를 가리켜서였고(GitHub 문서가 HTTPS 문제를 경고하는 설정), 2026-09-30 Route 53에서 `flvrdoyster.github.io`로 바꿨다. GitHub Pages 상태 API로 www가 유효·발급 대상이 된 것까지 확인했다. 재발급은 사이트가 잠깐 내려가는 도메인 재등록 대신 자동 갱신(현재 인증서 만료 2026-10-31)을 기다리기로 했다. 11월 초에 인증서에 www가 들어갔는지 보고, 없으면 Settings → Pages에서 도메인을 지웠다 다시 넣는다
 
 ## 파비콘
 
