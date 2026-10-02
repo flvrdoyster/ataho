@@ -30,6 +30,7 @@ fetch()가 아니라 <script src>로 읽히므로 로컬에서 index.html을 그
   - GA4_OUTPUT_DIR         저장 폴더 (기본: dashboard/data, 레포 루트 기준)
   - FEEDBACK_SHEET_ID      피드백 시트 ID (없으면 피드백은 건너뜀)
 """
+import calendar
 import json
 import os
 import re
@@ -353,6 +354,14 @@ DEVICE_LABELS = {"mobile": "모바일", "desktop": "데스크톱", "tablet": "�
 # 문턱이 낮으면 매일 "몇 배 뛰었다"가 나와 아무 뜻이 없어진다.
 SPIKE_MIN_VIEWS = 5    # 이보다 적게 본 페이지는 몇 배가 됐든 말하지 않는다
 SPIKE_RATIO = 2.0      # 평소 하루 평균의 몇 배부터 "튀었다"고 할지
+RATIO_FLOOR = 1.0      # 배율의 분모 하한
+RECENT_DAYS = 7        # "요즘"의 길이 — 튐은 이 구간보다도 높아야 하고, 증가는 이 구간 평균으로 잰다
+RISING_MIN_AVG = 2.0   # 최근 7일 하루 평균이 이보다 적으면 증가를 말하지 않는다
+RISING_RATIO = 1.5     # 최근 7일 평균이 그 전 평균의 몇 배부터 "늘었다"고 할지
+RISING_MIN_DAYS = 3    # 최근 7일 중 그 전 평균보다 높았던 날이 이만큼은 돼야 "늘었다"
+BAND_PCT = (10, 90)    # 히어로 배지·추세 띠의 아래·위 백분위
+LONG_START = "2020-01-01"   # 월별 흐름 조회 시작 — 속성이 생긴 날 이전은 0으로 와서 잘라 낸다
+LIST_PAGE_RE = re.compile(r"카테고리의 글 목록")
 MIN_DAYS_FOR_NORMAL = 14   # 이만큼은 쌓여야 "평소와 같았다"고 말할 수 있다
 # 한 사람당 몇 장·신규/재방문 같은 "소비 깊이" 문장은 사람 수가 적으면 한두 명의
 # 습관을 그날의 성격처럼 말하게 된다(블로그: 방문자 2명인 날에 "얕게 본 날").
@@ -370,12 +379,19 @@ def josa(word, with_final, without_final):
     "처"로 판정해야 한다. 한글로 끝나지 않는 이름(영문 경로 등)은 규칙이
     갈려서 두 형태를 함께 쓴다.
     """
-    tail = (word or "").strip().rstrip(")]}>'\"」』.… \t")
+    tail = (word or "").strip()
+    while True:
+        cut = re.sub(r"\s*(\([^()]*\)|\[[^\[\]]*\])$", "", tail).rstrip("'\"」』.… \t")
+        if cut == tail or not cut:
+            break
+        tail = cut
     if not tail:
         return f"{with_final}({without_final})"
     last = tail[-1]
     if "가" <= last <= "힣":
         return with_final if (ord(last) - 0xAC00) % 28 else without_final
+    if last.isdigit():
+        return with_final if last in "0136789" else without_final
     return f"{with_final}({without_final})"
 
 
@@ -387,10 +403,11 @@ def quartiles(values):
     n = len(ordered)
     # statistics.quantiles 는 표본이 2개 미만이면 예외를 던진다
     if n >= 4:
-        q1, _, q3 = statistics.quantiles(ordered, n=4)
+        cuts = statistics.quantiles(ordered, n=100, method="inclusive")
+        lo, hi = cuts[BAND_PCT[0] - 1], cuts[BAND_PCT[1] - 1]
     else:
-        q1 = q3 = statistics.median(ordered)
-    return {"median": statistics.median(ordered), "q1": q1, "q3": q3,
+        lo = hi = statistics.median(ordered)
+    return {"median": statistics.median(ordered), "lo": lo, "hi": hi,
             "min": ordered[0], "max": ordered[-1], "n": n}
 
 
@@ -400,9 +417,9 @@ def standing(value, box):
         return None
     # 동점이면 같은 등수 — "3번째로 많은 날"이 여럿일 수 있다
     rank = sum(1 for v in box["_values"] if v > value) + 1
-    if value > box["q3"]:
+    if value > box["hi"]:
         where = "high"
-    elif value < box["q1"]:
+    elif value < box["lo"]:
         where = "low"
     else:
         where = "usual"
@@ -418,6 +435,23 @@ def distribution(values, yday_value):
         return None
     box["_values"] = values
     return standing(yday_value, box)
+
+
+def rising_state(full):
+    """일별 조회 배열(오래된→최신)의 마지막 날 기준으로 "며칠에 걸쳐 늘었다"고 할 만한가.
+    최근 7일 평균이 기준 이상이고, 그 전 평균보다 충분히 높고, 창 안의 7일 평균 중 기록이고,
+    하루 튐 하나가 평균을 끌어올린 게 아니도록 7일 중 RISING_MIN_DAYS일 이상이 그 전 평균보다 높아야 한다."""
+    if len(full) < RECENT_DAYS * 2:
+        return None
+    roll = [sum(full[e - RECENT_DAYS + 1:e + 1]) / RECENT_DAYS
+            for e in range(RECENT_DAYS - 1, len(full))]
+    now, before = roll[-1], sum(full[:-RECENT_DAYS]) / (len(full) - RECENT_DAYS)
+    above = sum(1 for v in full[-RECENT_DAYS:] if v > max(before, RATIO_FLOOR))
+    if (now >= RISING_MIN_AVG and now >= RISING_RATIO * max(before, RATIO_FLOOR)
+            and now > max(roll[:-1]) and above >= RISING_MIN_DAYS):
+        return {"avg7": round(now, 1), "before": round(before, 1),
+                "beforeDays": len(full) - RECENT_DAYS}
+    return None
 
 
 def fetch(client, target, age=1, include_settled=True):
@@ -502,11 +536,21 @@ def fetch(client, target, age=1, include_settled=True):
     # 낸다. 어제 23회가 많은 건지 적은 건지는 그 페이지의 평소를 알아야 말할 수
     # 있다 — 어떤 페이지는 원래 하루 9회고 어떤 페이지는 0.7회다.
     prior_key = ["hostName", "pagePath"] if target.split_hosts else [target.page_dimension]
-    prior_views = {}
-    for r in report(client, target, dimensions=prior_key, metrics=["screenPageViews"],
-                    date_range=prior_range(age), order_by=("screenPageViews", True), limit=300):
-        prior_views[tuple(r[k] for k in prior_key)] = r["screenPageViews"]
     prior_days = max(1, len(data["daily"]) - 1)   # prior_range(age) 는 어제를 뺀 구간
+    span = prior_days + RECENT_DAYS   # 앞 7일은 "지난 7일 안에 이미 늘던 중이었나"를 같은 창 길이로 재는 데 쓴다
+    prior_dates = []
+    if yday_date:
+        y0 = date.fromisoformat(yday_date)
+        prior_dates = [(y0 - timedelta(days=k)).isoformat() for k in range(span, 0, -1)]
+    date_idx = {d: i for i, d in enumerate(prior_dates)}
+    prior_series = {}
+    for r in report(client, target, dimensions=prior_key + ["date"], metrics=["screenPageViews"],
+                    date_range=(f"{age + span}daysAgo", f"{age + 1}daysAgo"), limit=20000):
+        i = date_idx.get(date_key(r["date"]))
+        if i is None:
+            continue
+        series = prior_series.setdefault(tuple(r[k] for k in prior_key), [0] * len(prior_dates))
+        series[i] += int(r["screenPageViews"])
 
     if target.split_hosts:
         data["ydayPages"] = [
@@ -514,16 +558,18 @@ def fetch(client, target, age=1, include_settled=True):
              "host": r["hostName"],
              # 코너 이름(미니게임·해설서 등)은 이 레포만 아는 분류다. 예전엔 따로
              # 구획이 있었지만 어제 기준으로는 1~3행뿐이라, 페이지 표의 라벨로 붙인다.
-             "section": classify_section(r["pagePath"]) if r["hostName"] == MAIN_HOST else "",
+             "section": (classify_section(r["pagePath"]) if r["hostName"] == MAIN_HOST else "")
+                        .replace(SECTION_OTHER, ""),
              "views": int(r["screenPageViews"]), "users": int(r["activeUsers"]),
-             "priorAvg": prior_views.get((r["hostName"], r["pagePath"]), 0.0) / prior_days}
+             "_series": prior_series.get((r["hostName"], r["pagePath"]), [])}
             for r in page_rows
         ]
     else:
         data["ydayPages"] = [
             {"name": r[target.page_dimension] or "(제목 없음)", "title": "", "host": "",
              "section": "", "views": int(r["screenPageViews"]), "users": int(r["activeUsers"]),
-             "priorAvg": prior_views.get((r[target.page_dimension],), 0.0) / prior_days}
+             "list": bool(LIST_PAGE_RE.search(r[target.page_dimension] or "")),
+             "_series": prior_series.get((r[target.page_dimension],), [])}
             for r in page_rows
         ]
 
@@ -531,8 +577,24 @@ def fetch(client, target, age=1, include_settled=True):
     # 문장이 같은 문턱을 쓰게 하려는 것. 두 곳에서 따로 재면 언젠가 어긋나서
     # "표에는 튀었다고 표시됐는데 문장은 아무 말도 안 하는" 상태가 된다.
     for p in data["ydayPages"]:
+        series_all = p.pop("_series") or [0] * len(prior_dates)
+        series = series_all[-prior_days:]
+        p["priorAvg"] = sum(series) / prior_days
+        recent = series[-RECENT_DAYS:]
+        recent_avg = sum(recent) / len(recent) if recent else 0.0
+        ratio = p["views"] / max(p["priorAvg"], RATIO_FLOOR)
+        p["ratio"] = round(ratio, 1)
         p["spike"] = bool(p["priorAvg"] > 0 and p["views"] >= SPIKE_MIN_VIEWS
-                          and p["views"] / p["priorAvg"] >= SPIKE_RATIO)
+                          and ratio >= SPIKE_RATIO
+                          and p["views"] / max(recent_avg, RATIO_FLOOR) >= SPIKE_RATIO)
+
+        full = series_all + [p["views"]]
+        window = prior_days + 1
+        p["rising"] = None
+        now_rising = rising_state(full[-window:])
+        if now_rising and not any(rising_state(full[-window - k:-k])
+                                  for k in range(1, RECENT_DAYS + 1)):
+            p["rising"] = now_rising
 
     # --- 3-1) 신규 vs 재방문 — 날짜별 28일치 ------------------------------
     # 조회수를 기준으로 본다 — 사용자 수는 구간마다 중복 제외라 합이 총계와 안 맞고
@@ -607,6 +669,51 @@ def fetch(client, target, age=1, include_settled=True):
             hours[hh] = int(r["sessions"])
     data["ydayHours"] = hours
 
+    # --- 5-0) 시간대 패턴·긴 흐름 — 날짜 무관이라 top-level 에만 둔다 ----------
+    if include_settled:
+        pattern = [0.0] * 24
+        for r in report(client, target, dimensions=["hour"], metrics=["sessions"],
+                        date_range=TREND, limit=24):
+            try:
+                hh = int(r["hour"])
+            except ValueError:
+                continue
+            if 0 <= hh < 24:
+                pattern[hh] = r["sessions"]
+        n_days = max(1, len(data["daily"]))
+        data["hourPattern"] = [round(v / n_days, 2) for v in pattern]
+
+        got = {date_key(r["date"]): (int(r["activeUsers"]), int(r["screenPageViews"]))
+               for r in report(client, target, dimensions=["date"],
+                               metrics=["activeUsers", "screenPageViews"],
+                               date_range=(LONG_START, "yesterday"), limit=10000)
+               if r["activeUsers"] or r["screenPageViews"]}
+        days = []
+        if got and data["daily"]:
+            d0, end = date.fromisoformat(min(got)), date.fromisoformat(data["daily"][-1]["date"])
+            while d0 <= end:
+                k = d0.isoformat()
+                days.append((k, *got.get(k, (0, 0))))
+                d0 += timedelta(days=1)
+        by_month = {}
+        for d, u, v in days:
+            m = by_month.setdefault(d[:7], [0, 0, 0])
+            m[0] += u
+            m[1] += v
+            m[2] += 1
+        data["months"] = [
+            {"month": m, "users": round(u / n, 1), "views": round(v / n, 1), "days": n,
+             "partial": n < calendar.monthrange(int(m[:4]), int(m[5:]))[1]}
+            for m, (u, v, n) in sorted(by_month.items())
+        ]
+
+        week = data["daily"][-RECENT_DAYS:]
+        prev = data["daily"][-RECENT_DAYS * 2:-RECENT_DAYS]
+        if len(prev) == RECENT_DAYS:
+            avg = lambda rows, k: round(sum(r[k] for r in rows) / len(rows), 1)
+            data["weekCompare"] = {"users": avg(week, "users"), "prevUsers": avg(prev, "users"),
+                                   "views": avg(week, "views"), "prevViews": avg(prev, "views")}
+
     # --- 5-1) 그날의 최장 방문 ---------------------------------------------
     # 날짜에 딸린 값이라 history 항목에 함께 얼린다. 화면의 "확정 구간" 칸은
     # 이 값을 날짜마다 새로 묻지 않고 쌓인 history 에서 최댓값을 고른다.
@@ -665,19 +772,39 @@ def build_insights(data, day_label="어제", confirmed=False):
 
     # 1) 평소보다 튄 페이지 — 어제 조회수가 왜 그랬는지에 대한 답.
     #    판정(spike)은 fetch 에서 이미 끝났다. 표의 배율 표시와 같은 값을 쓴다.
-    spikes = [p for p in data["ydayPages"] if p["spike"]]
+    def page_label(p):
+        return p["section"] or p["title"] or p["name"]
+
+    pages = [p for p in data["ydayPages"] if not p.get("list")]
+    spikes = [p for p in pages if p["spike"]]
+    top = None
     if spikes:
-        top = max(spikes, key=lambda p: p["views"] / p["priorAvg"])
-        label = top["section"] or top["title"] or top["name"]
-        quiet = [p for p in data["ydayPages"]
-                 if p is not top and p["priorAvg"] > 0 and p["views"] < p["priorAvg"]]
-        tail = (f" 나머지 {len(quiet)}곳은 평소보다 조용했습니다."
-                if len(quiet) >= 2 else "")
+        top = max(spikes, key=lambda p: p["views"] - p["priorAvg"])
+        label = page_label(top)
+        head = f"{label}{josa(label, '이', '가')} {day_label} "
+        rise = top.get("rising")
+        rise_tail = (f" 최근 {RECENT_DAYS}일 하루 평균도 {rise['avg7']:.1f}회로 늘었습니다."
+                     if rise else "")
+        if top["priorAvg"] < RATIO_FLOOR:
+            text = (head + f"**{top['views']:,}회** — 평소 하루 1회도 안 보던 페이지"
+                    + ("인데," + rise_tail if rise else "입니다."))
+        else:
+            text = (head + f"{top['views']:,}회 — 평소 하루 {top['priorAvg']:.1f}회 보던 페이지라 "
+                    f"**{top['ratio']:.1f}배**로 " + ("뛰었고," + rise_tail if rise else "뛰었습니다."))
+        out.append({"tone": "up", "text": text})
+
+    # 1-1) 며칠에 걸쳐 늘어난 페이지 — 7일 평균이 창 안에서 새 기록일 때만.
+    risers = [p for p in pages if p.get("rising") and p is not top]
+    if risers:
+        r = max(risers, key=lambda p: p["rising"]["avg7"] - p["rising"]["before"])
+        label, ri = page_label(r), r["rising"]
         out.append({
             "tone": "up",
-            "text": f"{label}{josa(label, '이', '가')} {day_label} {top['views']:,}회 — 평소 하루 "
-                    f"{top['priorAvg']:.1f}회 보던 페이지라 **{top['views'] / top['priorAvg']:.1f}배**로 "
-                    f"뛰었습니다.{tail}",
+            "text": f"{label}{josa(label, '은', '는')} 최근 {RECENT_DAYS}일 하루 평균 "
+                    f"**{ri['avg7']:.1f}회**로 늘었습니다 — 그 전 {ri['beforeDays']}일은 "
+                    + (f"하루 {ri['before']:.1f}회였고" if ri["before"] >= 0.1 else "거의 조회가 없었고")
+                    + f", {RECENT_DAYS}일 평균으로는 최근 {ri['beforeDays'] + RECENT_DAYS}일 중 "
+                    "가장 높습니다.",
         })
 
     # 규칙 2·3·5는 같은 원칙을 따른다: 그날이 최근 28일의 **기록**일 때만 말한다.
@@ -812,7 +939,7 @@ def build_insights(data, day_label="어제", confirmed=False):
         else:
             out.append({
                 "tone": "flat",
-                "text": f"{day_label}는 평소와 크게 다른 점이 없었습니다 — 방문자도 "
+                "text": f"{day_label}{'는' if day_label == '어제' else '은'} 평소와 크게 다른 점이 없었습니다 — 방문자도 "
                         "페이지별 조회수도 늘 보던 범위 안입니다.",
             })
 

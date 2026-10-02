@@ -305,7 +305,7 @@
         });
     }
 
-    /* 어제 하루를 28일 분포 위에 얹어 그린다 — q1~q3 띠와 중앙값 선을 추세선
+    /* 어제 하루를 28일 분포 위에 얹어 그린다 — 띠(lo~hi)와 중앙값 선을 추세선
        뒤에 깔면 "어제가 평소보다 위인지 아래인지"를 눈금을 읽지 않고 알 수 있다.
        crosshair 와 같은 방식으로 데이터셋보다 먼저 그려 배경이 되게 한다. */
     function normalBand(box) {
@@ -315,8 +315,8 @@
                 if (!box) return;
                 const { ctx, chartArea: area, scales } = chart;
                 const y = scales.y;
-                const top = y.getPixelForValue(box.q3);
-                const bottom = y.getPixelForValue(box.q1);
+                const top = y.getPixelForValue(box.hi);
+                const bottom = y.getPixelForValue(box.lo);
                 const mid = y.getPixelForValue(box.median);
                 ctx.save();
                 ctx.fillStyle = C.band;
@@ -436,7 +436,7 @@
        실제로 그려지는 data.daily.length 를 쓴다(아래 「평소/일」 설명과 같은 이유). */
     parts.push(mod(7, '평소와 견주면',
         `최근 ${data.daily.length}일 일별 방문자 ·
-         띠는 가운데 절반이 들어오는 구간, 점선은 중앙값`,
+         띠는 열흘 중 여드레가 들어오는 구간, 점선은 중앙값`,
         `<div class="chart-box"><canvas id="c-trend-${key}"></canvas></div>
          ${tableView('표로 보기', ['날짜', '방문자', '세션', '조회'],
              data.daily.slice().reverse().map((d) => [
@@ -495,13 +495,14 @@
         const label = p.section || p.title || p.name;
         const sub = label !== p.name ? p.name : '';
         const usual = p.priorAvg > 0
-            ? dec1(p.priorAvg) + (p.spike
-                ? `<span class="ratio">${dec1(p.views / p.priorAvg)}배</span>` : '')
+            ? (p.priorAvg < 1 ? '&lt;1' : dec1(p.priorAvg)) + (p.spike
+                ? `<span class="ratio">${dec1(p.ratio)}배</span>` : '')
             : `<span class="dim" title="${esc(dayLabel)} 이전 구간에는 조회가 없던 페이지">처음</span>`;
         /* 호스트는 이름 옆에 작게 붙인다 — 제 줄을 차지하면 한 행이 3줄이 되고
            같은 호스트가 아홉 번 반복된다. 위의 점유율 막대가 이미 비중을 말한다. */
         return `<tr><td class="page bar" style="${barW(p.views, pageMax)}">` +
             `<span class="name">${esc(label)}</span>` +
+            (p.list ? '<span class="host">목록</span>' : '') +
             (p.host ? `<span class="host">${esc(p.host)}</span>` : '') +
             (sub ? `<div class="path">${esc(sub)}</div>` : '') +
             `</td><td class="num">${fmt(p.views)}</td>` +
@@ -570,18 +571,21 @@
        서너 개뿐이라 6단계 색 램프를 씌워도 실제로는 서너 색만 쓰였고, 24칸 중
        절반이 0이라 "빈 칸"과 "아주 작은 값"이 같은 색으로 뭉갰다.
 
-       높이는 그날의 최댓값을 100%로 잡은 상대값이다 — 절대 기준(예: 5세션=꽉 참)을
-       박아 두면 한산한 날엔 막대가 전부 바닥에 깔려 분포가 안 보이고, 붐비는 날엔
-       천장에 붙어 버린다. 대신 축 눈금을 그리지 않으므로 **최댓값 하나에만 숫자를
-       적어** 그날의 자가 얼마인지 알려 준다. */
+       높이는 평소 패턴과 그날 값 중 최댓값을 100%로 잡은 상대값이다. 축 눈금을 그리지
+       않으므로 그날 최댓값 하나에만 숫자를 적는다. */
     const hours = data.ydayHours || [];
-    const hourMax = Math.max(...hours, 0);
-    const peakAt = hourMax > 0 ? hours.indexOf(hourMax) : -1;
+    const pattern = data.hourPattern || [];
+    const hourMax = Math.max(...hours, ...pattern, 0);
+    const ydayMax = Math.max(...hours, 0);
+    const peakAt = ydayMax > 0 ? hours.indexOf(ydayMax) : -1;
+    const hgt = (v) => (hourMax > 0 ? (v / hourMax * 100).toFixed(1) : 0);
     const cols = hours.map((v, hh) => {
-        const h = hourMax > 0 ? (v / hourMax * 100).toFixed(1) : 0;
-        return `<div class="hour-col" title="${hh}시 · ${fmt(v)}세션">` +
-            (hh === peakAt ? `<b class="peak">${fmt(v)}</b>` : '') +
-            (v > 0 ? `<span class="bar" style="height:${h}%"></span>` : '') +
+        const usual = pattern[hh] || 0;
+        return `<div class="hour-col" title="${hh}시 · ${esc(dayLabel)} ${fmt(v)}세션 · ` +
+            `평소 ${dec1(usual)}">` +
+            (usual > 0 ? `<span class="bar usual" style="height:${hgt(usual)}%"></span>` : '') +
+            (v > 0 ? `<span class="bar yday" style="height:${hgt(v)}%"></span>` : '') +
+            (hh === peakAt ? `<b class="peak" style="bottom:${hgt(v)}%">${fmt(v)}</b>` : '') +
             '</div>';
     }).join('');
     const hourTicks = hours.map((_, hh) =>
@@ -592,7 +596,8 @@
        합이 맞지만, 재처리 전인 어제치는 오히려 크게 틀려(44 대 32) 값은 그대로
        두고 설명을 사실대로 적는다. */
     parts.push(mod(12, `${dayLabel} 시간대`,
-        '시각별 세션 · 여러 시간에 걸친 세션은 시간마다 셉니다 · 높이는 그날 최댓값 기준',
+        `시각별 세션 · 옅은 막대는 최근 ${data.daily.length}일의 시각별 하루 평균, 진한 막대는
+         ${esc(dayLabel)} · 여러 시간에 걸친 세션은 시간마다 셉니다`,
         `<div class="hour-chart">${cols}</div>
          <div class="hour-ticks">${hourTicks}</div>`));
 
@@ -625,6 +630,32 @@
                 <div><div class="label">평균 체류시간</div>
                      <div class="value">${dur(st.avgDuration)}</div></div>
              </div>${longRow}`));
+    }
+
+    /* 8) 긴 흐름 — 일별로는 흔들리는 규모라 달 단위 하루 평균으로 본다.
+       날짜 무관("지금 기준")이라 최신 화면에만. */
+    const months = data.months || [];
+    if (isLatest && months.length) {
+        const mMax = Math.max(...months.map((m) => m.users), 0);
+        const mCols = months.map((m) => {
+            const h = mMax > 0 ? (m.users / mMax * 100).toFixed(1) : 0;
+            return `<div class="month-col${m.partial ? ' partial' : ''}" ` +
+                `title="${esc(m.month)} · 하루 평균 방문자 ${dec1(m.users)}명 · 조회 ${dec1(m.views)}회 · ` +
+                `${fmt(m.days)}일${m.partial ? ' (일부)' : ''}">` +
+                `<b class="val" style="bottom:${h}%">${dec1(m.users)}</b>` +
+                `<span class="bar" style="height:${h}%"></span></div>`;
+        }).join('');
+        const mTicks = months.map((m) =>
+            `<div class="collabel">${esc(m.month.slice(2).replace('-', '.'))}</div>`).join('');
+        const wc = data.weekCompare;
+        const diff = (a, b) => (b > 0 ? ` (${a >= b ? '+' : ''}${Math.round((a - b) / b * 100)}%)` : '');
+        const wcLine = wc ? `<p class="note-line">최근 7일 하루 평균 방문자 <b>${dec1(wc.users)}명</b>` +
+            `${diff(wc.users, wc.prevUsers)} · 그 전 7일 ${dec1(wc.prevUsers)}명 · ` +
+            `조회 ${dec1(wc.views)}회 / ${dec1(wc.prevViews)}회</p>` : '';
+        parts.push(mod(12, '긴 흐름',
+            `달마다 하루 평균 방문자 · 흐린 막대는 아직 다 차지 않은 달(측정 시작 달·이번 달)`,
+            `${wcLine}<div class="month-chart" style="--n:${months.length}">${mCols}</div>
+             <div class="month-ticks" style="--n:${months.length}">${mTicks}</div>`));
     }
 
     parts.push(`<p class="meta-line span-12">GA4 속성 ${esc(data.meta.propertyId)} · ` +
@@ -685,7 +716,8 @@
         const h = viewData.history && viewData.history[date];
         if (!h) return null;
         return {
-            snap: Object.assign({}, h, { daily: viewData.daily, meta: viewData.meta }),
+            snap: Object.assign({}, h, {
+                daily: viewData.daily, meta: viewData.meta, hourPattern: viewData.hourPattern }),
             isLatest: false, date,
         };
     }

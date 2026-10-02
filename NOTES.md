@@ -1,6 +1,6 @@
 # atah.io 노트
 
-코드에 두지 않는 설명(배경·결정 이유·측정값)을 모아 둔다. 대시보드는 `dashboard/IMPROVE.md`, 패유기 웹 버전은 `haiyuki_web/STRUCTURE.md`에 따로 있다.
+코드에 두지 않는 설명(배경·결정 이유·측정값)을 모아 둔다. 대시보드는 `dashboard/NOTES.md`, 패유기 웹 버전은 `haiyuki_web/STRUCTURE.md`에 따로 있다.
 
 ## 월드 트리거 데이터 (`world/maps/cave/triggers.js`)
 
