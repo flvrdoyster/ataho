@@ -83,11 +83,11 @@ node scripts/gen_site_index.js --check  # 어긋나면 exit 1
 - 패유기 해설서의 패 이미지 337개에 alt. 이름은 게임의 `haiyuki_web/js/data/paiData.js`에서 가져왔다
 - 희담 취급설명서 머리 부분(`translator-info`)에 pc98 환세희담 링크
 - 검색엔진 등록 — 네이버 서치어드바이저는 atah.io·pc98·suiko 세 사이트를 따로 등록하고 HTML 파일 방식으로 소유 확인했다(확인 파일 `naver6ecd505c49bf822cb1185ddef5bce20b.html`은 레포 루트, 사이트맵에는 넣지 않는다). 구글 서치콘솔은 도메인 속성(`atah.io`)을 Route 53 TXT 레코드로 확인했고 사이트맵 세 개를 모두 제출했다
+- `www.atah.io` — CNAME이 apex(`atah.io`)를 가리키면 GitHub Pages 인증서에 www가 안 들어가(GitHub 문서가 경고하는 설정) https로 들어오면 경고가 떴다. 2026-09-30 Route 53에서 `flvrdoyster.github.io`로 바꿨고, 자동 갱신 때(2026-10-01) 인증서에 www가 들어갔다(만료 2026-12-30). 지금은 `https://www.atah.io`가 301로 `atah.io`에 간다
 
 ### 남은 것
 
 - 썸네일 없는 페이지의 `og:image`(1200×630)
-- `https://www.atah.io` 인증서 — 인증서에 `atah.io`만 있어 www는 https에서 경고가 뜬다. www CNAME이 apex(`atah.io`)를 가리켜서였고(GitHub 문서가 HTTPS 문제를 경고하는 설정), 2026-09-30 Route 53에서 `flvrdoyster.github.io`로 바꿨다. GitHub Pages 상태 API로 www가 유효·발급 대상이 된 것까지 확인했다. 재발급은 사이트가 잠깐 내려가는 도메인 재등록 대신 자동 갱신(현재 인증서 만료 2026-10-31)을 기다리기로 했다. 11월 초에 인증서에 www가 들어갔는지 보고, 없으면 Settings → Pages에서 도메인을 지웠다 다시 넣는다
 
 ## 파비콘
 
