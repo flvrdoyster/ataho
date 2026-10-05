@@ -46,6 +46,23 @@ window.MAP_DATA.triggers = [
     ]
   },
   {
+    "x": 31,
+    "y": 22,
+    "w": 2,
+    "h": 1,
+    "id": "jar-4",
+    "sprite": "object/object_jar.png",
+    "type": "menu",
+    "items": [
+      {
+        "label": "환세취호전 한국어판 개선 패치",
+        "href": "https://suiko.atah.io/patch.html",
+        "target": "_blank",
+        "group": "패치"
+      }
+    ]
+  },
+  {
     "x": 15,
     "y": 18,
     "w": 4,
@@ -143,13 +160,13 @@ window.MAP_DATA.triggers = [
         "group": "장면 뷰어"
       },
       {
-        "label": "애니메이션: 환세희담 외전\n~궁극의 에로문서 전설~",
+        "label": "환세희담 외전\n~궁극의 에로문서 전설~",
         "href": "viewer/scene.html?story=gaiden",
         "target": "_blank",
         "group": "장면 뷰어"
       },
       {
-        "label": "애니메이션: DS 아니메 총집편 '98",
+        "label": "DS 아니메 총집편 '98",
         "href": "viewer/ani.html",
         "target": "_blank",
         "group": "장면 뷰어"
@@ -169,18 +186,6 @@ window.MAP_DATA.triggers = [
       "종이 쓰레기는 모아서 버려야겠다."
     ],
     "itemsFrom": "RESOURCE_IMG_MANIFEST"
-  },
-  {
-    "x": 31,
-    "y": 22,
-    "w": 2,
-    "h": 1,
-    "id": "jar-4",
-    "sprite": "object/object_jar.png",
-    "type": "dialog",
-    "text": [
-      "텅 비어 있구먼."
-    ]
   },
   {
     "x": 11,
