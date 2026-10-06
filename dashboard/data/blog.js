@@ -10,9 +10,9 @@ window.DASHBOARD_DATA['blog'] = {
    "median": 3.0,
    "min": 1.25,
    "n": 27,
-   "rank": 22,
-   "value": 1.5,
-   "vsMedian": -50.0,
+   "rank": 19,
+   "value": 2.0,
+   "vsMedian": -33.33333333333333,
    "where": "usual"
   },
   "sessions": {
@@ -22,22 +22,22 @@ window.DASHBOARD_DATA['blog'] = {
    "median": 7,
    "min": 2,
    "n": 27,
-   "rank": 28,
-   "value": 0,
-   "vsMedian": -100.0,
-   "where": "low"
+   "rank": 5,
+   "value": 9,
+   "vsMedian": 28.57142857142857,
+   "where": "usual"
   },
   "users": {
-   "hi": 7.8,
+   "hi": 9.0,
    "lo": 2.6,
    "max": 15,
    "median": 4,
    "min": 2,
    "n": 27,
-   "rank": 28,
-   "value": 0,
-   "vsMedian": -100.0,
-   "where": "low"
+   "rank": 2,
+   "value": 9,
+   "vsMedian": 125.0,
+   "where": "usual"
   },
   "views": {
    "hi": 30.4,
@@ -46,20 +46,14 @@ window.DASHBOARD_DATA['blog'] = {
    "median": 12,
    "min": 3,
    "n": 27,
-   "rank": 28,
-   "value": 0,
-   "vsMedian": -100.0,
-   "where": "low"
+   "rank": 11,
+   "value": 18,
+   "vsMedian": 50.0,
+   "where": "usual"
   }
  },
  "confirmed": false,
  "daily": [
-  {
-   "date": "2026-09-07",
-   "sessions": 7,
-   "users": 6,
-   "views": 12
-  },
   {
    "date": "2026-09-08",
    "sessions": 4,
@@ -215,214 +209,15 @@ window.DASHBOARD_DATA['blog'] = {
    "sessions": 4,
    "users": 4,
    "views": 6
+  },
+  {
+   "date": "2026-10-05",
+   "sessions": 9,
+   "users": 9,
+   "views": 18
   }
  ],
  "history": {
-  "2026-09-07": {
-   "baseline": {
-    "perUser": {
-     "hi": 7.55,
-     "lo": 1.45,
-     "max": 12.0,
-     "median": 3.0,
-     "min": 1.25,
-     "n": 28,
-     "rank": 21,
-     "value": 2.0,
-     "vsMedian": -33.33333333333333,
-     "where": "usual"
-    },
-    "sessions": {
-     "hi": 11.0,
-     "lo": 4.0,
-     "max": 20,
-     "median": 7.0,
-     "min": 2,
-     "n": 28,
-     "rank": 10,
-     "value": 7,
-     "vsMedian": 0.0,
-     "where": "usual"
-    },
-    "users": {
-     "hi": 7.6,
-     "lo": 2.0,
-     "max": 15,
-     "median": 4.0,
-     "min": 2,
-     "n": 28,
-     "rank": 7,
-     "value": 6,
-     "vsMedian": 50.0,
-     "where": "usual"
-    },
-    "views": {
-     "hi": 30.3,
-     "lo": 5.7,
-     "max": 58,
-     "median": 12.0,
-     "min": 3,
-     "n": 28,
-     "rank": 14,
-     "value": 12,
-     "vsMedian": 0.0,
-     "where": "usual"
-    }
-   },
-   "confirmed": true,
-   "insights": [
-    {
-     "text": "09.07은 평소와 크게 다른 점이 없었습니다 — 방문자도 페이지별 조회수도 늘 보던 범위 안입니다.",
-     "tone": "flat"
-    }
-   ],
-   "longest": {
-    "device": "모바일",
-    "engagementSeconds": 82,
-    "landing": "/",
-    "pageViews": 5,
-    "seconds": 208,
-    "source": "직접 방문"
-   },
-   "ydayHours": [
-    0,
-    0,
-    1,
-    0,
-    0,
-    1,
-    0,
-    0,
-    1,
-    1,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    1,
-    0,
-    1,
-    1,
-    0
-   ],
-   "ydayPages": [
-    {
-     "host": "",
-     "list": false,
-     "name": "OYSTER BAY",
-     "priorAvg": 3.4814814814814814,
-     "ratio": 0.9,
-     "rising": null,
-     "section": "",
-     "spike": false,
-     "title": "",
-     "users": 1,
-     "views": 3
-    },
-    {
-     "host": "",
-     "list": false,
-     "name": "PC98 환세 시리즈 한글화",
-     "priorAvg": 5.2592592592592595,
-     "ratio": 0.4,
-     "rising": null,
-     "section": "",
-     "spike": false,
-     "title": "",
-     "users": 1,
-     "views": 2
-    },
-    {
-     "host": "",
-     "list": false,
-     "name": "환세패유기 소개",
-     "priorAvg": 0.9629629629629629,
-     "ratio": 2.0,
-     "rising": null,
-     "section": "",
-     "spike": false,
-     "title": "",
-     "users": 1,
-     "views": 2
-    },
-    {
-     "host": "",
-     "list": false,
-     "name": "환세희담 공략",
-     "priorAvg": 1.3703703703703705,
-     "ratio": 1.5,
-     "rising": null,
-     "section": "",
-     "spike": false,
-     "title": "",
-     "users": 2,
-     "views": 2
-    },
-    {
-     "host": "",
-     "list": false,
-     "name": "환세취호전 웹 에뮬레이터",
-     "priorAvg": 1.037037037037037,
-     "ratio": 1.0,
-     "rising": null,
-     "section": "",
-     "spike": false,
-     "title": "",
-     "users": 1,
-     "views": 1
-    },
-    {
-     "host": "",
-     "list": false,
-     "name": "환세포물장 공략",
-     "priorAvg": 0.9259259259259259,
-     "ratio": 1.0,
-     "rising": null,
-     "section": "",
-     "spike": false,
-     "title": "",
-     "users": 1,
-     "views": 1
-    },
-    {
-     "host": "",
-     "list": false,
-     "name": "환세희담 소개",
-     "priorAvg": 0.7407407407407407,
-     "ratio": 1.0,
-     "rising": null,
-     "section": "",
-     "spike": false,
-     "title": "",
-     "users": 1,
-     "views": 1
-    }
-   ],
-   "ydaySites": [],
-   "ydaySources": [
-    {
-     "name": "namu.wiki",
-     "sessions": 4
-    },
-    {
-     "name": "직접 방문",
-     "sessions": 3
-    }
-   ],
-   "ydayUnresolved": 0,
-   "yesterday": {
-    "date": "2026-09-07",
-    "newUsers": 5,
-    "sessions": 7,
-    "users": 6,
-    "views": 12
-   }
-  },
   "2026-09-08": {
    "baseline": {
     "perUser": {
@@ -5736,7 +5531,7 @@ window.DASHBOARD_DATA['blog'] = {
      "where": "low"
     },
     "users": {
-     "hi": 7.8,
+     "hi": 9.0,
      "lo": 2.6,
      "max": 15,
      "median": 4,
@@ -5760,10 +5555,10 @@ window.DASHBOARD_DATA['blog'] = {
      "where": "low"
     }
    },
-   "confirmed": false,
+   "confirmed": true,
    "insights": [
     {
-     "text": "어제 방문자 **0명** — 최근 27일 중 가장 적습니다(다른 날 최저 2명).",
+     "text": "10.03 방문자 **0명** — 최근 27일 중 가장 적습니다(다른 날 최저 2명).",
      "tone": "down"
     }
    ],
@@ -5805,37 +5600,270 @@ window.DASHBOARD_DATA['blog'] = {
     "users": 0,
     "views": 0
    }
+  },
+  "2026-10-05": {
+   "baseline": {
+    "perUser": {
+     "hi": 7.3,
+     "lo": 1.373333333333333,
+     "max": 12.0,
+     "median": 3.0,
+     "min": 1.25,
+     "n": 27,
+     "rank": 19,
+     "value": 2.0,
+     "vsMedian": -33.33333333333333,
+     "where": "usual"
+    },
+    "sessions": {
+     "hi": 11.0,
+     "lo": 4.0,
+     "max": 20,
+     "median": 7,
+     "min": 2,
+     "n": 27,
+     "rank": 5,
+     "value": 9,
+     "vsMedian": 28.57142857142857,
+     "where": "usual"
+    },
+    "users": {
+     "hi": 9.0,
+     "lo": 2.6,
+     "max": 15,
+     "median": 4,
+     "min": 2,
+     "n": 27,
+     "rank": 2,
+     "value": 9,
+     "vsMedian": 125.0,
+     "where": "usual"
+    },
+    "views": {
+     "hi": 30.4,
+     "lo": 5.6,
+     "max": 58,
+     "median": 12,
+     "min": 3,
+     "n": 27,
+     "rank": 11,
+     "value": 18,
+     "vsMedian": 50.0,
+     "where": "usual"
+    }
+   },
+   "confirmed": false,
+   "insights": [
+    {
+     "text": "어제 유입 가운데 **11건**은 출처가 아직 분류되지 않았습니다(분류된 것은 1건) — GA4가 세션 속성을 확정하는 데 하루 이상 걸립니다. 이 값은 내일 자동으로 다시 확인됩니다.",
+     "tone": "down"
+    }
+   ],
+   "longest": null,
+   "ydayHours": [
+    1,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    1,
+    0,
+    0,
+    0,
+    0,
+    4,
+    1,
+    0,
+    2
+   ],
+   "ydayPages": [
+    {
+     "host": "",
+     "list": true,
+     "name": "'분류 전체보기' 카테고리의 글 목록",
+     "priorAvg": 0.3076923076923077,
+     "ratio": 4.0,
+     "rising": null,
+     "section": "",
+     "spike": false,
+     "title": "",
+     "users": 1,
+     "views": 4
+    },
+    {
+     "host": "",
+     "list": false,
+     "name": "PC98 환세 시리즈 한글화",
+     "priorAvg": 3.5384615384615383,
+     "ratio": 0.8,
+     "rising": null,
+     "section": "",
+     "spike": false,
+     "title": "",
+     "users": 3,
+     "views": 3
+    },
+    {
+     "host": "",
+     "list": false,
+     "name": "환세취호전 웹 에뮬레이터 및 개선 패치",
+     "priorAvg": 0.5384615384615384,
+     "ratio": 3.0,
+     "rising": null,
+     "section": "",
+     "spike": false,
+     "title": "",
+     "users": 3,
+     "views": 3
+    },
+    {
+     "host": "",
+     "list": false,
+     "name": "환세쾌도전 공략",
+     "priorAvg": 0.5769230769230769,
+     "ratio": 2.0,
+     "rising": null,
+     "section": "",
+     "spike": false,
+     "title": "",
+     "users": 1,
+     "views": 2
+    },
+    {
+     "host": "",
+     "list": false,
+     "name": "OYSTER BAY",
+     "priorAvg": 1.7307692307692308,
+     "ratio": 0.6,
+     "rising": null,
+     "section": "",
+     "spike": false,
+     "title": "",
+     "users": 1,
+     "views": 1
+    },
+    {
+     "host": "",
+     "list": false,
+     "name": "환세취호전 스태프 인터뷰 (from 일본판 DS 14호)",
+     "priorAvg": 0.15384615384615385,
+     "ratio": 1.0,
+     "rising": null,
+     "section": "",
+     "spike": false,
+     "title": "",
+     "users": 1,
+     "views": 1
+    },
+    {
+     "host": "",
+     "list": false,
+     "name": "환세풍광전 공략",
+     "priorAvg": 0.7692307692307693,
+     "ratio": 1.0,
+     "rising": null,
+     "section": "",
+     "spike": false,
+     "title": "",
+     "users": 1,
+     "views": 1
+    },
+    {
+     "host": "",
+     "list": false,
+     "name": "환세희담 공략",
+     "priorAvg": 1.5384615384615385,
+     "ratio": 0.6,
+     "rising": null,
+     "section": "",
+     "spike": false,
+     "title": "",
+     "users": 1,
+     "views": 1
+    },
+    {
+     "host": "",
+     "list": false,
+     "name": "환세희담 만화 (from 환세희담 매뉴얼)",
+     "priorAvg": 0.038461538461538464,
+     "ratio": 1.0,
+     "rising": null,
+     "section": "",
+     "spike": false,
+     "title": "",
+     "users": 1,
+     "views": 1
+    },
+    {
+     "host": "",
+     "list": false,
+     "name": "환세희담 소개",
+     "priorAvg": 0.5384615384615384,
+     "ratio": 1.0,
+     "rising": null,
+     "section": "",
+     "spike": false,
+     "title": "",
+     "users": 1,
+     "views": 1
+    }
+   ],
+   "ydaySites": [],
+   "ydaySources": [
+    {
+     "name": "google",
+     "sessions": 1
+    }
+   ],
+   "ydayUnresolved": 11,
+   "yesterday": {
+    "date": "2026-10-05",
+    "newUsers": 8,
+    "sessions": 9,
+    "users": 9,
+    "views": 18
+   }
   }
  },
  "hourPattern": [
-  0.41,
+  0.44,
   0.15,
-  0.15,
+  0.11,
   0.07,
   0.04,
-  0.11,
+  0.07,
   0.04,
   0.04,
-  0.22,
-  0.22,
+  0.19,
+  0.19,
   0.33,
   0.22,
   0.48,
   0.56,
   0.56,
-  0.52,
+  0.56,
   0.56,
   0.48,
   0.41,
-  0.3,
-  0.3,
+  0.26,
+  0.44,
   0.56,
-  0.56,
-  0.44
+  0.52,
+  0.52
  ],
  "insights": [
   {
-   "text": "어제 방문자 **0명** — 최근 27일 중 가장 적습니다(다른 날 최저 2명).",
+   "text": "어제 유입 가운데 **11건**은 출처가 아직 분류되지 않았습니다(분류된 것은 1건) — GA4가 세션 속성을 확정하는 데 하루 이상 걸립니다. 이 값은 내일 자동으로 다시 확인됩니다.",
    "tone": "down"
   }
  ],
@@ -5846,7 +5874,7 @@ window.DASHBOARD_DATA['blog'] = {
   "propertyId": "549191220",
   "settledDays": 7,
   "trendDays": 28,
-  "updatedAt": "2026-10-05 08:56"
+  "updatedAt": "2026-10-06 10:45"
  },
  "months": [
   {
@@ -5864,27 +5892,28 @@ window.DASHBOARD_DATA['blog'] = {
    "views": 16.9
   },
   {
-   "days": 3,
+   "days": 5,
    "month": "2026-10",
    "partial": true,
-   "users": 5.3,
-   "views": 13.7
+   "users": 5.0,
+   "views": 11.8
   }
  ],
  "settled": {
-  "avgDuration": 140.73913605660377,
-  "engagementRate": 0.5471698113207547,
+  "avgDuration": 121.36812517777778,
+  "engagementRate": 0.5777777777777777,
   "from": "8daysAgo",
-  "sessions": 53,
+  "sessions": 45,
   "to": "2daysAgo"
  },
  "weekCompare": {
-  "prevUsers": 6.3,
-  "prevViews": 17.1,
-  "users": 5.1,
-  "views": 12.3
+  "prevUsers": 5.7,
+  "prevViews": 16.9,
+  "users": 6.1,
+  "views": 14.0
  },
  "ydayHours": [
+  1,
   0,
   0,
   0,
@@ -5899,26 +5928,161 @@ window.DASHBOARD_DATA['blog'] = {
   0,
   0,
   0,
+  1,
   0,
   0,
   0,
   0,
+  4,
+  1,
   0,
-  0,
-  0,
-  0,
-  0,
-  0
+  2
  ],
- "ydayPages": [],
+ "ydayPages": [
+  {
+   "host": "",
+   "list": true,
+   "name": "'분류 전체보기' 카테고리의 글 목록",
+   "priorAvg": 0.3076923076923077,
+   "ratio": 4.0,
+   "rising": null,
+   "section": "",
+   "spike": false,
+   "title": "",
+   "users": 1,
+   "views": 4
+  },
+  {
+   "host": "",
+   "list": false,
+   "name": "PC98 환세 시리즈 한글화",
+   "priorAvg": 3.5384615384615383,
+   "ratio": 0.8,
+   "rising": null,
+   "section": "",
+   "spike": false,
+   "title": "",
+   "users": 3,
+   "views": 3
+  },
+  {
+   "host": "",
+   "list": false,
+   "name": "환세취호전 웹 에뮬레이터 및 개선 패치",
+   "priorAvg": 0.5384615384615384,
+   "ratio": 3.0,
+   "rising": null,
+   "section": "",
+   "spike": false,
+   "title": "",
+   "users": 3,
+   "views": 3
+  },
+  {
+   "host": "",
+   "list": false,
+   "name": "환세쾌도전 공략",
+   "priorAvg": 0.5769230769230769,
+   "ratio": 2.0,
+   "rising": null,
+   "section": "",
+   "spike": false,
+   "title": "",
+   "users": 1,
+   "views": 2
+  },
+  {
+   "host": "",
+   "list": false,
+   "name": "OYSTER BAY",
+   "priorAvg": 1.7307692307692308,
+   "ratio": 0.6,
+   "rising": null,
+   "section": "",
+   "spike": false,
+   "title": "",
+   "users": 1,
+   "views": 1
+  },
+  {
+   "host": "",
+   "list": false,
+   "name": "환세취호전 스태프 인터뷰 (from 일본판 DS 14호)",
+   "priorAvg": 0.15384615384615385,
+   "ratio": 1.0,
+   "rising": null,
+   "section": "",
+   "spike": false,
+   "title": "",
+   "users": 1,
+   "views": 1
+  },
+  {
+   "host": "",
+   "list": false,
+   "name": "환세풍광전 공략",
+   "priorAvg": 0.7692307692307693,
+   "ratio": 1.0,
+   "rising": null,
+   "section": "",
+   "spike": false,
+   "title": "",
+   "users": 1,
+   "views": 1
+  },
+  {
+   "host": "",
+   "list": false,
+   "name": "환세희담 공략",
+   "priorAvg": 1.5384615384615385,
+   "ratio": 0.6,
+   "rising": null,
+   "section": "",
+   "spike": false,
+   "title": "",
+   "users": 1,
+   "views": 1
+  },
+  {
+   "host": "",
+   "list": false,
+   "name": "환세희담 만화 (from 환세희담 매뉴얼)",
+   "priorAvg": 0.038461538461538464,
+   "ratio": 1.0,
+   "rising": null,
+   "section": "",
+   "spike": false,
+   "title": "",
+   "users": 1,
+   "views": 1
+  },
+  {
+   "host": "",
+   "list": false,
+   "name": "환세희담 소개",
+   "priorAvg": 0.5384615384615384,
+   "ratio": 1.0,
+   "rising": null,
+   "section": "",
+   "spike": false,
+   "title": "",
+   "users": 1,
+   "views": 1
+  }
+ ],
  "ydaySites": [],
- "ydaySources": [],
- "ydayUnresolved": 0,
+ "ydaySources": [
+  {
+   "name": "google",
+   "sessions": 1
+  }
+ ],
+ "ydayUnresolved": 11,
  "yesterday": {
-  "date": "2026-10-03",
-  "newUsers": 0,
-  "sessions": 0,
-  "users": 0,
-  "views": 0
+  "date": "2026-10-05",
+  "newUsers": 8,
+  "sessions": 9,
+  "users": 9,
+  "views": 18
  }
 };
