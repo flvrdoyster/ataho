@@ -5960,7 +5960,7 @@ window.DASHBOARD_DATA['blog'] = {
   "propertyId": "549191220",
   "settledDays": 7,
   "trendDays": 28,
-  "updatedAt": "2026-10-07 08:58"
+  "updatedAt": "2026-10-07 09:39"
  },
  "months": [
   {
