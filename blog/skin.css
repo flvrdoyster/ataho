@@ -157,7 +157,12 @@
     var(--ray-2) 350.72deg 353.30deg,
     var(--ray-line) 353.30deg 353.56deg,
     var(--ray-2) 353.56deg 356.51deg,
-    var(--ray-4) 356.51deg 360.00deg;
+    var(--ray-4) 356.51deg 360.00deg
+}
+
+/* reset */
+body, div, dl, dt, dd, ul, ol, li, h1, h2, h3, h4, h5, h6, pre, code, form, fieldset, legend, textarea, p, blockquote, th, td, input, select, textarea, button {
+  margin: 0;
   padding: 0;
   outline: none
 }
