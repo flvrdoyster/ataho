@@ -120,9 +120,10 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
       <s_list>
         <div class="area_list">
-          <div class="tit_category">
-            <a class="link_category">[##_list_conform_##] ([##_list_count_##])</a>
-          </div>
+          <h2 class="tit_category">
+            <span class="link_category">[##_list_conform_##]</span>
+            <span class="txt_count">[##_list_count_##]개의 글</span>
+          </h2>
         </div>
       </s_list>
 
@@ -316,9 +317,9 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
           <s_tag>
             <div class="area_list">
-              <div class="tit_category">
-                <a class="link_category">태그</a>
-              </div>
+              <h2 class="tit_category">
+                <span class="link_category">태그</span>
+              </h2>
             </div>
 
             <div id="mArticle" class="article_skin skin_tag">
@@ -333,9 +334,9 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
           <s_guest>
             <div class="area_list">
-              <div class="tit_category">
-                <a class="link_category">방명록</a>
-              </div>
+              <h2 class="tit_category">
+                <span class="link_category">방명록</span>
+              </h2>
             </div>
             <div id="mArticle" class="article_skin skin_visitor">
               <div class="area_reply">
@@ -520,6 +521,23 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     (function ($) {
       $.Area.init();
     })(jQuery);
+
+    (function () {
+      var path;
+      try {
+        path = decodeURIComponent(location.pathname);
+      } catch (e) {
+        path = location.pathname;
+      }
+      path = path.replace(/\/+$/, '') || '/';
+      var links = document.querySelectorAll('.area_titlenav a');
+      for (var i = 0; i < links.length; i++) {
+        if (links[i].getAttribute('href') === path) {
+          links[i].className = 'on';
+          links[i].setAttribute('aria-current', 'page');
+        }
+      }
+    })();
   </script>
 
 </body>

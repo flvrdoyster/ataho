@@ -125,7 +125,7 @@
     <div class="area_banner">
       <nav class="area_titlenav" aria-label="작품별로 보기">
         <a href="#">전체</a>
-        <a href="#">환세희담</a>
+        <a href="#" class="on" aria-current="page">환세희담</a>
         <a href="#">환세풍광전</a>
         <a href="#">환세쾌도전</a>
         <a href="#">환세포물장</a>
@@ -139,13 +139,11 @@
 
     <hr class="hide">
 
-    <!-- skin.html 과 같은 위치(#dkWrap 직계, .area_menu 의 뒤 형제)에 둡니다.
-         검색을 펼쳤을 때 제목을 감추는 규칙이 형제 선택자라, 여기 있지 않으면
-         미리보기에서 그 동작을 확인할 수 없습니다. -->
     <div class="area_list">
-      <div class="tit_category">
-        <a class="link_category" href="#">최근 글 목록 예시</a>
-      </div>
+      <h2 class="tit_category">
+        <span class="link_category">환세희담</span>
+        <span class="txt_count">12개의 글</span>
+      </h2>
     </div>
 
     <div id="dkContent" class="cont_skin" role="main">
@@ -177,14 +175,14 @@
                 <h4 data-ke-size="size19">제목 4 (h4)</h4>
                 <p data-ke-size="size14">14pt 작은 문단입니다. 부가 설명이나 각주처럼 쓰는 크기예요.</p>
 
-                <p class="preview-note">⚠️ 아래 인용구는 실제 글에서 확인 못한 추정 마크업입니다(이 블로그 글 중엔 인용구를 쓴 글이 없었어요).</p>
+                <p class="preview-note verified">✅ 아래 인용구·파일첨부·동영상 블록은 다른 티스토리 블로그의 실제 발행본에서 확인한 마크업 구조입니다.</p>
                 <blockquote data-ke-style="style2">
-                  <p>인용구(style2) 샘플입니다. 이 블록 바로 아래 문단과의 간격이 예전엔 0으로 붙어있던 버그를 고쳤는지 확인하는 용도예요.</p>
+                  <p data-ke-size="size16">인용구(style2) 샘플입니다. 이 블록 바로 아래 문단과의 간격이 예전엔 0으로 붙어있던 버그를 고쳤는지 확인하는 용도예요.</p>
                 </blockquote>
                 <p data-ke-size="size16">인용구 바로 다음 문단 — 위 여백이 자연스럽게 떨어져 보이면 정상입니다.</p>
 
                 <blockquote data-ke-style="style3">
-                  <p>인용구(style3, 박스형) 샘플입니다.</p>
+                  <p data-ke-size="size16">인용구(style3, 박스형) 샘플입니다.</p>
                 </blockquote>
 
                 <ul>
@@ -214,23 +212,24 @@ console.log(greet('Noto Sans KR'));</code></pre>
                   <figcaption>이미지 캡션 샘플 — figure.imageblock.alignCenter (캡션 자체는 실제 글에서 못 봐서 미검증)</figcaption>
                 </figure>
 
-                <p class="preview-note">⚠️ 아래 파일첨부 카드는 실제 글에서 확인 못한 추정 마크업입니다(이 블로그 글 중엔 파일첨부를 쓴 글이 없었어요). 레이아웃은 맞게 고쳤지만 세부 구조(span/div 등)는 티스토리 실제 출력과 다를 수 있습니다.</p>
                 <figure class="fileblock" data-ke-align="alignCenter">
-                  <a href="#" onclick="return false">
-                    <span class="image"></span>
+                  <a href="#" onclick="return false" class="">
+                    <div class="image"></div>
                     <div class="desc">
                       <div class="filename"><span class="name">스킨_미리보기_아주긴파일이름_테스트용.zip</span></div>
-                      <span class="size">12.3MB</span>
+                      <div class="size">12.3MB</div>
                     </div>
                   </a>
                 </figure>
                 <p class="preview-note">↑ 파일첨부 카드 — 이 페이지를 좁은 창(모바일 폭)으로 줄여서 옆으로 안 튀어나오는지 확인하세요.</p>
 
-                <p class="preview-note">⚠️ 아래 동영상 블록도 마찬가지로 실제 글에서 확인 못한 추정 마크업입니다.</p>
-                <figure data-ke-type="video" data-ke-style="alignCenter">
-                  <iframe class="preview-video-box" width="0" height="0" src="about:blank" title="샘플 동영상 (width/height 정보 없음)"></iframe>
+                <figure data-ke-type="video" data-ke-style="alignCenter" data-video-host="kakaotv" data-video-width="860"
+                  data-video-height="484" data-video-origin-width="860" data-video-origin-height="484"
+                  data-ke-mobilestyle="widthContent" data-video-play-service="daum_tistory">
+                  <iframe class="preview-video-box" src="about:blank" width="860" height="484" frameborder="0" allowfullscreen="true" title="샘플 동영상"></iframe>
+                  <figcaption style="display: none;"></figcaption>
                 </figure>
-                <p class="preview-note">↑ width/height 없는 동영상 임베드 — 창 폭을 줄여도 찌그러지지 않고 비율이 유지되는지 확인하세요.</p>
+                <p class="preview-note">↑ 동영상 임베드 — 창 폭을 줄여도 찌그러지지 않고 비율(860×484)이 유지되는지 확인하세요.</p>
 
               </div>
 
