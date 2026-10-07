@@ -6,7 +6,7 @@
   --glass: rgba(255, 255, 255, .92);
   --glass-border: rgba(85, 34, 0, .16);
   --glass-shadow: 0 2px 0 rgba(85, 34, 0, .2);
-  --ctl-h: 44px;
+  --ctl-h: 52px;
   --ray-1: #ffff33;
   --ray-2: #ffcc44;
   --ray-3: #88bbff;
@@ -300,8 +300,9 @@ address, caption, cite, code, dfn, em, var {
   position: relative;
   padding: 6px 14px;
   color: var(--accent, #0068da);
-  font-size: 13px;
-  font-weight: var(--font-weight-bold, 700);
+  font-family: 'Dokkaebi DNR Gothic', var(--font-ui, sans-serif);
+  font-size: 16px;
+  font-weight: 700;
   text-decoration: none;
   white-space: nowrap;
   filter: drop-shadow(0 2px 0 rgba(85, 34, 0, .25));
@@ -350,6 +351,7 @@ address, caption, cite, code, dfn, em, var {
   }
 
   .area_titlenav a,
+  .area_menu .link_atah,
   .area_menu .area_search,
   .area_head .area_profile .info_profile {
     transition: none
@@ -357,6 +359,7 @@ address, caption, cite, code, dfn, em, var {
 
   .area_titlenav a:hover,
   .area_titlenav a:active,
+  .area_menu .link_atah:hover,
   .area_menu .area_search:not(.on):hover,
   .area_head .area_profile:not(.on) .info_profile:hover {
     transform: none
@@ -427,11 +430,11 @@ address, caption, cite, code, dfn, em, var {
   position: relative;
   box-sizing: border-box;
   display: flex;
-  flex-direction: column;
-  justify-content: center;
-  max-width: 250px;
+  align-items: center;
+  gap: 12px;
+  max-width: 360px;
   height: var(--ctl-h);
-  padding: 0 38px 0 20px;
+  padding: 0 48px 0 28px;
   border: var(--ui-border-w, 1px) solid var(--glass-border);
   border-radius: var(--radius-pill, 999px);
   background: var(--glass);
@@ -456,8 +459,11 @@ address, caption, cite, code, dfn, em, var {
 }
 
 .area_head .btn_name {
-  font-size: 11px;
-  line-height: 15px;
+  flex: none;
+  padding-left: 12px;
+  border-left: 1px solid rgba(85, 34, 0, .25);
+  font-size: 14px;
+  line-height: 16px;
   color: var(--text-secondary, #4d4d4d);
   text-align: left
 }
@@ -465,7 +471,7 @@ address, caption, cite, code, dfn, em, var {
 .area_head .ico_name {
   position: absolute;
   top: 50%;
-  right: 16px;
+  right: 20px;
   width: 10px;
   height: 6px;
   margin-top: -3px;
@@ -475,10 +481,10 @@ address, caption, cite, code, dfn, em, var {
 
 .area_head .txt_condition {
   order: -1;
-  width: 100%;
-  font-size: 13px;
+  min-width: 0;
+  font-size: 17px;
   font-weight: var(--font-weight-bold, 700);
-  line-height: 17px;
+  line-height: 22px;
   color: var(--text-primary, #1a1a1a);
   white-space: nowrap;
   text-overflow: ellipsis;
@@ -537,6 +543,7 @@ address, caption, cite, code, dfn, em, var {
   z-index: 31
 }
 
+.area_menu .link_atah,
 .area_menu .area_search {
   display: inline-block;
   margin: 0 2px;
@@ -548,9 +555,32 @@ address, caption, cite, code, dfn, em, var {
   transition: transform .1s, box-shadow .1s
 }
 
+.area_menu .link_atah:hover,
 .area_menu .area_search:not(.on):hover {
   transform: translateY(-2px);
   box-shadow: 0 4px 0 rgba(85, 34, 0, .2)
+}
+
+.area_menu .link_atah {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  width: var(--ctl-h);
+  height: var(--ctl-h)
+}
+
+.area_menu .ico_atah {
+  display: block;
+  width: 32px;
+  height: 32px;
+  border-radius: 4px;
+  background: rgba(26, 26, 26, 1);
+  color: rgba(204, 204, 204, 1)
+}
+
+.area_menu:has(.area_search.on) .link_atah {
+  display: none
 }
 
 .area_menu .on.area_search {
@@ -558,6 +588,9 @@ address, caption, cite, code, dfn, em, var {
 }
 
 .area_menu .btn_search {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   width: calc(var(--ctl-h) - 2px);
   height: calc(var(--ctl-h) - 2px)
 }
@@ -566,12 +599,19 @@ address, caption, cite, code, dfn, em, var {
   display: none
 }
 
+.area_menu .ico_search path,
+.area_menu .lab_search path {
+  vector-effect: non-scaling-stroke
+}
+
 .area_menu .ico_search {
-  width: 16px;
-  height: 16px;
-  margin-top: -1px;
-  color: var(--text-muted, #767676);
-  vertical-align: middle
+  width: 24px;
+  height: 24px;
+  color: var(--text-muted, #767676)
+}
+
+.area_menu .ico_search path {
+  stroke-width: 2px
 }
 
 .area_menu .frm_search {
@@ -637,6 +677,7 @@ address, caption, cite, code, dfn, em, var {
 .tit_category .txt_count {
   flex: none;
   font-size: 14px;
+  font-weight: normal;
   color: var(--text-muted, #767676)
 }
 
@@ -1180,15 +1221,6 @@ address, caption, cite, code, dfn, em, var {
   margin-top: 40px
 }
 
-.on .btn_replymore {
-  display: block
-}
-
-.on .list_reply {
-  display: block;
-  margin-bottom: 18px
-}
-
 /* 리스트 */
 .list_content {
   padding: 35px 0;
@@ -1282,7 +1314,6 @@ address, caption, cite, code, dfn, em, var {
   line-height: 34px;
   border: 1px solid #f0f0f0;
   background-color: #f0f0f0;
-  font-weight: 100;
   color: var(--text-secondary, #4d4d4d)
 }
 
@@ -1357,7 +1388,6 @@ address, caption, cite, code, dfn, em, var {
   color: var(--text-primary, #1a1a1a);
   min-height: 370px;
   font-size: 16px;
-  font-weight: 300;
   font-family: var(--font-ui, sans-serif);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -1366,8 +1396,7 @@ address, caption, cite, code, dfn, em, var {
 
 @media only screen and (max-width:820px) {
   body, th, td, input, select, textarea, button, p, span {
-    font-family: var(--font-ui, sans-serif);
-    font-weight: 100
+    font-family: var(--font-ui, sans-serif)
   }
 
   /* 헤더 */
@@ -1383,8 +1412,8 @@ address, caption, cite, code, dfn, em, var {
   }
 
   .area_head .area_profile .info_profile {
-    max-width: 228px;
-    padding: 0 16px
+    max-width: calc(100vw - 140px);
+    padding: 0 18px
   }
 
   .area_list {
@@ -1405,6 +1434,8 @@ address, caption, cite, code, dfn, em, var {
   }
 
   .area_head .btn_name {
+    padding-left: 10px;
+    font-size: 12px;
     line-height: 14px
   }
 
@@ -1413,14 +1444,24 @@ address, caption, cite, code, dfn, em, var {
   }
 
   .area_head .txt_condition {
-    width: auto;
-    line-height: 16px
+    font-size: 15px;
+    line-height: 19px
   }
 
   .area_menu {
     --ctl-h: 40px;
     top: 10px;
     right: 15px
+  }
+
+  .area_menu .ico_atah {
+    width: 24px;
+    height: 24px
+  }
+
+  .area_menu .ico_search {
+    width: 20px;
+    height: 20px
   }
 
   .area_menu .on.area_search {
@@ -1728,8 +1769,8 @@ address, caption, cite, code, dfn, em, var {
   }
 
   .area_titlenav a {
-    padding: 5px 12px;
-    font-size: 12px
+    padding: 4px 10px;
+    font-size: 16px
   }
 
   .area_foot {
@@ -1830,11 +1871,16 @@ address, caption, cite, code, dfn, em, var {
   line-height: 1.71
 }
 
+#article-view strong,
+#article-view b {
+  font-weight: 700
+}
+
 #article-view h1,
 #article-view h2,
 #article-view h3,
 #article-view h4 {
-  font-weight: normal;
+  font-weight: var(--font-weight-bold, 700);
   letter-spacing: -1px;
   color: var(--text-primary, #1a1a1a);
   margin: 1em 0 20px
@@ -2444,7 +2490,6 @@ hr[data-ke-style='style8'],
   overflow: hidden;
   font-family: var(--font-ui, sans-serif);
   font-size: 14px;
-  font-weight: 300;
   font-style: normal;
   font-stretch: normal;
   line-height: normal;
