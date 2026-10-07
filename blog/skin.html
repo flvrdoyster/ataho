@@ -554,6 +554,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
     (function () {
       var faceCount = 64;
+      var skipFaces = [51];
       var hero = document.querySelector('.hero_img');
       if (!hero) return;
       var base = hero.src.slice(0, hero.src.lastIndexOf('/') + 1);
@@ -564,6 +565,9 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
           hash = Math.imul(hash ^ name.charCodeAt(i), 16777619);
         }
         var n = (hash >>> 0) % faceCount + 1;
+        while (skipFaces.indexOf(n) !== -1) {
+          n = n % faceCount + 1;
+        }
         return base + 'face_' + (n < 10 ? '0' : '') + n + '.png';
       }
 
