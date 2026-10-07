@@ -468,11 +468,17 @@ def fetch(client, target, age=1, include_settled=True):
     daily_rows = report(client, target, dimensions=["date"],
                         metrics=["activeUsers", "sessions", "screenPageViews"],
                         date_range=TREND, order_by=("date", False))
-    data["daily"] = [
-        {"date": date_key(r["date"]), "users": int(r["activeUsers"]),
-         "sessions": int(r["sessions"]), "views": int(r["screenPageViews"])}
-        for r in daily_rows
-    ]
+    got = {date_key(r["date"]): r for r in daily_rows}
+    data["daily"] = []
+    if got:
+        day = date.fromisoformat(min(got))
+        end = max(date.fromisoformat(max(got)), datetime.now(KST).date() - timedelta(days=1))
+        while day <= end:
+            r = got.get(day.isoformat(), {})
+            data["daily"].append({"date": day.isoformat(), "users": int(r.get("activeUsers", 0)),
+                                  "sessions": int(r.get("sessions", 0)),
+                                  "views": int(r.get("screenPageViews", 0))})
+            day += timedelta(days=1)
 
     # daily 는 "28daysAgo~어제"로 항상 age=1 기준 끝나므로, 대상 날짜는
     # 뒤에서 age번째다(age=1→마지막, age=2→끝에서 둘째, ...).
