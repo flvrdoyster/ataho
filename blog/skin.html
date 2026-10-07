@@ -111,7 +111,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         <div class="area_list">
           <h2 class="tit_category">
             <span class="link_category">[##_list_conform_##]</span>
-            <span class="txt_count">[##_list_count_##]개의 글</span>
+            <span class="txt_count">[##_list_count_##]개</span>
           </h2>
         </div>
       </s_list>
@@ -500,6 +500,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       <div id="dkFoot" role="contentinfo" class="area_foot">
         <p class="txt_credit">Powered by <a href="https://www.tistory.com">Tistory</a><span class="txt_sep"> · </span>Code magic by AI<span class="txt_sep"> · </span>Rest by <a href="https://github.com/flvrdoyster">flvrdoyster</a></p>
       </div>
+
     </div>
   </s_t3>
 
@@ -540,6 +541,39 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
           links[i].className = 'on';
           links[i].setAttribute('aria-current', 'page');
         }
+      }
+    })();
+
+    (function () {
+      var faceCount = 64;
+      var hero = document.querySelector('.hero_img');
+      if (!hero) return;
+      var base = hero.src.slice(0, hero.src.lastIndexOf('/') + 1);
+
+      function faceUrl(name) {
+        var hash = 2166136261;
+        for (var i = 0; i < name.length; i++) {
+          hash = Math.imul(hash ^ name.charCodeAt(i), 16777619);
+        }
+        var n = (hash >>> 0) % faceCount + 1;
+        return base + 'face_' + (n < 10 ? '0' : '') + n + '.png';
+      }
+
+      function applyFaces() {
+        var thumbs = document.querySelectorAll('.tt-item-reply .tt-thumbnail:not(.tt-thumbnail-face)');
+        for (var i = 0; i < thumbs.length; i++) {
+          var thumb = thumbs[i];
+          if ((thumb.getAttribute('style') || '').indexOf('default_S') === -1) continue;
+          var user = thumb.closest('.tt-item-reply').querySelector('.tt-link-user');
+          thumb.style.backgroundImage = 'url("' + faceUrl(user ? user.textContent.trim() : '') + '")';
+          thumb.classList.add('tt-thumbnail-face');
+        }
+      }
+
+      applyFaces();
+      var areas = document.querySelectorAll('.area_reply');
+      for (var k = 0; k < areas.length; k++) {
+        new MutationObserver(applyFaces).observe(areas[k], { childList: true, subtree: true });
       }
     })();
   </script>
