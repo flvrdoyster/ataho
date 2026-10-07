@@ -297,35 +297,50 @@ address, caption, cite, code, dfn, em, var {
 }
 
 .area_titlenav a {
+  position: relative;
   padding: 6px 14px;
-  border-radius: var(--radius-pill, 999px);
-  border: var(--ui-border-w, 1px) solid var(--glass-border);
-  background: var(--glass);
-  box-shadow: var(--glass-shadow);
   color: var(--accent, #0068da);
   font-size: 13px;
   font-weight: var(--font-weight-bold, 700);
   text-decoration: none;
   white-space: nowrap;
-  transition: transform .1s, box-shadow .1s
+  filter: drop-shadow(0 2px 0 rgba(85, 34, 0, .25));
+  transition: transform .1s, filter .1s
+}
+
+.area_titlenav a::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: var(--glass);
+  clip-path: polygon(4px 0, calc(100% - 4px) 0, calc(100% - 4px) 2px, calc(100% - 2px) 2px, calc(100% - 2px) 4px, 100% 4px,
+    100% calc(100% - 4px), calc(100% - 2px) calc(100% - 4px), calc(100% - 2px) calc(100% - 2px), calc(100% - 4px) calc(100% - 2px),
+    calc(100% - 4px) 100%, 4px 100%, 4px calc(100% - 2px), 2px calc(100% - 2px), 2px calc(100% - 4px), 0 calc(100% - 4px),
+    0 4px, 2px 4px, 2px 2px, 4px 2px)
 }
 
 .area_titlenav a:hover {
-  background: #fff;
   text-decoration: none;
   transform: translateY(-2px);
-  box-shadow: 0 4px 0 rgba(85, 34, 0, .2)
+  filter: drop-shadow(0 4px 0 rgba(85, 34, 0, .25))
+}
+
+.area_titlenav a:hover::before {
+  background: #fff
 }
 
 .area_titlenav a:active {
   transform: translateY(1px);
-  box-shadow: 0 1px 0 rgba(85, 34, 0, .2)
+  filter: drop-shadow(0 1px 0 rgba(85, 34, 0, .25))
 }
 
 .area_titlenav a.on {
-  border-color: var(--accent, #0068da);
-  background: var(--accent, #0068da);
   color: #fff
+}
+
+.area_titlenav a.on::before {
+  background: var(--accent, #0068da)
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -335,13 +350,15 @@ address, caption, cite, code, dfn, em, var {
   }
 
   .area_titlenav a,
-  .area_menu .area_search {
+  .area_menu .area_search,
+  .area_head .area_profile .info_profile {
     transition: none
   }
 
   .area_titlenav a:hover,
   .area_titlenav a:active,
-  .area_menu .area_search:not(.on):hover {
+  .area_menu .area_search:not(.on):hover,
+  .area_head .area_profile:not(.on) .info_profile:hover {
     transform: none
   }
 }
@@ -414,36 +431,55 @@ address, caption, cite, code, dfn, em, var {
   justify-content: center;
   max-width: 250px;
   height: var(--ctl-h);
-  padding: 0 20px;
+  padding: 0 38px 0 20px;
   border: var(--ui-border-w, 1px) solid var(--glass-border);
   border-radius: var(--radius-pill, 999px);
   background: var(--glass);
-  box-shadow: var(--glass-shadow)
+  box-shadow: var(--glass-shadow);
+  transition: transform .1s, box-shadow .1s
+}
+
+.area_head .area_profile:not(.on) .info_profile:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 0 rgba(85, 34, 0, .2)
+}
+
+.area_head .area_profile.on .info_profile {
+  border-color: var(--accent, #0068da)
+}
+
+.area_head .btn_name::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: var(--radius-pill, 999px)
 }
 
 .area_head .btn_name {
-  font-size: 13px;
-  font-weight: var(--font-weight-bold, 700);
-  line-height: 17px;
-  color: var(--text-primary, #1a1a1a);
+  font-size: 11px;
+  line-height: 15px;
+  color: var(--text-secondary, #4d4d4d);
   text-align: left
 }
 
 .area_head .ico_name {
-  display: inline-block;
+  position: absolute;
+  top: 50%;
+  right: 16px;
   width: 10px;
   height: 6px;
-  margin: 6px 0 0 5px;
-  vertical-align: top;
+  margin-top: -3px;
   color: var(--text-secondary, #4d4d4d);
   transition: transform .15s
 }
 
 .area_head .txt_condition {
+  order: -1;
   width: 100%;
-  font-size: 11px;
-  line-height: 15px;
-  color: var(--text-secondary, #4d4d4d);
+  font-size: 13px;
+  font-weight: var(--font-weight-bold, 700);
+  line-height: 17px;
+  color: var(--text-primary, #1a1a1a);
   white-space: nowrap;
   text-overflow: ellipsis;
   overflow: hidden
@@ -452,18 +488,19 @@ address, caption, cite, code, dfn, em, var {
 .area_head .list_name {
   display: none;
   position: absolute;
-  top: calc(var(--ctl-h) + 4px);
-  left: 0;
-  border: 1px solid #dcdcdc;
-  border-radius: var(--radius-xs, 2px);
-  background-color: #fff
+  top: calc(var(--ctl-h) + 6px);
+  left: calc(-1 * var(--ui-border-w, 1px));
+  box-sizing: border-box;
+  min-width: calc(100% + 2 * var(--ui-border-w, 1px));
+  padding: 6px;
+  border: var(--ui-border-w, 1px) solid var(--glass-border);
+  border-radius: 16px;
+  background: var(--glass);
+  box-shadow: var(--glass-shadow)
 }
 
 .area_head .on .list_name {
-  display: block;
-  width: 112px;
-  padding-top: 13px;
-  padding-bottom: 2px
+  display: block
 }
 
 .area_head .on .ico_name {
@@ -472,21 +509,25 @@ address, caption, cite, code, dfn, em, var {
 
 .area_head .link_name {
   display: block;
-  padding-left: 15px;
-  margin-bottom: 7px;
+  padding: 6px 14px;
+  border-radius: 10px;
+  font-size: 13px;
+  line-height: 20px;
+  color: var(--text-primary, #1a1a1a);
   text-decoration: none;
-  color: var(--text-secondary, #4d4d4d)
+  white-space: nowrap
 }
 
 .area_head .link_name:hover {
-  text-decoration: underline;
-  color: var(--accent, #0068da)
+  background: rgba(0, 104, 218, .08);
+  color: var(--accent, #0068da);
+  text-decoration: none
 }
 
 .area_head .box_division {
-  padding-top: 13px;
-  border-top: 1px solid #f4f4f4;
-  margin-top: 9px
+  margin-top: 6px;
+  padding-top: 6px;
+  border-top: 1px solid var(--glass-border)
 }
 
 .area_menu {
@@ -929,6 +970,7 @@ address, caption, cite, code, dfn, em, var {
 
 .skin_view .tit_post {
   margin-top: 7px;
+  padding: 0 70px;
   font-size: 40px;
   font-weight: var(--font-weight-bold, 700);
   color: var(--text-primary, #1a1a1a);
@@ -1358,8 +1400,12 @@ address, caption, cite, code, dfn, em, var {
     display: none
   }
 
+  .area_head .area_profile.on .info_profile {
+    border-color: var(--glass-border)
+  }
+
   .area_head .btn_name {
-    line-height: 16px
+    line-height: 14px
   }
 
   .area_head .ico_name {
@@ -1368,7 +1414,7 @@ address, caption, cite, code, dfn, em, var {
 
   .area_head .txt_condition {
     width: auto;
-    line-height: 14px
+    line-height: 16px
   }
 
   .area_menu {
@@ -1499,7 +1545,7 @@ address, caption, cite, code, dfn, em, var {
 
   .skin_view .tit_post {
     margin-top: 3px;
-    padding: 0 8px;
+    padding: 0 5px;
     font-weight: var(--font-weight-bold, 700);
     font-size: 26px;
     line-height: 31px
