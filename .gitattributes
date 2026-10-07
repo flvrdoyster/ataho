@@ -1,4 +1,4 @@
-# dashboard/data/*.js 는 GitHub Actions(매일 07:00 KST)가 쓰는 기계 생성 파일이고
+# dashboard/data/*.js·dashboard/archive/*.json 은 GitHub Actions가 매일 쓰는 기계 생성 파일이고
 # 사람이 직접 고치지 않는다(ga4_dashboard.py 상단 주석 참조). 로컬 세션이 며칠
 # 전 지점에서 갈라져 기능을 쌓는 동안 워크플로우가 origin에 새 날짜를 커밋하면
 # git pull/머지 때 이 파일들에서만 충돌이 난다 — 매번 --ours 로 수동 해결해 왔다.
@@ -15,3 +15,4 @@
 # 따로 해야 한다). CI(GitHub Actions)는 매번 새로 체크아웃해 커밋만 하고 merge를
 # 하지 않으므로 이 설정이 필요 없다.
 dashboard/data/*.js merge=ours
+dashboard/archive/*.json merge=ours

@@ -214,7 +214,7 @@ def load_credentials():
 
 
 def report(client, target, *, dimensions=(), metrics, date_range, dimension_filter=None,
-           order_by=None, limit=None):
+           order_by=None, limit=None, offset=None):
     """run_report 한 번 → [{dim_name: str, metric_name: float}, ...] 로 평탄화.
 
     대상의 호스트 필터는 여기서 항상 AND로 붙는다 — 호출부가 빠뜨릴 수 없게.
@@ -242,6 +242,7 @@ def report(client, target, *, dimensions=(), metrics, date_range, dimension_filt
         dimension_filter=dimension_filter,
         order_bys=order_bys,
         limit=limit,
+        offset=offset,
     ))
 
     rows = []

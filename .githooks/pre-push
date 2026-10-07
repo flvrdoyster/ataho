@@ -46,6 +46,8 @@ while read -r local_ref local_sha remote_ref remote_sha; do
     path="dashboard/data/${name}.js"
     git show "${local_sha}:${path}" >"$TMPDIR/local_${name}.js" 2>/dev/null
     git show "${remote_sha}:${path}" >"$TMPDIR/remote_${name}.js" 2>/dev/null
+    git show "${local_sha}:dashboard/archive/${name}.json" >"$TMPDIR/local_${name}.archive.json" 2>/dev/null
+    git show "${remote_sha}:dashboard/archive/${name}.json" >"$TMPDIR/remote_${name}.archive.json" 2>/dev/null
   done
 
   python3 - "$TMPDIR" <<'PYEOF'
@@ -98,6 +100,16 @@ for name in ("ga4", "blog"):
     if lo and ro and lo < ro:
         blocked = True
         print(f"   {name}.js: 기준 날짜가 뒤로 감 — origin {ro} → 로컬 {lo}")
+
+    la, ra = tmp / f"local_{name}.archive.json", tmp / f"remote_{name}.archive.json"
+    try:
+        lost = sorted(set(json.loads(ra.read_text(encoding="utf-8")))
+                      - set(json.loads(la.read_text(encoding="utf-8"))))
+    except Exception:
+        lost = []
+    if lost:
+        blocked = True
+        print(f"   archive/{name}.json: origin에는 있는데 로컬엔 없는 날짜 — {lost[0]} 외 {len(lost) - 1}일")
 
 sys.exit(1 if blocked else 0)
 PYEOF

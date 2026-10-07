@@ -1,6 +1,7 @@
 User-agent: *
 Disallow: /blog/
 Disallow: /dashboard/data/
+Disallow: /dashboard/archive/
 Disallow: /scripts/
 
 Sitemap: https://atah.io/sitemap.xml

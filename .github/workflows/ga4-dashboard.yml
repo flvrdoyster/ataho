@@ -37,13 +37,20 @@ jobs:
           FEEDBACK_SHEET_ID: '10IdRL3n0wKav9TvPbS0kkm5Pq6fAaMxDNWauTNYy5cE'
         run: python scripts/ga4_dashboard.py
 
+      - name: Archive GA4 data
+        env:
+          GA4_SERVICE_ACCOUNT_JSON: ${{ secrets.GA4_SERVICE_ACCOUNT_JSON }}
+          GA4_PROPERTY_ID: '516513119'
+          GA4_BLOG_PROPERTY_ID: '549191220'
+        run: python scripts/ga4_archive.py
+
       # 페이지(dashboard/index.html·dashboard.css·dashboard.js)는 손으로 관리한다.
-      # 이 워크플로우는 data/ 아래 데이터 파일만 건드린다.
+      # 이 워크플로우는 data/·archive/ 아래 데이터 파일만 건드린다.
       - name: Commit and push
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add dashboard/data/
+          git add dashboard/data/ dashboard/archive/
           if git diff --cached --quiet; then
             echo "No changes to commit"
           else
