@@ -148,26 +148,152 @@ address, caption, cite, code, dfn, em, var {
   color: var(--accent, #0068da)
 }
 
-/* 고정 헤더(.area_head, 80px)를 비켜주는 여백은 .area_titlenav 가 지고
-   .cont_skin 은 0으로 둡니다 — 이제 헤더 바로 다음에 항상 .area_titlenav 가
-   오기 때문입니다(모바일·카테고리 레이어 열림 상태의 같은 짝은 각각의 규칙 참고). */
 .cont_skin {
   margin-top: 0
+}
+
+.area_banner {
+  margin-top: 80px;
+  border-bottom: var(--rule, 1px solid rgba(0, 0, 0, .1))
+}
+
+#tt-body-index .area_banner {
+  --ray-1: #ffff33;
+  --ray-2: #ffcc44;
+  --ray-3: #88bbff;
+  --ray-4: #ff66cc;
+  --ray-line: #dd6622;
+  background: conic-gradient(from 0deg at 50% calc(100% - 65px),
+    var(--ray-1) 0.00deg 5.22deg,
+    var(--ray-2) 5.22deg 11.25deg,
+    var(--ray-3) 11.25deg 14.33deg,
+    var(--ray-line) 14.33deg 14.70deg,
+    var(--ray-3) 14.70deg 19.98deg,
+    var(--ray-1) 19.98deg 25.30deg,
+    var(--ray-2) 25.30deg 30.94deg,
+    var(--ray-3) 30.94deg 37.17deg,
+    var(--ray-4) 37.17deg 39.52deg,
+    var(--ray-line) 39.52deg 39.93deg,
+    var(--ray-4) 39.93deg 40.40deg,
+    var(--ray-2) 40.40deg 46.07deg,
+    var(--ray-1) 46.07deg 52.61deg,
+    var(--ray-3) 52.61deg 60.37deg,
+    var(--ray-4) 60.37deg 61.75deg,
+    var(--ray-line) 61.75deg 62.15deg,
+    var(--ray-4) 62.15deg 62.93deg,
+    var(--ray-1) 62.93deg 67.04deg,
+    var(--ray-2) 67.04deg 69.58deg,
+    var(--ray-4) 69.58deg 77.46deg,
+    var(--ray-3) 77.46deg 78.16deg,
+    var(--ray-line) 78.16deg 78.41deg,
+    var(--ray-3) 78.41deg 84.47deg,
+    var(--ray-1) 84.47deg 86.64deg,
+    var(--ray-4) 86.64deg 95.81deg,
+    var(--ray-3) 95.81deg 103.04deg,
+    var(--ray-line) 103.04deg 103.48deg,
+    var(--ray-3) 103.48deg 104.84deg,
+    var(--ray-1) 104.84deg 111.56deg,
+    var(--ray-2) 111.56deg 118.00deg,
+    var(--ray-4) 118.00deg 118.31deg,
+    var(--ray-line) 118.31deg 118.74deg,
+    var(--ray-4) 118.74deg 121.03deg,
+    var(--ray-3) 121.03deg 123.00deg,
+    var(--ray-1) 123.00deg 128.79deg,
+    var(--ray-2) 128.79deg 131.10deg,
+    var(--ray-3) 131.10deg 134.37deg,
+    var(--ray-4) 134.37deg 138.03deg,
+    var(--ray-1) 138.03deg 140.11deg,
+    var(--ray-2) 140.11deg 142.66deg,
+    var(--ray-line) 142.66deg 143.00deg,
+    var(--ray-2) 143.00deg 145.42deg,
+    var(--ray-3) 145.42deg 150.56deg,
+    var(--ray-1) 150.56deg 158.68deg,
+    var(--ray-4) 158.68deg 164.40deg,
+    var(--ray-3) 164.40deg 169.57deg,
+    var(--ray-line) 169.57deg 169.93deg,
+    var(--ray-3) 169.93deg 171.02deg,
+    var(--ray-1) 171.02deg 176.60deg,
+    var(--ray-4) 176.60deg 183.39deg,
+    var(--ray-3) 183.39deg 187.30deg,
+    var(--ray-line) 187.30deg 187.55deg,
+    var(--ray-3) 187.55deg 188.65deg,
+    var(--ray-2) 188.65deg 192.57deg,
+    var(--ray-1) 192.57deg 201.85deg,
+    var(--ray-3) 201.85deg 211.12deg,
+    var(--ray-2) 211.12deg 219.23deg,
+    var(--ray-1) 219.23deg 219.43deg,
+    var(--ray-line) 219.43deg 219.73deg,
+    var(--ray-1) 219.73deg 226.35deg,
+    var(--ray-3) 226.35deg 230.55deg,
+    var(--ray-2) 230.55deg 231.45deg,
+    var(--ray-line) 231.45deg 231.86deg,
+    var(--ray-2) 231.86deg 234.12deg,
+    var(--ray-4) 234.12deg 238.13deg,
+    var(--ray-3) 238.13deg 240.51deg,
+    var(--ray-2) 240.51deg 248.07deg,
+    var(--ray-1) 248.07deg 252.91deg,
+    var(--ray-4) 252.91deg 253.67deg,
+    var(--ray-line) 253.67deg 254.08deg,
+    var(--ray-4) 254.08deg 261.06deg,
+    var(--ray-2) 261.06deg 265.80deg,
+    var(--ray-3) 265.80deg 274.78deg,
+    var(--ray-1) 274.78deg 276.02deg,
+    var(--ray-line) 276.02deg 276.40deg,
+    var(--ray-1) 276.40deg 282.94deg,
+    var(--ray-2) 282.94deg 284.81deg,
+    var(--ray-4) 284.81deg 288.22deg,
+    var(--ray-1) 288.22deg 296.85deg,
+    var(--ray-2) 296.85deg 302.21deg,
+    var(--ray-3) 302.21deg 308.64deg,
+    var(--ray-line) 308.64deg 308.89deg,
+    var(--ray-3) 308.89deg 311.36deg,
+    var(--ray-1) 311.36deg 316.17deg,
+    var(--ray-2) 316.17deg 318.58deg,
+    var(--ray-4) 318.58deg 322.26deg,
+    var(--ray-line) 322.26deg 322.55deg,
+    var(--ray-4) 322.55deg 325.12deg,
+    var(--ray-3) 325.12deg 332.77deg,
+    var(--ray-1) 332.77deg 336.63deg,
+    var(--ray-4) 336.63deg 339.14deg,
+    var(--ray-2) 339.14deg 343.47deg,
+    var(--ray-1) 343.47deg 352.50deg,
+    var(--ray-3) 352.50deg 353.55deg,
+    var(--ray-line) 353.55deg 354.00deg,
+    var(--ray-3) 354.00deg 360.00deg)
+}
+
+.area_hero {
+  display: none;
+  padding: 8px max(15px, calc(50% - 410px)) 0;
+  overflow: hidden
+}
+
+#tt-body-index .area_hero {
+  display: flex;
+  justify-content: center
+}
+
+.hero_img {
+  display: block;
+  flex: none;
+  width: 400px;
+  height: auto;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges
 }
 
 .area_titlenav {
   display: flex;
   flex-wrap: wrap;
+  justify-content: center;
   gap: 8px;
-  margin-top: 80px;
-  padding: 14px max(15px, calc(50% - 410px));
-  border-bottom: var(--rule, 1px solid rgba(0, 0, 0, .1))
+  padding: 14px max(15px, calc(50% - 410px))
 }
 
 .area_titlenav a {
   padding: 6px 14px;
   border-radius: var(--radius-pill, 999px);
-  background: rgba(0, 104, 218, .08);   /* --accent 의 옅은 틴트 */
+  background: rgba(0, 104, 218, .08);
   color: var(--accent, #0068da);
   font-size: 13px;
   font-weight: var(--font-weight-bold, 700);
@@ -180,29 +306,12 @@ address, caption, cite, code, dfn, em, var {
   text-decoration: none
 }
 
-/* 홈 히어로 밴드 — 텍스트 없이 이미지 하나. 기본은 숨김, #tt-body-index(홈)에서만
-   보이게 아래서 풀어줌(다른 페이지는 body id 가 다름 — tt-body-page/-tag/-guestbook
-   등, 실측 확인함). 배경 틴트는 이미지가 아직 없거나 로딩 전에도 빈 흰 배경으로
-   뚝 끊기지 않게 하는 안전망 겸, 이미지 로드 후엔 살짝 보이는 프레임 역할. */
-.area_hero {
-  display: none;
-  padding: 24px max(15px, calc(50% - 410px));
-  text-align: center;
-  background: linear-gradient(180deg, #eef3fa, #fff)
+#tt-body-index .area_titlenav a {
+  background: rgba(255, 255, 255, .9)
 }
 
-#tt-body-index .area_hero {
-  display: block
-}
-
-.hero_img {
-  display: inline-block;
-  max-width: 100%;
-  max-height: 260px;
-  width: auto;
-  height: auto;
-  image-rendering: pixelated;
-  image-rendering: crisp-edges
+#tt-body-index .area_titlenav a:hover {
+  background: #fff
 }
 
 .article_skin {
@@ -241,18 +350,6 @@ address, caption, cite, code, dfn, em, var {
   text-indent: -9999px
 }
 
-/* ── 인라인 아이콘 공통 ───────────────────────────────────────────────
-   스킨이 그리는 SVG 아이콘(메뉴·화살표·돋보기·닫기·페이징)의 선 두께와 마감을
-   여기 한 곳에서 관리합니다. 개별 SVG 에는 stroke-width 를 쓰지 않습니다 —
-   예전엔 아이콘마다 1.3 / 1.4 / 1.6 / 1.8 / 2 로 제각각이었습니다.
-
-   전제: 모든 아이콘은 viewBox 를 표시 크기와 1:1 로 맞춥니다(10×6 아이콘은
-   10×6 px 로 표시). 그래야 user unit 1 = 1px 이라 어느 아이콘에서든 같은
-   굵기로 보입니다. 새 아이콘을 추가할 때도 이 규칙을 지켜 주세요.
-
-   .ico_box 는 아이콘 안의 '상자'(햄버거 바깥 틀, 페이징 원)에 붙입니다.
-   옆에 놓이는 실제 버튼 테두리(.btn_cate, .area_search)와 같은 두께라야
-   나란히 뒀을 때 따로 놀지 않습니다. */
 .ico {
   fill: none;
   stroke: currentColor;
@@ -299,19 +396,12 @@ address, caption, cite, code, dfn, em, var {
 .area_head .area_profile {
   position: relative;
   float: left;
-  padding: 15px 0 0 max(30px, calc(50% - 410px))
+  padding: 17px 0 0 max(30px, calc(50% - 410px))
 }
 
-.area_head .area_profile .link_profile {
-  float: left
-}
-
-/* 200px 상한은 가운데 카테고리 제목의 자리를 확보하려는 것입니다 —
-   프로필 오른쪽 끝이 중앙 -144px 을 넘지 않아야 제목이 정중앙을 유지할 수 있습니다
-   (칼럼 왼쪽 -410 + 사진 50 + 여백 16 + 200 = -144). 넘치는 소개글은 말줄임 처리됩니다. */
 .area_head .area_profile .info_profile {
   float: left;
-  max-width: 200px;
+  max-width: 266px;
   /* 이름 드롭다운(.list_name)의 기준점. 예전엔 .area_profile 기준에 left:92px 로
      고정돼 있었는데, .area_profile 의 좌측 padding 이 화면 폭에 따라 변하게 되면서
      드롭다운만 제자리에 남아 어긋났습니다. 이름 블록 자체를 기준으로 삼으면
@@ -454,114 +544,6 @@ address, caption, cite, code, dfn, em, var {
   color: var(--text-primary, #1a1a1a)
 }
 
-.area_menu .area_navi {
-  display: inline-block;
-  position: relative;
-  margin: 0 2px 0 3px
-}
-
-.area_menu .btn_cate {
-  width: 160px;
-  height: 38px;
-  border: var(--ui-border-w, 1px) solid var(--accent, #0068da);
-  border-radius: var(--radius-sm, 4px);
-  font-weight: var(--font-weight-bold, 700);
-  font-size: 12px;
-  line-height: 38px;
-  color: var(--accent, #0068da);
-  padding: 0 1px 0 5px
-}
-
-.btn_close {
-  display: none
-}
-
-.area_menu .ico_cate {
-  display: inline-block;
-  width: 10px;
-  height: 6px;
-  margin: -2px 0 0 53px;
-  color: var(--accent, #0068da);
-  vertical-align: middle;
-  transition: transform .15s
-}
-
-.area_menu .list_cate {
-  display: none;
-  position: absolute;
-  top: 37px;
-  left: 0;
-  width: 158px;
-  padding: 18px 0 10px;
-  border: var(--ui-border-w, 1px) solid var(--accent, #0068da);
-  border-radius: 0 0 var(--radius-sm, 4px) var(--radius-sm, 4px);
-  background-color: #fff
-}
-
-.area_menu .on .list_cate {
-  display: block
-}
-
-.area_menu .on .ico_cate {
-  transform: rotate(180deg);
-}
-
-.area_menu .link_cate {
-  display: block;
-  padding-left: 17px;
-  margin-bottom: 12px;
-  font-size: 12px;
-  color: var(--text-primary, #1a1a1a)
-}
-
-.area_navi .list_cate ul li {
-  line-height: 18px
-}
-
-.area_navi .list_cate ul li a {
-  display: block;
-  padding-left: 17px;
-  margin-bottom: 12px;
-  font-size: 12px;
-  color: var(--text-primary, #1a1a1a);
-  height: 17px
-}
-
-.area_navi .list_cate ul li.selected>a,
-.area_navi .list_cate ul li a:hover {
-  text-decoration: underline;
-  color: var(--accent, #0068da)
-}
-
-.area_navi .list_cate .c_cnt, .area_navi .list_cate img {
-  display: none
-}
-
-.area_navi .list_cate ul li ul li ul {
-  padding-bottom: 6px;
-  margin-top: -6px
-}
-
-.area_navi .list_cate ul li ul li ul li {
-  color: var(--text-muted, #767676);
-  padding-left: 21px
-}
-
-.area_navi .list_cate ul li ul li ul li a {
-  padding-left: 0;
-  margin-bottom: 6px;
-  font-size: 12px;
-  color: var(--text-secondary, #4d4d4d)
-}
-
-.area_navi .list_cate ul li ul li ul li a::before {
-  content: '· '
-}
-
-.area_navi .list_cate .menu_profile {
-  display: none
-}
-
 /* 목록 페이지 카테고리 제목 — 헤더 가운데.
    헤더 좌우를 본문 칼럼(±410px)에 맞추면서 메뉴가 안쪽(중앙 +187px)으로 들어왔기
    때문에, 예전처럼 width:50%(중앙 ±25%)로 두면 긴 카테고리명이 메뉴 밑으로 깔립니다.
@@ -598,20 +580,6 @@ address, caption, cite, code, dfn, em, var {
 
 .tit_category .link_category:hover {
   text-decoration: none
-}
-
-.dimmed_layer {
-  position: fixed;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  display: none;
-  z-index: 30
-}
-
-.area_head .btn_menu {
-  display: none
 }
 
 /* 푸터 */
@@ -1616,17 +1584,9 @@ address, caption, cite, code, dfn, em, var {
   }
 
   .area_head .area_profile .info_profile {
-    max-width: 180px
+    max-width: 228px
   }
 
-  .area_head .img_profile {
-    margin-right: 8px
-  }
-
-  /* 좁은 화면에서는 데스크탑용 좌우 한계(중앙 ±144px)를 되돌립니다. 그 값은
-     프로필 이름과 오른쪽 메뉴가 헤더에 함께 놓인 데스크탑 기하에서 나온 것인데,
-     여기서는 메뉴가 서랍으로 빠지고 목록 페이지(#tt-body-category 등)에서는
-     프로필 이름·소개도 숨겨져(아래 규칙) 아바타만 남습니다. */
   .area_list .tit_category {
     left: 25%;
     right: auto;
@@ -1662,153 +1622,30 @@ address, caption, cite, code, dfn, em, var {
   }
 
   .area_menu {
-    display: none;
-    right: 0;
-    top: 0;
-    bottom: 0;
-    overflow-y: auto;
-    overflow-x: hidden;
-    width: 200px;
-    background-color: #fff
+    top: 12px;
+    right: 15px
   }
 
-  .area_menu .area_search {
-    display: none;
-    width: 168px;
-    height: 30px;
-    margin: 15px 0 0 15px;
-    border: 1px solid #dcdcdc;
-    border-radius: 31px
+  .area_menu .on.area_search {
+    position: fixed;
+    top: 12px;
+    left: 15px;
+    right: 15px;
+    margin: 0;
+    background: #fff
   }
 
-  .area_menu .frm_search {
-    width: 168px;
-    height: 30px
+  .area_menu .on .frm_search {
+    width: auto
   }
 
-  .area_menu .lab_search {
-    margin: 8px 0 0 16px;
-  }
-
-  .area_menu .tf_search {
-    width: 115px;
-    margin: 7px 0 3px 8px;
+  .area_menu .on .tf_search {
+    width: calc(100% - 52px);
     outline: none
   }
 
-  .dimmed_layer {
-    background-color: #000;
-    opacity: 0.7
-  }
-
-  .area_menu .btn_search {
-    display: none
-  }
-
-  .area_menu .area_navi {
-    display: block;
-    position: static;
-    margin: 0
-  }
-
-  .area_head .btn_menu {
-    display: block;
-    overflow: hidden;
-    position: absolute;
-    right: 15px;
-    top: 0;
-    width: 40px;
-    height: 35px;
-    margin-top: 13px;
-    border: 0 none
-  }
-
-  .area_head .ico_menu {
-    display: block;
-    width: 40px;
-    height: 31px;
-    margin: 0;
-    color: var(--accent, #0068da);
-  }
-
-  .area_menu .btn_cate {
-    display: none
-  }
-
-  .area_menu .list_cate {
-    position: static;
-    width: 200px;
-    padding: 13px 0 15px;
-    border: 0 none;
-    border-radius: 0
-  }
-
-  .area_navi .list_cate ul li {
-    line-height: 18px
-  }
-
-  .area_navi .list_cate ul li a {
-    margin-bottom: 0;
-    padding: 7px 0 15px 30px;
-    font-size: 15px;
-    line-height: 22px;
-    font-family: var(--font-ui, 'KoddiUDOnGothic', sans-serif);
-    font-weight: var(--font-weight-bold, 700)
-  }
-
-  .area_navi .list_cate ul li ul li a {
-    padding: 4px 0 15px 30px
-  }
-
-  .area_navi .list_cate ul li ul li ul {
-    padding-bottom: 3px;
-    margin-top: -3px
-  }
-
-  .area_navi .list_cate ul li ul li ul li {
-    padding-left: 0;
-    list-style: none;
-    margin-bottom: 1px
-  }
-
-  .area_navi .list_cate ul li ul li ul li a {
-    margin-bottom: 0;
-    padding: 4px 0 11px 37px;
-    font-size: 15px;
-    font-family: var(--font-ui, 'KoddiUDOnGothic', sans-serif);
-    font-weight: normal;
-  }
-
-  .area_navi .list_cate ul li ul li ul li a::before {
-    content: '· '
-  }
-
-  .area_navi .list_cate .menu_profile {
-    display: block;
-    margin-top: 14px;
-    padding-top: 20px;
-    border-top: 1px solid #e5e5e5
-  }
-
-  .btn_close {
-    position: fixed;
-    right: 210px;
-    top: 11px;
-    width: 30px;
-    height: 30px;
-    z-index: 31
-  }
-
-  .on .btn_close {
-    display: block
-  }
-
-  .ico_close {
-    display: inline-block;
-    width: 18px;
-    height: 18px;
-    color: var(--text-secondary, #4d4d4d);
-    vertical-align: middle
+  #dkWrap:has(.area_search.on) .area_profile {
+    visibility: hidden
   }
 
   /* 푸터 */
@@ -2425,8 +2262,15 @@ address, caption, cite, code, dfn, em, var {
     margin-top: 0
   }
 
+  .area_banner {
+    margin-top: 63px
+  }
+
+  .area_hero {
+    padding: 4px 0 0
+  }
+
   .area_titlenav {
-    margin-top: 63px;
     padding: 12px 15px;
     gap: 6px
   }
@@ -2434,14 +2278,6 @@ address, caption, cite, code, dfn, em, var {
   .area_titlenav a {
     padding: 5px 12px;
     font-size: 12px
-  }
-
-  .area_hero {
-    padding: 16px 15px
-  }
-
-  .hero_img {
-    max-height: 160px
   }
 
   #tt-body-search .area_head .btn_name,
@@ -2525,52 +2361,6 @@ address, caption, cite, code, dfn, em, var {
   .skin_tag .list_tag {
     overflow: hidden;
     padding: 30px 20px 90px
-  }
-
-  /* 카테고리 레이어 활성화 */
-  .layer_on {
-    overflow: hidden
-  }
-
-  /* 카테고리 레이어가 열리면 뒤 콘텐츠는 overflow:hidden 으로 스크롤이 잠기고
-     안 보입니다 — .area_titlenav 의 margin-top:63px 가 이미 자리를 잡아주므로
-     여기서 padding-top 을 더 얹을 필요가 없습니다(예전엔 61px 를 더해 63px 와
-     거의 같은 값을 흉내 냈는데, 지금은 진짜 63px 를 쓰고 있어 그 값이 필요 없음). */
-  .layer_on .cont_skin {
-    margin-top: 0;
-    padding-top: 0
-  }
-
-  .layer_on .dimmed_layer {
-    display: block
-  }
-
-  .layer_on .area_head .btn_menu {
-    display: none
-  }
-
-  .layer_on .area_menu {
-    display: block
-  }
-
-  .layer_on .area_menu .area_search {
-    display: block
-  }
-
-  .layer_on .area_menu .area_search {
-    display: block
-  }
-
-  .layer_on .area_menu .frm_search {
-    display: block
-  }
-
-  .layer_on .area_menu .list_cate {
-    display: block
-  }
-
-  .layer_on .btn_close {
-    display: block
   }
 }
 

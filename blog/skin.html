@@ -54,8 +54,6 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       <div id="dkHead" role="banner" class="area_head ">
         <h1 class="screen_out">[##_title_##]</h1>
         <div class="area_profile ">
-          <a class="link_profile" href="/"><img src="[##_image_##]" width="50" height="50" class="img_profile"
-              alt="프로필사진"></a>
           <div class="info_profile">
             <button type="button" class="btn_name">[##_blogger_##]
               <svg class="ico ico_name" viewBox="0 0 10 6" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"
@@ -73,27 +71,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             <p class="txt_condition">[##_title_##]</p>
           </div>
         </div>
-
-        <button type="button" class="btn_menu" aria-label="카테고리 메뉴열기">
-          <svg class="ico ico_menu" viewBox="0 0 40 31" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"
-            focusable="false">
-            <rect class="ico_box" x="0.5" y="0.5" width="39" height="30" rx="4" />
-            <line x1="11" y1="11" x2="29" y2="11" />
-            <line x1="11" y1="15.5" x2="29" y2="15.5" />
-            <line x1="11" y1="20" x2="29" y2="20" />
-          </svg>
-        </button>
       </div>
-
-      <div class="dimmed_layer"></div>
-
-      <button type="button" class="btn_close" aria-label="닫기">
-        <svg class="ico ico_close" viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"
-          focusable="false">
-          <line x1="4" y1="4" x2="14" y2="14" />
-          <line x1="14" y1="4" x2="4" y2="14" />
-        </svg>
-      </button>
 
       <div class="area_menu">
         <s_search>
@@ -121,50 +99,21 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             </form>
           </div>
         </s_search>
-
-        <div role="navigation" class="area_navi">
-          <button type="button" class="btn_cate">CATEGORY
-            <svg class="ico ico_cate" viewBox="0 0 10 6" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"
-              focusable="false">
-              <path d="M1.5 1 L5 5.2 L8.5 1" />
-            </svg>
-          </button>
-
-          <div class="list_cate">
-            [##_category_list_##]
-
-            <ul class="menu_profile">
-              <li><a href="[##_guestbook_link_##]">방명록</a></li>
-            </ul>
-          </div>
-        </div>
       </div>
 
-      <!-- 작품별 태그 내비게이션. s_* 블록 밖(#dkWrap 직계)이라 홈·목록·글·태그
-           페이지 어디서든 항상 나옵니다. 티스토리 skin.html은 조건부 merge tag가
-           없어서 이 목록은 직접 관리합니다 — 새 작품 글을 시작하면 여기 한 줄
-           추가해 주세요. 링크는 /tag/작품명(태그 목록 페이지, 티스토리 기본 제공)
-           그대로입니다. -->
-      <nav class="area_titlenav" aria-label="작품별로 보기">
-        <a href="/tag/환세희담">환세희담</a>
-        <a href="/tag/환세풍광전">환세풍광전</a>
-        <a href="/tag/환세쾌도전">환세쾌도전</a>
-        <a href="/tag/환세포물장">환세포물장</a>
-        <a href="/tag/환세취호전">환세취호전</a>
-        <a href="/tag/환세패유기">환세패유기</a>
-      </nav>
-
-      <!-- 홈 히어로 밴드 — 텍스트 없이 이미지 하나만. 홈(#tt-body-index)에서만
-           보이도록 skin.css 에서 처리(다른 페이지 body id 는 다름 — 실측 확인함:
-           글 tt-body-page, 태그 tt-body-tag, 방명록 tt-body-guestbook).
-           .area_titlenav(작품 태그칩)는 그대로 모든 페이지에 유지, 이 밴드는
-           그 아래·아티클 목록 위에 별도로 얹음.
-           이미지(hero.psd → 웹용 export → images/ 업로드)가 아직 준비 전이라
-           <img> 는 주석 처리해뒀습니다 — 이대로 적용하면 깨진 이미지 아이콘 대신
-           옅은 그라데이션 배경만 있는 빈 밴드로 보입니다. 이미지 준비되면
-           아래 주석을 풀고 src 경로를 실제 파일명으로 맞추세요. -->
-      <div class="area_hero">
-        <!-- <img src="./images/hero.png" alt="" class="hero_img"> -->
+      <div class="area_banner">
+        <nav class="area_titlenav" aria-label="작품별로 보기">
+          <a href="/">전체</a>
+          <a href="/tag/환세희담">환세희담</a>
+          <a href="/tag/환세풍광전">환세풍광전</a>
+          <a href="/tag/환세쾌도전">환세쾌도전</a>
+          <a href="/tag/환세포물장">환세포물장</a>
+          <a href="/tag/환세취호전">환세취호전</a>
+          <a href="/tag/환세패유기">환세패유기</a>
+        </nav>
+        <div class="area_hero">
+          <img src="./images/hero.png" alt="" class="hero_img">
+        </div>
       </div>
 
       <hr class="hide">
@@ -437,7 +386,6 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             </div>
           </s_paging>
 
-
           <div id="mEtc" class="wrap_etc">
             <div class="inner_aside">
               <s_sidebar>
@@ -466,7 +414,6 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                   </s_rct_notice>
                 </s_sidebar_element>
 
-
                 <s_sidebar_element>
                   <!-- 최근에 올라온 글 -->
                   <div class="box_aside">
@@ -479,8 +426,6 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                   </div>
                 </s_sidebar_element>
 
-
-
                 <s_sidebar_element>
                   <!-- 최근에 달린 댓글 -->
                   <div class="box_aside">
@@ -492,7 +437,6 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     </ul>
                   </div>
                 </s_sidebar_element>
-
 
                 <s_sidebar_element>
                   <!-- 방문자수 -->
@@ -512,7 +456,6 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                   </div>
                 </s_sidebar_element>
 
-
                 <s_sidebar_element>
                   <!-- 링크 -->
                   <div class="box_aside">
@@ -524,7 +467,6 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     </ul>
                   </div>
                 </s_sidebar_element>
-
 
                 <s_sidebar_element>
                   <!-- 태그 클라우드 -->
