@@ -166,12 +166,12 @@
     if (staleDays >= 2) {
         nav.insertAdjacentHTML('beforebegin',
             `<p class="reminder"><b>데이터가 ${fmt(staleDays)}일째 갱신되지 않았습니다</b>` +
-            '<span class="dim">GitHub Actions의 GA4 Daily Dashboard 실행 기록을 확인하세요</span></p>');
+            '<span class="dim">GitHub Actions의 ga4-dashboard 실행 기록을 확인하세요</span></p>');
     }
 
     if (!views.length) {
         panelRoot.innerHTML = '<p class="empty">아직 수집된 데이터가 없습니다.' +
-            '<br>GitHub Actions의 <b>GA4 Daily Dashboard</b> 워크플로우가 한 번 돌면 채워집니다.</p>';
+            '<br>GitHub Actions의 <b>ga4-dashboard</b> 워크플로우가 한 번 돌면 채워집니다.</p>';
         return;
     }
 

@@ -1,8 +1,8 @@
-name: GA4 Daily Dashboard
+name: ga4-dashboard
 
 on:
   schedule:
-    - cron: '13 21 * * *'   # 매일 06:13 KST (UTC 21:13)
+    - cron: '0 22 * * *'   # 매일 07:00 KST (UTC 22:00)
   workflow_dispatch: {}
 
 permissions:
