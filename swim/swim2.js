@@ -9,6 +9,16 @@
 
     // 캐릭터의 움직임 속도를 한 번에 조절하는 변수입니다. 원하는 값으로 변경해 보세요.
     const movementSpeed = 2;
+    const DROWN_PANEL_DELAY = 1500;
+
+    const gameOverOverlay = document.getElementById('game-over-overlay');
+    const gameOverMenu = new UIKeyboardMenu(
+        document.getElementById('game-over-panel'),
+        document.getElementById('game-over-cursor'),
+        [document.getElementById('btn-continue'), document.getElementById('btn-home')]
+    );
+    document.getElementById('btn-continue').addEventListener('click', () => resetCharacter());
+    document.getElementById('btn-home').addEventListener('click', () => { window.location.href = '../index.html'; });
 
     // 이미지 경로를 배열로 관리하여 코드를 간결하게 만듭니다.
     const imagePaths = [
@@ -25,12 +35,14 @@
         return new Promise(resolve => {
             imagePaths.forEach(path => {
                 const img = new Image();
-                img.onload = () => {
+                const done = () => {
                     imagesLoaded++;
                     if (imagesLoaded === imagePaths.length) {
                         resolve();
                     }
                 };
+                img.onload = done;
+                img.onerror = done;
                 img.src = path;
                 const fileName = path.split('.')[0];
                 images[fileName] = img;
@@ -103,6 +115,7 @@
         drown: 0
     };
     let drownStartTime = null;
+    let lastTimestamp = 0;
 
     // ✨ 마지막 수평 방향을 기억하기 위한 변수
     let lastHorizontalDirection = 'right';
@@ -111,27 +124,35 @@
     let swimBoost = 0;
 
     // 게임 루프 (`byFrame`): 매 프레임마다 호출됩니다.
-    function byFrame() {
+    function byFrame(timestamp) {
         requestAnimationFrame(byFrame);
+
+        // 60fps 기준으로 정규화한 프레임 배율. 탭 복귀 직후 급발진 방지로 3 상한.
+        const dt = (lastTimestamp > 0 && timestamp > 0)
+            ? Math.min((timestamp - lastTimestamp) / (1000 / 60), 3)
+            : 1;
+        lastTimestamp = timestamp || 0;
 
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
         if (isDrowned) {
             ataho.state = 'drown';
-            timer.drown++;
+            timer.drown += dt;
 
-            if (Date.now() - drownStartTime >= 3000) {
-                resetCharacter();
+            if (gameOverOverlay.hidden && Date.now() - drownStartTime >= DROWN_PANEL_DELAY) {
+                gameOverOverlay.hidden = false;
+                gameOverMenu.enable();
+                gameOverMenu.selectFirst();
             }
         } else {
             // 이동 속도 보정
             const isDiagonal = (inputState.up || inputState.down) && (inputState.left || inputState.right);
             // 기본 속도 + 부스트 속도 적용
-            const currentSpeed = (movementSpeed + swimBoost);
+            const currentSpeed = (movementSpeed + swimBoost) * dt;
             const speed = isDiagonal ? currentSpeed * 0.707 : currentSpeed;
 
             // 부스트 감소 (매 프레임마다 5%씩 감소)
-            swimBoost *= 0.95;
+            swimBoost *= Math.pow(0.95, dt);
             if (swimBoost < 0.1) swimBoost = 0;
 
             // 캐릭터의 다음 위치를 미리 계산합니다.
@@ -153,7 +174,7 @@
             if (distance > 0) {
                 // 거리가 가까울수록 더 강하게 끌어당김 (최대 속도 제한)
                 // 기존 300/distance -> 500/distance로 강화, 최대 속도 4 -> 6으로 증가
-                const pullSpeed = Math.min(6, 500 / distance);
+                const pullSpeed = Math.min(6, 500 / distance) * dt;
                 nextX += (dx / distance) * pullSpeed;
                 nextY += (dy / distance) * pullSpeed;
             }
@@ -169,25 +190,25 @@
             if (inputState.right) {
                 nextX += speed;
                 ataho.state = 'swim_right';
-                timer.swim++;
+                timer.swim += dt;
                 lastHorizontalDirection = 'right'; // 마지막 수평 방향 업데이트
             } else if (inputState.left) {
                 nextX -= speed;
                 ataho.state = 'swim_left';
-                timer.swim++;
+                timer.swim += dt;
                 lastHorizontalDirection = 'left'; // 마지막 수평 방향 업데이트
             }
             // ✨ 좌우 움직임은 없지만 상하 움직임이 있을 때
             else if (inputState.up || inputState.down) {
                 // 마지막 수평 방향으로 수영 애니메이션 유지
                 ataho.state = 'swim_' + lastHorizontalDirection;
-                timer.swim++;
+                timer.swim += dt;
             }
             // ✨ 모든 움직임이 없을 때
             else {
                 // 마지막 수평 방향에 따라 idle 상태 설정
                 ataho.state = 'idle_' + lastHorizontalDirection;
-                timer.idle++;
+                timer.idle += dt;
             }
 
             // 경계 충돌을 확인하고, 벗어나지 않는 경우에만 위치를 업데이트합니다.
@@ -201,21 +222,9 @@
 
         whirlpool.draw();
 
-        // Game Over 화면 표시 (소용돌이 위, 캐릭터 아래)
-        if (isDrowned) {
-            ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-            ctx.font = '48px "DungGeunMo", sans-serif';
-            ctx.fillStyle = 'white';
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
-            ctx.fillText('GAME OVER', canvas.width / 2, canvas.height / 2);
-        }
-
         ataho.draw();
 
-        checkCollision(ataho, whirlpool);
+        if (!isDrowned) checkCollision(ataho, whirlpool);
     }
 
     // 충돌 체크 함수
@@ -229,18 +238,19 @@
         const isCollidingY = playerBottom > obstacle.y && player.y < obstacleBottom;
 
         if (isCollidingX && isCollidingY) {
-            if (!isDrowned) {
-                isDrowned = true;
-                drownStartTime = Date.now();
-            }
-        } else {
-            isDrowned = false;
+            isDrowned = true;
+            drownStartTime = Date.now();
+            timer.drown = 0;
         }
     }
 
     // 키보드 이벤트 리스너
     document.addEventListener('keydown', (e) => {
         if (e.repeat) return;
+        if (e.code === 'Enter') {
+            if (!isDrowned) resetCharacter();
+            return;
+        }
         if (isDrowned) return;
 
         // 이동 키를 누를 때마다 부스트 증가 (최대 5)
@@ -266,9 +276,6 @@
             case 'ArrowRight':
                 inputState.right = true;
                 break;
-            case 'Enter':
-                resetCharacter();
-                break;
         }
     });
 
@@ -293,13 +300,18 @@
         }
     });
 
+    function clearInput() {
+        Object.keys(inputState).forEach(key => inputState[key] = false);
+    }
+
     // 터치 이벤트 리스너
     canvas.addEventListener('touchstart', (e) => {
         e.preventDefault();
         if (isDrowned) return;
 
-        const touchX = e.touches[0].clientX;
-        const touchY = e.touches[0].clientY;
+        const rect = canvas.getBoundingClientRect();
+        const touchX = (e.touches[0].clientX - rect.left) * (canvas.width / rect.width);
+        const touchY = (e.touches[0].clientY - rect.top) * (canvas.height / rect.height);
 
         const characterCenterX = ataho.x + ataho.width / 2;
         const characterCenterY = ataho.y + ataho.height / 2;
@@ -319,9 +331,9 @@
         }
     });
 
-    canvas.addEventListener('touchend', (e) => {
-        Object.keys(inputState).forEach(key => inputState[key] = false);
-    });
+    canvas.addEventListener('touchend', clearInput);
+    canvas.addEventListener('touchcancel', clearInput);
+    window.addEventListener('blur', clearInput);
 
     // 소용돌이 위치 랜덤 설정 함수
     function setRandomWhirlpoolPosition() {
@@ -342,7 +354,9 @@
         ataho.y = 250;
         isDrowned = false;
         drownStartTime = null;
-        Object.keys(inputState).forEach(key => inputState[key] = false);
+        gameOverOverlay.hidden = true;
+        gameOverMenu.disable();
+        clearInput();
         // 마지막 수평 방향 초기화
         lastHorizontalDirection = 'right';
 
@@ -350,19 +364,10 @@
         setRandomWhirlpoolPosition();
     }
 
-    // 폰트 로딩 함수 (캔버스 fillText는 CSS @font-face 선언만으로는 로드가 보장 안 돼서
-    // 게임 시작 전에 명시적으로 fetch+등록해야 함 — world/ui/DungGeunMo.woff2 자체 서빙)
-    function loadFonts() {
-        const font = new FontFace('DungGeunMo', 'url(../world/ui/DungGeunMo.woff2)');
-        return font.load().then(loadedFont => {
-            document.fonts.add(loadedFont);
-        });
-    }
-
-    // 모든 이미지와 폰트 로드가 완료되면 게임을 시작합니다.
-    Promise.all([loadImages(), loadFonts()]).then(() => {
+    // 모든 이미지 로드가 완료되면 게임을 시작합니다.
+    loadImages().then(() => {
         setRandomWhirlpoolPosition(); // 초기 위치 설정
-        byFrame();
+        requestAnimationFrame(byFrame);
     });
 
 })();

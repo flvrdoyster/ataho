@@ -15,6 +15,7 @@
     <meta property="og:site_name" content="atah.io">
     <meta property="og:locale" content="ko_KR">
     <link rel="stylesheet" href="../fonts.css">
+    <link rel="stylesheet" href="../world/ui.css">
     <link rel="stylesheet" href="swim.css">
     <!-- Google Tag Manager -->
     <script>(function (w, d, s, l, i) {
@@ -36,6 +37,17 @@
     <!-- End Google Tag Manager (noscript) -->
     <div id="bg">
         <canvas id="canvas"></canvas>
+        <div id="game-over-overlay" class="ui-panel-overlay" hidden>
+            <div id="game-over-panel" class="frame-box ui-panel">
+                <div id="game-over-cursor" class="ui-cursor" hidden></div>
+                <div class="ui-panel-actions">
+                    <button id="btn-continue">한 번 더</button>
+                    <button id="btn-home">그만할래</button>
+                </div>
+            </div>
+        </div>
+        <script>window.WORLD_BASE = '../world/';</script>
+        <script src="../world/ui.js"></script>
         <script src="swim2.js"></script>
     </div>
     <br>

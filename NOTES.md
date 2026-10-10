@@ -106,6 +106,23 @@ node scripts/gen_site_index.js --check  # 어긋나면 exit 1
 
   검정을 비워 두므로 어두운 바탕 위에서 원본처럼 보이고, 밝은 바탕에서는 명암이 뒤집힌다. 픽셀 모서리가 흐려지지 않게 `shape-rendering="crispEdges"`를 둔다
 
+## 미니게임 (`balance/`, `sweep/`, `swim/`)
+
+- 구성 — `balance/`는 자체 캔버스 루프, `sweep/`는 `world/engine.js` + `char_sweep.js`, `swim/`은 자체 루프(`swim2.js`). 공용 UI는 `world/ui.css` + `world/ui.js`
+- 공용 UI를 쓰는 페이지는 `ui.css`를 링크하고, `ui.js`보다 먼저 `window.WORLD_BASE = '../world/'`를 정의한다. `frame.png`·`cursor.png` 경로는 `ui.css` 기준이며 `--ui-frame-src`로 덮어쓸 수 있다(sweep 미니맵은 속이 비치는 `frame_t.png`)
+- 값은 `ui.js`의 `UI_CONFIG` 한 곳에서 정하고 CSS 변수로 내려보낸다. `CURSOR_*`·`PANEL_BORDER`는 JS(커서 위치 계산)와 CSS(커서 크기·테두리 두께)가 같은 값을 써야 한다. `frame.png`의 9-슬라이스 조각은 16px로 고정이라 `PANEL_BORDER`를 바꿔도 `border-image`의 16은 그대로 둔다
+- HUD(`#hud`) 너비는 공용 기본값이 없다. 게임마다 지정한다 — balance는 960px 고정, sweep은 `fit-content`(풀와이드 캔버스에서 960px 캡이 양옆에 여백을 남김)
+- 컴포넌트
+  - `UIKeyboardMenu` — 패널 안 버튼을 방향키로 이동, Enter/Space로 선택, 마우스 호버와 동기화. ESC 동작은 정하지 않았다
+  - `UITouchButton` — 터치 기기에서만 붙인다. URL에 `?gamepad`가 있으면 데스크톱에서도 보인다. 아이콘은 `currentColor` SVG이고 가로로 넓은 글리프는 `wideIcon`으로 가로 기준 스케일
+  - `UIMuteButton` — 아이콘은 gensei-pc98·suiko-web의 `#btn-mute`와 같다. 실제 음소거(WebAudio 게인, `AudioContext` suspend, BGM pause)는 게임마다 달라 `onToggle(muted)`에서 처리한다. swim은 오디오가 없어 아직 안 붙였다
+  - `SpriteNumberFont`/`UIStat` — 숫자 이미지 폰트(`num_small.png` 8px는 0~9와 `?`, `num_big.png` 16px는 0~9). 흰/초록/노랑/빨강 4행. 구두점이 없어 라벨·구분자는 별도 텍스트로 둔다
+- `.ui-pixel-text`에 `background: transparent`를 명시한다 — 호스트 페이지의 전역 `canvas { background }` 규칙에 가려 글자가 안 보인 적이 있다(balance)
+- `.ui-stat > span`은 `line-height: 1`로 둔다. 기본 줄 높이는 폰트 여백까지 포함해 숫자 캔버스보다 커서 가운데 정렬해도 어긋나 보인다
+- `.ui-touch-btn`은 폭을 고정한다. `min-width`만 두면 자식 SVG의 `width: %` 기준이 불확정이다
+- 폰트 — `--ui-font`는 Dokkaebi DNR Gothic이고 KoddiUDOnGothic은 폴백이다(곡선이 매끈해 픽셀 UI에는 안 맞음). Regular가 얇아 HUD는 Bold를 쓴다. `world/ui/DokkaebiDNRGothic-*.woff2`는 `github.com/flvrdoyster/font` 릴리스 산출물을 그대로 자체 서빙하고, `.github/workflows/update-dokkaebi-font.yml`이 매주 월요일 새 릴리스를 확인해 갈아끼운다(버전은 `world/ui/DokkaebiDNRGothic.version`)
+- swim — 게임오버 패널에 제목이 없다. 원작 대사를 확인하기 전에는 넣지 않는다
+
 ## 개발 도구
 
 - `world/editor.html`에는 doctype이 없다. 넣으면 호환 모드(quirks)에서 표준 모드로 바뀌어 에디터 레이아웃이 달라질 수 있어, charset·lang만 넣었다(2026-09-27). 넣으려면 에디터 화면을 직접 확인하면서 할 것
@@ -115,5 +132,5 @@ node scripts/gen_site_index.js --check  # 어긋나면 exit 1
 - 원본 자료가 공개 서빙된다 — `haiyuki_manual/ref/`(원본 설명서 PDF 2개), `kitan_manual/orig/manual_kitan.pdf`, `viewer/kaisin/ref/`(참고 영상·PSD), `viewer/gaiden/title-bg.psd`, 약 22MB. 작업 파일 노출이자 원본 설명서 스캔 배포다. 레포에서 빼도 git 히스토리엔 남고, robots.txt로 막아도 주소를 알면 받을 수 있다
 - 공식 일러스트 갤러리(`resource/img/`)가 장당 1.8~7MB PNG, 합계 36MB이고 라이트박스가 원본을 그대로 띄운다. 웹용 축소본을 따로 두면 모바일 로딩이 크게 준다
 - 패유기 웹의 안 쓰는 자산 18개(약 650KB) — `bgm_option`, `bgm_toilet`, `OPTBG.png`, `HELPBG.png`, 난이도·조작 UI 등. 앞으로 만들 옵션·도움말 화면용일 수 있다
-- 설명 주석이 많은 파일 — `world/ui.js`, `viewer/video_player.js`, `scripts/ga4_dashboard.py`, `world/engine.js`, `dashboard/dashboard.js` 등. 한꺼번에 옮기기보다 각 파일을 고칠 때 문서로 옮긴다
+- 설명 주석이 많은 파일 — `viewer/video_player.js`, `scripts/ga4_dashboard.py`, `world/engine.js`, `dashboard/dashboard.js` 등. 한꺼번에 옮기기보다 각 파일을 고칠 때 문서로 옮긴다
 - 옛 경로 `scene_viewer/` 리다이렉트 스텁은 유지한다 — 최근 90일 75회, 한 달 20회꼴로 아직 들어온다(마지막 2026-09-22)

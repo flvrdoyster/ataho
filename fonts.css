@@ -20,22 +20,6 @@
     font-display: swap;
 }
 
-/* 도트(픽셀) 한글 폰트 — world/ui.css(--ui-font)의 픽셀 UI 텍스트 전용.
-   KoddiUDOnGothic은 매끈한 곡선이라 픽셀 UI에는 안 맞음.
-   CDN 대신 자체 서빙(world/ui/DungGeunMo.*) — url()은 이 파일(fonts.css, 루트) 기준 상대경로. */
-@font-face {
-    font-family: 'DungGeunMo';
-    src: url('world/ui/DungGeunMo.woff2') format('woff2'),
-         url('world/ui/DungGeunMo.woff') format('woff');
-    font-weight: normal;
-    font-display: swap;
-}
-
-/* Dokkaebi DNR Gothic — 자체 프로젝트 픽셀 한글 폰트, world/ui.css(--ui-font)의
-   새 기본값. github.com/flvrdoyster/font 릴리스 산출물을 그대로 자체 서빙
-   (world/ui/DokkaebiDNRGothic-*.woff2). .github/workflows/update-dokkaebi-font.yml
-   이 매일 그 레포의 최신 릴리스를 확인해 자동으로 갈아끼우고 커밋한다
-   (버전 추적: world/ui/DokkaebiDNRGothic.version). */
 @font-face {
     font-family: 'Dokkaebi DNR Gothic';
     src: url('world/ui/DokkaebiDNRGothic-Regular.woff2') format('woff2');

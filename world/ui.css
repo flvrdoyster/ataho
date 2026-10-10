@@ -1,48 +1,22 @@
-/**
- * ui.css — 공용 픽셀 RPG UI (balance/ 의 frame-box·HUD·모달 시스템을 일반화)
- *
- * 사용하는 페이지는 이 파일을 로드하고 world/ui/frame.png, world/ui/cursor.png
- * 를 상대 경로로 참조할 수 있는 위치(=world/ 기준 상대 경로가 통하는 곳)에 있어야 한다.
- * 경로를 바꿔야 하면 --ui-frame-src 로 override:
- *   :root { --ui-frame-src: url('../world/ui/frame.png'); }
- *
- * 폰트는 도트 한글 폰트 Dokkaebi DNR Gothic (fonts.css, 자체 서빙) 사용 —
- * 별도 로드 필요. 자체 프로젝트 폰트로 교체(2026-08, github.com/flvrdoyster/font
- * v1.0.0) — 이전엔 DungGeunMo였고, swim/swim2.js는 캔버스 렌더링이라 이 변수와
- * 무관하게 여전히 DungGeunMo를 직접 쓴다(별개 전환).
- * KoddiUDOnGothic(사이트 공통 본문 서체)은 곡선이 매끈해 픽셀 UI에는 안 맞아 폴백으로만 둠.
- */
-
 :root {
     --ui-frame-src: url('ui/frame.png');
     --ui-cursor-src: url('ui/cursor.png');
     --ui-bg: rgba(33, 66, 123, 1);
     --ui-font: 'Dokkaebi DNR Gothic', 'KoddiUDOnGothic', sans-serif;
-    --ui-font-weight: bold;   /* Dokkaebi DNR Gothic Regular는 얇아서 HUD엔 Bold가 나음 */
-    --ui-hud-item-gap: 24px;   /* .ui-hud-stats 내부(번 돈 / 걸음 수 등) 및 옆의 아이콘 버튼과 공용 */
-    /* 아래 세 값은 폴백 기본값 — world/ui.js의 UI_CONFIG(FONT_SIZE/CURSOR_WIDTH/
-       CURSOR_HEIGHT/PANEL_BORDER)가 로드 시 덮어씀. 실제 조정은 거기서. */
-    --ui-font-size: 16px;
+    --ui-font-weight: bold;       --ui-hud-item-gap: 24px;           --ui-font-size: 16px;
     --ui-cursor-width: 12px;
     --ui-cursor-height: 16px;
     --ui-panel-border: 16px;
 }
 
-/* ── 프레임 박스: 9-슬라이스 픽셀 테두리 + 남색 배경 ── */
 .frame-box {
     border-width: var(--ui-panel-border);
     border-style: solid;
-    /* 9-슬라이스 조각 크기(16)는 frame.png 타일이 실제로 16px이라 고정 — PANEL_BORDER를
-       바꿔도 여긴 그대로 둬야 함(타일 크기와 안 맞으면 테두리 이미지가 늘어나 보임) */
-    border-image: var(--ui-frame-src) 16 fill / 16px round;
+        border-image: var(--ui-frame-src) 16 fill / 16px round;
     background-color: var(--ui-bg);
     image-rendering: pixelated;
 }
 
-/* ── 상단 HUD 바 ── */
-/* width/max-width는 여기서 기본값을 두지 않는다 — 미니게임마다 캔버스 폭/HUD 내용량이
-   달라 공용 기본값 하나가 안 맞았음(balance는 고정폭 960px, sweep은 뷰포트 풀와이드라
-   960px 캡이 화면 양옆에 어색한 여백을 남김). 각 게임의 CSS에서 #hud에 직접 지정할 것. */
 .ui-hud {
     position: fixed;
     top: 0;
@@ -51,15 +25,12 @@
     box-sizing: border-box;
     display: flex;
     flex-direction: row;
-    gap: var(--ui-hud-item-gap);   /* .ui-hud-stats와 옆의 아이콘 버튼(뮤트 등) 사이 간격 */
-    align-items: center;
+    gap: var(--ui-hud-item-gap);       align-items: center;
     color: white;
     font-family: var(--ui-font);
     font-weight: var(--ui-font-weight);
     font-size: var(--ui-font-size);
-    white-space: nowrap;   /* 좁은 화면에서 width:fit-content가 줄어들 때 라벨 텍스트가
-                               중간에서 줄바꿈되는 것 방지 — 대신 필요하면 화면 밖으로 넘침 */
-    pointer-events: auto;
+    white-space: nowrap;       pointer-events: auto;
     z-index: 10;
 }
 
@@ -72,26 +43,19 @@
     align-items: center;
 }
 
-/* 라벨 + 숫자(이미지 폰트) + 구분자 조합 (예: "TIME" 05 : 23) */
 .ui-stat {
     display: inline-flex;
     align-items: center;
     gap: 4px;
 }
 
-/* 라벨/구분자 텍스트의 line-height를 좁혀서 실제 글자 높이에 맞춘다 — 기본 line-height는
-   폰트 여백(ascent/descent)까지 포함해 캔버스(숫자)보다 박스가 커서, align-items:center로도
-   눈에는 살짝 어긋나 보임 */
 .ui-stat > span {
     line-height: 1;
 }
 
-/* em 단위 — .ui-hud의 font-size(--ui-font-size)를 상속받아 텍스트 높이에 맞춘다.
-   고정 px였을 때는 HUD의 다른 텍스트보다 훨씬 커서 .ui-hud 전체 높이를 밀어 올렸었다. */
 .ui-icon-btn {
     flex-shrink: 0;
-    font-size: inherit;   /* 브라우저 기본은 <button>에 font-size를 상속 안 시킴 — em 계산의 전제 */
-    width: 1.4em;
+    font-size: inherit;       width: 1.4em;
     height: 1.4em;
     background: transparent;
     border: none;
@@ -111,10 +75,8 @@
     width: 1em;
     height: 1em;
     display: block;
-    color: white;   /* svg 아이콘(currentColor)용 — UIMuteButton 등 */
-}
+    color: white;   }
 
-/* ── 모바일 터치 액션 버튼 (화면 하단 고정, gensei-pc98 가상 게임패드 키캡 스타일) ── */
 .ui-touch-btn {
     display: flex;
     align-items: center;
@@ -123,16 +85,13 @@
     bottom: 40px;
     left: 50%;
     transform: translateX(-50%);
-    width: 72px;      /* 고정폭 필요 — min-width만 있으면 너비가 불확정이라 자식 svg의
-                          width:% 기준(.ui-touch-btn--wide-icon)이 엉뚱하게 해석됨 */
-    height: 48px;
+    width: 72px;          height: 48px;
     box-sizing: border-box;
     padding: 0 10px;
     border-radius: 8px;
     background: rgba(30, 30, 30, 0.1);
     border: 1px solid rgba(255, 255, 255, 0.2);
-    color: rgba(230, 230, 230, 0.95);   /* 아이콘 currentColor 소스 */
-    font-family: var(--ui-font);
+    color: rgba(230, 230, 230, 0.95);       font-family: var(--ui-font);
     font-weight: var(--ui-font-weight);
     font-size: var(--ui-font-size);
     touch-action: none;
@@ -152,20 +111,16 @@
     pointer-events: none;
 }
 
-/* 가로로 넓은 글리프(스페이스바 등)는 세로 기준(height:%)으로 맞추면 비율상 폭이 과하게
-   커진다 — 이런 아이콘은 가로 기준으로 맞춘다 (UITouchButton opts.wideIcon: true) */
 .ui-touch-btn--wide-icon svg {
     width: 60%;
     height: auto;
 }
 
-/* 눌림 상태 — JS(UITouchButton)가 press/release에서 토글 */
 .ui-touch-btn.active {
     transform: translateX(-50%) translateY(3px);
     box-shadow: inset 0 -1px 0 rgba(0, 0, 0, 0.25), 0 1px 2px rgba(0, 0, 0, 0.2);
 }
 
-/* ── 중앙 패널(모달) ── */
 .ui-panel-overlay {
     position: absolute;
     inset: 0;
@@ -220,7 +175,6 @@
     cursor: pointer;
 }
 
-/* ── 키보드 네비게이션 커서 (버튼 옆에 뜨는 화살표) ── */
 .ui-cursor {
     position: absolute;
     width: var(--ui-cursor-width);
@@ -232,9 +186,6 @@
 
 .ui-cursor[hidden] { display: none; }
 
-/* ── SpriteNumberFont 캔버스: 작은 스프라이트를 정수배 확대 (world/ui.js 참고) ── */
-/* background 명시: 호스트 페이지에 흔한 전역 `canvas { background: ... }` 규칙에
-   깔려서 글자가 안 보이는 사고를 방지 (balance.css에서 실제로 겪은 문제) */
 .ui-pixel-text {
     display: inline-block;
     vertical-align: middle;

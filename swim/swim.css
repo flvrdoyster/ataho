@@ -10,9 +10,18 @@ body {
 }
 
 #bg {
+    position: relative;
     width: 960px;
     height: 640px;
     background-image: url("bg_2x.png");
     background-repeat: no-repeat;
     background-position: 80% center;
+}
+
+#game-over-panel {
+    padding-top: 0;
+}
+
+#game-over-panel .ui-panel-actions {
+    margin-top: 0;
 }
