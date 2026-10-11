@@ -24,8 +24,8 @@ let CONFIG = {
     CEILING_RENDER: {
         RANGE_TOP: 16,
         RANGE_BOTTOM: 32,
-        RANGE_LEFT: 16,
-        RANGE_RIGHT: 16
+        RANGE_LEFT: 24,
+        RANGE_RIGHT: 24
     },
     PATHS: {},
     SPEECH_BUBBLE_OFFSET_Y: -100,
@@ -69,6 +69,7 @@ let tilesetImg, ceilingTilesetImg;
 let mapData = [];
 let tileGrid = [];
 let mapObjects = [];
+let objectArtCells = new Set();
 let mapCollisions = new Set();
 let mapWidth = 0, mapHeight = 0;
 
@@ -101,6 +102,20 @@ let lastAutoTriggerId = null;    // latch so an auto-firing tile trigger fires o
 const DIALOGUE_AUTO_MS = 3000;   // bubble auto-advances after this delay
 
 function isInteracting() { return interactionState !== 'NONE'; }
+
+function collectObjectArtCells() {
+    const cells = new Set();
+    mapObjects.forEach(obj => {
+        if (!obj.img) return;
+        const fw = obj.animW || obj.width, fh = obj.animH || obj.height;
+        const c0 = Math.floor(obj.x / CONFIG.TILE_SIZE);
+        const c1 = Math.ceil((obj.x + fw) / CONFIG.TILE_SIZE);
+        const r0 = Math.floor((obj.y + obj.h - fh) / CONFIG.TILE_SIZE);
+        const r1 = Math.ceil((obj.y + obj.h) / CONFIG.TILE_SIZE);
+        for (let r = r0; r < r1; r++) for (let c = c0; c < c1; c++) cells.add(`${c},${r}`);
+    });
+    return cells;
+}
 
 // ===== Path Resolution =====
 function resolvePath(path) {
@@ -224,7 +239,9 @@ async function initGame() {
                 frames: triggerSource.frames || 0,
                 speed: triggerSource.speed || 0,
                 animW: triggerSource.animW || 0,
-                animH: triggerSource.animH || 0
+                animH: triggerSource.animH || 0,
+                baseline: triggerSource.baseline || 0,
+                belowPlayer: !!triggerSource.belowPlayer
             };
         });
     }
@@ -284,6 +301,8 @@ async function initGame() {
             };
         })));
     }
+
+    objectArtCells = collectObjectArtCells();
 
     // Calculate map bounds
     let maxGx = 0, maxGy = 0;
@@ -899,6 +918,25 @@ function uiButtonsSafeTop() {
 }
 
 // ===== Rendering =====
+const BELOW_PLAYER_OFFSET = 1e6;
+
+function drawMapObject(obj) {
+    const drawX = Math.floor(obj.x);
+    const drawY = Math.floor(obj.y + obj.h - (obj.animH || obj.height));
+    if (obj.frames > 1) {
+        const now = performance.now() / 1000;
+        const speedInSeconds = (obj.speed || 200) / 1000;
+        const frameIndex = Math.floor(now / speedInSeconds) % obj.frames;
+        const srcX = frameIndex * (obj.animW || obj.width);
+        ctx.drawImage(obj.img, srcX, 0,
+            (obj.animW || obj.width), (obj.animH || obj.height),
+            drawX, drawY,
+            (obj.animW || obj.width), (obj.animH || obj.height));
+    } else {
+        ctx.drawImage(obj.img, drawX, drawY);
+    }
+}
+
 function draw() {
     if (!ctx) return;
     ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -954,7 +992,8 @@ function draw() {
         if (obj.img &&
             obj.x + obj.width > viewL && obj.x < viewR &&
             obj.y + obj.height > viewT && obj.y < viewB) {
-            renderList.push({ type: 'object', data: obj, ySort: obj.y + obj.h });
+            const ySort = obj.y + obj.h - obj.baseline - (obj.belowPlayer ? BELOW_PLAYER_OFFSET : 0);
+            renderList.push({ type: 'object', data: obj, ySort });
         }
     });
 
@@ -964,21 +1003,7 @@ function draw() {
         if (item.type === 'player') {
             if (typeof playerDraw === 'function') playerDraw(ctx);
         } else {
-            const obj = item.data;
-            const drawX = Math.floor(obj.x);
-            const drawY = Math.floor(obj.y + obj.h - (obj.animH || obj.height));
-            if (obj.frames > 1) {
-                const now = performance.now() / 1000;
-                const speedInSeconds = (obj.speed || 200) / 1000;
-                const frameIndex = Math.floor(now / speedInSeconds) % obj.frames;
-                const srcX = frameIndex * (obj.animW || obj.width);
-                ctx.drawImage(obj.img, srcX, 0,
-                    (obj.animW || obj.width), (obj.animH || obj.height),
-                    drawX, drawY,
-                    (obj.animW || obj.width), (obj.animH || obj.height));
-            } else {
-                ctx.drawImage(obj.img, drawX, drawY);
-            }
+            drawMapObject(item.data);
         }
     });
 
@@ -999,6 +1024,7 @@ function draw() {
                 const cell = tileGrid[y][x];
                 for (let i = 0; i < cell.length; i++) {
                     const tile = cell[i];
+                    if (objectArtCells.has(`${tile.gx},${tile.gy}`)) continue;
                     ctx.drawImage(
                         ceilingTilesetImg,
                         tile.tx * CONFIG.TILE_SIZE, tile.ty * CONFIG.TILE_SIZE,

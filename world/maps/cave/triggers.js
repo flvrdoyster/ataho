@@ -51,6 +51,7 @@ window.MAP_DATA.triggers = [
     "w": 2,
     "h": 1,
     "id": "jar-4",
+    "baseline": 3,
     "sprite": "object/object_jar.png",
     "type": "menu",
     "items": [
@@ -68,6 +69,7 @@ window.MAP_DATA.triggers = [
     "w": 4,
     "h": 3,
     "id": "irori",
+    "belowPlayer": true,
     "type": "menu",
     "text": [
       "여기다 밧줄을 태울 생각을 하다니..."
@@ -93,6 +95,7 @@ window.MAP_DATA.triggers = [
     "w": 2,
     "h": 2,
     "id": "jar-1",
+    "baseline": 3,
     "sprite": "object/object_jar.png",
     "type": "menu",
     "items": [
@@ -143,6 +146,7 @@ window.MAP_DATA.triggers = [
   },
   {
     "id": "jar-2",
+    "baseline": 3,
     "sprite": "object/object_jar.png",
     "text": [
       "그러고보니 스마슈 녀석이 수상한 책을 줬었지."
@@ -179,6 +183,7 @@ window.MAP_DATA.triggers = [
     "w": 2,
     "h": 1,
     "id": "jar-3",
+    "baseline": 3,
     "sprite": "object/object_jar.png",
     "title": "공식 일러스트",
     "type": "menu",
