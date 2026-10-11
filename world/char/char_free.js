@@ -16,7 +16,11 @@ const CHAR_CONFIG = {
     COLLISION_PADDING_X: 8,
     COLLISION_PADDING_Y: 0,
     IDLE_START_TIME: 4,
-    DRUNK_DURATION: 10,
+    DRUNK_DURATION: 30,
+    TIPSY_DRINKS: 2,
+    WASTED_DRINKS: 3,
+    SWAY_FRAME_TIME: 0.2,
+    WASTED_LIE_DOWN_TIME: 10,
     HICCUP_MIN_INTERVAL: 1.0,
     HICCUP_MAX_INTERVAL: 3.0,
     HICCUP_PULSE_DURATION: 0.3,
@@ -31,7 +35,7 @@ const CHAR_CONFIG = {
 };
 
 // ===== Character State =====
-let charImg, idleImg, eatImg, drunkImg;
+let charImg, idleImg, eatImg, drunkIdleImg, drunkWalkImg;
 let gulpSfx;   // 마시기(drink) 효과음
 
 const player = {
@@ -60,8 +64,10 @@ const player = {
     animRemaining: Infinity,
     lastAnimLoopIdx: 0,
     drinkCount: 0,
-    isDrunk: false,
+    drunkLevel: 0,
     drunkTimer: 0,
+    swayTimer: 0,
+    wastedStillTimer: 0,
     isHiccuping: false,
     hiccupPulseTimer: 0,
     hiccupIntervalTimer: 0,
@@ -76,6 +82,24 @@ const BUBBLE_SEQUENCE = [0, 1, 2, 3, 4, 5, 6, 5, 4, 3, 2, 1];
 const EAT_SEQUENCE = [0, 1, 2, 3, 2, 1, 0];
 const DRINK_SEQUENCE = [4, 5, 6, 7, 7, 6, 5, 4];
 const HICCUP_SEQUENCE = [0, 1];
+const SWAY_SEQUENCE = [0, 1, 2, 3, 4, 5];
+
+const DRUNK = { SOBER: 0, TIPSY: 1, WASTED: 2 };
+const DRUNK_SPEED_SCALE = [1, 0.75, 0.5];
+
+function drunkLevelFor(drinkCount) {
+    if (drinkCount >= CHAR_CONFIG.WASTED_DRINKS) return DRUNK.WASTED;
+    if (drinkCount >= CHAR_CONFIG.TIPSY_DRINKS) return DRUNK.TIPSY;
+    return DRUNK.SOBER;
+}
+
+function soberUp() {
+    player.drinkCount = 0;
+    player.drunkLevel = DRUNK.SOBER;
+    player.drunkTimer = 0;
+    player.isHiccuping = false;
+    player.wastedStillTimer = 0;
+}
 
 function getNextYawnInterval() {
     return CHAR_CONFIG.YAWN_MIN_INTERVAL + Math.random() * (CHAR_CONFIG.YAWN_MAX_INTERVAL - CHAR_CONFIG.YAWN_MIN_INTERVAL);
@@ -113,13 +137,19 @@ async function playerInit(assets) {
         eatImg.onerror = () => { console.warn("Eat load failed"); resolve(); };
     });
 
-    // Load drunk sprite
-    const drunkPath = resolvePath('char/ataho-drunk.png');
-    drunkImg = new Image();
-    drunkImg.src = drunkPath;
+    // Load drunk sprites
+    drunkIdleImg = new Image();
+    drunkIdleImg.src = resolvePath('char/ataho-idle-drunken.png');
     await new Promise((resolve) => {
-        drunkImg.onload = resolve;
-        drunkImg.onerror = () => { console.warn("Drunk load failed"); resolve(); };
+        drunkIdleImg.onload = resolve;
+        drunkIdleImg.onerror = () => { console.warn("Drunk idle load failed"); resolve(); };
+    });
+
+    drunkWalkImg = new Image();
+    drunkWalkImg.src = resolvePath('char/ataho-walk-drunken.png');
+    await new Promise((resolve) => {
+        drunkWalkImg.onload = resolve;
+        drunkWalkImg.onerror = () => { console.warn("Drunk walk load failed"); resolve(); };
     });
 
     // 마시기 효과음 (drink 액션 시 재생). 메뉴 클릭이 사용자 제스처라 자동재생 정책 통과.
@@ -172,8 +202,9 @@ function playerUpdate(dt) {
         dy = pointerInput.dy;
     }
 
-    dx *= CHAR_CONFIG.MOVEMENT_SPEED * dt;
-    dy *= CHAR_CONFIG.MOVEMENT_SPEED * dt;
+    const speed = CHAR_CONFIG.MOVEMENT_SPEED * DRUNK_SPEED_SCALE[player.drunkLevel];
+    dx *= speed * dt;
+    dy *= speed * dt;
 
     // --- Eat/Drink Animation ---
     if (player.isEating || player.isDrinking) {
@@ -185,10 +216,6 @@ function playerUpdate(dt) {
         player.animFrame = totalFramesPassed % sequence.length;
 
         if (currentLoopIdx > player.lastAnimLoopIdx) {
-            if (player.isDrinking && player.drinkCount >= 3) {
-                player.isDrunk = true;
-                player.drunkTimer = CHAR_CONFIG.DRUNK_DURATION;
-            }
             if (player.animRemaining !== Infinity) {
                 player.animRemaining--;
                 if (player.animRemaining <= 0) {
@@ -202,12 +229,15 @@ function playerUpdate(dt) {
     }
 
     // --- Drunk Timer ---
-    if (player.isDrunk) {
+    if (player.drinkCount > 0 && !player.isDrinking) {
+        player.drunkLevel = drunkLevelFor(player.drinkCount);
         player.drunkTimer -= dt;
         if (player.drunkTimer <= 0) {
-            player.isDrunk = false;
-            player.drinkCount = 0;
+            player.drinkCount = Math.min(player.drinkCount, CHAR_CONFIG.WASTED_DRINKS) - 1;
+            player.drunkLevel = drunkLevelFor(player.drinkCount);
+            player.drunkTimer = CHAR_CONFIG.DRUNK_DURATION;
             player.isHiccuping = false;
+            player.swayTimer = 0;
         }
     }
 
@@ -224,6 +254,7 @@ function playerUpdate(dt) {
         player.isEating = false;
         player.isDrinking = false;
         player.lieDownTimer = 0;
+        player.wastedStillTimer = 0;
 
         player.stepTimer += dt;
         if (player.stepTimer >= CHAR_CONFIG.ANIMATION_SPEED) {
@@ -236,8 +267,21 @@ function playerUpdate(dt) {
         }
         player.stepTimer = 0;
 
-        // Drunk idle → hiccup
-        if (player.isDrunk && !player.isEating && !player.isDrinking) {
+        if (player.drunkLevel === DRUNK.WASTED && !player.isEating && !player.isDrinking) {
+            player.isIdle = false;
+            player.isYawning = false;
+            player.isLyingDown = false;
+            player.isHiccuping = false;
+            player.swayTimer += dt;
+            player.wastedStillTimer = isInteracting() ? 0 : player.wastedStillTimer + dt;
+            if (player.wastedStillTimer >= CHAR_CONFIG.WASTED_LIE_DOWN_TIME) {
+                soberUp();
+                player.isIdle = true;
+                player.isLyingDown = true;
+                player.yawnCount = CHAR_CONFIG.YAWN_COUNT_LIE_DOWN;
+                player.idleTimer = CHAR_CONFIG.IDLE_START_TIME;
+            }
+        } else if (player.drunkLevel === DRUNK.TIPSY && !player.isEating && !player.isDrinking) {
             player.isIdle = false;
             player.isYawning = false;
             player.isLyingDown = false;
@@ -307,6 +351,7 @@ function playerUpdate(dt) {
                     } else if (player.yawnTimer >= player.currentYawnInterval) {
                         if (player.yawnCount >= CHAR_CONFIG.YAWN_COUNT_LIE_DOWN) {
                             player.isLyingDown = true;
+                            soberUp();
                         } else {
                             player.isYawning = true;
                             player.yawnFrame = 0;
@@ -345,14 +390,20 @@ function playerUpdate(dt) {
 
 function playerDraw(ctx) {
     // Drunk state (priority when idle)
-    if (player.isDrunk && !player.isMoving && !player.isEating && !player.isDrinking && drunkImg) {
+    if (player.drunkLevel !== DRUNK.SOBER && !player.isMoving && !player.isEating && !player.isDrinking && drunkIdleImg) {
         const spriteW = 48, spriteH = 64;
-        const sequence = HICCUP_SEQUENCE;
-        const frameIdx = player.isHiccuping ? (sequence[player.animFrame] || 0) : 0;
+        let frameIdx, srcY;
+        if (player.drunkLevel === DRUNK.WASTED) {
+            frameIdx = SWAY_SEQUENCE[Math.floor(player.swayTimer / CHAR_CONFIG.SWAY_FRAME_TIME) % SWAY_SEQUENCE.length];
+            srcY = spriteH;
+        } else {
+            frameIdx = player.isHiccuping ? (HICCUP_SEQUENCE[player.animFrame] || 0) : 0;
+            srcY = 0;
+        }
         const srcX = frameIdx * spriteW;
         const dstX = Math.floor(player.x + 8 - spriteW / 2);
         const dstY = Math.floor(player.y + 16 - spriteH);
-        ctx.drawImage(drunkImg, srcX, 0, spriteW, spriteH, dstX, dstY, spriteW, spriteH);
+        ctx.drawImage(drunkIdleImg, srcX, srcY, spriteW, spriteH, dstX, dstY, spriteW, spriteH);
     }
     // Eating / Drinking
     else if ((player.isEating || player.isDrinking) && eatImg) {
@@ -396,11 +447,12 @@ function playerDraw(ctx) {
     }
     // Walking / Standing
     else if (charImg) {
+        const walkImg = (player.drunkLevel !== DRUNK.SOBER && drunkWalkImg && drunkWalkImg.naturalWidth) ? drunkWalkImg : charImg;
         const spriteW = 48, spriteH = 64;
         const seqIndex = WALK_SEQUENCE[player.animFrame];
         const framesPerDir = 5;
         const totalFrameIndex = (player.direction * framesPerDir) + seqIndex;
-        let framesPerRow = Math.floor(charImg.width / spriteW);
+        let framesPerRow = Math.floor(walkImg.width / spriteW);
         if (framesPerRow < 1) framesPerRow = 1;
         const col = totalFrameIndex % framesPerRow;
         const row = Math.floor(totalFrameIndex / framesPerRow);
@@ -408,7 +460,7 @@ function playerDraw(ctx) {
         const srcY = row * spriteH;
         const dstX = Math.floor(player.x + 8 - spriteW / 2);
         const dstY = Math.floor(player.y + 16 - spriteH);
-        ctx.drawImage(charImg, srcX, srcY, spriteW, spriteH, dstX, dstY, spriteW, spriteH);
+        ctx.drawImage(walkImg, srcX, srcY, spriteW, spriteH, dstX, dstY, spriteW, spriteH);
     }
     // Fallback
     else {
@@ -434,6 +486,8 @@ function playerOnAction(actionType, count = Infinity) {
         player.isDrinking = true;
         player.idleTimer = 0;
         player.drinkCount++;
+        player.drunkTimer = CHAR_CONFIG.DRUNK_DURATION;
+        player.wastedStillTimer = 0;
         if (gulpSfx) { gulpSfx.currentTime = 0; gulpSfx.play().catch(() => { }); }
     } else if (actionType === 'sit') {
         player.isIdle = true;
@@ -441,6 +495,7 @@ function playerOnAction(actionType, count = Infinity) {
     } else if (actionType === 'lie') {
         player.isIdle = true;
         player.isLyingDown = true;
+        soberUp();
         player.yawnCount = CHAR_CONFIG.YAWN_COUNT_LIE_DOWN;
         player.idleTimer = CHAR_CONFIG.IDLE_START_TIME;
     } else if (actionType === 'yawn') {
@@ -471,6 +526,12 @@ window.skipToLying = () => {
     player.isMoving = false;
     player.yawnTimer = player.currentYawnInterval;
 };
+
+window.addEventListener('keydown', (e) => {
+    if (e.code !== 'KeyL' || e.repeat || e.ctrlKey || e.metaKey || e.altKey) return;
+    if (isInteracting()) return;
+    playerOnAction('lie');
+});
 
 window.toggleIdleDebug = () => {
     player.debugMode = !player.debugMode;
