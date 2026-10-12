@@ -110,6 +110,18 @@ window.MAP_DATA.triggers = [
         "href": "haiyuki_manual/index.html",
         "target": "_blank",
         "group": "매뉴얼"
+      },
+      {
+        "label": "환세희담 외전\n~궁극의 에로문서 전설~",
+        "href": "viewer/scene.html?story=gaiden",
+        "target": "_blank",
+        "group": "장면 뷰어"
+      },
+      {
+        "label": "DS 아니메 총집편 '98",
+        "href": "viewer/ani.html",
+        "target": "_blank",
+        "group": "장면 뷰어"
       }
     ]
   },
@@ -156,24 +168,13 @@ window.MAP_DATA.triggers = [
     "y": 16,
     "w": 2,
     "h": 1,
+    "title": "게임 플레이",
     "items": [
       {
-        "label": "엔딩: 환세쾌진극",
-        "href": "viewer/scene.html?story=kaisin",
+        "label": "환세쾌진극",
+        "href": "https://kaisin.atah.io/",
         "target": "_blank",
-        "group": "장면 뷰어"
-      },
-      {
-        "label": "환세희담 외전\n~궁극의 에로문서 전설~",
-        "href": "viewer/scene.html?story=gaiden",
-        "target": "_blank",
-        "group": "장면 뷰어"
-      },
-      {
-        "label": "DS 아니메 총집편 '98",
-        "href": "viewer/ani.html",
-        "target": "_blank",
-        "group": "장면 뷰어"
+        "group": "웹 포팅"
       }
     ]
   },
