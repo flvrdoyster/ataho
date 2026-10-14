@@ -97,6 +97,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
           <a href="/tag/환세풍광전">환세풍광전</a>
           <a href="/tag/환세쾌도전">환세쾌도전</a>
           <a href="/tag/환세포물장">환세포물장</a>
+          <a href="/tag/환세쾌진극">환세쾌진극</a>
           <a href="/tag/환세취호전">환세취호전</a>
           <a href="/tag/환세패유기">환세패유기</a>
           <a href="/category/기타">기타</a>
@@ -336,45 +337,19 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
           </s_guest>
 
           <s_paging>
-            <div class="area_paging area_paging_list">
-              <span class="inner_paging">
-                <a [##_prev_page_##] class="link_prev [##_no_more_prev_##]"><span class="screen_out">이전</span>
-                  <svg class="ico ico_pg_circle" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"
-                    aria-hidden="true" focusable="false">
-                    <circle class="ico_box" cx="12" cy="12" r="11" />
-                    <path d="M13.5 8 L9.5 12 L13.5 16" />
-                  </svg>
-                </a>
+            <nav class="area_paging" aria-label="페이지 이동">
+              <a [##_prev_page_##] class="link_prev [##_no_more_prev_##]" aria-label="이전 페이지">
+                <svg class="ico ico_pg" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false"><path d="M10 3 L5 8 L10 13" /></svg>
+              </a>
+              <span class="list_page">
                 <s_paging_rep>
                   <a [##_paging_rep_link_##] class="link_page">[##_paging_rep_link_num_##]</a>
                 </s_paging_rep>
-                <a [##_next_page_##] class="link_next [##_no_more_next_##]"><span class="screen_out">다음</span>
-                  <svg class="ico ico_pg_circle" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"
-                    aria-hidden="true" focusable="false">
-                    <circle class="ico_box" cx="12" cy="12" r="11" />
-                    <path d="M10.5 8 L14.5 12 L10.5 16" />
-                  </svg>
-                </a>
               </span>
-            </div>
-
-            <div class="area_paging area_paging_simple">
-              <div class="inner_paging">
-                <a [##_prev_page_##] class="link_prev [##_no_more_prev_##]">
-                  <svg class="ico ico_pg_simple" viewBox="0 0 10 18" xmlns="http://www.w3.org/2000/svg"
-                    aria-hidden="true" focusable="false">
-                    <path d="M8.5 1.5 L1.5 9 L8.5 16.5" />
-                  </svg>이전
-                </a>
-
-                <a [##_next_page_##] class="link_next [##_no_more_next_##]">
-                  다음<svg class="ico ico_pg_simple" viewBox="0 0 10 18" xmlns="http://www.w3.org/2000/svg"
-                    aria-hidden="true" focusable="false">
-                    <path d="M1.5 1.5 L8.5 9 L1.5 16.5" />
-                  </svg>
-                </a>
-              </div>
-            </div>
+              <a [##_next_page_##] class="link_next [##_no_more_next_##]" aria-label="다음 페이지">
+                <svg class="ico ico_pg" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false"><path d="M6 3 L11 8 L6 13" /></svg>
+              </a>
+            </nav>
           </s_paging>
 
           <div id="mEtc" class="wrap_etc">
