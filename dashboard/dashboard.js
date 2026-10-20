@@ -421,7 +421,8 @@
             <button type="button" class="date-nav" data-nav="next" aria-label="다음 날짜"${isLatest ? ' disabled' : ''}>▶</button>
         </div>
         <p class="meta-line">마지막 갱신 ${esc(data.meta.updatedAt)} KST ·
-            매일 아침 어제 하루치를 모읍니다.</p>
+            매일 아침 어제 하루치를 모읍니다.${data.confirmed ? '' :
+                ' 어제 수치는 잠정이라 내일 아침 수집 때 바로잡힙니다.'}</p>
         <div class="stat-grid">
             ${stat('방문자', base.users, '명', fmt, newSub)}
             ${stat('페이지 조회', base.views, '회', fmt)}

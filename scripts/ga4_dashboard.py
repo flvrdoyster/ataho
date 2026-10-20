@@ -63,7 +63,7 @@ TREND = (f"{TREND_DAYS}daysAgo", "yesterday")
 # 날의 참여율 0%는 나올 수 없는 값이고, 그동안 이 값이 매일 화면에 찍혀 왔다.
 #
 # 그래서 지표를 신뢰도로 나눈다:
-#   - 개수 세기(사용자·세션·조회수와 그 분해)는 어제치를 그대로 쓴다
+#   - 개수 세기(사용자·세션·조회수와 그 분해)는 어제치를 그대로 쓰되, 첫 수집값은 덜 찬 날이 있어 다음 날 다시 받아 정정한다
 #   - 세션 속성(참여율·평균 체류)은 재처리가 끝난 구간에서만 본다  ← SETTLED
 #   - 유입원은 그 중간이라 어제치를 쓰되 미분류분을 합치지 않고 따로 센다
 SETTLED = ("8daysAgo", "2daysAgo")     # 어제를 뺀, 확정된 마지막 7일
@@ -463,7 +463,7 @@ def fetch(client, target, age=1, include_settled=True):
     히스토리 항목엔 안 실리는 값이라 그때는 조회할 필요가 없다."""
     data = {}
 
-    # --- 1) 어제 하루 (개수 세기 — 재처리 지연의 영향이 적은 지표) --------
+    # --- 1) 어제 하루 -----------------------------------------------------
     yday = totals(client, target, day_range(age),
                   ["activeUsers", "newUsers", "sessions", "screenPageViews"])
     daily_rows = report(client, target, dimensions=["date"],
