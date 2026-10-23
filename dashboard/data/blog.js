@@ -7,25 +7,25 @@ window.DASHBOARD_DATA['blog'] = {
    "hi": 4.27,
    "lo": 1.47,
    "max": 15.333333333333334,
-   "median": 2.173611111111111,
+   "median": 2.236111111111111,
    "min": 0.0,
    "n": 28,
-   "rank": 16,
-   "value": 2.0,
-   "vsMedian": -7.987220447284347,
+   "rank": 9,
+   "value": 3.142857142857143,
+   "vsMedian": 40.55013309671694,
    "where": "usual"
   },
   "sessions": {
    "hi": 15.1,
-   "lo": 2.7,
+   "lo": 3.0,
    "max": 40,
    "median": 8.5,
    "min": 0,
    "n": 28,
-   "rank": 27,
-   "value": 1,
-   "vsMedian": -88.23529411764706,
-   "where": "low"
+   "rank": 15,
+   "value": 8,
+   "vsMedian": -5.88235294117647,
+   "where": "usual"
   },
   "users": {
    "hi": 11.6,
@@ -34,32 +34,26 @@ window.DASHBOARD_DATA['blog'] = {
    "median": 6.0,
    "min": 0,
    "n": 28,
-   "rank": 27,
-   "value": 1,
-   "vsMedian": -83.33333333333334,
-   "where": "low"
+   "rank": 9,
+   "value": 7,
+   "vsMedian": 16.666666666666664,
+   "where": "usual"
   },
   "views": {
    "hi": 45.3,
    "lo": 3.0,
    "max": 89,
-   "median": 13.5,
+   "median": 16.0,
    "min": 0,
    "n": 28,
-   "rank": 27,
-   "value": 2,
-   "vsMedian": -85.18518518518519,
-   "where": "low"
+   "rank": 9,
+   "value": 22,
+   "vsMedian": 37.5,
+   "where": "usual"
   }
  },
  "confirmed": false,
  "daily": [
-  {
-   "date": "2026-09-24",
-   "sessions": 2,
-   "users": 2,
-   "views": 3
-  },
   {
    "date": "2026-09-25",
    "sessions": 5,
@@ -221,162 +215,15 @@ window.DASHBOARD_DATA['blog'] = {
    "sessions": 1,
    "users": 1,
    "views": 2
+  },
+  {
+   "date": "2026-10-22",
+   "sessions": 8,
+   "users": 7,
+   "views": 22
   }
  ],
  "history": {
-  "2026-09-24": {
-   "baseline": {
-    "perUser": {
-     "hi": 6.85,
-     "lo": 1.319047619047619,
-     "max": 12.0,
-     "median": 3.0,
-     "min": 0.0,
-     "n": 28,
-     "rank": 22,
-     "value": 1.5,
-     "vsMedian": -50.0,
-     "where": "usual"
-    },
-    "sessions": {
-     "hi": 11.3,
-     "lo": 4.0,
-     "max": 20,
-     "median": 7.0,
-     "min": 0,
-     "n": 28,
-     "rank": 27,
-     "value": 2,
-     "vsMedian": -71.42857142857143,
-     "where": "low"
-    },
-    "users": {
-     "hi": 9.0,
-     "lo": 2.0,
-     "max": 15,
-     "median": 4.0,
-     "min": 0,
-     "n": 28,
-     "rank": 25,
-     "value": 2,
-     "vsMedian": -50.0,
-     "where": "usual"
-    },
-    "views": {
-     "hi": 30.3,
-     "lo": 5.0,
-     "max": 58,
-     "median": 12.5,
-     "min": 0,
-     "n": 28,
-     "rank": 27,
-     "value": 3,
-     "vsMedian": -76.0,
-     "where": "low"
-    }
-   },
-   "confirmed": true,
-   "insights": [
-    {
-     "text": "09.24은 평소와 크게 다른 점이 없었습니다 — 방문자도 페이지별 조회수도 늘 보던 범위 안입니다.",
-     "tone": "flat"
-    }
-   ],
-   "longest": {
-    "device": "데스크톱",
-    "engagementSeconds": 78,
-    "landing": "/100",
-    "pageViews": 2,
-    "seconds": 113,
-    "source": "google"
-   },
-   "ydayHours": [
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    1,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    1,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0
-   ],
-   "ydayPages": [
-    {
-     "host": "",
-     "list": false,
-     "name": "OYSTER BAY",
-     "priorAvg": 2.3703703703703702,
-     "ratio": 0.4,
-     "rising": null,
-     "section": "",
-     "spike": false,
-     "title": "",
-     "users": 1,
-     "views": 1
-    },
-    {
-     "host": "",
-     "list": false,
-     "name": "환세풍광전 공략",
-     "priorAvg": 0.6296296296296297,
-     "ratio": 1.0,
-     "rising": null,
-     "section": "",
-     "spike": false,
-     "title": "",
-     "users": 1,
-     "views": 1
-    },
-    {
-     "host": "",
-     "list": false,
-     "name": "환세희담 공략",
-     "priorAvg": 1.5555555555555556,
-     "ratio": 0.6,
-     "rising": null,
-     "section": "",
-     "spike": false,
-     "title": "",
-     "users": 1,
-     "views": 1
-    }
-   ],
-   "ydaySites": [],
-   "ydaySources": [
-    {
-     "name": "직접 방문",
-     "sessions": 1
-    },
-    {
-     "name": "google",
-     "sessions": 1
-    }
-   ],
-   "ydayUnresolved": 0,
-   "yesterday": {
-    "date": "2026-09-24",
-    "newUsers": 1,
-    "sessions": 2,
-    "users": 2,
-    "views": 3
-   }
-  },
   "2026-09-25": {
    "baseline": {
     "perUser": {
@@ -6051,17 +5898,17 @@ window.DASHBOARD_DATA['blog'] = {
      "hi": 4.27,
      "lo": 1.47,
      "max": 15.333333333333334,
-     "median": 2.173611111111111,
+     "median": 2.236111111111111,
      "min": 0.0,
      "n": 28,
-     "rank": 16,
+     "rank": 17,
      "value": 2.0,
-     "vsMedian": -7.987220447284347,
+     "vsMedian": -10.559006211180126,
      "where": "usual"
     },
     "sessions": {
      "hi": 15.1,
-     "lo": 2.7,
+     "lo": 3.0,
      "max": 40,
      "median": 8.5,
      "min": 0,
@@ -6087,19 +5934,19 @@ window.DASHBOARD_DATA['blog'] = {
      "hi": 45.3,
      "lo": 3.0,
      "max": 89,
-     "median": 13.5,
+     "median": 16.0,
      "min": 0,
      "n": 28,
      "rank": 27,
      "value": 2,
-     "vsMedian": -85.18518518518519,
+     "vsMedian": -87.5,
      "where": "low"
     }
    },
-   "confirmed": false,
+   "confirmed": true,
    "insights": [
     {
-     "text": "어제는 평소와 크게 다른 점이 없었습니다 — 방문자도 페이지별 조회수도 늘 보던 범위 안입니다.",
+     "text": "10.21은 평소와 크게 다른 점이 없었습니다 — 방문자도 페이지별 조회수도 늘 보던 범위 안입니다.",
      "tone": "flat"
     }
    ],
@@ -6180,55 +6027,237 @@ window.DASHBOARD_DATA['blog'] = {
     "users": 1,
     "views": 2
    }
+  },
+  "2026-10-22": {
+   "baseline": {
+    "perUser": {
+     "hi": 4.27,
+     "lo": 1.47,
+     "max": 15.333333333333334,
+     "median": 2.236111111111111,
+     "min": 0.0,
+     "n": 28,
+     "rank": 9,
+     "value": 3.142857142857143,
+     "vsMedian": 40.55013309671694,
+     "where": "usual"
+    },
+    "sessions": {
+     "hi": 15.1,
+     "lo": 3.0,
+     "max": 40,
+     "median": 8.5,
+     "min": 0,
+     "n": 28,
+     "rank": 15,
+     "value": 8,
+     "vsMedian": -5.88235294117647,
+     "where": "usual"
+    },
+    "users": {
+     "hi": 11.6,
+     "lo": 2.0,
+     "max": 31,
+     "median": 6.0,
+     "min": 0,
+     "n": 28,
+     "rank": 9,
+     "value": 7,
+     "vsMedian": 16.666666666666664,
+     "where": "usual"
+    },
+    "views": {
+     "hi": 45.3,
+     "lo": 3.0,
+     "max": 89,
+     "median": 16.0,
+     "min": 0,
+     "n": 28,
+     "rank": 9,
+     "value": 22,
+     "vsMedian": 37.5,
+     "where": "usual"
+    }
+   },
+   "confirmed": false,
+   "insights": [
+    {
+     "text": "환세취호전 웹 에뮬레이터 및 개선 패치가 어제 8회 — 평소 하루 2.3회 보던 페이지라 **3.4배**로 뛰었습니다.",
+     "tone": "up"
+    }
+   ],
+   "longest": null,
+   "ydayHours": [
+    1,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    1,
+    1,
+    0,
+    0,
+    0,
+    1,
+    0,
+    0,
+    0,
+    1,
+    0,
+    0,
+    2,
+    0,
+    2
+   ],
+   "ydayPages": [
+    {
+     "host": "",
+     "list": false,
+     "name": "환세취호전 웹 에뮬레이터 및 개선 패치",
+     "priorAvg": 2.3333333333333335,
+     "ratio": 3.4,
+     "rising": null,
+     "section": "",
+     "spike": true,
+     "title": "",
+     "users": 2,
+     "views": 8
+    },
+    {
+     "host": "",
+     "list": false,
+     "name": "OYSTER BAY",
+     "priorAvg": 3.962962962962963,
+     "ratio": 1.3,
+     "rising": null,
+     "section": "",
+     "spike": false,
+     "title": "",
+     "users": 2,
+     "views": 5
+    },
+    {
+     "host": "",
+     "list": false,
+     "name": "'환세취호전' 태그의 글 목록",
+     "priorAvg": 1.2222222222222223,
+     "ratio": 2.5,
+     "rising": null,
+     "section": "",
+     "spike": false,
+     "title": "",
+     "users": 1,
+     "views": 3
+    },
+    {
+     "host": "",
+     "list": false,
+     "name": "PC98 환세 시리즈 한글화",
+     "priorAvg": 4.074074074074074,
+     "ratio": 0.7,
+     "rising": null,
+     "section": "",
+     "spike": false,
+     "title": "",
+     "users": 3,
+     "views": 3
+    },
+    {
+     "host": "",
+     "list": false,
+     "name": "환세쾌진극 웹 버전",
+     "priorAvg": 0.5925925925925926,
+     "ratio": 2.0,
+     "rising": null,
+     "section": "",
+     "spike": false,
+     "title": "",
+     "users": 1,
+     "views": 2
+    },
+    {
+     "host": "",
+     "list": false,
+     "name": "환세패유기 소개",
+     "priorAvg": 0.4074074074074074,
+     "ratio": 1.0,
+     "rising": null,
+     "section": "",
+     "spike": false,
+     "title": "",
+     "users": 1,
+     "views": 1
+    }
+   ],
+   "ydaySites": [],
+   "ydaySources": [
+    {
+     "name": "직접 방문",
+     "sessions": 3
+    },
+    {
+     "name": "google",
+     "sessions": 3
+    },
+    {
+     "name": "pc98.atah.io",
+     "sessions": 2
+    }
+   ],
+   "ydayUnresolved": 1,
+   "yesterday": {
+    "date": "2026-10-22",
+    "newUsers": 6,
+    "sessions": 8,
+    "users": 7,
+    "views": 22
+   }
   }
  },
  "hourPattern": [
-  0.64,
+  0.68,
   0.29,
   0.14,
   0.21,
   0.18,
   0.18,
-  0.11,
-  0.14,
   0.07,
   0.14,
-  0.36,
+  0.07,
+  0.18,
+  0.39,
   0.21,
   0.39,
   0.43,
-  0.54,
-  0.86,
+  0.57,
+  0.82,
   1.18,
   0.39,
-  0.18,
+  0.21,
   0.29,
   0.68,
-  0.89,
+  0.96,
   0.71,
-  0.64
+  0.71
  ],
  "insights": [
   {
-   "text": "어제는 평소와 크게 다른 점이 없었습니다 — 방문자도 페이지별 조회수도 늘 보던 범위 안입니다.",
-   "tone": "flat"
+   "text": "환세취호전 웹 에뮬레이터 및 개선 패치가 어제 8회 — 평소 하루 2.3회 보던 페이지라 **3.4배**로 뛰었습니다.",
+   "tone": "up"
   }
  ],
- "longest": {
-  "device": "데스크톱",
-  "engagementSeconds": 6,
-  "landing": "/",
-  "pageViews": 2,
-  "seconds": 12,
-  "source": "google"
- },
+ "longest": null,
  "meta": {
   "key": "blog",
   "label": "블로그",
   "propertyId": "549191220",
   "settledDays": 7,
   "trendDays": 28,
-  "updatedAt": "2026-10-22 09:21"
+  "updatedAt": "2026-10-23 09:18"
  },
  "months": [
   {
@@ -6246,40 +6275,27 @@ window.DASHBOARD_DATA['blog'] = {
    "views": 16.9
   },
   {
-   "days": 21,
+   "days": 22,
    "month": "2026-10",
    "partial": true,
-   "users": 7.6,
-   "views": 25.0
+   "users": 7.5,
+   "views": 24.9
   }
  ],
  "settled": {
-  "avgDuration": 196.6895236595745,
-  "engagementRate": 0.6382978723404256,
+  "avgDuration": 182.24718271111112,
+  "engagementRate": 0.6666666666666666,
   "from": "8daysAgo",
-  "sessions": 47,
+  "sessions": 45,
   "to": "2daysAgo"
  },
  "weekCompare": {
-  "prevUsers": 8.7,
-  "prevViews": 34.1,
-  "users": 4.9,
-  "views": 18.0
+  "prevUsers": 7.1,
+  "prevViews": 23.0,
+  "users": 5.0,
+  "views": 19.6
  },
  "ydayHours": [
-  0,
-  0,
-  0,
-  0,
-  0,
-  0,
-  0,
-  0,
-  0,
-  0,
-  0,
-  0,
-  0,
   1,
   0,
   0,
@@ -6289,29 +6305,94 @@ window.DASHBOARD_DATA['blog'] = {
   0,
   0,
   0,
+  1,
+  1,
   0,
-  0
+  0,
+  0,
+  1,
+  0,
+  0,
+  0,
+  1,
+  0,
+  0,
+  2,
+  0,
+  2
  ],
  "ydayPages": [
   {
    "host": "",
    "list": false,
+   "name": "환세취호전 웹 에뮬레이터 및 개선 패치",
+   "priorAvg": 2.3333333333333335,
+   "ratio": 3.4,
+   "rising": null,
+   "section": "",
+   "spike": true,
+   "title": "",
+   "users": 2,
+   "views": 8
+  },
+  {
+   "host": "",
+   "list": false,
    "name": "OYSTER BAY",
    "priorAvg": 3.962962962962963,
-   "ratio": 0.3,
+   "ratio": 1.3,
+   "rising": null,
+   "section": "",
+   "spike": false,
+   "title": "",
+   "users": 2,
+   "views": 5
+  },
+  {
+   "host": "",
+   "list": false,
+   "name": "'환세취호전' 태그의 글 목록",
+   "priorAvg": 1.2222222222222223,
+   "ratio": 2.5,
    "rising": null,
    "section": "",
    "spike": false,
    "title": "",
    "users": 1,
-   "views": 1
+   "views": 3
   },
   {
    "host": "",
    "list": false,
-   "name": "환세취호전 웹 에뮬레이터 및 개선 패치",
-   "priorAvg": 2.2962962962962963,
-   "ratio": 0.4,
+   "name": "PC98 환세 시리즈 한글화",
+   "priorAvg": 4.074074074074074,
+   "ratio": 0.7,
+   "rising": null,
+   "section": "",
+   "spike": false,
+   "title": "",
+   "users": 3,
+   "views": 3
+  },
+  {
+   "host": "",
+   "list": false,
+   "name": "환세쾌진극 웹 버전",
+   "priorAvg": 0.5925925925925926,
+   "ratio": 2.0,
+   "rising": null,
+   "section": "",
+   "spike": false,
+   "title": "",
+   "users": 1,
+   "views": 2
+  },
+  {
+   "host": "",
+   "list": false,
+   "name": "환세패유기 소개",
+   "priorAvg": 0.4074074074074074,
+   "ratio": 1.0,
    "rising": null,
    "section": "",
    "spike": false,
@@ -6323,16 +6404,24 @@ window.DASHBOARD_DATA['blog'] = {
  "ydaySites": [],
  "ydaySources": [
   {
+   "name": "직접 방문",
+   "sessions": 3
+  },
+  {
    "name": "google",
-   "sessions": 1
+   "sessions": 3
+  },
+  {
+   "name": "pc98.atah.io",
+   "sessions": 2
   }
  ],
- "ydayUnresolved": 0,
+ "ydayUnresolved": 1,
  "yesterday": {
-  "date": "2026-10-21",
-  "newUsers": 1,
-  "sessions": 1,
-  "users": 1,
-  "views": 2
+  "date": "2026-10-22",
+  "newUsers": 6,
+  "sessions": 8,
+  "users": 7,
+  "views": 22
  }
 };
