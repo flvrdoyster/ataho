@@ -1,30 +1,4 @@
 #!/usr/bin/env python3
-"""
-과거 히스토리 일괄 채우기 — 1회성 도구. 자동 실행되는 워크플로우와 무관하다.
-
-날짜 히스토리 기능(ga4_dashboard.py, HISTORY_REFRESH_AGE)은 매일 어제(age=1)·
-그저께(age=2) 딱 두 날짜만 채운다. 그 안쪽(3일 전 ~ TREND_DAYS일 전)은 자연히
-쌓이길 기다리면 26일이 걸리는데, GA4가 그만큼의 과거를 이미 갖고 있으므로
-(실측 2026-08-18: 사이트 속성은 2025-12-16부터, 블로그는 속성이 어려서 9일치뿐)
-한 번에 긁어와 채운다.
-
-TREND_DAYS(28일) 보존 정책은 안 건드린다 — 그 이상 긁어와 봐야 다음 날 아침
-워크플로우가 main()을 돌리며 바로 잘라낸다(main()의 cutoff 정리 로직 참조).
-그래서 나이(age) 3~TREND_DAYS 만 채운다. 이미 있는 날짜는 건너뛰어 재실행해도
-안전하다(부분 실패 후 재시도 가능).
-
-백필한 날짜는 전부 confirmed=True 로 저장한다 — HISTORY_REFRESH_AGE(2일)보다
-훨씬 오래된 날짜라 재처리 지연 걱정 없이 이미 확정된 값이다.
-
---refresh 를 주면 이미 있는 날짜도 age 2~TREND_DAYS 전부 다시 조회해 덮어쓴다.
-수집 로직의 버그를 고친 뒤, 틀린 값으로 얼어 버린 과거 항목을 한 번에 바로잡을 때
-쓴다(값·인사이트·최장 방문이 전부 지금 코드로 다시 계산된다).
-
-실행:
-  GA4_SERVICE_ACCOUNT_FILE=... [GA4_BLOG_PROPERTY_ID=... FEEDBACK_SHEET_ID=...] \\
-      python scripts/ga4_backfill_history.py [--refresh]
-(자격 증명·환경변수는 ga4_dashboard.py 와 동일)
-"""
 import argparse
 import json
 import sys
@@ -47,7 +21,6 @@ def backfill_target(client, target, refresh=False):
     history = on_disk.get("history", {})
 
     filled, skipped = 0, 0
-    # 갱신 모드는 그저께(age=2)도 포함한다 — 어제(age=1)는 main() 몫이다.
     for age in range(2 if refresh else 3, ga4.TREND_DAYS + 1):
         d = ga4.fetch(client, target, age=age, include_settled=False)
         date = d["yesterday"]["date"]
@@ -66,14 +39,13 @@ def backfill_target(client, target, refresh=False):
         filled += 1
         print(f"  {target.key}: {date} {'다시 씀' if refresh else '채움'} (age={age})")
 
-    # main() 과 같은 정리 규칙 — 여기서도 지켜야 다음 날 워크플로우와 결과가 같다.
     cutoff = (ga4.datetime.now(ga4.KST).date()
               - ga4.timedelta(days=ga4.TREND_DAYS)).isoformat()
     on_disk["history"] = {dt: v for dt, v in history.items() if dt >= cutoff}
 
     out_body = json.dumps(on_disk, ensure_ascii=False, indent=1, sort_keys=True)
     path.write_text(
-        f"{ga4.HEADER}window.DASHBOARD_DATA = window.DASHBOARD_DATA || {{}};\n"
+        f"window.DASHBOARD_DATA = window.DASHBOARD_DATA || {{}};\n"
         f"window.DASHBOARD_DATA['{target.key}'] = {out_body};\n",
         encoding="utf-8")
     print(f"  {target.key}: 새로 {filled}일 채움 · 이미 있던 {skipped}일 건너뜀 "

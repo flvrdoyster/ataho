@@ -147,5 +147,5 @@ node scripts/gen_site_index.js --check  # 어긋나면 exit 1
 - 원본 자료가 공개 서빙된다 — `haiyuki_manual/ref/`(원본 설명서 PDF 2개), `kitan_manual/orig/manual_kitan.pdf`, `viewer/kaisin/ref/`(참고 영상·PSD), `viewer/gaiden/title-bg.psd`, 약 22MB. 작업 파일 노출이자 원본 설명서 스캔 배포다. 레포에서 빼도 git 히스토리엔 남고, robots.txt로 막아도 주소를 알면 받을 수 있다
 - 공식 일러스트 갤러리(`resource/img/`)가 장당 1.8~7MB PNG, 합계 36MB이고 라이트박스가 원본을 그대로 띄운다. 웹용 축소본을 따로 두면 모바일 로딩이 크게 준다
 - 패유기 웹의 안 쓰는 자산 18개(약 650KB) — `bgm_option`, `bgm_toilet`, `OPTBG.png`, `HELPBG.png`, 난이도·조작 UI 등. 앞으로 만들 옵션·도움말 화면용일 수 있다
-- 설명 주석이 많은 파일 — `viewer/video_player.js`, `scripts/ga4_dashboard.py`, `world/engine.js`, `dashboard/dashboard.js` 등. 한꺼번에 옮기기보다 각 파일을 고칠 때 문서로 옮긴다
+- 설명 주석이 많은 파일 — `viewer/video_player.js`, `world/engine.js` 등. 한꺼번에 옮기기보다 각 파일을 고칠 때 문서로 옮긴다
 - 옛 경로 `scene_viewer/` 리다이렉트 스텁은 유지한다 — 최근 90일 75회, 한 달 20회꼴로 아직 들어온다(마지막 2026-09-22)

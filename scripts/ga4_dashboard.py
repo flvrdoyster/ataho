@@ -1,35 +1,4 @@
 #!/usr/bin/env python3
-"""
-atah.io GA4 데이터 수집기.
-
-GA4(Google Analytics 4) Data API에서 지표를 읽어 dashboard/data/ga4.js 로
-저장한다. 페이지(dashboard/index.html)는 손으로 관리하고, 이 스크립트는
-데이터만 덮어쓴다 — 자동 커밋 diff가 데이터에만 남도록.
-
-이 대시보드가 말하는 날은 **어제 하루**다. 28일치도 함께 담지만 그건 어제가
-많은 날이었는지 적은 날이었는지 가늠할 자로만 쓴다. 지표마다 확정 시점이
-다르다는 점이 수집 구조를 가른다 — 아래 SETTLED 주석 참조.
-
-출력 형식은 `window.DASHBOARD_DATA['<key>'] = {...};` 인 JS 파일이다(JSON 아님).
-fetch()가 아니라 <script src>로 읽히므로 로컬에서 index.html을 그냥 열어도 동작한다.
-
-자격 증명 (둘 중 하나):
-  - GA4_SERVICE_ACCOUNT_JSON   서비스 계정 키 JSON 전문을 담은 환경변수 (CI)
-  - GA4_SERVICE_ACCOUNT_FILE   키 파일 경로 (로컬 테스트용)
-
-수집 대상은 GA4 속성 하나당 하나이고, 각각 dashboard/data/<key>.js 로 나온다.
-사이트(ga4)는 항상 돌고, 블로그(blog)는 속성 ID가 주어졌을 때만 돈다.
-
-에뮬레이터 피드백 시트(gensei-pc98)도 함께 읽어 dashboard/data/feedback.js 로
-낸다 — "확인" 칸이 안 찍힌 제보가 몇 건 남았는지만. 자세한 내용은 fetch_feedback
-주석 참조.
-
-기타 설정:
-  - GA4_PROPERTY_ID        사이트 속성 ID (기본: 516513119)
-  - GA4_BLOG_PROPERTY_ID   블로그 속성 ID (없으면 블로그는 건너뜀)
-  - GA4_OUTPUT_DIR         저장 폴더 (기본: dashboard/data, 레포 루트 기준)
-  - FEEDBACK_SHEET_ID      피드백 시트 ID (없으면 피드백은 건너뜀)
-"""
 import calendar
 import json
 import os
@@ -53,79 +22,31 @@ REPO_ROOT = Path(__file__).resolve().parent.parent
 OUTPUT_DIR = REPO_ROOT / os.environ.get("GA4_OUTPUT_DIR", "dashboard/data")
 KST = timezone(timedelta(hours=9))
 
-# 이 대시보드가 말하는 날은 "어제"다. 오늘은 아직 진행 중이라 어느 구간에도 넣지 않는다.
 TREND_DAYS = 28
-TREND = (f"{TREND_DAYS}daysAgo", "yesterday")
 
-# GA4는 어제치를 아침에 확정하지 않는다 —— 세션 속성(채널 그룹, 참여 세션)을
-# 하루 이상 뒤에 재처리한다. 실측(2026-08-14 조회): 어제는 참여세션 0 / 채널
-# Unassigned 16-of-22 인데 그저께는 참여율 69%로 정상이었다. 평균 체류가 441초인
-# 날의 참여율 0%는 나올 수 없는 값이고, 그동안 이 값이 매일 화면에 찍혀 왔다.
-#
-# 그래서 지표를 신뢰도로 나눈다:
-#   - 개수 세기(사용자·세션·조회수와 그 분해)는 어제치를 그대로 쓰되, 첫 수집값은 덜 찬 날이 있어 다음 날 다시 받아 정정한다
-#   - 세션 속성(참여율·평균 체류)은 재처리가 끝난 구간에서만 본다  ← SETTLED
-#   - 유입원은 그 중간이라 어제치를 쓰되 미분류분을 합치지 않고 따로 센다
-SETTLED = ("8daysAgo", "2daysAgo")     # 어제를 뺀, 확정된 마지막 7일
+SETTLED = ("8daysAgo", "2daysAgo")
 
-# --- 최장 방문 -----------------------------------------------------------------
-# GA4 Data API 는 세션을 낱개로 주지 않는다 — 세션 ID 같은 차원이 없고, 체류
-# 시간도 평균(averageSessionDuration)으로만 나온다. 그래서 "가장 오래 머문
-# 방문"을 직접 물어볼 수단이 없다.
-#
-# 우회 방법: **세션 내내 값이 안 바뀌는 차원**들로 잘게 쪼갠다. 칸 하나에
-# 세션이 딱 1건만 남으면 그 칸의 "평균"은 나눌 게 하나뿐이라 곧 그 세션의
-# 실제 체류 시간이다. 하루 세션이 10~35건뿐인 규모라 대개 잘 갈라진다.
-#
-# 다만 항상 되지는 않아서 관문 두 개를 세워 두고, 통과 못 하면 그날은 값을
-# 남기지 않는다(화면에서 그냥 빠진다):
-#   1) 정합성 — 쪼갠 세션 수의 합이 원본 총계와 같아야 한다. 다르면 한 세션이
-#      여러 칸에 흩어졌다는 뜻이고(체류 시간도 나뉘어 들어간다), 그러면
-#      "1건짜리 칸"이 온전한 세션이 아니라 조각일 수 있어 값이 실제보다
-#      짧게 나온다.
-#   2) 확정 — 세션이 2건 이상 뭉친 칸은 개별 값을 알 수 없지만 그 칸의 합계
-#      (세션수 × 평균)가 상한이다. 찾은 최댓값이 모든 뭉친 칸의 상한보다
-#      크거나 같아야 "이게 진짜 최댓값"이라고 말할 수 있다.
-#
-# 실측(2026-08-20, 20일 대조): 두 관문 모두 통과한 날이 9일(45%). 어제(1일 전)는
-# 유입원이 아직 안 굳어 세션이 19건→37건으로 쪼개지므로 거의 항상 탈락한다 —
-# HISTORY_REFRESH_AGE 갱신 때 유입원이 확정된 상태로 다시 계산되며 대개 살아난다.
-#
-# 검산(2026-08-20, 08-28의 70.8분 건): 이 칸의 조건을 쪼개기가 아니라 필터로
-# 걸어 통째로 조회하니 세션 1·사용자 1·페이지뷰 7·참여 41분이 나왔고,
-# 이벤트 시각도 15:31~16:42 = 71분으로 계산값과 일치했다. 필터로 걸러 남긴
-# 부스러기가 아니라 실제 한 사람의 한 방문이 맞다.
 LONGEST_DIMS = ("sessionSource", "deviceCategory", "city", "browser",
                 "screenResolution", "operatingSystemVersion", "language",
                 "landingPagePlusQueryString")
 
-# --- 히스토리("살아있는 기록") ----------------------------------------------
-# 매일 어제(1일 전)를 새로 모으고, 그저께(2일 전)를 한 번 더 조회해 어제
-# 저장해 둔 값을 덮어쓴다. 딱 한 번만 갱신하고 그 뒤로는 다시 안 건드린다.
-#
-# 왜 2일인가 — 실측(2026-08-18, 커밋 히스토리로 최근 4일 대조): 08-14~08-17
-# 나흘 모두 수집 당시(1일째) 67~83%가 미분류였는데, 다시 확인했을 때
-# (1~4일 뒤) 전부 0%였다. 08-17은 하루도 안 지나 이미 0이었다 — 2일이면
-# 넉넉하다. 예외로 08-12는 6일이 지나도 1/36(2.8%)이 남았는데, 이건 "재처리
-# 중"이 아니라 리퍼러 없는 방문처럼 영영 분류가 안 되는 종류로 보인다(50%
-# 경고 문턱에 걸리지 않을 만큼 작아 문제되지 않는다).
 HISTORY_REFRESH_AGE = 2
 
 
 def day_range(age):
-    """`age`일 전 하루. age=1 이 옛 YDAY(어제)와 같다."""
     tag = f"{age}daysAgo"
     return (tag, tag)
 
 
+def trend_range(age):
+    return (f"{TREND_DAYS + age - 1}daysAgo", f"{age}daysAgo")
+
+
 def prior_range(age):
-    """`age`일 전 날짜를 뺀 TREND_DAYS 만큼의 비교 구간 — "평소"의 기준.
-    age=1(어제)일 때 옛 PRIOR와 값이 같다."""
     return (f"{TREND_DAYS + age - 1}daysAgo", f"{age + 1}daysAgo")
 
 
 def mmdd(iso):
-    """"2026-08-15" → "08.15". dashboard.js의 mmdd()와 표기를 맞춘다."""
     return iso[5:].replace("-", ".")
 
 def host_regex(pattern):
@@ -136,16 +57,10 @@ def host_regex(pattern):
     ))
 
 
-# 사이트 속성은 atah.io / pc98.atah.io / suiko.atah.io 세 호스트를 함께 받는다.
-# 여기에 localhost·사설 IP(개발 중 자기 방문)까지 섞이면 숫자가 부풀기 때문에
-# 모든 리포트에 호스트 필터를 건다. 블로그는 속성 자체가 분리돼 있지만, 스킨을
-# 로컬에서 미리보기 할 때가 있어 같은 방식으로 막는다.
 SITE_HOSTS = host_regex(r"^([a-z0-9-]+\.)*atah\.io$")
 BLOG_HOSTS = host_regex(r"^([a-z0-9-]+\.)*tistory\.com$")
 MAIN_HOST = "atah.io"
 
-# pagePath 접두사 → 사이트 코너 이름. 위에서부터 첫 일치를 쓴다.
-# atah.io 안에서만 쓴다 (다른 호스트는 사이트 단위로 따로 센다).
 SECTION_PREFIXES = [
     ("/haiyuki_web", "환세패유기 (웹)"),
     ("/haiyuki_manual", "환세패유기 해설서"),
@@ -153,23 +68,16 @@ SECTION_PREFIXES = [
     ("/sweep", "미니게임 · 술창고 청소"),
     ("/swim", "미니게임 · 헤엄치기"),
     ("/viewer", "장면 뷰어"),
-    ("/scene_viewer", "장면 뷰어"),   # 옛 경로 — 이름이 같아야 이력이 한 섹션으로 이어진다
+    ("/scene_viewer", "장면 뷰어"),
     ("/world", "월드 (에디터/뷰어)"),
     ("/dashboard", "대시보드"),
 ]
 SECTION_MAIN = "메인 (아타호의 거처)"
 SECTION_OTHER = "기타"
-SITE_TITLE_SUFFIX = " : atah.io"   # 사이트 공통 <title> 접미사 — pageTitle 정리용
+SITE_TITLE_SUFFIX = " : atah.io"
 
 
 class Target:
-    """수집 대상 하나 = GA4 속성 하나 = 데이터 파일 하나(dashboard/data/<key>.js).
-
-    사이트와 블로그는 성격이 달라서 화면 구성도 다르다:
-    - 사이트는 호스트가 셋이라 사이트별·코너별로 나눠 볼 값이 있다.
-    - 블로그는 호스트가 하나뿐이라 그 둘이 무의미하고, 대신 인기 목록을
-      경로가 아니라 글 제목으로 봐야 한다 (/entry/123 만 봐선 무슨 글인지 모른다).
-    """
 
     def __init__(self, key, label, property_id, hosts, *, split_hosts, page_dimension):
         self.key = key
@@ -187,7 +95,6 @@ def build_targets():
         hosts=SITE_HOSTS, split_hosts=True, page_dimension="pagePath",
     )]
 
-    # 블로그 속성은 아직 없을 수도 있다 — ID가 없으면 조용히 건너뛴다.
     blog_id = os.environ.get("GA4_BLOG_PROPERTY_ID", "").strip()
     if blog_id:
         targets.append(Target(
@@ -215,10 +122,6 @@ def load_credentials():
 
 def report(client, target, *, dimensions=(), metrics, date_range, dimension_filter=None,
            order_by=None, limit=None, offset=None):
-    """run_report 한 번 → [{dim_name: str, metric_name: float}, ...] 로 평탄화.
-
-    대상의 호스트 필터는 여기서 항상 AND로 붙는다 — 호출부가 빠뜨릴 수 없게.
-    """
     start, end = date_range
     if dimension_filter is None:
         dimension_filter = target.hosts
@@ -255,19 +158,11 @@ def report(client, target, *, dimensions=(), metrics, date_range, dimension_filt
 
 
 def totals(client, target, date_range, metrics):
-    """구간 전체 합계 한 줄. 차원이 없으면 GA4는 총계 한 행만 돌려준다."""
     rows = report(client, target, metrics=metrics, date_range=date_range)
     return rows[0] if rows else {m: 0.0 for m in metrics}
 
 
 def fetch_longest_visit(client, target, date_range):
-    """그 하루 중 가장 오래 머문 방문 하나. 못 믿을 날은 None.
-
-    방법과 관문 두 개는 LONGEST_DIMS 주석에 적어 뒀다. 여기서는 그걸 그대로
-    집행하고, 통과했을 때만 그 방문의 맥락(페이지뷰·참여 시간 등)을 한 번 더
-    물어 붙인다. 하루 단위로만 부른다 — 여러 날을 한 번에 쪼개면 칸마다 세션이
-    뭉쳐 관문을 못 넘는다(실측: 7일 통째로는 130건→132건으로 정합성 실패).
-    """
     base = totals(client, target, date_range, ["sessions", "averageSessionDuration"])
     n_sessions, avg = base["sessions"], base["averageSessionDuration"]
     if n_sessions < 1:
@@ -280,7 +175,6 @@ def fetch_longest_visit(client, target, date_range):
     if not rows:
         return None
 
-    # 관문 1) 정합성 — 세션 수와 총 체류 시간이 원본과 맞아떨어져야 한다.
     if (abs(sum(r["sessions"] for r in rows) - n_sessions) > 0.5
             or abs(sum(r["sessions"] * r["averageSessionDuration"]
                        for r in rows) - total_duration) > 1):
@@ -292,7 +186,6 @@ def fetch_longest_visit(client, target, date_range):
     best = max(singles, key=lambda r: r["averageSessionDuration"])
     seconds = best["averageSessionDuration"]
 
-    # 관문 2) 확정 — 뭉친 칸에 더 긴 세션이 숨어 있을 여지가 없어야 한다.
     bound = max((r["sessions"] * r["averageSessionDuration"]
                  for r in rows if r["sessions"] > 1), default=0)
     if seconds < bound:
@@ -300,8 +193,6 @@ def fetch_longest_visit(client, target, date_range):
     if seconds <= 0:
         return None
 
-    # 통과 — 이 한 방문의 맥락을 붙인다. 위에서 쓴 차원값 전부를 필터로 걸면
-    # 그 세션 하나만 남는다(호스트 필터까지 9개, GA4 한도와 같다).
     pin = FilterExpression(and_group=FilterExpressionList(expressions=[
         FilterExpression(filter=Filter(
             field_name=d, string_filter=Filter.StringFilter(value=best[d])))
@@ -315,8 +206,6 @@ def fetch_longest_visit(client, target, date_range):
         "seconds": round(seconds),
         "engagementSeconds": round(d0.get("userEngagementDuration", 0)),
         "pageViews": int(d0.get("screenPageViews", 0)),
-        # 화면이 그대로 쓸 수 있게 여기서 사람 말로 바꿔 둔다 — 유입원 라벨은
-        # 어제 표(ydaySources)와 같은 규칙을 쓴다.
         "source": SOURCE_LABELS.get(source, source) or "출처 미상",
         "landing": best["landingPagePlusQueryString"],
         "device": DEVICE_LABELS.get(best["deviceCategory"], best["deviceCategory"]),
@@ -338,49 +227,32 @@ def date_key(yyyymmdd):
 
 
 def pct_delta(cur, prev):
-    """증감률(%). 이전 구간이 0이면 비율이 무의미하므로 None."""
     if not prev:
         return None
     return (cur - prev) / prev * 100
 
 
-# 유입원 이름 중 "아직 모른다"는 뜻인 값들. 어제치에서는 이것들이 크게 잡히는데
-# (재처리 전이라) 다른 출처와 나란히 세우면 1위가 "(not set)"이 되어 화면이
-# 거짓말을 한다. 합계에서 떼어 내 따로 센다.
 UNRESOLVED_SOURCES = {"(not set)", "(data not available)", ""}
 SOURCE_LABELS = {"(direct)": "직접 방문"}
 DEVICE_LABELS = {"mobile": "모바일", "desktop": "데스크톱", "tablet": "태블릿"}
 
-# 인사이트 문장을 낼지 말지 가르는 문턱. 이 사이트는 하루 15~20명 규모라
-# 문턱이 낮으면 매일 "몇 배 뛰었다"가 나와 아무 뜻이 없어진다.
-SPIKE_MIN_VIEWS = 5    # 이보다 적게 본 페이지는 몇 배가 됐든 말하지 않는다
-SPIKE_RATIO = 2.0      # 평소 하루 평균의 몇 배부터 "튀었다"고 할지
-RATIO_FLOOR = 1.0      # 배율의 분모 하한
-RECENT_DAYS = 7        # "요즘"의 길이 — 튐은 이 구간보다도 높아야 하고, 증가는 이 구간 평균으로 잰다
-RISING_MIN_AVG = 2.0   # 최근 7일 하루 평균이 이보다 적으면 증가를 말하지 않는다
-RISING_RATIO = 1.5     # 최근 7일 평균이 그 전 평균의 몇 배부터 "늘었다"고 할지
-RISING_MIN_DAYS = 3    # 최근 7일 중 그 전 평균보다 높았던 날이 이만큼은 돼야 "늘었다"
-BAND_PCT = (10, 90)    # 히어로 배지·추세 띠의 아래·위 백분위
-LONG_START = "2020-01-01"   # 월별 흐름 조회 시작 — 속성이 생긴 날 이전은 0으로 와서 잘라 낸다
+SPIKE_MIN_VIEWS = 5
+SPIKE_RATIO = 2.0
+RATIO_FLOOR = 1.0
+RECENT_DAYS = 7
+RISING_MIN_AVG = 2.0
+RISING_RATIO = 1.5
+RISING_MIN_DAYS = 3
+BAND_PCT = (10, 90)
+LONG_START = "2020-01-01"
 LIST_PAGE_RE = re.compile(r"(카테고리|태그)의 글 목록|^태그 목록$|^방명록$")
-DEBUG_SOURCES = {"tagassistant.google.com"}   # GTM 미리보기로 연 내 방문
-MIN_DAYS_FOR_NORMAL = 14   # 이만큼은 쌓여야 "평소와 같았다"고 말할 수 있다
-# 한 사람당 몇 장·신규/재방문 같은 "소비 깊이" 문장은 사람 수가 적으면 한두 명의
-# 습관을 그날의 성격처럼 말하게 된다(블로그: 방문자 2명인 날에 "얕게 본 날").
-MIN_USERS_FOR_DEPTH = 5    # 그날 방문자가 이보다 적으면 깊이 문장을 내지 않는다
-MIN_GROUP_USERS = 2        # 신규·재방문 각 쪽 최소 인원 — 한 명의 습관이 "몫"을 좌우하지 않게
+DEBUG_SOURCES = {"tagassistant.google.com"}
+MIN_DAYS_FOR_NORMAL = 14
+MIN_USERS_FOR_DEPTH = 5
+MIN_GROUP_USERS = 2
 
 
 def josa(word, with_final, without_final):
-    """받침 유무에 맞는 조사를 고른다 — "환세풍광전이" / "술창고 청소가".
-
-    문장 안에 "이(가)"를 그대로 두면 자동 생성 티가 심하게 난다. 페이지 이름이
-    데이터에서 오는 값이라 미리 정할 수 없어 여기서 가린다.
-    한글 음절(가~힣)은 (코드 - 0xAC00) % 28 이 0이 아니면 받침이 있다.
-    끝의 괄호·따옴표 따위는 건너뛴다 — "메인 (아타호의 거처)"는 ")"가 아니라
-    "처"로 판정해야 한다. 한글로 끝나지 않는 이름(영문 경로 등)은 규칙이
-    갈려서 두 형태를 함께 쓴다.
-    """
     tail = (word or "").strip()
     while True:
         cut = re.sub(r"\s*(\([^()]*\)|\[[^\[\]]*\])$", "", tail).rstrip("'\"」』.… \t")
@@ -403,12 +275,10 @@ def josa(word, with_final, without_final):
 
 
 def quartiles(values):
-    """28일 분포 요약. 어제가 '평소'인지 가리는 자."""
     if not values:
         return None
     ordered = sorted(values)
     n = len(ordered)
-    # statistics.quantiles 는 표본이 2개 미만이면 예외를 던진다
     if n >= 4:
         cuts = statistics.quantiles(ordered, n=100, method="inclusive")
         lo, hi = cuts[BAND_PCT[0] - 1], cuts[BAND_PCT[1] - 1]
@@ -419,10 +289,8 @@ def quartiles(values):
 
 
 def standing(value, box):
-    """어제 값이 28일 분포의 어디인가. 화면 문구와 색을 여기서 한 번에 정한다."""
     if not box:
         return None
-    # 동점이면 같은 등수 — "3번째로 많은 날"이 여럿일 수 있다
     rank = sum(1 for v in box["_values"] if v > value) + 1
     if value > box["hi"]:
         where = "high"
@@ -445,9 +313,6 @@ def distribution(values, yday_value):
 
 
 def rising_state(full):
-    """일별 조회 배열(오래된→최신)의 마지막 날 기준으로 "며칠에 걸쳐 늘었다"고 할 만한가.
-    최근 7일 평균이 기준 이상이고, 그 전 평균보다 충분히 높고, 창 안의 7일 평균 중 기록이고,
-    하루 튐 하나가 평균을 끌어올린 게 아니도록 7일 중 RISING_MIN_DAYS일 이상이 그 전 평균보다 높아야 한다."""
     if len(full) < RECENT_DAYS * 2:
         return None
     roll = [sum(full[e - RECENT_DAYS + 1:e + 1]) / RECENT_DAYS
@@ -462,24 +327,18 @@ def rising_state(full):
 
 
 def fetch(client, target, age=1, include_settled=True):
-    """대상 날짜(`age`일 전) 하루를 중심으로 모은다. 28일치는 그 날짜를 가늠할
-    기준자로만 쓴다. age=1(기본값)이 옛 "어제"다 — 매일의 최신 스냅샷과
-    히스토리 갱신(HISTORY_REFRESH_AGE) 양쪽이 이 함수 하나를 같이 쓴다.
-    include_settled=False 면 참여율 조회(날짜 무관 롤링 구간)를 건너뛴다 —
-    히스토리 항목엔 안 실리는 값이라 그때는 조회할 필요가 없다."""
     data = {}
 
-    # --- 1) 어제 하루 -----------------------------------------------------
     yday = totals(client, target, day_range(age),
                   ["activeUsers", "newUsers", "sessions", "screenPageViews"])
     daily_rows = report(client, target, dimensions=["date"],
                         metrics=["activeUsers", "sessions", "screenPageViews"],
-                        date_range=TREND, order_by=("date", False))
+                        date_range=trend_range(age), order_by=("date", False))
     got = {date_key(r["date"]): r for r in daily_rows}
     data["daily"] = []
     if got:
         day = date.fromisoformat(min(got))
-        end = max(date.fromisoformat(max(got)), datetime.now(KST).date() - timedelta(days=1))
+        end = max(date.fromisoformat(max(got)), datetime.now(KST).date() - timedelta(days=age))
         while day <= end:
             r = got.get(day.isoformat(), {})
             data["daily"].append({"date": day.isoformat(), "users": int(r.get("activeUsers", 0)),
@@ -487,9 +346,7 @@ def fetch(client, target, age=1, include_settled=True):
                                   "views": int(r.get("screenPageViews", 0))})
             day += timedelta(days=1)
 
-    # daily 는 "28daysAgo~어제"로 항상 age=1 기준 끝나므로, 대상 날짜는
-    # 뒤에서 age번째다(age=1→마지막, age=2→끝에서 둘째, ...).
-    yday_date = data["daily"][-age]["date"] if len(data["daily"]) >= age else None
+    yday_date = data["daily"][-1]["date"] if data["daily"] else None
     data["yesterday"] = {
         "date": yday_date,
         "users": int(yday["activeUsers"]),
@@ -498,14 +355,8 @@ def fetch(client, target, age=1, include_settled=True):
         "views": int(yday["screenPageViews"]),
     }
 
-    # --- 2) 평소 대비 어디쯤인가 -----------------------------------------
-    # 어제 하나만 보면 많은 날인지 적은 날인지 알 수 없다. 28일 분포에서의
-    # 위치를 사용자와 조회수 양쪽으로 낸다 — 둘의 방향이 갈리는 날이 있다
-    # (사람 수는 평소인데 조회수만 높은 날 = 적은 사람이 깊게 본 날).
     per_user = [(d["views"] / d["users"] if d["users"] else 0.0) for d in data["daily"]]
-    # 대상 날짜의 값은 창의 마지막이 아니라 뒤에서 age번째다(yday_date 와 같은 규칙).
-    # daily 는 age 와 무관하게 늘 어제로 끝나는 28일 창이다.
-    pu_value = per_user[-age] if len(per_user) >= age else 0.0
+    pu_value = per_user[-1] if per_user else 0.0
     data["baseline"] = {
         "users": distribution([d["users"] for d in data["daily"]],
                               data["yesterday"]["users"]),
@@ -513,20 +364,9 @@ def fetch(client, target, age=1, include_settled=True):
                               data["yesterday"]["views"]),
         "sessions": distribution([d["sessions"] for d in data["daily"]],
                                  data["yesterday"]["sessions"]),
-        # 한 사람이 몇 장을 보고 갔나. 방문자 수와 조회수를 따로 보면 "사람은
-        # 평소인데 조회수만 많은 날"이 눈에 안 들어오는데, 이 값 하나면 잡힌다.
         "perUser": distribution(per_user, pu_value),
     }
 
-    # --- 3) 어제 본 페이지 / 사이트별 -------------------------------------
-    # 사이트는 "어느 호스트의 어느 경로"가 필요하고, 블로그는 /entry/123 만
-    # 봐선 무슨 글인지 모르니 제목으로 센다.
-    #
-    # 사이트 쪽도 pageTitle 을 함께 물어본다 — pc98/suiko 페이지는 atah.io 같은
-    # 코너 분류가 없어 원시 경로(/hukyou.html)만 남는데, GA4가 <title>을 자동
-    # 수집한 pageTitle 에는 "환세풍광전 : atah.io" 처럼 사람이 읽는 이름이 있다.
-    # 접미사(" : atah.io")는 이 사이트 공통 <title> 템플릿이라 잘라낸다
-    # (2026-08-14 API 실측: pc98·suiko·atah.io 모든 페이지가 이 형식이었다).
     page_dims = (["hostName", "pagePath", "pageTitle"] if target.split_hosts
                  else [target.page_dimension])
 
@@ -539,18 +379,11 @@ def fetch(client, target, age=1, include_settled=True):
     page_rows = report(client, target, dimensions=page_dims,
                        metrics=["screenPageViews", "activeUsers"],
                        date_range=day_range(age), order_by=("screenPageViews", True), limit=15)
-    # 같은 경로가 제목별로 갈라지면 조회 없이 참여 이벤트만 있는 조각 행이 끼어
-    # 든다 — 에뮬레이터 페이지는 실행 중에 제목이 "Neko Project II kai"로 바뀐다
-    # (실측 09-13 /kitan-opening.html: 조회 5회 행 옆에 "조회 0 · 사람 1" 행이
-    # 따로 나왔다). "본 페이지" 표에 조회 0은 뜻이 없으므로 뺀다.
     page_rows = [r for r in page_rows if r["screenPageViews"] > 0]
 
-    # 같은 페이지를 어제 이전 구간에서도 세어 "평소 하루 몇 번 보던 페이지인가"를
-    # 낸다. 어제 23회가 많은 건지 적은 건지는 그 페이지의 평소를 알아야 말할 수
-    # 있다 — 어떤 페이지는 원래 하루 9회고 어떤 페이지는 0.7회다.
     prior_key = ["hostName", "pagePath"] if target.split_hosts else [target.page_dimension]
-    prior_days = max(1, len(data["daily"]) - 1)   # prior_range(age) 는 어제를 뺀 구간
-    span = prior_days + RECENT_DAYS   # 앞 7일은 "지난 7일 안에 이미 늘던 중이었나"를 같은 창 길이로 재는 데 쓴다
+    prior_days = max(1, len(data["daily"]) - 1)
+    span = prior_days + RECENT_DAYS
     prior_dates = []
     if yday_date:
         y0 = date.fromisoformat(yday_date)
@@ -569,8 +402,6 @@ def fetch(client, target, age=1, include_settled=True):
         data["ydayPages"] = [
             {"name": r["pagePath"], "title": clean_title(r.get("pageTitle")),
              "host": r["hostName"],
-             # 코너 이름(미니게임·해설서 등)은 이 레포만 아는 분류다. 예전엔 따로
-             # 구획이 있었지만 어제 기준으로는 1~3행뿐이라, 페이지 표의 라벨로 붙인다.
              "section": (classify_section(r["pagePath"]) if r["hostName"] == MAIN_HOST else "")
                         .replace(SECTION_OTHER, ""),
              "views": int(r["screenPageViews"]), "users": int(r["activeUsers"]),
@@ -586,9 +417,6 @@ def fetch(client, target, age=1, include_settled=True):
             for r in page_rows
         ]
 
-    # "평소보다 튀었다"의 판정은 여기서만 한다 — 화면(표의 배율 표시)과 인사이트
-    # 문장이 같은 문턱을 쓰게 하려는 것. 두 곳에서 따로 재면 언젠가 어긋나서
-    # "표에는 튀었다고 표시됐는데 문장은 아무 말도 안 하는" 상태가 된다.
     for p in data["ydayPages"]:
         series_all = p.pop("_series") or [0] * len(prior_dates)
         series = series_all[-prior_days:]
@@ -609,19 +437,10 @@ def fetch(client, target, age=1, include_settled=True):
                                   for k in range(1, RECENT_DAYS + 1)):
             p["rising"] = now_rising
 
-    # --- 3-1) 신규 vs 재방문 — 날짜별 28일치 ------------------------------
-    # 조회수를 기준으로 본다 — 사용자 수는 구간마다 중복 제외라 합이 총계와 안 맞고
-    # (실측: new 11 + returning 4 + 미분류 6 = 21 ≠ 총 15), 세션도 넘친다.
-    # 조회수는 정확히 떨어진다(22 + 36 + 2 = 60 = 어제 총 조회).
-    #
-    # 하루치가 아니라 daily 와 같은 28일 창을 날짜별로 받는다 — "재방문자 몫"이
-    # 평소와 견줘 기록적인지 말하려면 다른 날의 값이 있어야 한다(인사이트 3번).
-    # newVsReturning 은 세션 속성이라 재처리 지연군이다 — 어제치에는 빈 문자열로
-    # 남는 몫(other)이 있어, 그게 큰 날은 인사이트가 비교에서 뺀다.
     by_day = {}
     for r in report(client, target, dimensions=["date", "newVsReturning"],
                     metrics=["screenPageViews", "activeUsers"],
-                    date_range=TREND, limit=500):
+                    date_range=trend_range(age), limit=500):
         day = by_day.setdefault(date_key(r["date"]), {
             "newViews": 0, "newUsers": 0, "retViews": 0, "retUsers": 0, "otherViews": 0})
         kind = r["newVsReturning"]
@@ -633,7 +452,6 @@ def fetch(client, target, age=1, include_settled=True):
             day["retUsers"] += int(r["activeUsers"])
         else:
             day["otherViews"] += int(r["screenPageViews"])
-    # 인사이트 문장(3번)에만 쓰이고 화면은 읽지 않는다 — 밑줄을 붙여 파일에서 뺀다.
     data["_visitorsByDay"] = by_day
 
     data["ydaySites"] = []
@@ -645,9 +463,6 @@ def fetch(client, target, age=1, include_settled=True):
                             order_by=("screenPageViews", True), limit=10)
         ]
 
-    # --- 4) 어제 온 곳 ----------------------------------------------------
-    # 미분류(not set 등)를 목록에 섞으면 대개 그게 1위로 올라와 화면이 거짓말을
-    # 한다. 떼어 내 따로 세고, 화면에서도 "아직 분류 중"으로 따로 말한다.
     sources, unresolved = [], 0
     for r in report(client, target, dimensions=["sessionSource"],
                     metrics=["sessions"], date_range=day_range(age),
@@ -661,8 +476,6 @@ def fetch(client, target, age=1, include_settled=True):
     data["ydaySources"] = sources
     data["ydayUnresolved"] = unresolved
 
-    # 어제 처음 보는 유입원을 가리기 위한 28일치 목록(어제 제외).
-    # 이름만 쓰고 버린다 — 화면에 싣지 않고 인사이트 문장에만 쓴다.
     data["_scope"] = target.label
     data["_priorSources"] = sorted({
         r["sessionSource"] for r in report(
@@ -671,7 +484,6 @@ def fetch(client, target, age=1, include_settled=True):
         if r["sessionSource"] and r["sessionSource"] not in UNRESOLVED_SOURCES
     })
 
-    # --- 5) 어제 시간대 ---------------------------------------------------
     hours = [0] * 24
     for r in report(client, target, dimensions=["hour"], metrics=["sessions"],
                     date_range=day_range(age), limit=24):
@@ -683,11 +495,10 @@ def fetch(client, target, age=1, include_settled=True):
             hours[hh] = int(r["sessions"])
     data["ydayHours"] = hours
 
-    # --- 5-0) 시간대 패턴·긴 흐름 — 날짜 무관이라 top-level 에만 둔다 ----------
     if include_settled:
         pattern = [0.0] * 24
         for r in report(client, target, dimensions=["hour"], metrics=["sessions"],
-                        date_range=TREND, limit=24):
+                        date_range=trend_range(age), limit=24):
             try:
                 hh = int(r["hour"])
             except ValueError:
@@ -728,18 +539,8 @@ def fetch(client, target, age=1, include_settled=True):
             data["weekCompare"] = {"users": avg(week, "users"), "prevUsers": avg(prev, "users"),
                                    "views": avg(week, "views"), "prevViews": avg(prev, "views")}
 
-    # --- 5-1) 그날의 최장 방문 ---------------------------------------------
-    # 날짜에 딸린 값이라 history 항목에 함께 얼린다. 화면의 "확정 구간" 칸은
-    # 이 값을 날짜마다 새로 묻지 않고 쌓인 history 에서 최댓값을 고른다.
-    # 못 믿을 날은 None 이고, 그런 날은 화면에서 후보로 안 잡힌다.
     data["longest"] = fetch_longest_visit(client, target, day_range(age))
 
-    # --- 6) 확정 구간 지표 -------------------------------------------------
-    # 참여율·평균 체류는 어제치를 믿을 수 없다(파일 맨 위 주석 참조).
-    # 재처리가 끝난 구간에서만 내고, 화면에도 그 구간을 밝혀 적는다.
-    #
-    # 날짜 무관(늘 "지금 기준 최근 7일")이라 히스토리 항목엔 안 싣는다 — 그래서
-    # HISTORY_REFRESH_AGE 갱신 때는 include_settled=False 로 이 조회 자체를 건너뛴다.
     if include_settled:
         settled = totals(client, target, SETTLED,
                          ["engagementRate", "averageSessionDuration", "sessions"])
@@ -754,38 +555,13 @@ def fetch(client, target, age=1, include_settled=True):
 
 
 def build_insights(data, day_label="어제", confirmed=False):
-    """대상 날짜를 주어로. 화면을 봐서는 알 수 없는 것만 문장으로 낸다.
-
-    규칙 하나: **화면에 이미 있는 숫자를 되풀이하지 않는다.** 히어로가 "어제
-    방문자 15명 · 평소 범위"를 이미 말하고 표가 "환세풍광전 23회"를 이미
-    보여주는데, 인사이트가 같은 말을 하면 네 줄이 두 줄 값어치밖에 못 한다.
-    그래서 여기서는 비교(평소 그 페이지는 몇 회였나)와 분해(누가 그 조회수를
-    만들었나)만 말한다. 할 말이 없으면 줄 수가 줄어드는 게 정상이다.
-
-    문장마다 눈이 먼저 가야 할 숫자 하나를 **…** 로 감싼다. 화면(dashboard.js)이
-    문장을 이스케이프한 뒤 이 표시만 <b> 로 바꾼다 — HTML을 여기서 만들지 않는다.
-
-    day_label — 문장 속에서 "어제"를 대신할 말. 최신(age=1) 스냅샷을 만들 때는
-    기본값 "어제"를 그대로 쓰고, 히스토리에 얼려 둘 스냅샷(그저께 갱신 포함)은
-    호출부가 mmdd(날짜)("08.15")를 넘긴다 — "어제"는 상대적인 말이라 얼려서
-    나중에 다시 보여주면 그날 그대로 거짓말이 된다("3주 뒤에도 어제 15명"),
-    반면 날짜는 얼려도 계속 맞다.
-
-    confirmed — 이 스냅샷이 HISTORY_REFRESH_AGE 갱신을 거쳤는지. 미분류 유입
-    문장(6번)이 이 값으로 갈린다: 아직이면 "내일 다시 확인됩니다"가 참이고,
-    이미 거쳤으면 그 약속을 지킬 다음 갱신이 없으므로 다른 말을 해야 한다.
-    """
     out = []
     y = data["yesterday"]
     if not y["date"]:
         return out
 
-    # "유입원이 어제 생겼습니다"처럼 조사가 필요한 자리 전용. day_label이 "어제"면
-    # 그 자체로 부사어라 조사가 없고, 날짜("08.15")면 "에"를 붙여야 자연스럽다.
     day_at = day_label if day_label == "어제" else f"{day_label}에"
 
-    # 1) 평소보다 튄 페이지 — 어제 조회수가 왜 그랬는지에 대한 답.
-    #    판정(spike)은 fetch 에서 이미 끝났다. 표의 배율 표시와 같은 값을 쓴다.
     def page_label(p):
         return p["section"] or p["title"] or p["name"]
 
@@ -807,7 +583,6 @@ def build_insights(data, day_label="어제", confirmed=False):
                     f"**{top['ratio']:.1f}배**로 " + ("뛰었고," + rise_tail if rise else "뛰었습니다."))
         out.append({"tone": "up", "text": text})
 
-    # 1-1) 며칠에 걸쳐 늘어난 페이지 — 7일 평균이 창 안에서 새 기록일 때만.
     risers = [p for p in pages if p.get("rising") and p is not top]
     if risers:
         r = max(risers, key=lambda p: p["rising"]["avg7"] - p["rising"]["before"])
@@ -821,13 +596,7 @@ def build_insights(data, day_label="어제", confirmed=False):
                     "가장 높습니다.",
         })
 
-    # 규칙 2·3·5는 같은 원칙을 따른다: 그날이 최근 28일의 **기록**일 때만 말한다.
-    # "평소 범위(q1~q3) 밖"을 조건으로 두면 정의상 절반의 날이 걸려 격일로 나오고
-    # (실측 28일 중 14~15일), 범위 밖이라는 사실은 히어로 배지가 이미 말한다.
-    # 비교 상대는 그날을 뺀 나머지 날이고, 같은 값인 날이 있으면 기록이 아니므로
-    # 침묵한다(블로그는 방문자 2명인 날이 4일이라 "가장 적은 날"이 넘쳐났다).
     def record(value, others):
-        """나머지 날보다 엄밀히 크면 "high", 작으면 "low", 아니면 None."""
         if not others:
             return None
         if value > max(others):
@@ -836,7 +605,6 @@ def build_insights(data, day_label="어제", confirmed=False):
             return "low"
         return None
 
-    # 2) 한 사람이 몇 장을 보고 갔나
     pu_others = [d["views"] / d["users"] for d in data["daily"]
                  if d["date"] != y["date"] and d["users"]]
     pu_value = y["views"] / y["users"] if y["users"] else 0.0
@@ -851,11 +619,6 @@ def build_insights(data, day_label="어제", confirmed=False):
                     f"(다른 날 {'최고' if deeper else '최저'} {edge:.1f}장).",
         })
 
-    # 3) 그 조회수를 누가 만들었나 — 재방문자 몫(조회 비중)이 기록일 때만.
-    #    평소엔 재방문자가 더 깊게 본다(실측: 사이트 28일 중 22일) — 그걸 매일
-    #    "재방문 쪽입니다"라고 말하던 게 옛 규칙이었다. 1인당 장수로 견주지 않는
-    #    이유: 조회 없이 참여만 잡힌 사람 때문에 "재방문 0.5장" 같은 착시가 생긴다.
-    #    미분류(재처리 전)가 20% 넘게 섞인 날은 비율이 흔들려 비교에서 뺀다.
     def ret_share(v):
         total = v["newViews"] + v["retViews"] + v["otherViews"]
         if not total or v["otherViews"] / total >= 0.2 or not (v["newViews"] + v["retViews"]):
@@ -874,7 +637,6 @@ def build_insights(data, day_label="어제", confirmed=False):
     if rec:
         high = rec == "high"
         edge = max(others) if high else min(others)
-        # 분류가 덜 끝나 빠진 날이 있으면 "27일 중"처럼 숫자만 줄어 이상하게 읽힌다.
         span = (f"최근 {len(others) + 1}일" if len(others) + 1 >= len(data["daily"])
                 else f"최근 {len(data['daily'])}일 가운데 분류가 끝난 {len(others) + 1}일")
         out.append({
@@ -885,7 +647,6 @@ def build_insights(data, day_label="어제", confirmed=False):
                     + ("" if high else " 새로 온 사람들이 대부분을 봤습니다."),
         })
 
-    # 4) 28일 동안 없다가 어제 처음 나타난 유입원
     prior = set(data.get("_priorSources", []))
     fresh = [s for s in data["ydaySources"] if s["name"] not in prior and s["name"] not in DEBUG_SOURCES
              and s["name"] != SOURCE_LABELS["(direct)"]]
@@ -896,9 +657,6 @@ def build_insights(data, day_label="어제", confirmed=False):
             "text": f"{data.get('_scope', '이 사이트')}에 최근 {TREND_DAYS}일 동안 없던 유입원이 {day_at} 생겼습니다 — {names}.",
         })
 
-    # 5) 방문자 수 — 기록일 때만(위 규칙 2·3과 같은 원칙). 비교 상대에서 그날을
-    #    빼는 게 특히 중요했다: 분포의 max 에는 그날도 들어 있어, 새 기록인 날
-    #    "그 전 최고"가 제 숫자로 나왔다.
     others = [d["users"] for d in data["daily"] if d["date"] != y["date"]]
     rec = record(y["users"], others)
     if rec:
@@ -911,17 +669,6 @@ def build_insights(data, day_label="어제", confirmed=False):
                     f"{edge:,}명).",
         })
 
-    # 6) 미분류가 절반을 넘으면 수치를 곧이곧대로 읽지 말라고 말해 준다.
-    #    여기서 합계를 "{day_label} 세션 수"라고 부르지 않는 이유: GA4는 한
-    #    세션에 출처를 여럿 붙이는 경우가 있어 유입원별 합이 총 세션을 넘는다
-    #    (실측 22 vs 35). 헤드라인 숫자와 어긋나는 총계를 말하면 화면이 서로 모순된다.
-    #
-    #    confirmed 로 갈린다. 아직 갱신 전(fresh, age=1)이면 "내일 자동으로
-    #    다시 확인됩니다"가 참말이다 — HISTORY_REFRESH_AGE 갱신이 실제로 내일
-    #    이 날짜를 다시 조회해 덮어쓴다. 이미 갱신을 거쳤는데도(confirmed)
-    #    여전히 절반 넘게 미분류면, 그건 재처리 지연이 아니라 계측 설정 문제일
-    #    가능성이 크므로("영영 그렇다") 다른 문장을 쓴다 — 더 이상 재갱신
-    #    예정이 없는데 "다시 확인됩니다"라고 하면 또 지키지 못할 약속이 된다.
     resolved = sum(s["sessions"] for s in data["ydaySources"])
     total = resolved + data["ydayUnresolved"]
     if total and data["ydayUnresolved"] / total > 0.5:
@@ -940,8 +687,6 @@ def build_insights(data, day_label="어제", confirmed=False):
                         f"확정하는 데 하루 이상 걸립니다. 이 값은 내일 자동으로 다시 확인됩니다.",
             })
 
-    # 할 말이 없으면 없다고 말한다 — 빈 자리만 남기면 고장 난 것처럼 보인다.
-    # 다만 "평소와 같았다"는 판단은 평소를 알 만큼 쌓였을 때만 할 수 있다.
     if not out:
         days = len(data["daily"])
         if days < MIN_DAYS_FOR_NORMAL:
@@ -960,12 +705,11 @@ def build_insights(data, day_label="어제", confirmed=False):
     return out
 
 
-# --- 최근 7일 인사이트 --------------------------------------------------------
 WEEK = 7
-WEEKLY_SPAN = 35            # 7일 창 4개(검색 비교) + 앞선 6일(이미 알렸는지 재는 창)
-SHIFT_RATIO = 2.0           # 채널 세션이 전 주의 몇 배(또는 몇 분의 1)면 말할지
-SHIFT_MIN = 15              # 그리고 차이가 이 세션 수 이상일 때만
-SEARCH_RATIO = 1.5          # 검색 유입이 전 3주 주평균의 몇 배면 말할지
+WEEKLY_SPAN = 35
+SHIFT_RATIO = 2.0
+SHIFT_MIN = 15
+SEARCH_RATIO = 1.5
 SEARCH_MIN = 5
 CHANNEL_LABELS = {"Direct": "직접 들어온 방문", "Referral": "다른 사이트 링크로 온 방문",
                   "Organic Social": "소셜에서 온 방문"}
@@ -1015,7 +759,7 @@ def fetch_weekly(client, target):
             if key == "play_milestone":
                 key = f"play_{r['customEvent:minutes']}"
             games.setdefault(g, {})[key] = games.get(g, {}).get(key, 0) + int(r["totalUsers"])
-    except Exception:            # noqa: BLE001 — 게임 측정기준이 없는 속성(블로그)
+    except Exception:  # noqa: BLE001
         games = {}
 
     return {"series": series, "cur": by_host((f"{WEEK}daysAgo", "yesterday")),
@@ -1128,27 +872,13 @@ def weekly_insights(w, scope, recent_keys, said_today=()):
     return out
 
 
-# --- 에뮬레이터 피드백 시트 -------------------------------------------------
-# gensei-pc98 의 게임 페이지에서 보낸 제보가 쌓이는 시트. 쓰는 쪽은 그 레포의
-# tools/feedback-appsscript.gs 이고, 여기서는 읽기만 한다.
-#
-# 시트 열은 10개인데 앞 8개(시각·분류·게임·버전·메시지·스크린샷·UA·URL)만
-# Apps Script 가 쓴다. 뒤의 비고·확인은 손으로 관리하는 처리용 칸이라,
-# "확인"이 안 찍힌 줄 = 아직 안 본 제보다.
 SHEETS_SCOPE = "https://www.googleapis.com/auth/spreadsheets.readonly"
 FEEDBACK_RANGE = "A1:J1000"
 FEEDBACK_KEYS = ("시각", "분류", "게임", "확인")
-# "2026. 8. 15 오전 9:19:41" 앞머리에서 날짜만. 시트 로캘이 바뀌어 구분자가
-# 달라져도 숫자 세 덩이만 집으면 되도록 느슨하게 맞춘다.
 FEEDBACK_DATE_RE = re.compile(r"(\d{4})\D+(\d{1,2})\D+(\d{1,2})")
 
 
 def _sheet_values(creds, sheet_id, cell_range):
-    """Sheets API v4 values.get — 얇은 REST 래퍼.
-
-    google-api-python-client 를 새로 넣지 않으려고 REST 를 직접 부른다. 이미
-    쓰고 있는 google-auth 로 토큰만 얻으면 되므로 의존성이 늘지 않는다.
-    """
     import google.auth.transport.requests
 
     scoped = creds.with_scopes([SHEETS_SCOPE])
@@ -1161,39 +891,24 @@ def _sheet_values(creds, sheet_id, cell_range):
 
 
 def fetch_feedback(creds, sheet_id):
-    """아직 확인 안 한 제보가 몇 건인지만 집계한다.
-
-    **내용은 가져오지 않는다** — 메시지·UA·스크린샷 링크는 읽지도 싣지도 않는다.
-    대시보드는 noindex 일 뿐 주소만 알면 누구나 보는 공개 페이지라, 남이 보낸
-    글을 옮겨 실으면 제보자가 예상 못 한 형태로 공개된다. 여기서 만드는 건
-    "몇 건이 밀렸나"까지이고, 실제 내용은 시트를 열어 봐야 한다.
-
-    읽기에 실패해도 수집 전체를 세우지 않는다 — GA4 쪽은 멀쩡한데 시트 권한
-    하나 때문에 대시보드가 통째로 안 갱신되면 손해가 더 크다.
-    """
     out = {"available": False, "updatedAt": datetime.now(KST).strftime("%Y-%m-%d %H:%M"),
            "sheetUrl": f"https://docs.google.com/spreadsheets/d/{sheet_id}/edit"}
     try:
         rows = _sheet_values(creds, sheet_id, FEEDBACK_RANGE)
-    except Exception as err:                      # noqa: BLE001 — 어떤 실패든 건너뛴다
+    except Exception as err:  # noqa: BLE001
         out["error"] = f"{type(err).__name__}"
-        # 403 하나로는 "시트가 공유 안 됨"과 "Sheets API가 꺼짐"이 구분되지 않아
-        # 몇 달째 원인을 모른 채 실패했다. Google 응답의 열거값만 옮겨 적는다 —
-        # message 같은 자유 문구엔 프로젝트 번호 등이 섞일 수 있어 공개 파일에 안 싣는다.
         if isinstance(err, urllib.error.HTTPError):
             out["status"] = err.code
             try:
                 body = json.loads(err.read().decode("utf-8")).get("error", {})
                 reasons = [d.get("reason") for d in body.get("details", []) if d.get("reason")]
                 out["reason"] = reasons[0] if reasons else body.get("status")
-            except Exception:                     # noqa: BLE001 — 원인 파악 실패는 무시
+            except Exception:  # noqa: BLE001
                 pass
         print(f"  피드백 시트를 읽지 못해 건너뜁니다: {err} "
               f"({out.get('reason') or '원인 미상'})", file=sys.stderr)
         return out
 
-    # 헤더 줄을 찾아서 쓴다 — 행 번호를 박아 두면 시트 맨 위에 제목 줄이 하나
-    # 생기는 순간 조용히 어긋난다.
     header_at = next((i for i, r in enumerate(rows[:10])
                       if "확인" in r and "시각" in r), None)
     if header_at is None:
@@ -1212,11 +927,8 @@ def fetch_feedback(creds, sheet_id):
     for row in rows[header_at + 1:]:
         when = cell(row, "시각")
         if not when:
-            continue                              # 빈 줄·서식만 남은 줄
+            continue
         total += 1
-        # TRUE 가 아니면 전부 "아직 안 봄"으로 센다. 수신 스크립트가 확인 칸을
-        # 쓰지 않으므로 새 제보는 FALSE 가 아니라 **빈 칸**으로 들어온다 —
-        # FALSE 만 세면 정작 새로 온 제보가 리마인드에 안 잡힌다.
         if cell(row, "확인").upper() == "TRUE":
             continue
         pending.append({"category": cell(row, "분류") or "(미분류)",
@@ -1247,39 +959,23 @@ def fetch_feedback(creds, sheet_id):
     return out
 
 
-HEADER = """// 이 파일은 자동 생성됩니다 — scripts/ga4_dashboard.py 가 매일 덮어씁니다.
-// 직접 고치지 마세요. 페이지 쪽 수정은 dashboard/ 의 html·css·js 에서.
-"""
-
-# history 항목 하나에 담는 필드. daily(28일 트렌드)·settled(참여율 롤링 구간)는
-# 날짜 종속이 아니라 대상 전체에 하나뿐이라 top-level에만 두고 여기엔 안 싣는다
-# — 항목마다 28개짜리 배열을 복제하면 history가 금방 커진다. 밑줄 필드(인사이트
-# 계산용 중간 재료)도 당연히 뺀다.
 HISTORY_KEEP = ("yesterday", "baseline", "ydayPages", "ydaySites",
                 "ydaySources", "ydayUnresolved", "ydayHours", "insights", "confirmed",
                 "longest")
 
 
 def snapshot_shape(data):
-    """fetch()+build_insights() 결과에서 history 에 얼려 둘 부분만 추린다."""
     return {k: data[k] for k in HISTORY_KEEP if k in data}
 
 
 def _load_prior_history(path):
-    """직전 산출물의 history 를 읽어 이어간다.
-
-    history는 "누적"이라 매번 새로 계산하는 게 아니라 이전 파일에서 읽어
-    와야 한다 — 이 스크립트가 데이터의 유일한 출처이므로 제 산출물을 다시
-    읽는다. 파일이 없거나(첫 실행) 형식이 깨져 있으면 빈 채로 시작한다 —
-    사고가 아니라 그만큼 짧은 기록으로 다시 쌓이기 시작할 뿐이다.
-    """
     if not path.exists():
         return {}
     try:
         text = path.read_text(encoding="utf-8")
         body = text.split("=", 2)[2].strip().rstrip(";")
         return json.loads(body).get("history", {})
-    except Exception as err:                          # noqa: BLE001
+    except Exception as err:  # noqa: BLE001
         print(f"  {path.name}의 이전 history 를 못 읽어 새로 시작합니다: "
               f"{type(err).__name__}", file=sys.stderr)
         return {}
@@ -1294,7 +990,6 @@ def main():
         path = OUTPUT_DIR / f"{target.key}.js"
         history = _load_prior_history(path)
 
-        # 1) 어제(1일 전) — 지금까지 하던 대로. 아직 재처리 전이라 미확정.
         data = fetch(client, target, age=1)
         data["confirmed"] = False
         data["insights"] = build_insights(data, day_label="어제", confirmed=False)
@@ -1306,9 +1001,6 @@ def main():
         if data["yesterday"]["date"]:
             history[data["yesterday"]["date"]] = snapshot_shape(data)
 
-        # 2) 그저께(HISTORY_REFRESH_AGE 일 전) — 한 번만 다시 물어봐서 재처리가
-        #    끝난 값으로 덮어쓴다("살아있는 기록"). fetch() 를 그대로 재사용하되
-        #    settled(날짜 무관 롤링 구간)는 이미 위에서 얻었으니 다시 안 묻는다.
         day2 = fetch(client, target, age=HISTORY_REFRESH_AGE, include_settled=False)
         day2_date = day2["yesterday"]["date"]
         if day2_date:
@@ -1318,8 +1010,6 @@ def main():
                 i for i in history.get(day2_date, {}).get("insights", []) if i.get("key")]
             history[day2_date] = snapshot_shape(day2)
 
-        # 보존 기간 28일 — daily 트렌드 창과 맞춘다("이 대시보드가 신경 쓰는
-        # 범위"를 하나로 통일). 안 그러면 history가 끝없이 커진다.
         cutoff = (datetime.now(KST).date() - timedelta(days=TREND_DAYS)).isoformat()
         data["history"] = {d: v for d, v in history.items() if d >= cutoff}
 
@@ -1332,31 +1022,23 @@ def main():
             "settledDays": 7,
         }
 
-        # 밑줄로 시작하는 키는 인사이트 문장을 만들 때만 쓰는 중간 재료다.
-        # 화면은 안 쓰므로 파일에 싣지 않는다 — 매일 커밋되는 파일이라 군더더기를 뺀다.
         data = {k: v for k, v in data.items() if not k.startswith("_")}
 
         body = json.dumps(data, ensure_ascii=False, indent=1, sort_keys=True)
         path.write_text(
-            f"{HEADER}window.DASHBOARD_DATA = window.DASHBOARD_DATA || {{}};\n"
+            f"window.DASHBOARD_DATA = window.DASHBOARD_DATA || {{}};\n"
             f"window.DASHBOARD_DATA['{target.key}'] = {body};\n",
             encoding="utf-8")
         print(f"Wrote {path} ({path.stat().st_size:,} bytes) "
               f"— {target.label} / 속성 {target.property_id} "
               f"/ history {len(data['history'])}일")
 
-    # 피드백은 GA4 대상이 아니라 시트라서 위 루프 밖에 둔다. 탭도 만들지 않는다
-    # (탭은 data/*.js 의 DASHBOARD_DATA 키 개수만큼 생기는데, 피드백은 별도
-    # 전역 DASHBOARD_FEEDBACK 으로 낸다 — 어제 지표가 아니라 처리할 일 목록이다).
-    #
-    # 시트 ID가 없어도 파일은 만든다. index.html 이 <script src>로 무조건 읽으므로
-    # 파일이 없으면 404가 나서 콘솔이 지저분해진다.
     sheet_id = os.environ.get("FEEDBACK_SHEET_ID", "").strip()
     feedback = (fetch_feedback(creds, sheet_id) if sheet_id
                 else {"available": False, "error": "no-sheet-id"})
     fb_path = OUTPUT_DIR / "feedback.js"
     fb_path.write_text(
-        f"{HEADER}window.DASHBOARD_FEEDBACK = "
+        f"window.DASHBOARD_FEEDBACK = "
         f"{json.dumps(feedback, ensure_ascii=False, indent=1, sort_keys=True)};\n",
         encoding="utf-8")
     state = (f"미확인 {feedback['pending']['count']}건 / 전체 {feedback['total']}건"

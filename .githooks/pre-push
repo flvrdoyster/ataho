@@ -1,25 +1,4 @@
 #!/usr/bin/env bash
-# dashboard/data/*.js 의 history(28일치 기록)가 origin보다 뒤처진 채로
-# push 되는 걸 막는다.
-#
-# merge=ours(.gitattributes)는 머지 때 신선도를 안 따지고 무조건 로컬을 쓴다.
-# 로컬이 origin에서 며칠 안 당겨온 채로 컬렉터를 돌리면, "어제" 날짜 자체는
-# 맞게 나와도 그 사이 origin이 이미 채워둔 history 항목들은 로컬에 없을 수
-# 있다 — 이 상태로 push 하면 그 항목들이 조용히 사라진다. 그래서 "어제 날짜가
-# 맞나"가 아니라 "origin의 history 날짜를 로컬이 다 갖고 있나"를 비교한다.
-# 여기에 더해 history 바깥의 최상위 스냅샷(yesterday·daily·settled)이 뒤로
-# 가지 않았는지도 본다 — 날짜 집합만 보면 이쪽 후퇴를 놓친다.
-#
-# 단, 28일 보존 창(TREND_DAYS, scripts/ga4_dashboard.py) 밖으로 자연스럽게
-# 밀려난 옛 날짜는 비교에서 뺀다 — origin의 마지막 push가 며칠 전이면 그때는
-# 아직 창 안이었던 날짜를, 오늘 로컬이 정상적으로 가지치기했을 뿐인데 그걸
-# "유실"로 오탐하면 안 되기 때문이다(2026-08-20 실제로 겪음: 7/22가 오늘
-# 기준 창 밖으로 나가 로컬엔 없고 origin의 옛 커밋엔 남아 있었다).
-#
-# 활성화(클론마다 1회, 로컬 설정이라 git으로 관리 안 됨):
-#   git config core.hooksPath .githooks
-#
-# 급할 때 건너뛰기: SKIP_GA4_CHECK=1 git push
 
 if [ -n "$SKIP_GA4_CHECK" ]; then
   exit 0
@@ -36,11 +15,9 @@ trap 'rm -rf "$TMPDIR"' EXIT
 
 blocked=0
 
-# pre-push 훅은 push 될 갱신 내역을 stdin으로 받는다:
-#   <local ref> <local sha1> <remote ref> <remote sha1>
 while read -r local_ref local_sha remote_ref remote_sha; do
-  [ "$local_sha" = "$ZERO" ] && continue   # 브랜치/태그 삭제 — 비교 불필요
-  [ "$remote_sha" = "$ZERO" ] && continue  # origin에 아직 없는 새 브랜치 — 비교 대상 없음
+  [ "$local_sha" = "$ZERO" ] && continue
+  [ "$remote_sha" = "$ZERO" ] && continue
 
   for name in ga4 blog; do
     path="dashboard/data/${name}.js"
@@ -58,12 +35,9 @@ from pathlib import Path
 
 tmp = Path(sys.argv[1])
 
-# scripts/ga4_dashboard.py의 TREND_DAYS와 반드시 같은 값이어야 한다 — 거기서
-# 바뀌면 여기도 같이 고칠 것.
 TREND_DAYS = 28
 KST = timezone(timedelta(hours=9))
 cutoff = (datetime.now(KST).date() - timedelta(days=TREND_DAYS)).isoformat()
-
 
 def load(path):
     if not path.exists() or path.stat().st_size == 0:
@@ -73,8 +47,7 @@ def load(path):
         body = text.split("=", 2)[2].strip().rstrip(";")
         return json.loads(body)
     except Exception:
-        return None  # 형식이 안 맞으면 이 훅의 책임이 아니다 — 조용히 넘어간다
-
+        return None
 
 blocked = False
 for name in ("ga4", "blog"):
@@ -82,19 +55,12 @@ for name in ("ga4", "blog"):
     if local is None or remote is None:
         continue
 
-    # 1) history — origin 이 가진 날짜를 로컬이 다 갖고 있나.
-    #    오늘 기준 보존 창 밖으로 밀려난 날짜는 "로컬이 뒤처짐"이 아니라
-    #    "정상적으로 늙어서 빠짐"이므로 비교에서 뺀다.
     gap = sorted(d for d in (set(remote.get("history", {}))
                              - set(local.get("history", {}))) if d >= cutoff)
     if gap:
         blocked = True
         print(f"   {name}.js: origin에는 있는데 로컬엔 없는 날짜 — {', '.join(gap)}")
 
-    # 2) 최상위 스냅샷 — history 바깥 필드(yesterday·daily·settled)는 위 검사에
-    #    안 걸린다. 실제로 2026-08-31 에 블로그가 origin 08-29 → 로컬 08-26 으로
-    #    후퇴한 채 통과할 뻔했다. 기준 날짜가 뒤로 가면 그 하루치 최신 수치가
-    #    통째로 옛것으로 덮이는 것이므로 막는다.
     lo = (local.get("yesterday") or {}).get("date")
     ro = (remote.get("yesterday") or {}).get("date")
     if lo and ro and lo < ro:

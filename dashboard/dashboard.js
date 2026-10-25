@@ -1,31 +1,3 @@
-/* atah.io 대시보드 — data/*.js 가 window.DASHBOARD_DATA 에 넣어 둔 대상들을 탭으로 그린다.
-   데이터는 scripts/ga4_dashboard.py 가 매일 새로 쓰고, 이 파일은 손으로 관리한다.
-   대상을 늘리려면 수집 스크립트에 Target 을 추가하고 index.html 에 <script> 한 줄만
-   더하면 된다 — 탭은 여기서 자동으로 만들어진다.
-
-   이 페이지의 주어는 "어제"다. 28일치도 담지만 어제가 많은 날이었는지 적은
-   날이었는지 가늠할 자로만 쓴다. 지표마다 GA4가 확정하는 시점이 달라서
-   (수집 스크립트의 SETTLED 주석 참조) 어제 칸에 올릴 수 있는 것과 없는 것이
-   갈린다 — 참여율·평균 체류는 맨 아래 확정 구간에만 둔다.
-
-   히어로의 ◀▶ 로 과거 날짜(최대 28일 전)도 다시 볼 수 있다 — 수집 스크립트가
-   매일 "어제"를 history 에 얼려 넣고, 그저께치는 재처리가 끝난 값으로 한 번
-   더 덮어써서(HISTORY_REFRESH_AGE) 그 뒤로는 안 건드린다("살아있는 기록").
-   과거 날짜를 보고 있을 땐 isLatest=false 가 두 가지를 바꾼다: 문장 속
-   "어제"가 그 날짜(mmdd)로 바뀌고, 날짜 무관인 확정 구간·미확인 피드백
-   모듈은 안 보인다(현재 시점 값을 과거 화면 옆에 두면 시점이 섞인다). 자세한
-   흐름은 파일 맨 아래 snapshotFor()/renderPanel() 참조.
-
-   차트 규칙(고쳐도 되지만 이유는 알고 고치세요):
-   - y축은 하나만. 크기가 다른 두 지표를 한 그림에 겹치지 않는다.
-   - 색은 항목의 정체성을 따른다. 순위가 바뀌어도 같은 항목은 같은 색.
-   - 크기(많고 적음)는 파랑 한 색의 명도로만 표현한다(무지개 금지).
-   - 많고 적음을 좋고 나쁨의 색으로 칠하지 않는다. 방문자가 적은 날이
-     나쁜 날은 아니므로 "평소 범위 / 많은 편 / 적은 편"이라는 말로만 쓴다.
-   - 캔버스로 그린 것에는 같은 값을 읽을 수 있는 표가 함께 있다.
-
-   보이는 값(색·서체·굵기·둥글기)은 이 파일에 두지 않는다 — 전부 theme.css 의
-   토큰에서 읽는다. 테마를 갈아끼울 때 이 파일을 열지 않아도 되게 하려는 것. */
 (function () {
     'use strict';
 
@@ -34,15 +6,9 @@
     const panelRoot = document.getElementById('dash-panels');
     const views = Object.keys(registry).map((key) => ({ key, data: registry[key] }));
 
-    /* 피드백은 GA4 대상이 아니라 시트라서 탭을 만들지 않고 전역으로 온다.
-       수집 쪽이 집계만 담아 보낸다 — 메시지·UA·스크린샷 링크는 아예 읽지
-       않는다(공개 페이지라 남이 보낸 글을 옮겨 싣지 않는다). */
     const fb = window.DASHBOARD_FEEDBACK || {};
     const fbPending = (fb.available && fb.pending && fb.pending.count > 0)
         ? fb.pending : null;
-    /* 시트를 못 읽은 날은 "미확인 0건"과 겉보기가 같아서, 조용히 두면 고장을 모른
-       채 지나간다(실제로 몇 달 그랬다). 시트 ID를 안 준 경우(no-sheet-id)는 일부러
-       끈 것이라 말하지 않는다. 원인은 수집기가 Google 응답의 열거값만 옮겨 온다. */
     const FB_REASON = {
         SERVICE_DISABLED: 'Sheets API가 꺼져 있습니다',
         PERMISSION_DENIED: '시트가 서비스 계정에 공유되지 않았습니다',
@@ -51,15 +17,8 @@
         ? (FB_REASON[fb.reason] || (fb.status ? `HTTP ${fb.status}` : fb.error))
         : null;
 
-    // --- 토큰 & 포맷 -------------------------------------------------
-    /* 캔버스(Chart.js·스파크라인 SVG)는 CSS가 닿지 않는 그림이라, 색·서체·굵기를
-       여기서 직접 정해야 한다. 그 값을 코드에 박아 두면 테마를 갈아끼울 때 CSS와
-       JS 두 곳을 고쳐야 하므로, 전부 theme.css 의 토큰에서 읽어 온다.
-       새 시각 상수가 필요하면 여기 박지 말고 theme.css 에 토큰을 만들 것. */
     const css = getComputedStyle(document.documentElement);
     const T = (name, fallback) => css.getPropertyValue(name).trim() || fallback || '';
-    /* px·배수 토큰을 숫자로. 토큰이 없거나 이상하면 fallback — 테마 파일을
-       빠뜨려도 차트가 통째로 사라지지는 않게. */
     const N = (name, fallback) => {
         const v = parseFloat(T(name));
         return Number.isFinite(v) ? v : fallback;
@@ -73,7 +32,7 @@
                  T('--series-4'), T('--series-5'), T('--series-6')],
     };
     const FONT = T('--font-ui', 'sans-serif');
-    const G = {   // 기하 — 전부 theme.css 에서
+    const G = {
         fontSize: N('--chart-font-size', 12),
         lineW: N('--line-w', 2),
         tension: N('--line-tension', 0.25),
@@ -81,9 +40,6 @@
         pointR: N('--point-r', 4),
     };
 
-    /* 선 아래 면은 같은 색의 옅은 칠. #rrggbb 면 알파를 덧붙이고, 그 밖의
-       표기(rgba()·color-mix 등)를 쓰는 테마에서는 원색을 그대로 돌려준다 —
-       문자열을 잘못 이어 붙여 색이 통째로 무효가 되는 것보다 낫다. */
     function fillColor(color) {
         if (!/^#[0-9a-f]{6}$/i.test(color)) return color;
         const a = Math.round(Math.min(1, Math.max(0, G.fillAlpha)) * 255);
@@ -92,8 +48,6 @@
 
     const nf = new Intl.NumberFormat('ko-KR');
     const fmt = (n) => nf.format(Math.round(n));
-    /* 하루 평균처럼 1보다 작을 수 있는 값은 반올림하면 "0"이 되어 버린다
-       (평소 하루 0.7회짜리 페이지가 "0"으로 보이면 배율을 읽을 수가 없다). */
     const dec1 = (n) => n.toFixed(1);
     const pct = (n, digits) => `${n.toFixed(digits === undefined ? 0 : digits)}%`;
     const dur = (s) => {
@@ -108,9 +62,6 @@
         new Date(Date.parse(`${iso}T00:00:00Z`) + days * 86400000)
             .toISOString().slice(0, 10);
 
-    /* 확정 구간(어제를 뺀 7일) 안에서 가장 오래 머문 방문. 수집기의 SETTLED
-       (8daysAgo~2daysAgo)와 같은 창을 날짜로 다시 그린다 — 최신이 어제이므로
-       어제-7 ~ 어제-1 이다. 판정을 못 내린 날은 longest 가 없어 건너뛴다. */
     function longestInSettled(viewData) {
         const latest = viewData.yesterday && viewData.yesterday.date;
         const hist = viewData.history;
@@ -133,9 +84,6 @@
             `</tbody></table></div></details>`;
     }
 
-    /* 미확인 피드백 리마인드 — 탭 위에 띠 하나. 탭을 옮겨 다녀도 늘 보이도록
-       패널 밖(탭바 앞)에 둔다. 0건이면 아무것도 만들지 않는다: 평소엔 화면이
-       예전과 똑같고, 남아 있을 때만 시끄럽다. */
     const tally = (items) => items.map((i) => `${esc(i.name)} ${fmt(i.count)}`).join(' · ');
     const fbAsOf = /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}$/.test(fb.updatedAt || '')
         ? `${mmdd(fb.updatedAt.slice(0, 10))} ${fb.updatedAt.slice(11)} 기준` : '';
@@ -152,10 +100,6 @@
                 `rel="noopener noreferrer">시트 열기</a>` : '') + '</p>');
     }
 
-    /* 데이터가 멈췄을 때의 경고 — 워크플로우가 실패하면 옛 숫자가 그대로 남아
-       화면만 봐서는 모른다. 매일 아침 한 번 도니, 마지막 갱신일이 KST 오늘보다
-       2일 이상 전이면 적어도 하루치가 빠진 것이다(그날 실행 전엔 1일 차라
-       오탐이 없다). 대상이 여럿이면 가장 오래된 쪽 기준. */
     const kstToday = new Date(Date.now() + 9 * 3600000).toISOString().slice(0, 10);
     const updatedDays = views
         .map((v) => (v.data.meta && v.data.meta.updatedAt || '').slice(0, 10))
@@ -175,10 +119,6 @@
         return;
     }
 
-    // --- Chart.js 공통 ------------------------------------------------
-    /* Chart.js 는 CDN에서 온다. 못 불러오면 Chart 가 없는데, 여기서 그대로
-       Chart.defaults 를 건드리면 ReferenceError 로 이 파일 전체가 멈춰 화면이
-       통째로 빈다. 차트만 포기하고 나머지는 그린다(makeCharts 참조). */
     const hasChart = typeof window.Chart === 'function';
     if (hasChart) {
         Chart.defaults.font.family = FONT;
@@ -190,7 +130,6 @@
     const gridStyle = { color: C.grid, drawTicks: false, borderDash: [] };
     const axisStyle = { color: C.axis };
 
-    /* 세로 기준선 — 선 그래프에서 어느 날짜를 읽고 있는지 표시 */
     const crosshair = {
         id: 'crosshair',
         beforeDatasetsDraw(chart) {
@@ -209,8 +148,6 @@
         },
     };
 
-    /* 선 끝 직접 라벨. 두 선이 글자 한 줄(+여유 2px)보다 가까우면 겹쳐 읽히므로
-       범례에 맡기고 그리지 않는다 — 서체 크기를 키우면 이 기준도 같이 커진다. */
     const lineEndLabels = {
         id: 'lineEndLabels',
         afterDatasetsDraw(chart) {
@@ -243,10 +180,6 @@
             data: {
                 labels,
                 datasets: datasets.map((d, i) => {
-                    /* 선 색은 데이터셋이 정할 수 있다. 주색(#7CA6DE)은 큰 면에는
-                       좋지만 2px 선으로는 흰 배경에서 2.5:1 뿐이라, 띠 위를
-                       지날 때 윤곽을 잃는다 — 추세선은 같은 색상각의 진한
-                       형제(--accent)를 쓴다. 면은 주색 그대로. */
                     const line = d.color || C.series[i];
                     return {
                     label: d.label,
@@ -255,13 +188,8 @@
                     backgroundColor: fillColor(C.series[i]),
                     borderWidth: G.lineW,
                     tension: G.tension,
-                    /* 굴곡 — monotone 은 데이터 점을 넘어서 부풀지 않는 곡선이다.
-                       Chart.js 기본 cubic 은 7→25→15 처럼 뾰족한 날에서 곡선이
-                       점 바깥으로 튀었다가 되돌아오느라 억지로 꺾인 것처럼 보인다.
-                       tension 이 0 이면(각진 톤을 원하는 스킨) 곡선을 끄고 직선으로. */
                     cubicInterpolationMode: G.tension > 0 ? 'monotone' : 'default',
                     fill: !!d.fill,
-                    /* 점마다 다른 크기를 줄 수 있다 — 어제 점만 크게 그릴 때 쓴다 */
                     pointRadius: d.pointRadius === undefined ? 0 : d.pointRadius,
                     pointBackgroundColor: line,
                     pointBorderColor: C.surface,
@@ -305,9 +233,6 @@
         });
     }
 
-    /* 어제 하루를 28일 분포 위에 얹어 그린다 — 띠(lo~hi)와 중앙값 선을 추세선
-       뒤에 깔면 "어제가 평소보다 위인지 아래인지"를 눈금을 읽지 않고 알 수 있다.
-       crosshair 와 같은 방식으로 데이터셋보다 먼저 그려 배경이 되게 한다. */
     function normalBand(box) {
         return {
             id: 'normalBand',
@@ -333,21 +258,10 @@
         };
     }
 
-    // --- 화면 한 벌 ----------------------------------------------------
-    /* 이 페이지의 주어는 "어제"다. 28일치는 어제를 가늠할 자로만 쓴다.
-       지표마다 확정 시점이 달라서(수집 스크립트의 SETTLED 주석 참조) 어제 칸에
-       올릴 수 있는 것과 없는 것이 갈린다 — 참여율·평균 체류는 맨 아래 확정 구간에만.
-
-       화면은 모듈(박스) 여럿을 12칸 격자에 올려 만든다. 구획을 하나 넣거나
-       빼거나 순서를 바꾸는 일이 mod() 호출 하나로 끝나게 하려는 것 —
-       배치 규칙은 CSS 한 곳(.dash-main / .module)에만 있다. */
     function buildHTML(data, key, primary, isLatest, latestDate) {
     const parts = [];
     const y = data.yesterday;
 
-    /* 모듈 하나 = 박스 하나. span 은 12칸 중 몇 칸을 차지할지.
-       note·body 는 이 파일 안에서 만든 마크업이라 그대로 넣고, 데이터에서 온
-       문자열은 각 호출부에서 esc() 를 거친다. */
     function mod(span, title, note, body, extra) {
         return `<section class="module span-${span}${extra ? ' ' + extra : ''}">` +
             (title ? `<h2>${esc(title)}</h2>` : '') +
@@ -363,19 +277,6 @@
             '<br>측정 코드를 심은 다음 날부터 채워집니다.</p>');
     }
 
-    /* dayLabel — 문장 속에서 "어제"를 대신할 말. 파이썬의 build_insights()와
-       같은 이유로 갈린다: 최신 날짜는 "어제"가 맞지만, 히스토리를 눌러 과거
-       날짜를 보고 있을 땐 "어제"라고 하면 거짓말이 된다(그 날짜는 이제
-       어제가 아니다). heroWord 는 히어로 타이틀 전용 — 바로 옆에 날짜 태그가
-       또 있어서 "08.15 (08.15)"처럼 겹치지 않게 "{n}일 전"으로 대신한다
-       (fbPending.oldestDays 와 같은 표기). n 은 최신("어제" = 1일 전) 기준
-       날짜 차이로 구하므로 뷰어의 로컬 타임존과 무관하다 — 단 이때 쓰는
-       "최신"은 반드시 latestDate 인자여야 한다. data.yesterday 는 과거
-       스냅샷을 볼 땐 그 날짜 자신의 yesterday 로 바뀌어 있어서(history 항목이
-       자기 자신을 yesterday 로 갖고 있음) data.yesterday.date 를 쓰면 항상
-       y.date 와 같아져 n 이 늘 1로 나온다 — 실제로 겪은 버그.
-       위의 "데이터 없음" 가드보다 반드시 뒤에 있어야 한다 — y.date 가 없을 때
-       mmdd(y.date) 를 부르면 죽는다. */
     const dayLabel = isLatest ? '어제' : mmdd(y.date);
     const daysAgo = Math.round(
         (Date.parse(`${latestDate}T00:00:00Z`) - Date.parse(`${y.date}T00:00:00Z`))
@@ -385,10 +286,6 @@
     const base = data.baseline || {};
     const WHERE = { high: '많은 편', low: '적은 편', usual: '평소 범위' };
 
-    /* 어제가 분포의 어디인지 한 줄로. 색은 좋고 나쁨이 아니라 위치를 말한다 —
-       방문자가 적은 날이 "나쁜 날"은 아니므로 증감색은 쓰지 않는다.
-       num 은 칸마다 다르다 — 방문자·세션은 정수지만 "한 사람당 2.7장"은
-       반올림하면 3장이 되어 4.0장과의 차이가 사라진다. */
     function standing(box, unit, num) {
         if (!box) return '<div class="standing"></div>';
         return `<div class="standing"><span class="where ${esc(box.where)}">` +
@@ -407,12 +304,7 @@
         </div>`;
     }
 
-    // 1) 어제 스탯 네 칸
     const pu = base.perUser;
-    /* "방문자"는 GA4 활성 사용자, "새로 온 사람"은 전체 사용자 기준이라 드물게
-       신규가 방문자보다 많게 나온다(실측 블로그 09-01: 활성 2 · 전체 3 · 신규 3).
-       "방문자 2명 · 새로 온 사람 3명"은 읽는 사람에게 모순이므로 그런 날은 보조줄을
-       뺀다 — 값을 깎아 맞추면 없는 숫자를 만드는 셈이다. */
     const newSub = y.newUsers <= y.users ? `새로 온 사람 ${fmt(y.newUsers)}명` : '';
     parts.push(mod(5, '', '', `
         <div class="yday-title">
@@ -430,11 +322,6 @@
             ${stat('한 사람당', pu, '장', dec1)}
         </div>`, 'accent stretch'));
 
-    // 2) 평소와 견주면 — 28일 추세선 + 분포 띠. 어제 점만 크게.
-    /* data.meta.trendDays 는 수집 스크립트가 "요청한" 구간(항상 28)이라 실제
-       받아온 일수와 다를 수 있다 — 블로그는 속성을 튼 지 얼마 안 돼 daily 가
-       5행뿐인데 trendDays 를 그대로 쓰면 "최근 28일"이라고 거짓말하게 된다.
-       실제로 그려지는 data.daily.length 를 쓴다(아래 「평소/일」 설명과 같은 이유). */
     parts.push(mod(7, '평소와 견주면',
         `최근 ${data.daily.length}일 일별 방문자 ·
          띠는 열흘 중 여드레가 들어오는 구간, 점선은 중앙값`,
@@ -443,9 +330,6 @@
              data.daily.slice().reverse().map((d) => [
                  d.date, fmt(d.users), fmt(d.sessions), fmt(d.views)]))}`, 'stretch'));
 
-    // 3) 인사이트 — 수집기가 **…** 로 감싼 숫자만 굵게. 이스케이프를 먼저 하고
-    // 표시를 바꾸므로 문장 속 데이터(페이지 이름 등)가 태그로 해석될 일은 없다.
-    // 이 표시가 생기기 전에 얼린 과거 문장은 그냥 평문으로 나온다.
     if (data.insights && data.insights.length) {
         const emph = (t) => esc(t).replace(/\*\*(.+?)\*\*/g, '<b>$1</b>');
         parts.push(mod(12, '', '',
@@ -453,10 +337,6 @@
                 .map((i) => `<li>${emph(i.text)}</li>`).join('')}</ul>`));
     }
 
-    /* 3-1) 미확인 피드백 — 첫 탭의 최신 화면에만. 어제 지표가 아니라 "지금
-       처리할 일"이라 대상(사이트·블로그)에 딸린 값도 아니고 날짜에 딸린
-       값도 아니다 — 3주 전 날짜를 보고 있는데 "지금 미확인 3건"이 뜨면
-       그날의 일처럼 오해할 수 있어 과거 화면에선 뺀다. */
     if (primary && isLatest && fbPending) {
         const oldest = fbPending.oldest
             ? `가장 오래된 건 ${esc(mmdd(fbPending.oldest))}` +
@@ -482,14 +362,6 @@
             `${esc(fbFailed)}.${fbAsOf ? ` (${fbAsOf})` : ''}</p>`));
     }
 
-    // 4) 어제 본 페이지 — 사이트별 소계를 위에 한 줄로
-    /* 이름 우선순위: 코너(atah.io 안) → 페이지 제목(pc98/suiko — <title>에서
-       따온 사람이 읽는 이름) → 원시 경로(둘 다 없을 때만). 원래 경로로 바꿔치기
-       한 경우에만 그 경로를 작게 보조줄로 남긴다 — "환세풍광전" 아래 "/hukyou.html".
-       「평소/일」 칸의 배율은 수집 스크립트가 튀었다고 판정한 행에만 붙인다 —
-       문턱을 여기서 다시 재면 표와 인사이트 문장이 언젠가 어긋난다. */
-    /* 순위 표의 이름 칸 뒤에 옅은 막대 — 숫자만으론 크기 차가 늦게 읽힌다.
-       길이는 그 표의 1위를 100%로 둔 상대값. */
     const barW = (v, max) => `--w:${max > 0 ? (v / max * 100).toFixed(1) : 0}%`;
     const pageMax = Math.max(0, ...data.ydayPages.map((p) => p.views));
     const pageRows = data.ydayPages.map((p) => {
@@ -499,8 +371,6 @@
             ? (p.priorAvg < 1 ? '&lt;1' : dec1(p.priorAvg)) + (p.spike
                 ? `<span class="ratio">${dec1(p.ratio)}배</span>` : '')
             : `<span class="dim" title="${esc(dayLabel)} 이전 구간에는 조회가 없던 페이지">처음</span>`;
-        /* 호스트는 이름 옆에 작게 붙인다 — 제 줄을 차지하면 한 행이 3줄이 되고
-           같은 호스트가 아홉 번 반복된다. 위의 점유율 막대가 이미 비중을 말한다. */
         return `<tr><td class="page bar" style="${barW(p.views, pageMax)}">` +
             `<span class="name">${esc(label)}</span>` +
             (p.list ? '<span class="host">목록</span>' : '') +
@@ -519,9 +389,6 @@
             `<span><i class="key" style="background:${C.series[n]}"></i>${esc(s.name)} ` +
             `<b>${fmt(s.views)}</b> (${pct(share(s.views, siteTotal))})</span>`).join('')}</div>` : '';
 
-    /* 설명문은 대상에 맞춰 갈라진다 — 코너 묶음은 사이트에만 있고, 평소 평균의
-       기준 일수도 대상마다 다르다(블로그는 아직 5일치라 4일 평균이다).
-       meta.trendDays 를 그대로 쓰면 블로그에도 "27일 평균"이라고 적힌다. */
     parts.push(mod(7, `${dayLabel} 본 페이지`,
         `조회수 순${data.ydaySites.length ? ' · atah.io 안은 코너 이름으로 묶어 표시' : ''} ·
          「평소/일」은 ${dayLabel} 이전 ${data.daily.length - 1}일의 하루 평균`,
@@ -533,21 +400,11 @@
             `<tr><td colspan="4" class="dim">${esc(dayLabel)} 조회된 페이지가 없습니다.</td></tr>`}
          </tbody></table></div>`));
 
-    // 5) 어제 온 곳
     const srcMax = Math.max(0, ...data.ydaySources.map((s) => s.sessions));
     const srcRows = data.ydaySources.map((s) =>
         `<tr><td class="name bar" style="${barW(s.sessions, srcMax)}">${esc(s.name)}</td>` +
         `<td class="num">${fmt(s.sessions)}</td></tr>`).join('');
 
-    /* 미분류를 목록에 섞지 않는 이유는 수집 스크립트 주석 참조 — 어제치는
-       GA4가 아직 재처리 중이라 대개 이게 1위로 올라온다.
-
-       문구는 data.confirmed 로 갈린다 — 파이썬 build_insights()의 6번 규칙과
-       같은 이유다. 아직 갱신 전(fresh)이면 "내일 자동으로 다시 확인됩니다"가
-       참말이다(수집 스크립트가 실제로 내일 이 날짜를 한 번 더 조회해 덮어쓴다).
-       이미 갱신을 거쳤는데도(confirmed) 남아 있으면 재처리 지연이 아니라
-       "끝내 못 알아낸" 값이라 다른 말을 한다 — 더는 재확인 예정이 없는데
-       "다시 확인됩니다"라고 하면 또 지키지 못할 약속이 된다. */
     const unresolved = data.ydayUnresolved
         ? `<p class="note-line">${data.confirmed
             ? `출처를 끝내 알 수 없었던 세션 <b>${fmt(data.ydayUnresolved)}</b>건입니다 — ` +
@@ -567,13 +424,6 @@
          </tbody></table></div>
          ${unresolved}`));
 
-    // 6) 어제 시간대 — 24칸이라 전체폭이 가장 잘 맞는다
-    /* 크기를 색이 아니라 **길이**로 말한다. 이 데이터는 하루 0~4세션에 값 종류가
-       서너 개뿐이라 6단계 색 램프를 씌워도 실제로는 서너 색만 쓰였고, 24칸 중
-       절반이 0이라 "빈 칸"과 "아주 작은 값"이 같은 색으로 뭉갰다.
-
-       높이는 평소 패턴과 그날 값 중 최댓값을 100%로 잡은 상대값이다. 축 눈금을 그리지
-       않으므로 그날 최댓값 하나에만 숫자를 적는다. */
     const hours = data.ydayHours || [];
     const pattern = data.hourPattern || [];
     const hourMax = Math.max(...hours, ...pattern, 0);
@@ -592,27 +442,14 @@
     const hourTicks = hours.map((_, hh) =>
         `<div class="collabel">${hh % 6 === 0 ? `${hh}시` : ''}</div>`).join('');
 
-    /* GA4는 여러 시간에 걸친 세션을 그 시간마다 한 번씩 센다 — 그래서 24칸의
-       합이 그날 세션 수보다 크다(실측 1~4건). 시작 시각(session_start)으로 세면
-       합이 맞지만, 재처리 전인 어제치는 오히려 크게 틀려(44 대 32) 값은 그대로
-       두고 설명을 사실대로 적는다. */
     parts.push(mod(12, `${dayLabel} 시간대`,
         `시각별 세션 · 옅은 막대는 최근 ${data.daily.length}일의 시각별 하루 평균, 진한 막대는
          ${esc(dayLabel)} · 여러 시간에 걸친 세션은 시간마다 셉니다`,
         `<div class="hour-chart">${cols}</div>
          <div class="hour-ticks">${hourTicks}</div>`));
 
-    // 7) 확정 구간 — 어제 칸에 못 올리는 두 값. 날짜 무관(늘 "지금 기준")이라
-    // 수집 스크립트가 히스토리 스냅샷엔 애초에 안 담는다 — 그래서 과거 날짜를
-    // 보고 있을 땐 data.settled 가 없어 이 if 가 저절로 꺼진다(현재 화면에만
-    // 참여율·체류시간이 뜨는 게 옳다 — 3주 전 날짜 옆에 "지금" 참여율을
-    // 나란히 두면 시점이 섞인다).
     const st = data.settled;
     if (st) {
-        /* 최장 방문은 날짜마다 하나씩 얼려 둔 값(history 항목의 longest) 중에서
-           고른다 — 여기서 새로 계산할 수는 없다(화면엔 원본 세션이 없다).
-           수집기가 판정을 못 내린 날은 longest 가 없어 후보에서 자연히 빠지므로,
-           확정 구간 7일이 통째로 비어 값이 아예 안 나오는 날도 있다. */
         const long_ = longestInSettled(data);
         const longRow = long_ ? `
             <p class="note-line">가장 오래 머문 방문 <b>${dur(long_.longest.seconds)}</b>
@@ -633,8 +470,6 @@
              </div>${longRow}`));
     }
 
-    /* 8) 긴 흐름 — 일별로는 흔들리는 규모라 달 단위 하루 평균으로 본다.
-       날짜 무관("지금 기준")이라 최신 화면에만. */
     const months = data.months || [];
     if (isLatest && months.length) {
         const mMax = Math.max(...months.map((m) => m.users), 0);
@@ -665,13 +500,10 @@
     return parts.join('');
     }
 
-    /* 캔버스 차트는 패널이 화면에 나온 뒤에 만든다 — 숨어 있는(display:none) 칸에서
-       만들면 Chart.js가 크기를 0으로 재서 탭을 눌렀을 때 찌그러진 채로 나온다. */
     function makeCharts(data, key) {
         const at = (id) => document.getElementById(`${id}-${key}`);
-        if (!at('c-trend')) return;   // 데이터가 없어 빈 화면을 그린 경우
+        if (!at('c-trend')) return;
 
-        // 차트를 못 그리면 빈 칸 대신 그 사실을 적고, 같은 값을 담은 표를 펼쳐 둔다.
         if (!hasChart) {
             const box = at('c-trend').parentElement;
             box.outerHTML = '<p class="note-line">차트를 불러오지 못했습니다 — ' +
@@ -681,11 +513,6 @@
             return;
         }
 
-        /* 보고 있는 날짜의 점만 크게 — 선 위에서 "지금 말하는 날"이 어디인지
-           바로 짚이게. 예전엔 늘 마지막 점(최신)이었지만, 히스토리를 눌러
-           과거 날짜를 보고 있을 땐 그 날짜의 위치를 daily 에서 직접 찾아야
-           한다(daily 는 대상 전체가 공유하는 28일 창이라 날짜별로 안 바뀐다).
-           못 찾으면(28일보다 오래된 예외적 경우) 마지막 점으로 물러난다. */
         const y = data.yesterday;
         const found = data.daily.findIndex((d) => d.date === (y && y.date));
         const at_ = found === -1 ? data.daily.length - 1 : found;
@@ -696,19 +523,10 @@
         ], [normalBand(data.baseline && data.baseline.users)]);
     }
 
-    // --- 탭 & 날짜 히스토리 ---------------------------------------------
-    /* 대상마다 history 의 날짜를 오름차순(오래된→최신)으로 미리 뽑아 둔다 —
-       화살표를 누를 때마다 다시 계산하지 않고 이 배열의 인덱스만 옮긴다.
-       최신 날짜도 수집 스크립트가 history 에 함께 넣어 두므로(균일하게 다루려는
-       설계), 이 배열의 마지막 항목이 항상 최신과 같다. */
     views.forEach((v) => {
         v.dates = Object.keys(v.data.history || {}).sort();
     });
 
-    /* 대상의 최상위 데이터(=최신)와 history 항목(=과거)을 같은 모양으로
-       맞춰 준다. history 항목엔 daily(28일 트렌드)·meta 가 없다 — 대상
-       전체가 공유하는 값이라 날짜마다 중복 저장하지 않기로 했으므로,
-       여기서 최상위 것을 빌려와 buildHTML()이 구분 없이 쓸 수 있게 한다. */
     function snapshotFor(viewData, wantDate) {
         const latestDate = viewData.yesterday && viewData.yesterday.date;
         if (!latestDate) return null;
@@ -731,13 +549,11 @@
             picked.snap, v.key, v.key === views[0].key, picked.isLatest, v.data.yesterday.date);
         panel.dataset.date = picked.date;
 
-        // 화살표 경계 — 더 이전 기록이 없으면 ◀ 비활성, 이미 최신이면 ▶는
-        // buildHTML 이 이미 disabled 로 그렸다(isLatest 를 알고 있으므로).
         const idx = v.dates.indexOf(picked.date);
         const prevBtn = panel.querySelector('[data-nav="prev"]');
         if (prevBtn) prevBtn.disabled = idx <= 0;
 
-        makeCharts(picked.snap, v.key);   // 보이는 상태에서 그려야 하므로 항상 여기서
+        makeCharts(picked.snap, v.key);
     }
 
     function showTab(key, date) {
@@ -755,9 +571,6 @@
         `<a href="#${esc(v.key)}" data-key="${esc(v.key)}"${i === 0 ? ' class="active"' : ''}>` +
         `${esc(v.data.meta.label || v.key)}</a>`).join('');
 
-    // 패널 껍데기만 미리 만든다 — 내용은 실제로 보일 때 renderPanel() 이 채운다
-    // (숨은 채로 차트를 만들면 크기가 0으로 잡히는 문제 때문에, 항상 "보이게
-    // 만든 다음 그린다"는 순서를 지켜야 한다).
     panelRoot.innerHTML = views.map((v, i) =>
         `<section class="panel" data-key="${esc(v.key)}"${i === 0 ? '' : ' hidden'}></section>`).join('');
 
@@ -766,12 +579,9 @@
         if (!a) return;
         e.preventDefault();
         history.replaceState(null, '', `#${a.dataset.key}`);
-        showTab(a.dataset.key, null);   // 탭을 바꾸면 그 탭의 최신 날짜로
+        showTab(a.dataset.key, null);
     });
 
-    /* 날짜 화살표 — 패널 내용이 매번 다시 그려지므로 이벤트를 패널 각각이
-       아니라 panelRoot 에 위임한다(재렌더링해도 리스너를 다시 붙일 필요가
-       없다). URL은 최신이면 `#ga4`, 과거면 `#ga4/2026-08-15`. */
     panelRoot.addEventListener('click', (e) => {
         const btn = e.target.closest('[data-nav]');
         if (!btn || btn.disabled) return;
