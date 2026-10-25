@@ -362,7 +362,8 @@ RISING_RATIO = 1.5     # 최근 7일 평균이 그 전 평균의 몇 배부터 "
 RISING_MIN_DAYS = 3    # 최근 7일 중 그 전 평균보다 높았던 날이 이만큼은 돼야 "늘었다"
 BAND_PCT = (10, 90)    # 히어로 배지·추세 띠의 아래·위 백분위
 LONG_START = "2020-01-01"   # 월별 흐름 조회 시작 — 속성이 생긴 날 이전은 0으로 와서 잘라 낸다
-LIST_PAGE_RE = re.compile(r"카테고리의 글 목록")
+LIST_PAGE_RE = re.compile(r"(카테고리|태그)의 글 목록|^태그 목록$|^방명록$")
+DEBUG_SOURCES = {"tagassistant.google.com"}   # GTM 미리보기로 연 내 방문
 MIN_DAYS_FOR_NORMAL = 14   # 이만큼은 쌓여야 "평소와 같았다"고 말할 수 있다
 # 한 사람당 몇 장·신규/재방문 같은 "소비 깊이" 문장은 사람 수가 적으면 한두 명의
 # 습관을 그날의 성격처럼 말하게 된다(블로그: 방문자 2명인 날에 "얕게 본 날").
@@ -393,6 +394,11 @@ def josa(word, with_final, without_final):
         return with_final if (ord(last) - 0xAC00) % 28 else without_final
     if last.isdigit():
         return with_final if last in "0136789" else without_final
+    low = last.lower()
+    if low in "aeiouwyr":
+        return without_final
+    if low in "lmn":
+        return with_final
     return f"{with_final}({without_final})"
 
 
@@ -657,6 +663,7 @@ def fetch(client, target, age=1, include_settled=True):
 
     # 어제 처음 보는 유입원을 가리기 위한 28일치 목록(어제 제외).
     # 이름만 쓰고 버린다 — 화면에 싣지 않고 인사이트 문장에만 쓴다.
+    data["_scope"] = target.label
     data["_priorSources"] = sorted({
         r["sessionSource"] for r in report(
             client, target, dimensions=["sessionSource"], metrics=["sessions"],
@@ -880,13 +887,13 @@ def build_insights(data, day_label="어제", confirmed=False):
 
     # 4) 28일 동안 없다가 어제 처음 나타난 유입원
     prior = set(data.get("_priorSources", []))
-    fresh = [s for s in data["ydaySources"] if s["name"] not in prior
+    fresh = [s for s in data["ydaySources"] if s["name"] not in prior and s["name"] not in DEBUG_SOURCES
              and s["name"] != SOURCE_LABELS["(direct)"]]
     if prior and fresh:
         names = ", ".join(s["name"] for s in fresh[:3])
         out.append({
             "tone": "up",
-            "text": f"최근 {TREND_DAYS}일 동안 없던 유입원이 {day_at} 생겼습니다 — {names}.",
+            "text": f"{data.get('_scope', '이 사이트')}에 최근 {TREND_DAYS}일 동안 없던 유입원이 {day_at} 생겼습니다 — {names}.",
         })
 
     # 5) 방문자 수 — 기록일 때만(위 규칙 2·3과 같은 원칙). 비교 상대에서 그날을
@@ -950,6 +957,174 @@ def build_insights(data, day_label="어제", confirmed=False):
                         "페이지별 조회수도 늘 보던 범위 안입니다.",
             })
 
+    return out
+
+
+# --- 최근 7일 인사이트 --------------------------------------------------------
+WEEK = 7
+WEEKLY_SPAN = 35            # 7일 창 4개(검색 비교) + 앞선 6일(이미 알렸는지 재는 창)
+SHIFT_RATIO = 2.0           # 채널 세션이 전 주의 몇 배(또는 몇 분의 1)면 말할지
+SHIFT_MIN = 15              # 그리고 차이가 이 세션 수 이상일 때만
+SEARCH_RATIO = 1.5          # 검색 유입이 전 3주 주평균의 몇 배면 말할지
+SEARCH_MIN = 5
+CHANNEL_LABELS = {"Direct": "직접 들어온 방문", "Referral": "다른 사이트 링크로 온 방문",
+                  "Organic Social": "소셜에서 온 방문"}
+ENGINE_LABELS = {"naver": "네이버", "m.search.naver.com": "네이버", "search.naver.com": "네이버",
+                 "google": "구글", "daum": "다음", "bing": "빙"}
+GAME_NAMES = {"suiko": "환세취호전", "suiko-jp": "환세취호전 일본어 원판", "suiko-demo": "환세취호전 체험판",
+              "hukyou": "환세풍광전", "kitan": "환세희담", "kitan-opening": "환세희담 오프닝",
+              "kaitou": "환세쾌도전", "torimono": "환세포물장", "kaisin": "환세쾌진극"}
+MILESTONE_STEPS = (120, 60, 30, 15, 5)
+
+
+def fetch_weekly(client, target):
+    end = datetime.now(KST).date() - timedelta(days=1)
+    dates = [(end - timedelta(days=k)).isoformat() for k in range(WEEKLY_SPAN - 1, -1, -1)]
+    idx = {d: i for i, d in enumerate(dates)}
+    series = {}
+    for r in report(client, target, dimensions=["date", "sessionDefaultChannelGroup"], metrics=["sessions"],
+                    date_range=(f"{WEEKLY_SPAN}daysAgo", "yesterday"), limit=5000):
+        i = idx.get(date_key(r["date"]))
+        if i is not None:
+            series.setdefault(r["sessionDefaultChannelGroup"], [0] * WEEKLY_SPAN)[i] += int(r["sessions"])
+
+    def by_host(rng):
+        out = {}
+        for r in report(client, target, dimensions=["sessionDefaultChannelGroup", "hostName", "newVsReturning"],
+                        metrics=["sessions"], date_range=rng, limit=1000):
+            ch = out.setdefault(r["sessionDefaultChannelGroup"], {})
+            h = ch.setdefault(r["hostName"], {"sessions": 0, "returning": 0})
+            h["sessions"] += int(r["sessions"])
+            if r["newVsReturning"] == "returning":
+                h["returning"] += int(r["sessions"])
+        return out
+
+    sources = {}
+    for r in report(client, target, dimensions=["sessionDefaultChannelGroup", "sessionSource"], metrics=["sessions"],
+                    date_range=(f"{WEEK}daysAgo", "yesterday"), limit=500):
+        sources.setdefault(r["sessionDefaultChannelGroup"], {})[r["sessionSource"]] = int(r["sessions"])
+
+    games = {}
+    try:
+        for r in report(client, target, dimensions=["eventName", "customEvent:game", "customEvent:minutes"],
+                        metrics=["totalUsers"], date_range=(f"{WEEK}daysAgo", "yesterday"), limit=1000):
+            g = r["customEvent:game"]
+            if g not in GAME_NAMES:
+                continue
+            key = r["eventName"]
+            if key == "play_milestone":
+                key = f"play_{r['customEvent:minutes']}"
+            games.setdefault(g, {})[key] = games.get(g, {}).get(key, 0) + int(r["totalUsers"])
+    except Exception:            # noqa: BLE001 — 게임 측정기준이 없는 속성(블로그)
+        games = {}
+
+    return {"series": series, "cur": by_host((f"{WEEK}daysAgo", "yesterday")),
+            "prev": by_host((f"{WEEK * 2}daysAgo", f"{WEEK + 1}daysAgo")),
+            "sources": sources, "games": games}
+
+
+def weekly_insights(w, scope, recent_keys, said_today=()):
+    out = []
+    n = WEEKLY_SPAN
+
+    def win(ch, k, back=0):
+        s = w["series"].get(ch, [0] * n)
+        end = n - k - back * WEEK
+        return sum(s[max(0, end - WEEK):end])
+
+    games = sorted(w["games"].items(), key=lambda kv: -kv[1].get("emulator_start", 0))
+    parts = []
+    for g, d in games[:3]:
+        start = d.get("emulator_start", 0)
+        if not start:
+            continue
+        bits = [f"세이브 {d.get('save_created', 0)}명"]
+        if d.get("save_restored"):
+            bits.append(f"이어하기 {d['save_restored']}명")
+        for m in MILESTONE_STEPS:
+            if d.get(f"play_{m}"):
+                bits.append(f"{m}분 넘게 {d[f'play_{m}']}명")
+                break
+        parts.append(f"{GAME_NAMES[g]} {start}명 시작 → " + "·".join(bits))
+    if parts:
+        out.append({"tone": "flat", "text": "최근 7일 게임: " + " / ".join(parts) + "."})
+
+    def shift(ch, k):
+        cur, prev = win(ch, k), win(ch, k, 1)
+        if abs(cur - prev) < SHIFT_MIN:
+            return None
+        if cur >= SHIFT_RATIO * max(prev, 1):
+            return "up"
+        if cur * SHIFT_RATIO <= prev:
+            return "down"
+        return None
+
+    for ch, label in CHANNEL_LABELS.items():
+        way = shift(ch, 0)
+        key = f"channel:{ch}:{way}"
+        if not way or key in recent_keys:
+            continue
+        cur, prev = win(ch, 0), win(ch, 0, 1)
+        hc, hp = w["cur"].get(ch, {}), w["prev"].get(ch, {})
+        diffs = {h: hc.get(h, {}).get("sessions", 0) - hp.get(h, {}).get("sessions", 0) for h in set(hc) | set(hp)}
+        if way == "up":
+            text = f"지난 7일 {label}이 그 전 7일의 **{cur / max(prev, 1):.1f}배**입니다({prev}→{cur}세션)."
+        else:
+            text = f"지난 7일 {label}이 그 전 7일의 절반 아래로 줄었습니다({prev}→**{cur}세션**)."
+        if len(diffs) > 1:
+            host = max(diffs, key=lambda h: diffs[h] if way == "up" else -diffs[h])
+            if diffs[host] * (cur - prev) > 0:
+                text += (f" 가장 많이 {'늘어난' if way == 'up' else '줄어든'} 곳은 {host}"
+                         f"({diffs[host]:+d}세션)")
+                h = hc.get(host, {})
+                if way == "up" and h.get("sessions"):
+                    text += f"이고, 그곳 세션의 {round(h['returning'] * 100 / h['sessions'])}%가 재방문입니다."
+                else:
+                    text += "입니다."
+        out.append({"tone": "up" if way == "up" else "down", "text": text, "key": key})
+
+    def search_state(k):
+        cur = win("Organic Search", k)
+        avg = sum(win("Organic Search", k, b) for b in (1, 2, 3)) / 3
+        if abs(cur - avg) < SEARCH_MIN:
+            return None
+        if cur >= SEARCH_RATIO * max(avg, 1):
+            return "up"
+        if cur * 2 <= avg:
+            return "down"
+        return None
+
+    way = search_state(0)
+    key = f"search:{way}"
+    if way and key not in recent_keys:
+        cur = win("Organic Search", 0)
+        avg = sum(win("Organic Search", 0, b) for b in (1, 2, 3)) / 3
+        eng = {}
+        for src, v in w["sources"].get("Organic Search", {}).items():
+            name = ENGINE_LABELS.get(src, src)
+            eng[name] = eng.get(name, 0) + v
+        engines = ", ".join(f"{k} {v}" for k, v in sorted(eng.items(), key=lambda kv: -kv[1]))
+        if way == "up":
+            text = (f"지난 7일 검색 유입이 **{cur}세션**으로, 그 전 3주 평균(주 {avg:.0f}세션)의 "
+                    f"{cur / max(avg, 1):.1f}배입니다" + (f" — {engines}." if engines else "."))
+        else:
+            text = f"지난 7일 검색 유입이 **{cur}세션**으로, 그 전 3주 평균(주 {avg:.0f}세션)의 절반 아래입니다."
+        out.append({"tone": "up" if way == "up" else "down", "text": text, "key": key})
+
+    def ai_new(k):
+        cur = win("AI Assistant", k)
+        return cur > 0 and cur > max(win("AI Assistant", k, b) for b in (1, 2, 3))
+
+    ai_srcs = sorted(w["sources"].get("AI Assistant", {}))
+    said = " ".join(i["text"] for i in said_today)
+    if (ai_new(0) and "ai:up" not in recent_keys
+            and not (ai_srcs and all(src in said for src in ai_srcs))):
+        cur = win("AI Assistant", 0)
+        mx = max(win("AI Assistant", 0, b) for b in (1, 2, 3))
+        before = f"주 최대 {mx}세션이었습니다" if mx else "없었습니다"
+        out.append({"tone": "up", "key": "ai:up",
+                    "text": f"지난 7일 {scope}에 AI 어시스턴트에서 온 방문이 **{cur}세션**입니다"
+                            + (f"({', '.join(ai_srcs)})" if ai_srcs else "") + f" — 그 전 3주에는 {before}."})
     return out
 
 
@@ -1123,6 +1298,11 @@ def main():
         data = fetch(client, target, age=1)
         data["confirmed"] = False
         data["insights"] = build_insights(data, day_label="어제", confirmed=False)
+        week_cut = (datetime.now(KST).date() - timedelta(days=WEEK)).isoformat()
+        recent_keys = {i["key"] for d, h in history.items() if week_cut < d < (data["yesterday"]["date"] or "")
+                       for i in h.get("insights", []) if i.get("key")}
+        data["insights"] += weekly_insights(fetch_weekly(client, target), target.label, recent_keys,
+                                            data["insights"])
         if data["yesterday"]["date"]:
             history[data["yesterday"]["date"]] = snapshot_shape(data)
 
@@ -1134,7 +1314,8 @@ def main():
         if day2_date:
             day2_label = mmdd(day2_date)
             day2["confirmed"] = True
-            day2["insights"] = build_insights(day2, day_label=day2_label, confirmed=True)
+            day2["insights"] = build_insights(day2, day_label=day2_label, confirmed=True) + [
+                i for i in history.get(day2_date, {}).get("insights", []) if i.get("key")]
             history[day2_date] = snapshot_shape(day2)
 
         # 보존 기간 28일 — daily 트렌드 창과 맞춘다("이 대시보드가 신경 쓰는

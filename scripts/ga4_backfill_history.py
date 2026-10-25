@@ -60,7 +60,8 @@ def backfill_target(client, target, refresh=False):
             continue
         day_label = ga4.mmdd(date)
         d["confirmed"] = True
-        d["insights"] = ga4.build_insights(d, day_label=day_label, confirmed=True)
+        d["insights"] = ga4.build_insights(d, day_label=day_label, confirmed=True) + [
+            i for i in history.get(date, {}).get("insights", []) if i.get("key")]
         history[date] = ga4.snapshot_shape(d)
         filled += 1
         print(f"  {target.key}: {date} {'다시 씀' if refresh else '채움'} (age={age})")
