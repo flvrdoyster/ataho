@@ -3,7 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>환세 시리즈 지도 : atah.io</title>
+<title>환세 시리즈 세계관 지도 : atah.io</title>
+<meta name="robots" content="noindex">
 <link rel="icon" href="https://atah.io/favicon.ico">
 <link rel="preload" href="https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2105_2@1.0/KoddiUDOnGothic-Regular.woff" as="font" type="font/woff" crossorigin>
 <link rel="preload" href="https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2105_2@1.0/KoddiUDOnGothic-Bold.woff" as="font" type="font/woff" crossorigin>
@@ -26,7 +27,7 @@ body{touch-action:pan-x pan-y;background:var(--plane);color:var(--text-primary);
 h1{font-size:var(--fs-h1);font-weight:var(--font-weight-bold);line-height:1.3;margin:0}
 section.dg{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:20px}
 section.dg svg{display:block;height:auto;overflow:visible;max-width:none}
-.scroller{overflow-x:auto;background:linear-gradient(to right,var(--surface) 30%,transparent) left center/40px 100% no-repeat local,linear-gradient(to left,var(--surface) 30%,transparent) right center/40px 100% no-repeat local,linear-gradient(to right,rgba(0,0,0,.12),transparent) left center/12px 100% no-repeat scroll,linear-gradient(to left,rgba(0,0,0,.12),transparent) right center/12px 100% no-repeat scroll;scrollbar-width:thin;scrollbar-color:rgba(0,0,0,.25) transparent}
+.scroller{overflow-x:auto;scrollbar-width:thin;scrollbar-color:rgba(0,0,0,.25) transparent}
 .scroller::-webkit-scrollbar{height:8px}
 .scroller::-webkit-scrollbar-track{background:transparent}
 .scroller::-webkit-scrollbar-thumb{background-color:rgba(0,0,0,.25);border-radius:4px}
@@ -70,6 +71,9 @@ h2.sec{font-size:var(--fs-h2);font-weight:var(--font-weight-bold);line-height:1.
 .mzoom{position:absolute;top:8px;right:8px;z-index:1;font:400 var(--fs-note) var(--font-ui);color:var(--text-primary);background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-pill);padding:4px 12px;cursor:pointer}
 .mzoom[hidden]{display:none}
 .dwrap{position:relative}
+.dbar{display:none;position:relative;height:4px;margin-bottom:8px;border-radius:2px;background:rgba(0,0,0,.08)}
+.dbar i{position:absolute;top:0;bottom:0;border-radius:2px;background:rgba(0,0,0,.35)}
+@media (hover:none){.dbar.on{display:block}.scroller{scrollbar-width:none}.scroller::-webkit-scrollbar{display:none}}
 .mapbox svg{position:absolute;inset:0;width:100%;height:100%}
 .mk>*{transform:scale(var(--ms,1))}
 .noname .mk .name{display:none}
@@ -102,7 +106,7 @@ h2.sec{font-size:var(--fs-h2);font-weight:var(--font-weight-bold);line-height:1.
 <div class="wrap container">
   <header>
     <div>
-      <h1>환세 시리즈 지도</h1>
+      <h1>환세 시리즈 세계관 지도</h1>
     </div>
   </header>
   <section class="dg" id="sec-world">
@@ -120,7 +124,7 @@ h2.sec{font-size:var(--fs-h2);font-weight:var(--font-weight-bold);line-height:1.
   <section class="dg" id="sec-place">
     <h2 class="sec">장소 관계도</h2>
     <div class="views" id="views" role="group" aria-label="보기 선택"></div>
-    <div class="dwrap"><div class="scroller" id="root"></div><button class="mzoom" id="dzoom" type="button" hidden>원래 크기</button></div>
+    <div class="dwrap"><div class="dbar" id="dbar" aria-hidden="true"><i></i></div><div class="scroller" id="root"></div><button class="mzoom" id="dzoom" type="button" hidden>원래 크기</button></div>
     <div class="legend">
       <span><svg viewBox="0 0 28 16" aria-hidden="true"><rect class="lg-main" x="1" y="1" width="26" height="14" rx="4"/></svg>파란 테두리 · 월드맵에 표시한 장소</span>
       <span><svg viewBox="0 0 28 16" aria-hidden="true"><rect class="lg-box" x="1" y="1" width="26" height="14" rx="4" stroke-dasharray="4 3"/></svg>점선 테두리 · 그 작품에서 일행이 들르지 않는 곳</span>
@@ -233,7 +237,8 @@ function drawEdges(P){
     if(e.src)txt("text",{class:"src",x:r.lab.x,y:r.lab.sy,"text-anchor":r.lab.a},e.src,g);
   }}
 let lastB=null;
-function frame(B){lastB=B;svg.setAttribute("viewBox",`0 0 ${B.x1} ${B.y1}`);const k=Math.max(root.clientWidth/fullW,0.8)*dz;svg.style.width=`${B.x1*k}px`}
+function cue(){const b=document.getElementById("dbar"),t=b.firstElementChild,r=root.clientWidth/root.scrollWidth;b.classList.toggle("on",r<0.999);t.style.width=`${r*100}%`;t.style.left=`${root.scrollLeft/root.scrollWidth*100}%`}
+function frame(B){lastB=B;svg.setAttribute("viewBox",`0 0 ${B.x1} ${B.y1}`);const k=Math.max(root.clientWidth/fullW,0.8)*dz;svg.style.width=`${B.x1*k}px`;cue()}
 addEventListener("resize",()=>{if(svg&&lastB)frame(lastB)});
 
 function update(){
@@ -308,6 +313,7 @@ const MARKERS=[{"id":"A","name":"강반마을","conf":"mid","x":778,"y":1005,"si
   btn.addEventListener("click",()=>{setZ(1,root.clientWidth/2)});
 })();
 addEventListener("gesturestart",e=>e.preventDefault());
+root.addEventListener("scroll",cue,{passive:true});new ResizeObserver(cue).observe(root);
 raw=DATA.places;links=DATA.links;seen.places=seen.links=true;maybeRender();
 const postH=()=>{try{parent.postMessage({type:"gensei-places-height",height:Math.ceil(document.body.getBoundingClientRect().height)},"*")}catch(_){}};
 new ResizeObserver(postH).observe(document.body);addEventListener("load",postH);

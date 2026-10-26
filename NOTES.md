@@ -89,6 +89,7 @@ node scripts/gen_site_index.js --check  # 어긋나면 exit 1
 
 - `robots.txt` — `/blog/`(티스토리 스킨 원본. 페이지에 태그를 넣으면 그대로 블로그 스킨에 실려 나간다), `/dashboard/data/`, `/scripts/`를 막는다
 - 개발 도구(`world/editor.html`, `world/viewer.html`, `sweep/stage_editor.html`)는 robots.txt가 아니라 페이지 안 `noindex`로 뺀다. robots.txt로 막으면 크롤러가 그 `noindex`를 읽지 못해, 다른 곳에 링크가 걸렸을 때 제목 없는 주소로 색인될 수 있다
+- `viewer/map.html`도 `noindex`, GTM·canonical·OG는 두지 않고 사이트맵에도 넣지 않는다. 블로그 포스트에 iframe으로 끼워 쓰는 조각이라 `char.html`과 같은 취급이다(내용은 포스트가 검색되게 한다)
 - `haiyuki_manual/char.html`도 `noindex`. 해설서 안에 iframe으로 끼워 쓰는 조각이라 단독으로 검색되면 머리말 없는 반쪽 화면에 떨어진다(대신 그 내용은 검색되기 어렵다)
 - `sitemap.xml` — 손으로 관리한다. 주소는 각 페이지의 canonical과 같은 모양(폴더는 끝에 `/`). pc98·suiko는 다른 호스트라 넣을 수 없다. 개발 도구·대시보드·`char.html`은 뺐다. `lastmod`·`changefreq`·`priority`는 쓰지 않는다 — 구글은 뒤의 둘을 무시하고, `lastmod`는 손으로 맞추다 틀리면 오히려 신뢰를 잃는다
 - 공개 페이지 메타 — description, `og:title`·`type`·`url`·`description`·`site_name`·`locale`, canonical. pc98 페이지들과 같은 구성이다
@@ -153,7 +154,7 @@ HTML·CSS·JS·데이터가 한 파일에 들어 있다. 외부 의존은 `map/w
 - iframe으로 넣으면 `postMessage({type:"gensei-places-height"})`로 문서 높이를 알린다
 - 모바일 — 페이지 자체 줌은 막고(`maximum-scale=1`, `touch-action:pan-x pan-y`, `gesturestart` 차단) 월드맵과 관계도 안에서만 줌한다. 두 손가락 핀치·더블탭(월드맵 1~4배, 관계도 1~3배)과 ctrl+휠, 확대하면 "원래 크기" 버튼이 나온다. 터치는 브라우저가 가로채지 못하게 touch 이벤트로 직접 처리한다
 - 월드맵 마커 — 지도가 작으면 배지를 최소 18px로 키우고, 이름은 실제 글자 크기가 9px 밑이면 숨긴다(확대하면 다시 보임)
-- 장소 관계도 — 그림 비율은 최소 0.8(이름 약 12px)이라 좁은 화면에서는 가로 스크롤이고, 양 끝에 그림자 단서를 둔다
+- 장소 관계도 — 그림 비율은 최소 0.8(이름 약 12px)이라 좁은 화면에서는 가로 스크롤이다. 터치 기기(`hover:none`)는 스크롤바가 숨겨지므로 그림 위에 스크롤 위치 표시줄을 둔다
 - 임베드 모드 — `?world`(월드맵 전체), `?img`(지도 이미지만), `?place`(장소 관계도). 제목·`h1`·푸터·카드 테두리·좌우 여백을 없애고 상하 여백만 16px 둔다
 
 ### 표기 규칙
