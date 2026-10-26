@@ -138,6 +138,38 @@ node scripts/gen_site_index.js --check  # 어긋나면 exit 1
 - 폰트 — `--ui-font`는 Dokkaebi DNR Gothic이고 KoddiUDOnGothic은 폴백이다(곡선이 매끈해 픽셀 UI에는 안 맞음). Regular가 얇아 HUD는 Bold를 쓴다. `world/ui/DokkaebiDNRGothic-*.woff2`는 `github.com/flvrdoyster/font` 릴리스 산출물을 그대로 자체 서빙하고, `.github/workflows/update-dokkaebi-font.yml`이 매주 월요일 새 릴리스를 확인해 갈아끼운다(버전은 `world/ui/DokkaebiDNRGothic.version`)
 - swim — 게임오버 패널에 제목이 없다. 원작 대사를 확인하기 전에는 넣지 않는다
 
+## 환세 지도 (`viewer/map.html`)
+
+HTML·CSS·JS·데이터가 한 파일에 들어 있다. 외부 의존은 `map/worldmap.png`와 Noto Sans KR(한자·가나 폴백)뿐이고, 색·서체·푸터는 `design-tokens.css`·`fonts.css`·`footer.css`를 쓴다.
+
+### 데이터
+- `MARKERS` — 월드맵 마커. `id, name, conf(high·mid·cand·low·loose), x, y`(1850×1280 기준), `side`(이름 위치), `note`. 지도 밖은 `kind:"off"`+`dir`(각도)
+- `DATA.places` — `id, name, jp, sub`(`subs.{작품}`은 그 작품만 켰을 때의 설명), `games`(hukyou·kitan·kaitou·suiko), `style:"main"`, `dashedIn`, `col, row`(격자, 소수 가능), `w`. `kind:"group"`은 좌표 없이 자식(`group`에 묶음 id)을 감싸도록 자동 계산
+- `DATA.links` — `from, to, games, label`(`labels.{작품}`), `src`, `style:"dashed"`, `arrow`(`true`·`"both"`), `route`(`"vh"`·`"h"`·`"v"`), `so`/`eo`(출발·도착 지점의 y 오프셋, 같은 변에서 선이 겹칠 때)
+
+### 배치
+- 열 간격 290, 행 간격 110. 켜진 작품 기준으로 빈 행·열을 접고, 접을 때 간격은 최대 1.5칸
+- 선은 직각 3구간으로 자동 라우팅한다. 토글하면 상자는 CSS transform으로 움직이고 선은 이동이 끝난 뒤(420ms) 다시 그린다
+- iframe으로 넣으면 `postMessage({type:"gensei-places-height"})`로 문서 높이를 알린다
+- 임베드 모드 — `?world`(월드맵 전체), `?img`(지도 이미지만), `?place`(장소 관계도). 제목·`h1`·푸터·카드 테두리·좌우 여백을 없애고 상하 여백만 16px 둔다
+
+### 표기 규칙
+- 파란 테두리: 월드맵에 마커가 있는 장소
+- 점선 테두리: 그 작품에서 일행이 들르지 않는 곳. 위치 관계가 없는 곳은 점선이 아니라 선을 잇지 않는다
+- 점선 연결: 일행이 지나지 않는 연결(막힌 길)
+- 화살표: 이동 방향. 열차·철도·배는 양방향
+- 장소 설명: 무슨 곳인지 한 구절, 대사 근거. 줄거리 사건은 넣지 않고 애매하면 비운다
+- 일본어 병기: 게임 속 원문만. 공중도시의 탑 4개(바닥 타일 모양으로 임의로 붙인 이름), 호수 아래의 성, 우하우하단 거점은 원문이 없어 병기하지 않는다
+- 근거 위치(STAGE·줄 번호)나 출처는 페이지와 그림에 넣지 않고 블로그 포스트에서만 쓴다
+
+### 갱신 절차
+- 데이터를 고치면 `blog/post/img/`의 `kitan_places`·`hukyou_places`·`kaitou_places`·`suiko_places`·`places_all` PNG를 다시 찍는다. 마커를 고치면 `worldmap_markers.png`도 다시 찍는다
+- 라벨·선 겹침은 브라우저에서 각 작품 보기마다 라벨 bbox 겹침, 라벨과 상자 겹침, 같은 선분 위 겹침을 재서 확인한다. 한 지점에서 갈래가 나뉘는 것(역성 도착점, 해변마을 출발점)은 남겨 둔 상태다
+
+### 남은 것
+- 월드맵에서 바다마을·초원마을은 아직 비정하지 않았고 서리산맥은 후보다
+- 역성 도착점에서 실선과 점선이 겹친다
+
 ## 개발 도구
 
 - `world/editor.html`에는 doctype이 없다. 넣으면 호환 모드(quirks)에서 표준 모드로 바뀌어 에디터 레이아웃이 달라질 수 있어, charset·lang만 넣었다(2026-09-27). 넣으려면 에디터 화면을 직접 확인하면서 할 것
