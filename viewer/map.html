@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <title>환세 시리즈 지도 : atah.io</title>
 <link rel="icon" href="https://atah.io/favicon.ico">
 <link rel="preload" href="https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2105_2@1.0/KoddiUDOnGothic-Regular.woff" as="font" type="font/woff" crossorigin>
@@ -20,13 +20,13 @@
   --edge:#8a8f98;
   --fs-h1:1.5rem; --fs-h2:1.125rem; --fs-sm:.875rem; --fs-label:.8125rem; --fs-note:.75rem;
 }
-body{background:var(--plane);color:var(--text-primary);font-family:var(--font-ui);line-height:var(--line-height);word-break:keep-all;overflow-wrap:break-word;
+body{touch-action:pan-x pan-y;background:var(--plane);color:var(--text-primary);font-family:var(--font-ui);line-height:var(--line-height);word-break:keep-all;overflow-wrap:break-word;
   padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:32px 24px}
 .wrap{max-width:1240px;margin:0 auto;display:grid;grid-template-columns:minmax(0,1fr);gap:24px}
 h1{font-size:var(--fs-h1);font-weight:var(--font-weight-bold);line-height:1.3;margin:0}
 section.dg{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:20px}
 section.dg svg{display:block;height:auto;overflow:visible;max-width:none}
-.scroller{overflow-x:auto;scrollbar-width:thin;scrollbar-color:rgba(0,0,0,.25) transparent}
+.scroller{overflow-x:auto;background:linear-gradient(to right,var(--surface) 30%,transparent) left center/40px 100% no-repeat local,linear-gradient(to left,var(--surface) 30%,transparent) right center/40px 100% no-repeat local,linear-gradient(to right,rgba(0,0,0,.12),transparent) left center/12px 100% no-repeat scroll,linear-gradient(to left,rgba(0,0,0,.12),transparent) right center/12px 100% no-repeat scroll;scrollbar-width:thin;scrollbar-color:rgba(0,0,0,.25) transparent}
 .scroller::-webkit-scrollbar{height:8px}
 .scroller::-webkit-scrollbar-track{background:transparent}
 .scroller::-webkit-scrollbar-thumb{background-color:rgba(0,0,0,.25);border-radius:4px}
@@ -66,7 +66,13 @@ h2.sec{font-size:var(--fs-h2);font-weight:var(--font-weight-bold);line-height:1.
 .secsub{margin:12px 0 0;color:var(--text-secondary);font-size:var(--fs-label);text-wrap:pretty}
 .mapbox{position:relative;margin:0;border:1px solid var(--border);border-radius:var(--radius-sm);overflow:hidden;background:var(--paper)}
 .mapbox img{display:block;width:100%;height:auto}
+.mapin{position:relative;transform-origin:0 0}
+.mzoom{position:absolute;top:8px;right:8px;z-index:1;font:400 var(--fs-note) var(--font-ui);color:var(--text-primary);background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-pill);padding:4px 12px;cursor:pointer}
+.mzoom[hidden]{display:none}
+.dwrap{position:relative}
 .mapbox svg{position:absolute;inset:0;width:100%;height:100%}
+.mk>*{transform:scale(var(--ms,1))}
+.noname .mk .name{display:none}
 .mk circle{stroke:#fff;stroke-width:5}
 .mk polygon{stroke:#fff;stroke-width:4;stroke-linejoin:round}
 .mk .letter{font:700 30px var(--font-ui);fill:#fff;text-anchor:middle;dominant-baseline:central}
@@ -101,7 +107,7 @@ h2.sec{font-size:var(--fs-h2);font-weight:var(--font-weight-bold);line-height:1.
   </header>
   <section class="dg" id="sec-world">
     <h2 class="sec">월드맵</h2>
-    <div class="mapbox"><img src="map/worldmap.png" alt="환세희담 매뉴얼 월드맵 복원본" width="1850" height="1280"><svg id="ov" viewBox="0 0 1850 1280" aria-label="지명 마커"></svg></div>
+    <div class="mapbox"><div class="mapin"><img src="map/worldmap.png" alt="환세희담 매뉴얼 월드맵 복원본" width="1850" height="1280"><svg id="ov" viewBox="0 0 1850 1280" aria-label="지명 마커"></svg></div><button class="mzoom" type="button" hidden>원래 크기</button></div>
     <div class="legend">
       <span><i class="dot" style="background:var(--hi)"></i>확신도 높음 · 지형이 대사·그래픽과 일치</span>
       <span><i class="dot" style="background:var(--mid)"></i>확신도 중간 · 대사 속 방향·거리로 상대 위치를 맞춤</span>
@@ -114,7 +120,7 @@ h2.sec{font-size:var(--fs-h2);font-weight:var(--font-weight-bold);line-height:1.
   <section class="dg" id="sec-place">
     <h2 class="sec">장소 관계도</h2>
     <div class="views" id="views" role="group" aria-label="보기 선택"></div>
-    <div class="scroller" id="root"></div>
+    <div class="dwrap"><div class="scroller" id="root"></div><button class="mzoom" id="dzoom" type="button" hidden>원래 크기</button></div>
     <div class="legend">
       <span><svg viewBox="0 0 28 16" aria-hidden="true"><rect class="lg-main" x="1" y="1" width="26" height="14" rx="4"/></svg>파란 테두리 · 월드맵에 표시한 장소</span>
       <span><svg viewBox="0 0 28 16" aria-hidden="true"><rect class="lg-box" x="1" y="1" width="26" height="14" rx="4" stroke-dasharray="4 3"/></svg>점선 테두리 · 그 작품에서 일행이 들르지 않는 곳</span>
@@ -129,6 +135,7 @@ const DATA={"places":[{"id":"isle","w":200,"games":["kitan"],"name":"외딴섬",
 const NS="http://www.w3.org/2000/svg", BOX_H=52, TAG=18, CW=290, RH=110, X0=130, Y0=60, PAD=16, DUR=420;
 const GAMES=[["hukyou","환세풍광전"],["kitan","환세희담"],["kaitou","환세쾌도전"],["suiko","환세취호전"]];
 const root=document.getElementById("root"), viewsEl=document.getElementById("views");
+let dz=1;
 let raw=[], links=[], svg=null, fullW=0, pos={}, built=false, timer=null;
 let active=new Set(GAMES.map(g=>g[0]));
 const seen={places:false,links:false};
@@ -226,7 +233,7 @@ function drawEdges(P){
     if(e.src)txt("text",{class:"src",x:r.lab.x,y:r.lab.sy,"text-anchor":r.lab.a},e.src,g);
   }}
 let lastB=null;
-function frame(B){lastB=B;svg.setAttribute("viewBox",`0 0 ${B.x1} ${B.y1}`);const k=Math.max(root.clientWidth/fullW,0.62);svg.style.width=`${B.x1*k}px`}
+function frame(B){lastB=B;svg.setAttribute("viewBox",`0 0 ${B.x1} ${B.y1}`);const k=Math.max(root.clientWidth/fullW,0.8)*dz;svg.style.width=`${B.x1*k}px`}
 addEventListener("resize",()=>{if(svg&&lastB)frame(lastB)});
 
 function update(){
@@ -259,6 +266,48 @@ const MARKERS=[{"id":"A","name":"강반마을","conf":"mid","x":778,"y":1005,"si
     const bd=li.querySelector(".badge");bd.style.background=`var(${tok})`;bd.textContent=m.kind==="off"?"▲":m.id;
     li.querySelector("b").textContent=m.name;li.querySelector("p").textContent=m.note||"";list.appendChild(li)}
 })();
+(function(){
+  const ov=document.getElementById("ov"),box=document.querySelector(".mapbox"),inn=box.querySelector(".mapin"),btn=box.querySelector(".mzoom"),Z={z:1,x:0,y:0},MAX=4;
+  const apply=()=>{const w=box.clientWidth,h=box.clientHeight;Z.x=Math.min(0,Math.max(w-w*Z.z,Z.x));Z.y=Math.min(0,Math.max(h-h*Z.z,Z.y));
+    inn.style.transform=`translate(${Z.x}px,${Z.y}px) scale(${Z.z})`;box.style.touchAction=Z.z>1?"none":"pan-x pan-y";btn.hidden=Z.z<1.001;
+    const k=w/1850;ov.style.setProperty("--ms",Math.max(1,18/(52*k*Z.z)).toFixed(3));box.classList.toggle("noname",27*k*Z.z<9)};
+  const zoomAt=(nz,cx,cy)=>{nz=Math.min(MAX,Math.max(1,nz));const r=nz/Z.z;Z.x=cx-(cx-Z.x)*r;Z.y=cy-(cy-Z.y)*r;Z.z=nz;apply()};
+  const reset=()=>{Z.z=1;Z.x=Z.y=0;apply()};
+  const at=(cx,cy)=>{const b=box.getBoundingClientRect();return{x:cx-b.left,y:cy-b.top}};
+  const mid=t=>{const a=t[0],b=t[1];return{d:Math.hypot(a.clientX-b.clientX,a.clientY-b.clientY)||1,...at((a.clientX+b.clientX)/2,(a.clientY+b.clientY)/2)}};
+  let g=null,tap={t:0,x:0,y:0},last=null;
+  box.addEventListener("touchstart",e=>{
+    if(e.touches.length===2){e.preventDefault();const m=mid(e.touches);g={d:m.d,z:Z.z,px:(m.x-Z.x)/Z.z,py:(m.y-Z.y)/Z.z}}
+    else if(e.touches.length===1){const p=at(e.touches[0].clientX,e.touches[0].clientY);g={moved:0};last=p}},{passive:false});
+  box.addEventListener("touchmove",e=>{
+    if(e.touches.length===2&&g&&g.d){e.preventDefault();const m=mid(e.touches);Z.z=Math.min(MAX,Math.max(1,g.z*m.d/g.d));Z.x=m.x-g.px*Z.z;Z.y=m.y-g.py*Z.z;apply()}
+    else if(e.touches.length===1&&g&&!g.d){const p=at(e.touches[0].clientX,e.touches[0].clientY);g.moved+=Math.abs(p.x-last.x)+Math.abs(p.y-last.y);
+      if(Z.z>1){e.preventDefault();Z.x+=p.x-last.x;Z.y+=p.y-last.y;apply()}last=p}},{passive:false});
+  box.addEventListener("touchend",e=>{
+    if(e.touches.length===0&&g&&!g.d&&g.moved<8&&e.changedTouches.length===1){const p=at(e.changedTouches[0].clientX,e.changedTouches[0].clientY),now=Date.now();
+      if(now-tap.t<300&&Math.hypot(p.x-tap.x,p.y-tap.y)<30){tap.t=0;Z.z>1?reset():zoomAt(2.5,p.x,p.y)}else tap={t:now,x:p.x,y:p.y}}
+    if(e.touches.length===0)g=null;else if(e.touches.length===1){g={moved:99};last=at(e.touches[0].clientX,e.touches[0].clientY)}});
+  box.addEventListener("touchcancel",()=>{g=null});
+  let drag=null;
+  box.addEventListener("pointerdown",e=>{if(e.pointerType!=="mouse"||Z.z<=1)return;drag={x:e.clientX,y:e.clientY};box.setPointerCapture(e.pointerId)});
+  box.addEventListener("pointermove",e=>{if(!drag)return;Z.x+=e.clientX-drag.x;Z.y+=e.clientY-drag.y;drag={x:e.clientX,y:e.clientY};apply()});
+  const end=()=>{drag=null};box.addEventListener("pointerup",end);box.addEventListener("pointercancel",end);
+  box.addEventListener("dblclick",e=>{const p=at(e.clientX,e.clientY);Z.z>1?reset():zoomAt(2.5,p.x,p.y)});
+  box.addEventListener("wheel",e=>{if(!e.ctrlKey)return;e.preventDefault();const p=at(e.clientX,e.clientY);zoomAt(Z.z*Math.exp(-e.deltaY*0.01),p.x,p.y)},{passive:false});
+  btn.addEventListener("click",reset);addEventListener("resize",apply);apply();
+})();
+(function(){
+  const dwrap=document.querySelector(".dwrap"),btn=document.getElementById("dzoom"),MAX=3;let g=null;
+  root.style.touchAction="pan-x pan-y";
+  const dist=t=>Math.hypot(t[0].clientX-t[1].clientX,t[0].clientY-t[1].clientY)||1;
+  const setZ=(nz,cx)=>{nz=Math.min(MAX,Math.max(1,nz));if(!svg||nz===dz)return;const old=svg.getBoundingClientRect().width,a=(root.scrollLeft+cx)/old;dz=nz;frame(lastB);root.scrollLeft=a*svg.getBoundingClientRect().width-cx;btn.hidden=dz<1.001};
+  root.addEventListener("touchstart",e=>{if(e.touches.length===2){e.preventDefault();g={d:dist(e.touches),z:dz}}},{passive:false});
+  root.addEventListener("touchmove",e=>{if(e.touches.length===2&&g){e.preventDefault();const r=root.getBoundingClientRect();setZ(g.z*dist(e.touches)/g.d,(e.touches[0].clientX+e.touches[1].clientX)/2-r.left)}},{passive:false});
+  root.addEventListener("touchend",e=>{if(e.touches.length<2)g=null});
+  root.addEventListener("wheel",e=>{if(!e.ctrlKey)return;e.preventDefault();const r=root.getBoundingClientRect();setZ(dz*Math.exp(-e.deltaY*0.01),e.clientX-r.left)},{passive:false});
+  btn.addEventListener("click",()=>{setZ(1,root.clientWidth/2)});
+})();
+addEventListener("gesturestart",e=>e.preventDefault());
 raw=DATA.places;links=DATA.links;seen.places=seen.links=true;maybeRender();
 const postH=()=>{try{parent.postMessage({type:"gensei-places-height",height:Math.ceil(document.body.getBoundingClientRect().height)},"*")}catch(_){}};
 new ResizeObserver(postH).observe(document.body);addEventListener("load",postH);
