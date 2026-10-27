@@ -1242,6 +1242,14 @@ address, caption, cite, code, dfn, em, var {
   margin-top: calc(40px * var(--space-y))
 }
 
+.area_reply .tt_box_namecard {
+  min-height: 0
+}
+
+.tt_box_namecard .tt_desc {
+  display: none
+}
+
 /* 리스트 */
 .list_content {
   display: grid;
