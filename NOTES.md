@@ -79,12 +79,6 @@ node scripts/gen_site_index.js --check  # 어긋나면 exit 1
 
 ## SEO
 
-### 현황 (GA4, 2026-09-27 기준 최근 90일 확정 구간)
-
-- 세션 채널: 추천 52.6%(나무위키 733, 블로그 405), 직접 20.5%, 소셜 17.9%, 검색 8.7%
-- 검색 유입 194세션 중 네이버 계열 168(약 87%), 구글 13, 다음 13 — 네이버 기준으로 맞추는 게 효과가 가장 크다
-- 검색으로 들어오는 곳은 거의 pc98·suiko 서브도메인이다(환세희담 54, 환세풍광전 50, 환세취호전 31 …). atah.io 자체는 홈 8, 패유기 웹 4, 해설서 각 2 수준. pc98 페이지들은 description·OG가 갖춰져 있었고 atah.io는 패유기 웹 한 곳뿐이었다
-
 ### 적용한 것
 
 - `robots.txt` — `/blog/`(티스토리 스킨 원본. 페이지에 태그를 넣으면 그대로 블로그 스킨에 실려 나간다), `/dashboard/data/`, `/scripts/`를 막는다
@@ -100,10 +94,6 @@ node scripts/gen_site_index.js --check  # 어긋나면 exit 1
 - 희담 취급설명서 머리 부분(`translator-info`)에 pc98 환세희담 링크
 - 검색엔진 등록 — 네이버 서치어드바이저는 atah.io·pc98·suiko 세 사이트를 따로 등록하고 HTML 파일 방식으로 소유 확인했다(확인 파일 `naver6ecd505c49bf822cb1185ddef5bce20b.html`은 레포 루트, 사이트맵에는 넣지 않는다). 구글 서치콘솔은 도메인 속성(`atah.io`)을 Route 53 TXT 레코드로 확인했고 사이트맵 세 개를 모두 제출했다
 - `www.atah.io` — CNAME이 apex(`atah.io`)를 가리키면 GitHub Pages 인증서에 www가 안 들어가(GitHub 문서가 경고하는 설정) https로 들어오면 경고가 떴다. 2026-09-30 Route 53에서 `flvrdoyster.github.io`로 바꿨고, 자동 갱신 때(2026-10-01) 인증서에 www가 들어갔다(만료 2026-12-30). 지금은 `https://www.atah.io`가 301로 `atah.io`에 간다
-
-### 남은 것
-
-- 썸네일 없는 페이지의 `og:image`(1200×630)
 
 ## 파비콘
 
