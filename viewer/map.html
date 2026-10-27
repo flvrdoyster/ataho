@@ -71,13 +71,21 @@ h2.sec{font-size:var(--fs-h2);font-weight:var(--font-weight-bold);line-height:1.
 .mapin{position:relative;transform-origin:0 0}
 .mzoom{position:absolute;top:8px;right:8px;z-index:1;font:400 var(--fs-note) var(--font-ui);color:var(--text-primary);background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-pill);padding:4px 12px;cursor:pointer}
 .mzoom[hidden]{display:none}
+.mctl{position:absolute;top:8px;right:8px;z-index:1;display:flex;gap:8px}
+.mctl .mzoom{position:static}
+.vrow{display:flex;align-items:flex-start;gap:8px;margin:0 0 16px}
+.vrow .views{flex:1;margin:0}
+.vrow .mexpand{position:static;flex:none}
+.mexpand{display:none;align-items:center;gap:6px;text-decoration:none}
+.mexpand svg{stroke-width:var(--ico-stroke-w-thin,1px)}
+[data-embed] .mexpand{display:inline-flex}
 .mtoggle{right:auto;left:8px}
 .mapbox.nomark #ov{display:none}
 .dwrap{position:relative}
 .dbar{display:none;position:relative;height:4px;margin-bottom:8px;border-radius:2px;background:rgba(0,0,0,.08)}
 .dbar i{position:absolute;top:0;bottom:0;border-radius:2px;background:rgba(0,0,0,.35)}
 @media (hover:none){.dbar.on{display:block}.scroller{scrollbar-width:none}.scroller::-webkit-scrollbar{display:none}}
-.mapbox svg{position:absolute;inset:0;width:100%;height:100%}
+#ov{position:absolute;inset:0;width:100%;height:100%}
 .mk>*{transform:scale(var(--ms,1))}
 .noname .mk .name{display:none}
 .mk circle{stroke:#fff;stroke-width:5}
@@ -114,7 +122,7 @@ h2.sec{font-size:var(--fs-h2);font-weight:var(--font-weight-bold);line-height:1.
   </header>
   <section class="dg" id="sec-world">
     <h2 class="sec">월드맵</h2>
-    <div class="mapbox"><div class="mapin"><img src="map/worldmap.png" alt="환세희담 매뉴얼 월드맵 복원본" width="1850" height="1280"><svg id="ov" viewBox="0 0 1850 1280" aria-label="지명 마커"></svg></div><button class="mzoom" type="button" hidden>원래 크기</button><button class="mzoom mtoggle" type="button" aria-pressed="false">마커 끄기</button></div>
+    <div class="mapbox"><div class="mapin"><img src="map/worldmap.png" alt="환세희담 매뉴얼 월드맵 복원본" width="1850" height="1280"><svg id="ov" viewBox="0 0 1850 1280" aria-label="지명 마커"></svg></div><div class="mctl"><button class="mzoom" type="button" hidden>원래 크기</button><a class="mzoom mexpand" href="map.html#sec-world" target="_blank" rel="noopener">크게 보기<svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 2.5H3A1.5 1.5 0 0 0 1.5 4v5A1.5 1.5 0 0 0 3 10.5h5A1.5 1.5 0 0 0 9.5 9V7"/><path d="M7 1.5h3.5V5M10.5 1.5 5.5 6.5"/></svg></a></div><button class="mzoom mtoggle" type="button" aria-pressed="false">마커 끄기</button></div>
     <div class="legend">
       <span><i class="dot" style="background:var(--hi)"></i>확신도 높음 · 지형이 대사·그래픽과 일치</span>
       <span><i class="dot" style="background:var(--mid)"></i>확신도 중간 · 대사 속 방향·거리로 상대 위치를 맞춤</span>
@@ -126,7 +134,7 @@ h2.sec{font-size:var(--fs-h2);font-weight:var(--font-weight-bold);line-height:1.
   </section>
   <section class="dg" id="sec-place">
     <h2 class="sec">장소 관계도</h2>
-    <div class="views" id="views" role="group" aria-label="보기 선택"></div>
+    <div class="vrow"><div class="views" id="views" role="group" aria-label="보기 선택"></div><a class="mzoom mexpand" href="map.html#sec-place" target="_blank" rel="noopener">크게 보기<svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 2.5H3A1.5 1.5 0 0 0 1.5 4v5A1.5 1.5 0 0 0 3 10.5h5A1.5 1.5 0 0 0 9.5 9V7"/><path d="M7 1.5h3.5V5M10.5 1.5 5.5 6.5"/></svg></a></div>
     <div class="dwrap"><div class="dbar" id="dbar" aria-hidden="true"><i></i></div><div class="scroller" id="root"></div><button class="mzoom" id="dzoom" type="button" hidden>원래 크기</button></div>
     <div class="legend">
       <span><svg viewBox="0 0 28 16" aria-hidden="true"><rect class="lg-main" x="1" y="1" width="26" height="14" rx="4"/></svg>파란 테두리 · 월드맵에 표시한 장소</span>
