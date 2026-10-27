@@ -18,7 +18,7 @@
 *{box-sizing:border-box}body{margin:0}
 :root{
   --hi:#c0392b; --mid:#2c5fb8; --low:#7b7f84; --paper:#ececec;
-  --edge:#8a8f98;
+  --edge:#8a8f98; --vrow-h:34px;
   --fs-h1:1.5rem; --fs-h2:1.125rem; --fs-sm:.875rem; --fs-label:.8125rem; --fs-note:.75rem;
 }
 body{touch-action:pan-x pan-y;background:var(--plane);color:var(--text-primary);font-family:var(--font-ui);line-height:var(--line-height);word-break:keep-all;overflow-wrap:break-word;
@@ -33,8 +33,10 @@ section.dg svg{display:block;height:auto;overflow:visible;max-width:none}
 .scroller::-webkit-scrollbar-thumb{background-color:rgba(0,0,0,.25);border-radius:4px}
 .scroller::-webkit-scrollbar-thumb:hover{background-color:rgba(0,0,0,.4)}
 .scroller svg{min-width:0}
+.scroller.can{cursor:grab}
+.scroller.grab{cursor:grabbing;user-select:none}
 .views{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 16px}
-.vbtn{display:inline-flex;align-items:center;gap:7px;font:400 var(--fs-sm) var(--font-ui);border:1px solid var(--border);background:var(--surface);color:var(--text-primary);border-radius:var(--radius-pill);padding:6px 14px;cursor:pointer}
+.vbtn{display:inline-flex;align-items:center;gap:7px;font:400 var(--fs-sm) var(--font-ui);border:1px solid var(--border);background:var(--surface);color:var(--text-primary);border-radius:var(--radius-pill);height:var(--vrow-h);padding:0 14px;cursor:pointer}
 .vbtn[aria-pressed="true"]{border-color:var(--text-primary);font-weight:700}
 .vbtn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .vbtn img{width:20px;height:20px;display:block;border-radius:22%}
@@ -69,12 +71,14 @@ h2.sec{font-size:var(--fs-h2);font-weight:var(--font-weight-bold);line-height:1.
 .mapbox{position:relative;margin:0;border:1px solid var(--border);border-radius:var(--radius-sm);overflow:hidden;background:var(--paper)}
 .mapbox img{display:block;width:100%;height:auto}
 .mapin{position:relative;transform-origin:0 0}
-.mzoom{position:absolute;top:8px;right:8px;z-index:1;font:400 var(--fs-note) var(--font-ui);color:var(--text-primary);background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-pill);padding:4px 12px;cursor:pointer}
+.mzoom{position:absolute;top:8px;right:8px;z-index:1;font:400 var(--fs-note) var(--font-ui);color:var(--text-primary);background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:4px 12px;cursor:pointer}
 .mzoom[hidden]{display:none}
 .mctl{position:absolute;top:8px;right:8px;z-index:1;display:flex;gap:8px}
 .mctl .mzoom{position:static}
-.vrow{display:flex;align-items:flex-start;gap:8px;margin:0 0 16px}
-.vrow .views{flex:1;margin:0}
+.vrow{display:flex;flex-wrap:wrap;align-items:flex-start;gap:8px;margin:0 0 16px}
+.vctl{display:flex;align-items:center;gap:8px;height:var(--vrow-h);flex:none;margin-left:auto}
+.vctl .mzoom{position:static}
+.vrow .views{flex:1 1 auto;margin:0}
 .vrow .mexpand{position:static;flex:none}
 .mexpand{display:none;align-items:center;gap:6px;text-decoration:none}
 .mexpand svg{stroke-width:var(--ico-stroke-w-thin,1px)}
@@ -134,8 +138,8 @@ h2.sec{font-size:var(--fs-h2);font-weight:var(--font-weight-bold);line-height:1.
   </section>
   <section class="dg" id="sec-place">
     <h2 class="sec">장소 관계도</h2>
-    <div class="vrow"><div class="views" id="views" role="group" aria-label="보기 선택"></div><a class="mzoom mexpand" href="map.html#sec-place" target="_blank" rel="noopener">크게 보기<svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 2.5H3A1.5 1.5 0 0 0 1.5 4v5A1.5 1.5 0 0 0 3 10.5h5A1.5 1.5 0 0 0 9.5 9V7"/><path d="M7 1.5h3.5V5M10.5 1.5 5.5 6.5"/></svg></a></div>
-    <div class="dwrap"><div class="dbar" id="dbar" aria-hidden="true"><i></i></div><div class="scroller" id="root"></div><button class="mzoom" id="dzoom" type="button" hidden>원래 크기</button></div>
+    <div class="vrow"><div class="views" id="views" role="group" aria-label="보기 선택"></div><div class="vctl"><button class="mzoom" id="dzoom" type="button" hidden>원래 크기</button><a class="mzoom mexpand" href="map.html#sec-place" target="_blank" rel="noopener">크게 보기<svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 2.5H3A1.5 1.5 0 0 0 1.5 4v5A1.5 1.5 0 0 0 3 10.5h5A1.5 1.5 0 0 0 9.5 9V7"/><path d="M7 1.5h3.5V5M10.5 1.5 5.5 6.5"/></svg></a></div></div>
+    <div class="dwrap"><div class="dbar" id="dbar" aria-hidden="true"><i></i></div><div class="scroller" id="root"></div></div>
     <div class="legend">
       <span><svg viewBox="0 0 28 16" aria-hidden="true"><rect class="lg-main" x="1" y="1" width="26" height="14" rx="4"/></svg>파란 테두리 · 월드맵에 표시한 장소</span>
       <span><svg viewBox="0 0 28 16" aria-hidden="true"><rect class="lg-box" x="1" y="1" width="26" height="14" rx="4" stroke-dasharray="4 3"/></svg>점선 테두리 · 그 작품에서 일행이 들르지 않는 곳</span>
@@ -248,7 +252,7 @@ function drawEdges(P){
     if(e.src)txt("text",{class:"src",x:r.lab.x,y:r.lab.sy,"text-anchor":r.lab.a},e.src,g);
   }}
 let lastB=null;
-function cue(){const b=document.getElementById("dbar"),t=b.firstElementChild,r=root.clientWidth/root.scrollWidth;b.classList.toggle("on",r<0.999);t.style.width=`${r*100}%`;t.style.left=`${root.scrollLeft/root.scrollWidth*100}%`}
+function cue(){const b=document.getElementById("dbar"),t=b.firstElementChild,r=root.clientWidth/root.scrollWidth;b.classList.toggle("on",r<0.999);root.classList.toggle("can",r<0.999);t.style.width=`${r*100}%`;t.style.left=`${root.scrollLeft/root.scrollWidth*100}%`}
 function frame(B){lastB=B;svg.setAttribute("viewBox",`0 0 ${B.x1} ${B.y1}`);const k=Math.max(root.clientWidth/fullW,0.8)*dz;svg.style.width=`${B.x1*k}px`;cue()}
 addEventListener("resize",()=>{if(svg&&lastB)frame(lastB)});
 
@@ -324,6 +328,10 @@ const MARKERS=[{"id":"A","name":"강반마을","conf":"mid","x":778,"y":1005,"si
   root.addEventListener("touchend",e=>{if(e.touches.length<2)g=null});
   root.addEventListener("wheel",e=>{if(!e.ctrlKey)return;e.preventDefault();const r=root.getBoundingClientRect();setZ(dz*Math.exp(-e.deltaY*0.01),e.clientX-r.left)},{passive:false});
   btn.addEventListener("click",()=>{setZ(1,root.clientWidth/2)});
+  let drag=null;
+  root.addEventListener("pointerdown",e=>{if(e.pointerType!=="mouse"||e.button!==0||root.scrollWidth<=root.clientWidth)return;drag={x:e.clientX,s:root.scrollLeft};try{root.setPointerCapture(e.pointerId)}catch(_){}root.classList.add("grab")});
+  root.addEventListener("pointermove",e=>{if(drag)root.scrollLeft=drag.s-(e.clientX-drag.x)});
+  const end=()=>{drag=null;root.classList.remove("grab")};root.addEventListener("pointerup",end);root.addEventListener("pointercancel",end);
 })();
 addEventListener("gesturestart",e=>e.preventDefault());
 root.addEventListener("scroll",cue,{passive:true});new ResizeObserver(cue).observe(root);
