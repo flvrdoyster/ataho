@@ -221,6 +221,7 @@ window.DASHBOARD_DATA['blog'] = {
    "views": 8
   }
  ],
+ "games": [],
  "history": {
   "2026-09-29": {
    "baseline": {
@@ -6493,7 +6494,8 @@ window.DASHBOARD_DATA['blog'] = {
     },
     {
      "key": "ai:up",
-     "text": "지난 7일 블로그에 AI 어시스턴트에서 온 방문이 **1세션**입니다(chatgpt.com) — 그 전 3주에는 없었습니다.",
+     "span": "week",
+     "text": "블로그에 AI 어시스턴트에서 온 방문이 **1세션**입니다(chatgpt.com) — 그 전 3주에는 없었습니다.",
      "tone": "up"
     }
    ],
@@ -6649,7 +6651,8 @@ window.DASHBOARD_DATA['blog'] = {
   },
   {
    "key": "ai:up",
-   "text": "지난 7일 블로그에 AI 어시스턴트에서 온 방문이 **1세션**입니다(chatgpt.com) — 그 전 3주에는 없었습니다.",
+   "span": "week",
+   "text": "블로그에 AI 어시스턴트에서 온 방문이 **1세션**입니다(chatgpt.com) — 그 전 3주에는 없었습니다.",
    "tone": "up"
   }
  ],
@@ -6660,7 +6663,7 @@ window.DASHBOARD_DATA['blog'] = {
   "propertyId": "549191220",
   "settledDays": 7,
   "trendDays": 28,
-  "updatedAt": "2026-10-27 10:02"
+  "updatedAt": "2026-10-27 14:56"
  },
  "months": [
   {

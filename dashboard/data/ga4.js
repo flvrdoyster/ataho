@@ -221,6 +221,59 @@ window.DASHBOARD_DATA['ga4'] = {
    "views": 38
   }
  ],
+ "games": [
+  {
+   "game": "환세취호전",
+   "longest": {
+    "minutes": 120,
+    "users": 3
+   },
+   "restore": 9,
+   "save": 17,
+   "start": 34
+  },
+  {
+   "game": "환세희담",
+   "longest": {
+    "minutes": 60,
+    "users": 1
+   },
+   "restore": 1,
+   "save": 4,
+   "start": 11
+  },
+  {
+   "game": "환세풍광전",
+   "longest": {
+    "minutes": 30,
+    "users": 1
+   },
+   "restore": 2,
+   "save": 3,
+   "start": 9
+  },
+  {
+   "game": "환세쾌도전",
+   "longest": null,
+   "restore": 1,
+   "save": 0,
+   "start": 2
+  },
+  {
+   "game": "환세희담 오프닝",
+   "longest": null,
+   "restore": 0,
+   "save": 0,
+   "start": 1
+  },
+  {
+   "game": "환세포물장",
+   "longest": null,
+   "restore": 0,
+   "save": 0,
+   "start": 1
+  }
+ ],
  "history": {
   "2026-09-29": {
    "baseline": {
@@ -7687,29 +7740,28 @@ window.DASHBOARD_DATA['ga4'] = {
    "confirmed": false,
    "insights": [
     {
-     "text": "환세패유기 (웹)는 최근 7일 하루 평균 **2.1회**로 늘었습니다 — 그 전 21일은 하루 0.3회였고, 7일 평균으로는 최근 28일 중 가장 높습니다.",
+     "text": "환세패유기 (웹)는 최근 7일 하루 평균 **2.1회**로 늘었습니다(그 전 21일 하루 0.3회).",
      "tone": "up"
     },
     {
-     "text": "어제 방문자 **10명** — 최근 28일 중 가장 적습니다(다른 날 최저 11명).",
+     "text": "어제 방문자가 최근 28일 중 **가장 적습니다**(다른 날 최저 11명).",
      "tone": "down"
     },
     {
-     "text": "최근 7일 게임: 환세취호전 36명 시작 → 세이브 19명·이어하기 11명·120분 넘게 3명 / 환세희담 11명 시작 → 세이브 4명·이어하기 1명·60분 넘게 1명 / 환세풍광전 9명 시작 → 세이브 3명·이어하기 2명·30분 넘게 1명.",
+     "key": "channel:Direct:up channel:Referral:down",
+     "span": "week",
+     "text": "직접 들어온 방문이 그 전 7일의 **2.9배**(49→143세션)로 늘고, 다른 사이트 링크로 온 방문은 절반 아래(129→50세션)로 줄었습니다. 둘 다 suiko.atah.io에서 가장 크게 바뀌었습니다(+86·-35세션) — 그곳 직접 들어온 방문의 71%가 재방문입니다.",
      "tone": "flat"
-    },
-    {
-     "key": "channel:Direct:up",
-     "text": "지난 7일 직접 들어온 방문이 그 전 7일의 **2.9배**입니다(49→142세션). 가장 많이 늘어난 곳은 suiko.atah.io(+85세션)이고, 그곳 세션의 68%가 재방문입니다.",
-     "tone": "up"
-    },
-    {
-     "key": "channel:Referral:down",
-     "text": "지난 7일 다른 사이트 링크로 온 방문이 그 전 7일의 절반 아래로 줄었습니다(129→**50세션**). 가장 많이 줄어든 곳은 suiko.atah.io(-35세션)입니다.",
-     "tone": "down"
     }
    ],
-   "longest": null,
+   "longest": {
+    "device": "데스크톱",
+    "engagementSeconds": 4285,
+    "landing": "/kr.html",
+    "pageViews": 1,
+    "seconds": 5123,
+    "source": "직접 방문"
+   },
    "ydayHours": [
     3,
     0,
@@ -7822,7 +7874,7 @@ window.DASHBOARD_DATA['ga4'] = {
      "section": "",
      "spike": false,
      "title": "환세희담 취급설명서",
-     "users": 0,
+     "users": 1,
      "views": 2
     },
     {
@@ -7879,7 +7931,7 @@ window.DASHBOARD_DATA['ga4'] = {
    "ydaySources": [
     {
      "name": "직접 방문",
-     "sessions": 9
+     "sessions": 10
     },
     {
      "name": "oysterbay.tistory.com",
@@ -7898,7 +7950,7 @@ window.DASHBOARD_DATA['ga4'] = {
      "sessions": 2
     }
    ],
-   "ydayUnresolved": 3,
+   "ydayUnresolved": 0,
    "yesterday": {
     "date": "2026-10-26",
     "newUsers": 5,
@@ -7936,36 +7988,35 @@ window.DASHBOARD_DATA['ga4'] = {
  ],
  "insights": [
   {
-   "text": "환세패유기 (웹)는 최근 7일 하루 평균 **2.1회**로 늘었습니다 — 그 전 21일은 하루 0.3회였고, 7일 평균으로는 최근 28일 중 가장 높습니다.",
+   "text": "환세패유기 (웹)는 최근 7일 하루 평균 **2.1회**로 늘었습니다(그 전 21일 하루 0.3회).",
    "tone": "up"
   },
   {
-   "text": "어제 방문자 **10명** — 최근 28일 중 가장 적습니다(다른 날 최저 11명).",
+   "text": "어제 방문자가 최근 28일 중 **가장 적습니다**(다른 날 최저 11명).",
    "tone": "down"
   },
   {
-   "text": "최근 7일 게임: 환세취호전 36명 시작 → 세이브 19명·이어하기 11명·120분 넘게 3명 / 환세희담 11명 시작 → 세이브 4명·이어하기 1명·60분 넘게 1명 / 환세풍광전 9명 시작 → 세이브 3명·이어하기 2명·30분 넘게 1명.",
+   "key": "channel:Direct:up channel:Referral:down",
+   "span": "week",
+   "text": "직접 들어온 방문이 그 전 7일의 **2.9배**(49→143세션)로 늘고, 다른 사이트 링크로 온 방문은 절반 아래(129→50세션)로 줄었습니다. 둘 다 suiko.atah.io에서 가장 크게 바뀌었습니다(+86·-35세션) — 그곳 직접 들어온 방문의 71%가 재방문입니다.",
    "tone": "flat"
-  },
-  {
-   "key": "channel:Direct:up",
-   "text": "지난 7일 직접 들어온 방문이 그 전 7일의 **2.9배**입니다(49→142세션). 가장 많이 늘어난 곳은 suiko.atah.io(+85세션)이고, 그곳 세션의 68%가 재방문입니다.",
-   "tone": "up"
-  },
-  {
-   "key": "channel:Referral:down",
-   "text": "지난 7일 다른 사이트 링크로 온 방문이 그 전 7일의 절반 아래로 줄었습니다(129→**50세션**). 가장 많이 줄어든 곳은 suiko.atah.io(-35세션)입니다.",
-   "tone": "down"
   }
  ],
- "longest": null,
+ "longest": {
+  "device": "데스크톱",
+  "engagementSeconds": 4285,
+  "landing": "/kr.html",
+  "pageViews": 1,
+  "seconds": 5123,
+  "source": "직접 방문"
+ },
  "meta": {
   "key": "ga4",
   "label": "사이트",
   "propertyId": "516513119",
   "settledDays": 7,
   "trendDays": 28,
-  "updatedAt": "2026-10-27 10:02"
+  "updatedAt": "2026-10-27 14:56"
  },
  "months": [
   {
@@ -8047,7 +8098,7 @@ window.DASHBOARD_DATA['ga4'] = {
   }
  ],
  "settled": {
-  "avgDuration": 435.502082990566,
+  "avgDuration": 435.50208299056607,
   "engagementRate": 0.5141509433962265,
   "from": "8daysAgo",
   "sessions": 212,
@@ -8171,7 +8222,7 @@ window.DASHBOARD_DATA['ga4'] = {
    "section": "",
    "spike": false,
    "title": "환세희담 취급설명서",
-   "users": 0,
+   "users": 1,
    "views": 2
   },
   {
@@ -8228,7 +8279,7 @@ window.DASHBOARD_DATA['ga4'] = {
  "ydaySources": [
   {
    "name": "직접 방문",
-   "sessions": 9
+   "sessions": 10
   },
   {
    "name": "oysterbay.tistory.com",
@@ -8247,7 +8298,7 @@ window.DASHBOARD_DATA['ga4'] = {
    "sessions": 2
   }
  ],
- "ydayUnresolved": 3,
+ "ydayUnresolved": 0,
  "yesterday": {
   "date": "2026-10-26",
   "newUsers": 5,
