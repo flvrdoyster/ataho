@@ -240,6 +240,10 @@ a:hover {
     color: var(--text-muted);
 }
 
+.insight-group + .insight-group {
+    margin-top: var(--gap-tight);
+}
+
 .insights {
     margin: 0;
     padding: 2px 0 2px 18px;
@@ -262,12 +266,17 @@ a:hover {
     font-weight: var(--font-weight-bold);
 }
 
-.module h2 {
+.module h2,
+.insight-group h3 {
     margin: 0 0 4px;
     font-size: var(--fs-section-title);
     font-weight: var(--font-weight-bold);
     letter-spacing: var(--tracking-title);
     color: var(--text-secondary);
+}
+
+.insight-group h3 {
+    margin-bottom: 8px;
 }
 
 .module-note {

@@ -590,10 +590,8 @@ def build_insights(data, day_label="어제", confirmed=False):
         out.append({
             "tone": "up",
             "text": f"{label}{josa(label, '은', '는')} 최근 {RECENT_DAYS}일 하루 평균 "
-                    f"**{ri['avg7']:.1f}회**로 늘었습니다 — 그 전 {ri['beforeDays']}일은 "
-                    + (f"하루 {ri['before']:.1f}회였고" if ri["before"] >= 0.1 else "거의 조회가 없었고")
-                    + f", {RECENT_DAYS}일 평균으로는 최근 {ri['beforeDays'] + RECENT_DAYS}일 중 "
-                    "가장 높습니다.",
+                    f"**{ri['avg7']:.1f}회**로 늘었습니다(그 전 {ri['beforeDays']}일 "
+                    + (f"하루 {ri['before']:.1f}회)." if ri["before"] >= 0.1 else "거의 0회)."),
         })
 
     def record(value, others):
@@ -614,8 +612,8 @@ def build_insights(data, day_label="어제", confirmed=False):
         edge = max(pu_others) if deeper else min(pu_others)
         out.append({
             "tone": "flat",
-            "text": f"{day_label} 한 사람이 평균 **{pu_value:.1f}장**을 봤습니다 — 최근 "
-                    f"{len(pu_others) + 1}일 중 가장 {'깊게' if deeper else '얕게'} 본 날입니다"
+            "text": f"{day_label} 한 사람당 본 장수가 최근 {len(pu_others) + 1}일 중 "
+                    f"**가장 {'많습니다' if deeper else '적습니다'}**"
                     f"(다른 날 {'최고' if deeper else '최저'} {edge:.1f}장).",
         })
 
@@ -664,8 +662,8 @@ def build_insights(data, day_label="어제", confirmed=False):
         edge = max(others) if many else min(others)
         out.append({
             "tone": "up" if many else "down",
-            "text": f"{day_label} 방문자 **{y['users']:,}명** — 최근 {len(others) + 1}일 중 "
-                    f"가장 {'많습니다' if many else '적습니다'}(다른 날 {'최고' if many else '최저'} "
+            "text": f"{day_label} 방문자가 최근 {len(others) + 1}일 중 "
+                    f"**가장 {'많습니다' if many else '적습니다'}**(다른 날 {'최고' if many else '최저'} "
                     f"{edge:,}명).",
         })
 
@@ -776,23 +774,6 @@ def weekly_insights(w, scope, recent_keys, said_today=()):
         end = n - k - back * WEEK
         return sum(s[max(0, end - WEEK):end])
 
-    games = sorted(w["games"].items(), key=lambda kv: -kv[1].get("emulator_start", 0))
-    parts = []
-    for g, d in games[:3]:
-        start = d.get("emulator_start", 0)
-        if not start:
-            continue
-        bits = [f"세이브 {d.get('save_created', 0)}명"]
-        if d.get("save_restored"):
-            bits.append(f"이어하기 {d['save_restored']}명")
-        for m in MILESTONE_STEPS:
-            if d.get(f"play_{m}"):
-                bits.append(f"{m}분 넘게 {d[f'play_{m}']}명")
-                break
-        parts.append(f"{GAME_NAMES[g]} {start}명 시작 → " + "·".join(bits))
-    if parts:
-        out.append({"tone": "flat", "text": "최근 7일 게임: " + " / ".join(parts) + "."})
-
     def shift(ch, k):
         cur, prev = win(ch, k), win(ch, k, 1)
         if abs(cur - prev) < SHIFT_MIN:
@@ -803,6 +784,7 @@ def weekly_insights(w, scope, recent_keys, said_today=()):
             return "down"
         return None
 
+    shifts = []
     for ch, label in CHANNEL_LABELS.items():
         way = shift(ch, 0)
         key = f"channel:{ch}:{way}"
@@ -811,21 +793,40 @@ def weekly_insights(w, scope, recent_keys, said_today=()):
         cur, prev = win(ch, 0), win(ch, 0, 1)
         hc, hp = w["cur"].get(ch, {}), w["prev"].get(ch, {})
         diffs = {h: hc.get(h, {}).get("sessions", 0) - hp.get(h, {}).get("sessions", 0) for h in set(hc) | set(hp)}
-        if way == "up":
-            text = f"지난 7일 {label}이 그 전 7일의 **{cur / max(prev, 1):.1f}배**입니다({prev}→{cur}세션)."
-        else:
-            text = f"지난 7일 {label}이 그 전 7일의 절반 아래로 줄었습니다({prev}→**{cur}세션**)."
+        host, ret = None, None
         if len(diffs) > 1:
-            host = max(diffs, key=lambda h: diffs[h] if way == "up" else -diffs[h])
-            if diffs[host] * (cur - prev) > 0:
-                text += (f" 가장 많이 {'늘어난' if way == 'up' else '줄어든'} 곳은 {host}"
-                         f"({diffs[host]:+d}세션)")
-                h = hc.get(host, {})
+            top = max(diffs, key=lambda h: diffs[h] if way == "up" else -diffs[h])
+            if diffs[top] * (cur - prev) > 0:
+                host = top
+                h = hc.get(top, {})
                 if way == "up" and h.get("sessions"):
-                    text += f"이고, 그곳 세션의 {round(h['returning'] * 100 / h['sessions'])}%가 재방문입니다."
-                else:
-                    text += "입니다."
-        out.append({"tone": "up" if way == "up" else "down", "text": text, "key": key})
+                    ret = round(h["returning"] * 100 / h["sessions"])
+        shifts.append({"label": label, "way": way, "key": key, "cur": cur, "prev": prev,
+                       "host": host, "diff": diffs.get(host, 0), "ret": ret})
+
+    pairs = []
+    for up in [x for x in shifts if x["way"] == "up" and x["host"]]:
+        down = next((x for x in shifts if x["way"] == "down" and x["host"] == up["host"]
+                     and not any(x in p for p in pairs)), None)
+        if down:
+            pairs.append((up, down))
+    for up, down in pairs:
+        text = (f"{up['label']}이 그 전 7일의 **{up['cur'] / max(up['prev'], 1):.1f}배**({up['prev']}→{up['cur']}세션)로 "
+                f"늘고, {down['label']}은 절반 아래({down['prev']}→{down['cur']}세션)로 줄었습니다. "
+                f"둘 다 {up['host']}에서 가장 크게 바뀌었습니다({up['diff']:+d}·{down['diff']:+d}세션)"
+                + (f" — 그곳 {up['label']}의 {up['ret']}%가 재방문입니다." if up["ret"] is not None else "."))
+        out.append({"tone": "flat", "text": text, "key": f"{up['key']} {down['key']}", "span": "week"})
+    for x in shifts:
+        if any(x in p for p in pairs):
+            continue
+        if x["way"] == "up":
+            text = f"{x['label']}이 그 전 7일의 **{x['cur'] / max(x['prev'], 1):.1f}배**입니다({x['prev']}→{x['cur']}세션)."
+        else:
+            text = f"{x['label']}이 그 전 7일의 절반 아래로 줄었습니다({x['prev']}→**{x['cur']}세션**)."
+        if x["host"]:
+            text += (f" 가장 많이 {'늘어난' if x['way'] == 'up' else '줄어든'} 곳은 {x['host']}({x['diff']:+d}세션)"
+                     + (f"이고, 그곳 세션의 {x['ret']}%가 재방문입니다." if x["ret"] is not None else "입니다."))
+        out.append({"tone": x["way"], "text": text, "key": x["key"], "span": "week"})
 
     def search_state(k):
         cur = win("Organic Search", k)
@@ -849,11 +850,11 @@ def weekly_insights(w, scope, recent_keys, said_today=()):
             eng[name] = eng.get(name, 0) + v
         engines = ", ".join(f"{k} {v}" for k, v in sorted(eng.items(), key=lambda kv: -kv[1]))
         if way == "up":
-            text = (f"지난 7일 검색 유입이 **{cur}세션**으로, 그 전 3주 평균(주 {avg:.0f}세션)의 "
+            text = (f"검색 유입이 **{cur}세션**으로, 그 전 3주 평균(주 {avg:.0f}세션)의 "
                     f"{cur / max(avg, 1):.1f}배입니다" + (f" — {engines}." if engines else "."))
         else:
-            text = f"지난 7일 검색 유입이 **{cur}세션**으로, 그 전 3주 평균(주 {avg:.0f}세션)의 절반 아래입니다."
-        out.append({"tone": "up" if way == "up" else "down", "text": text, "key": key})
+            text = f"검색 유입이 **{cur}세션**으로, 그 전 3주 평균(주 {avg:.0f}세션)의 절반 아래입니다."
+        out.append({"tone": "up" if way == "up" else "down", "text": text, "key": key, "span": "week"})
 
     def ai_new(k):
         cur = win("AI Assistant", k)
@@ -866,10 +867,22 @@ def weekly_insights(w, scope, recent_keys, said_today=()):
         cur = win("AI Assistant", 0)
         mx = max(win("AI Assistant", 0, b) for b in (1, 2, 3))
         before = f"주 최대 {mx}세션이었습니다" if mx else "없었습니다"
-        out.append({"tone": "up", "key": "ai:up",
-                    "text": f"지난 7일 {scope}에 AI 어시스턴트에서 온 방문이 **{cur}세션**입니다"
+        out.append({"tone": "up", "key": "ai:up", "span": "week",
+                    "text": f"{scope}에 AI 어시스턴트에서 온 방문이 **{cur}세션**입니다"
                             + (f"({', '.join(ai_srcs)})" if ai_srcs else "") + f" — 그 전 3주에는 {before}."})
     return out
+
+
+def weekly_games(w):
+    rows = []
+    for g, d in w["games"].items():
+        if not d.get("emulator_start"):
+            continue
+        top = next((m for m in MILESTONE_STEPS if d.get(f"play_{m}")), None)
+        rows.append({"game": GAME_NAMES[g], "start": d["emulator_start"], "save": d.get("save_created", 0),
+                     "restore": d.get("save_restored", 0),
+                     "longest": {"minutes": top, "users": d[f"play_{top}"]} if top else None})
+    return sorted(rows, key=lambda r: -r["start"])
 
 
 SHEETS_SCOPE = "https://www.googleapis.com/auth/spreadsheets.readonly"
@@ -994,10 +1007,11 @@ def main():
         data["confirmed"] = False
         data["insights"] = build_insights(data, day_label="어제", confirmed=False)
         week_cut = (datetime.now(KST).date() - timedelta(days=WEEK)).isoformat()
-        recent_keys = {i["key"] for d, h in history.items() if week_cut < d < (data["yesterday"]["date"] or "")
-                       for i in h.get("insights", []) if i.get("key")}
-        data["insights"] += weekly_insights(fetch_weekly(client, target), target.label, recent_keys,
-                                            data["insights"])
+        recent_keys = {k for d, h in history.items() if week_cut < d < (data["yesterday"]["date"] or "")
+                       for i in h.get("insights", []) for k in (i.get("key") or "").split()}
+        weekly = fetch_weekly(client, target)
+        data["insights"] += weekly_insights(weekly, target.label, recent_keys, data["insights"])
+        data["games"] = weekly_games(weekly)
         if data["yesterday"]["date"]:
             history[data["yesterday"]["date"]] = snapshot_shape(data)
 

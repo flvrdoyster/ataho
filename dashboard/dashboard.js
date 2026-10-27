@@ -332,9 +332,14 @@
 
     if (data.insights && data.insights.length) {
         const emph = (t) => esc(t).replace(/\*\*(.+?)\*\*/g, '<b>$1</b>');
-        parts.push(mod(12, '', '',
-            `<ul class="insights">${data.insights
-                .map((i) => `<li>${emph(i.text)}</li>`).join('')}</ul>`));
+        const weekly = (i) => i.span === 'week' || !!i.key;
+        const groups = [
+            [dayLabel, data.insights.filter((i) => !weekly(i))],
+            [isLatest ? '최근 7일' : `${mmdd(y.date)}까지 7일`, data.insights.filter(weekly)],
+        ].filter(([, items]) => items.length);
+        parts.push(mod(12, '', '', groups.map(([title, items]) =>
+            `<div class="insight-group"><h3>${esc(title)}</h3><ul class="insights">${items
+                .map((i) => `<li>${emph(i.text)}</li>`).join('')}</ul></div>`).join('')));
     }
 
     if (primary && isLatest && fbPending) {
@@ -447,6 +452,24 @@
          ${esc(dayLabel)} · 여러 시간에 걸친 세션은 시간마다 셉니다`,
         `<div class="hour-chart">${cols}</div>
          <div class="hour-ticks">${hourTicks}</div>`));
+
+    const games = data.games || [];
+    if (isLatest && games.length) {
+        const gameMax = Math.max(0, ...games.map((g) => g.start));
+        const gameRows = games.map((g) =>
+            `<tr><td class="page bar" style="${barW(g.start, gameMax)}">` +
+            `<span class="name">${esc(g.game)}</span></td>` +
+            `<td class="num">${fmt(g.start)}</td><td class="num">${fmt(g.save)}</td>` +
+            `<td class="num">${fmt(g.restore)}</td>` +
+            `<td class="num">${g.longest
+                ? `${fmt(g.longest.minutes)}분 넘게 ${fmt(g.longest.users)}명` : '—'}</td></tr>`).join('');
+        parts.push(mod(12, '게임 플레이 · 최근 7일',
+            '시작한 사람이 많은 순 · 사람 수는 7일 동안 중복 제외',
+            `<div class="scroll"><table class="rank pages"><thead><tr>
+                <th>게임</th><th class="num">시작</th><th class="num">세이브</th>
+                <th class="num">이어하기</th><th class="num">가장 긴 플레이</th>
+             </tr></thead><tbody>${gameRows}</tbody></table></div>`));
+    }
 
     const st = data.settled;
     if (st) {
