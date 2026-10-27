@@ -13,7 +13,7 @@
 <link rel="stylesheet" href="../footer.css">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400&display=swap">
-<script>{const q=new URLSearchParams(location.search),m=["img","world","place"].find(k=>q.has(k));if(m)document.documentElement.dataset.embed=m}</script>
+<script>{const q=new URLSearchParams(location.search),m=["img","world","place"].find(k=>q.has(k));if(m){document.documentElement.dataset.embed=m;if(top!==self)document.documentElement.dataset.framed=""}}</script>
 <style>
 *{box-sizing:border-box}body{margin:0}
 :root{
@@ -37,6 +37,7 @@ section.dg svg{display:block;height:auto;overflow:visible;max-width:none}
 .scroller.grab{cursor:grabbing;user-select:none}
 .views{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 16px}
 .vbtn{display:inline-flex;align-items:center;gap:7px;font:400 var(--fs-sm) var(--font-ui);border:1px solid var(--border);background:var(--surface);color:var(--text-primary);border-radius:var(--radius-pill);height:var(--vrow-h);padding:0 14px;cursor:pointer}
+.vbtn{-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}
 .vbtn[aria-pressed="true"]{border-color:var(--text-primary);font-weight:700}
 .vbtn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .vbtn img{width:20px;height:20px;display:block;border-radius:22%}
@@ -90,7 +91,7 @@ h2.sec{font-size:var(--fs-h2);font-weight:var(--font-weight-bold);line-height:1.
 .dwrap{position:relative}
 .dbar{display:none;position:relative;height:4px;margin-bottom:8px;border-radius:2px;background:rgba(0,0,0,.08)}
 .dbar i{position:absolute;top:0;bottom:0;border-radius:2px;background:rgba(0,0,0,.35)}
-@media (hover:none){.dbar.on{display:block}.scroller{scrollbar-width:none}.scroller::-webkit-scrollbar{display:none}}
+.dbar.on{display:block}.scroller{scrollbar-width:none}.scroller::-webkit-scrollbar{display:none}
 #ov{position:absolute;inset:0;width:100%;height:100%}
 .mk>*{transform:scale(var(--ms,1))}
 .noname .mk .name{display:none}
@@ -112,10 +113,12 @@ h2.sec{font-size:var(--fs-h2);font-weight:var(--font-weight-bold);line-height:1.
 .mlist li{break-inside:avoid;margin:0 0 8px;display:grid;grid-template-columns:30px 1fr;gap:10px;align-items:start;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px 12px}
 .badge{align-self:center;width:26px;height:26px;border-radius:50%;display:grid;place-items:center;color:#fff;font-weight:700;font-size:var(--fs-label)}
 .mlist b{font-size:var(--fs-sm)}.mlist p{margin:2px 0 0;font-size:var(--fs-label);color:var(--text-secondary);overflow-wrap:anywhere}
+[data-framed]{overflow-y:hidden}
 [data-embed] body{background:transparent;padding:16px 0}
 [data-embed] header,[data-embed] .sec,[data-embed] #footer{display:none}
 [data-embed] .wrap{gap:0}
 [data-embed] section.dg{background:none;border:0;padding:0}
+[data-embed=place] section.dg{background:var(--surface);border:var(--ui-border-w) solid var(--border);padding:16px}
 [data-embed=world] #sec-place,[data-embed=img] #sec-place,[data-embed=place] #sec-world{display:none}
 [data-embed=img] #sec-world .secsub,[data-embed=img] #sec-world .legend,[data-embed=img] #sec-world .mlist{display:none}
 </style>
@@ -172,6 +175,7 @@ const subOf=n=>{const o=only();return(o&&n.subs&&n.subs[o])||n.sub||""};
 function labelOf(e){const gs=(e.games||[]).filter(g=>active.has(g));const ls=gs.map(g=>(e.labels&&e.labels[g])||e.label).filter(Boolean);return[...new Set(ls)].join(" · ")}
 const isDashed=n=>{const gs=(n.games||[]).filter(g=>active.has(g));return gs.length>0&&gs.every(g=>(n.dashedIn||[]).includes(g))};
 
+let held=false;
 function renderViews(){
   viewsEl.textContent="";
   const all=document.createElement("button");all.type="button";all.className="vbtn";all.textContent="전체";
@@ -180,9 +184,14 @@ function renderViews(){
   for(const [k,name] of GAMES){
     const b=document.createElement("button");b.type="button";b.className="vbtn";b.setAttribute("aria-pressed",String(active.has(k)));
     const i=document.createElement("img");i.src=`map/${k}.png`;i.alt="";i.width=i.height=20;b.appendChild(i);b.appendChild(document.createTextNode(name));
-    b.title="눌러서 켜고 끄기 · 더블클릭하면 이 작품만";
-    b.addEventListener("click",()=>{if(active.has(k)){if(active.size>1)active.delete(k)}else active.add(k);changed()});
+    b.title="눌러서 켜고 끄기 · 길게 누르거나 더블클릭하면 이 작품만";
+    b.addEventListener("click",()=>{if(held){held=false;return}if(active.has(k)){if(active.size>1)active.delete(k)}else active.add(k);changed()});
     b.addEventListener("dblclick",()=>{active=new Set([k]);changed()});
+    let hold=0,sx=0,sy=0;const stop=()=>clearTimeout(hold);
+    b.addEventListener("pointerdown",e=>{if(e.button)return;sx=e.clientX;sy=e.clientY;held=false;hold=setTimeout(()=>{held=true;active=new Set([k]);changed()},500)});
+    b.addEventListener("pointermove",e=>{if(Math.hypot(e.clientX-sx,e.clientY-sy)>8)stop()});
+    for(const t of["pointerup","pointercancel","pointerleave"])b.addEventListener(t,stop);
+    b.addEventListener("contextmenu",e=>e.preventDefault());
     viewsEl.appendChild(b)}}
 function changed(){try{localStorage.setItem("gensei-flow-active",JSON.stringify([...active]))}catch(_){}renderViews();update()}
 
