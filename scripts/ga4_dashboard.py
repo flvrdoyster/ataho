@@ -436,7 +436,7 @@ def fetch(client, target, age=1, include_settled=True):
         recent_avg = sum(recent) / len(recent) if recent else 0.0
         ratio = p["views"] / max(p["priorAvg"], RATIO_FLOOR)
         p["ratio"] = round(ratio, 1)
-        p["spike"] = bool(p["priorAvg"] > 0 and p["views"] >= SPIKE_MIN_VIEWS
+        p["spike"] = bool(p["views"] >= SPIKE_MIN_VIEWS
                           and ratio >= SPIKE_RATIO
                           and p["views"] / max(recent_avg, RATIO_FLOOR) >= SPIKE_RATIO)
 
@@ -586,7 +586,10 @@ def build_insights(data, day_label="어제", confirmed=False):
         rise = top.get("rising")
         rise_tail = (f" 최근 {RECENT_DAYS}일 하루 평균도 {rise['avg7']:.1f}회로 늘었습니다."
                      if rise else "")
-        if top["priorAvg"] < RATIO_FLOOR:
+        if top["priorAvg"] == 0:
+            text = (head + f"**{top['views']:,}회** — 전에 조회가 없던 페이지"
+                    + ("인데," + rise_tail if rise else "입니다."))
+        elif top["priorAvg"] < RATIO_FLOOR:
             text = (head + f"**{top['views']:,}회** — 평소 하루 1회도 안 보던 페이지"
                     + ("인데," + rise_tail if rise else "입니다."))
         else:
