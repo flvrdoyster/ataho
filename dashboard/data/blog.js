@@ -6226,8 +6226,8 @@ window.DASHBOARD_DATA['blog'] = {
    "confirmed": true,
    "insights": [
     {
-     "text": "10.27은 평소와 크게 다른 점이 없었습니다 — 방문자도 페이지별 조회수도 늘 보던 범위 안입니다.",
-     "tone": "flat"
+     "text": "지도로 보는 환세 시리즈 세계관이 10.27 **16회** — 전에 조회가 없던 페이지입니다.",
+     "tone": "up"
     }
    ],
    "longest": null,
@@ -6266,7 +6266,7 @@ window.DASHBOARD_DATA['blog'] = {
      "ratio": 16.0,
      "rising": null,
      "section": "",
-     "spike": false,
+     "spike": true,
      "title": "",
      "users": 8,
      "views": 16
@@ -6700,7 +6700,7 @@ window.DASHBOARD_DATA['blog'] = {
   "propertyId": "549191220",
   "settledDays": 7,
   "trendDays": 28,
-  "updatedAt": "2026-10-29 08:13"
+  "updatedAt": "2026-10-29 08:24"
  },
  "months": [
   {
