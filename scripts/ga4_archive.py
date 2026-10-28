@@ -39,7 +39,7 @@ def collect(client, target, start, end):
         d["users"], d["newUsers"] = int(r["activeUsers"]), int(r["newUsers"])
         d["sessions"], d["views"] = int(r["sessions"]), int(r["screenPageViews"])
 
-    page_dims = ["hostName", "pagePath"] if target.split_hosts else [target.page_dimension]
+    page_dims = ["hostName", "pagePath"] if target.split_hosts else ["pagePath", "pageTitle"]
     for r in report_all(client, target, dimensions=["date"] + page_dims,
                         metrics=["screenPageViews", "activeUsers"], date_range=rng):
         if r["screenPageViews"] > 0:

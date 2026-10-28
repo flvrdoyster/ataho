@@ -79,27 +79,26 @@ SITE_TITLE_SUFFIX = " : atah.io"
 
 class Target:
 
-    def __init__(self, key, label, property_id, hosts, *, split_hosts, page_dimension):
+    def __init__(self, key, label, property_id, hosts, *, split_hosts):
         self.key = key
         self.label = label
         self.property_id = property_id
         self.hosts = hosts
         self.split_hosts = split_hosts
-        self.page_dimension = page_dimension
 
 
 def build_targets():
     targets = [Target(
         key="ga4", label="사이트",
         property_id=os.environ.get("GA4_PROPERTY_ID", "516513119"),
-        hosts=SITE_HOSTS, split_hosts=True, page_dimension="pagePath",
+        hosts=SITE_HOSTS, split_hosts=True,
     )]
 
     blog_id = os.environ.get("GA4_BLOG_PROPERTY_ID", "").strip()
     if blog_id:
         targets.append(Target(
             key="blog", label="블로그", property_id=blog_id,
-            hosts=BLOG_HOSTS, split_hosts=False, page_dimension="pageTitle",
+            hosts=BLOG_HOSTS, split_hosts=False,
         ))
     return targets
 
@@ -155,6 +154,17 @@ def report(client, target, *, dimensions=(), metrics, date_range, dimension_filt
             row[m] = float(r.metric_values[i].value or 0)
         rows.append(row)
     return rows
+
+
+def latest_titles(client, target, date_range):
+    latest = {}
+    for r in report(client, target, dimensions=["pagePath", "pageTitle", "dateHour"],
+                    metrics=["screenPageViews"], date_range=date_range, limit=20000):
+        if r["screenPageViews"] <= 0 or not r["pageTitle"]:
+            continue
+        if r["pagePath"] not in latest or r["dateHour"] > latest[r["pagePath"]][0]:
+            latest[r["pagePath"]] = (r["dateHour"], r["pageTitle"])
+    return {path: title for path, (_, title) in latest.items()}
 
 
 def totals(client, target, date_range, metrics):
@@ -367,8 +377,7 @@ def fetch(client, target, age=1, include_settled=True):
         "perUser": distribution(per_user, pu_value),
     }
 
-    page_dims = (["hostName", "pagePath", "pageTitle"] if target.split_hosts
-                 else [target.page_dimension])
+    page_dims = ["hostName", "pagePath", "pageTitle"] if target.split_hosts else ["pagePath"]
 
     def clean_title(raw):
         t = (raw or "").strip()
@@ -381,7 +390,7 @@ def fetch(client, target, age=1, include_settled=True):
                        date_range=day_range(age), order_by=("screenPageViews", True), limit=15)
     page_rows = [r for r in page_rows if r["screenPageViews"] > 0]
 
-    prior_key = ["hostName", "pagePath"] if target.split_hosts else [target.page_dimension]
+    prior_key = ["hostName", "pagePath"] if target.split_hosts else ["pagePath"]
     prior_days = max(1, len(data["daily"]) - 1)
     span = prior_days + RECENT_DAYS
     prior_dates = []
@@ -409,13 +418,15 @@ def fetch(client, target, age=1, include_settled=True):
             for r in page_rows
         ]
     else:
-        data["ydayPages"] = [
-            {"name": r[target.page_dimension] or "(제목 없음)", "title": "", "host": "",
-             "section": "", "views": int(r["screenPageViews"]), "users": int(r["activeUsers"]),
-             "list": bool(LIST_PAGE_RE.search(r[target.page_dimension] or "")),
-             "_series": prior_series.get((r[target.page_dimension],), [])}
-            for r in page_rows
-        ]
+        titles = latest_titles(client, target, day_range(age))
+        data["ydayPages"] = []
+        for r in page_rows:
+            name = titles.get(r["pagePath"]) or r["pagePath"] or "(제목 없음)"
+            data["ydayPages"].append({
+                "name": name, "title": "", "host": "", "section": "",
+                "views": int(r["screenPageViews"]), "users": int(r["activeUsers"]),
+                "list": bool(LIST_PAGE_RE.search(name)),
+                "_series": prior_series.get((r["pagePath"],), [])})
 
     for p in data["ydayPages"]:
         series_all = p.pop("_series") or [0] * len(prior_dates)
