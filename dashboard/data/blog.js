@@ -275,6 +275,7 @@ window.DASHBOARD_DATA['blog'] = {
     }
    },
    "confirmed": true,
+   "games": [],
    "insights": [
     {
      "text": "환세취호전 웹 에뮬레이터 및 개선 패치는 최근 7일 하루 평균 **2.0회**로 늘었습니다 — 그 전 21일은 거의 조회가 없었고, 7일 평균으로는 최근 28일 중 가장 높습니다.",
@@ -466,6 +467,7 @@ window.DASHBOARD_DATA['blog'] = {
     }
    },
    "confirmed": true,
+   "games": [],
    "insights": [
     {
      "text": "10.03은 평소와 크게 다른 점이 없었습니다 — 방문자도 페이지별 조회수도 늘 보던 범위 안입니다.",
@@ -606,6 +608,7 @@ window.DASHBOARD_DATA['blog'] = {
     }
    },
    "confirmed": true,
+   "games": [],
    "insights": [
     {
      "text": "10.04 방문자 **0명** — 최근 28일 중 가장 적습니다(다른 날 최저 2명).",
@@ -703,6 +706,7 @@ window.DASHBOARD_DATA['blog'] = {
     }
    },
    "confirmed": true,
+   "games": [],
    "insights": [
     {
      "text": "10.05은 평소와 크게 다른 점이 없었습니다 — 방문자도 페이지별 조회수도 늘 보던 범위 안입니다.",
@@ -955,6 +959,7 @@ window.DASHBOARD_DATA['blog'] = {
     }
    },
    "confirmed": true,
+   "games": [],
    "insights": [
     {
      "text": "최근 28일 동안 없던 유입원이 10.06에 생겼습니다 — m.search.naver.com.",
@@ -1216,6 +1221,7 @@ window.DASHBOARD_DATA['blog'] = {
     }
    },
    "confirmed": true,
+   "games": [],
    "insights": [
     {
      "text": "OYSTER BAY이(가) 10.07 20회 — 평소 하루 1.7회 보던 페이지라 **11.5배**로 뛰었고, 최근 7일 하루 평균도 3.9회로 늘었습니다.",
@@ -1538,6 +1544,7 @@ window.DASHBOARD_DATA['blog'] = {
     }
    },
    "confirmed": true,
+   "games": [],
    "insights": [
     {
      "text": "OYSTER BAY이(가) 10.08 22회 — 평소 하루 2.5회 보던 페이지라 **8.9배**로 뛰었습니다.",
@@ -1867,6 +1874,7 @@ window.DASHBOARD_DATA['blog'] = {
     }
    },
    "confirmed": true,
+   "games": [],
    "insights": [
     {
      "text": "'환세희담' 태그의 글 목록은 최근 7일 하루 평균 **2.0회**로 늘었습니다 — 그 전 21일은 하루 0.5회였고, 7일 평균으로는 최근 28일 중 가장 높습니다.",
@@ -2149,6 +2157,7 @@ window.DASHBOARD_DATA['blog'] = {
     }
    },
    "confirmed": true,
+   "games": [],
    "insights": [
     {
      "text": "PC98 환세 시리즈 한글화가 10.10 15회 — 평소 하루 3.9회 보던 페이지라 **3.9배**로 뛰었습니다.",
@@ -2409,6 +2418,7 @@ window.DASHBOARD_DATA['blog'] = {
     }
    },
    "confirmed": true,
+   "games": [],
    "insights": [
     {
      "text": "10.11은 평소와 크게 다른 점이 없었습니다 — 방문자도 페이지별 조회수도 늘 보던 범위 안입니다.",
@@ -2639,6 +2649,7 @@ window.DASHBOARD_DATA['blog'] = {
     }
    },
    "confirmed": true,
+   "games": [],
    "insights": [
     {
      "text": "최근 28일 동안 없던 유입원이 10.12에 생겼습니다 — suiko.atah.io.",
@@ -2878,6 +2889,7 @@ window.DASHBOARD_DATA['blog'] = {
     }
    },
    "confirmed": true,
+   "games": [],
    "insights": [
     {
      "text": "OYSTER BAY이(가) 10.13 20회 — 평소 하루 3.2회 보던 페이지라 **6.2배**로 뛰었습니다.",
@@ -3114,6 +3126,7 @@ window.DASHBOARD_DATA['blog'] = {
     }
    },
    "confirmed": true,
+   "games": [],
    "insights": [
     {
      "text": "10.14은 평소와 크게 다른 점이 없었습니다 — 방문자도 페이지별 조회수도 늘 보던 범위 안입니다.",
@@ -3258,6 +3271,7 @@ window.DASHBOARD_DATA['blog'] = {
     }
    },
    "confirmed": true,
+   "games": [],
    "insights": [
     {
      "text": "10.15은 평소와 크게 다른 점이 없었습니다 — 방문자도 페이지별 조회수도 늘 보던 범위 안입니다.",
@@ -3434,6 +3448,7 @@ window.DASHBOARD_DATA['blog'] = {
     }
    },
    "confirmed": true,
+   "games": [],
    "insights": [
     {
      "text": "환세쾌진극 웹 버전이 10.16 **6회** — 평소 하루 1회도 안 보던 페이지입니다.",
@@ -3738,6 +3753,7 @@ window.DASHBOARD_DATA['blog'] = {
     }
    },
    "confirmed": true,
+   "games": [],
    "insights": [
     {
      "text": "10.17은 평소와 크게 다른 점이 없었습니다 — 방문자도 페이지별 조회수도 늘 보던 범위 안입니다.",
@@ -3921,6 +3937,7 @@ window.DASHBOARD_DATA['blog'] = {
     }
    },
    "confirmed": true,
+   "games": [],
    "insights": [
     {
      "text": "PC98 환세 시리즈 한글화가 10.18 9회 — 평소 하루 3.9회 보던 페이지라 **2.3배**로 뛰었습니다.",
@@ -4114,6 +4131,7 @@ window.DASHBOARD_DATA['blog'] = {
     }
    },
    "confirmed": true,
+   "games": [],
    "insights": [
     {
      "text": "OYSTER BAY이(가) 10.19 19회 — 평소 하루 3.6회 보던 페이지라 **5.3배**로 뛰었습니다.",
@@ -4406,6 +4424,7 @@ window.DASHBOARD_DATA['blog'] = {
     }
    },
    "confirmed": true,
+   "games": [],
    "insights": [
     {
      "text": "10.20은 평소와 크게 다른 점이 없었습니다 — 방문자도 페이지별 조회수도 늘 보던 범위 안입니다.",
@@ -4550,6 +4569,7 @@ window.DASHBOARD_DATA['blog'] = {
     }
    },
    "confirmed": true,
+   "games": [],
    "insights": [
     {
      "text": "10.21은 평소와 크게 다른 점이 없었습니다 — 방문자도 페이지별 조회수도 늘 보던 범위 안입니다.",
@@ -4686,6 +4706,7 @@ window.DASHBOARD_DATA['blog'] = {
     }
    },
    "confirmed": true,
+   "games": [],
    "insights": [
     {
      "text": "환세취호전 웹 에뮬레이터 및 개선 패치가 10.22 8회 — 평소 하루 2.3회 보던 페이지라 **3.4배**로 뛰었습니다.",
@@ -4882,6 +4903,7 @@ window.DASHBOARD_DATA['blog'] = {
     }
    },
    "confirmed": true,
+   "games": [],
    "insights": [
     {
      "text": "10.23은 평소와 크게 다른 점이 없었습니다 — 방문자도 페이지별 조회수도 늘 보던 범위 안입니다.",
@@ -5191,6 +5213,7 @@ window.DASHBOARD_DATA['blog'] = {
     }
    },
    "confirmed": true,
+   "games": [],
    "insights": [
     {
      "text": "'환세취호전' 태그의 글 목록이 10.24 11회 — 평소 하루 1.4회 보던 페이지라 **8.0배**로 뛰었습니다.",
@@ -5456,6 +5479,7 @@ window.DASHBOARD_DATA['blog'] = {
     }
    },
    "confirmed": true,
+   "games": [],
    "insights": [
     {
      "text": "10.25은 평소와 크게 다른 점이 없었습니다 — 방문자도 페이지별 조회수도 늘 보던 범위 안입니다.",
@@ -5777,6 +5801,7 @@ window.DASHBOARD_DATA['blog'] = {
     }
    },
    "confirmed": true,
+   "games": [],
    "insights": [
     {
      "text": "10.26은 평소와 크게 다른 점이 없었습니다 — 방문자도 페이지별 조회수도 늘 보던 범위 안입니다.",
@@ -5959,6 +5984,7 @@ window.DASHBOARD_DATA['blog'] = {
     }
    },
    "confirmed": true,
+   "games": [],
    "insights": [
     {
      "text": "지도로 보는 환세 시리즈 세계관이 10.27 **16회** — 전에 조회가 없던 페이지입니다.",
@@ -6156,6 +6182,7 @@ window.DASHBOARD_DATA['blog'] = {
     }
    },
    "confirmed": true,
+   "games": [],
    "insights": [
     {
      "text": "지도로 보는 환세 시리즈 세계관이 10.28 **8회** — 평소 하루 1회도 안 보던 페이지입니다.",
@@ -6443,6 +6470,7 @@ window.DASHBOARD_DATA['blog'] = {
     }
    },
    "confirmed": false,
+   "games": [],
    "insights": [
     {
      "text": "어제는 평소와 크게 다른 점이 없었습니다 — 방문자도 페이지별 조회수도 늘 보던 범위 안입니다.",

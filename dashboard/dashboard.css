@@ -390,6 +390,11 @@ svg {
     color: var(--text-muted);
 }
 
+.rank .week {
+    margin-left: 4px;
+    color: var(--text-muted);
+}
+
 .rank .ratio {
     margin-left: 6px;
     color: var(--text-primary);

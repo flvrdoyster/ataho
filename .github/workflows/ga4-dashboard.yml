@@ -2,7 +2,7 @@ name: ga4-dashboard
 
 on:
   schedule:
-    - cron: '0 22 * * *'   # 07:00 KST
+    - cron: '0 20 * * *'   # 05:00 KST
   workflow_dispatch: {}
 
 permissions:

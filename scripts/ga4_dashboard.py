@@ -551,6 +551,7 @@ def fetch(client, target, age=1, include_settled=True):
                                    "views": avg(week, "views"), "prevViews": avg(prev, "views")}
 
     data["longest"] = fetch_longest_visit(client, target, day_range(age))
+    data["games"] = fetch_games(client, target, age)
 
     if include_settled:
         settled = totals(client, target, SETTLED,
@@ -760,10 +761,16 @@ def fetch_weekly(client, target):
                     date_range=(f"{WEEK}daysAgo", "yesterday"), limit=500):
         sources.setdefault(r["sessionDefaultChannelGroup"], {})[r["sessionSource"]] = int(r["sessions"])
 
+    return {"series": series, "cur": by_host((f"{WEEK}daysAgo", "yesterday")),
+            "prev": by_host((f"{WEEK * 2}daysAgo", f"{WEEK + 1}daysAgo")),
+            "sources": sources}
+
+
+def fetch_game_events(client, target, date_range):
     games = {}
     try:
         for r in report(client, target, dimensions=["eventName", "customEvent:game", "customEvent:minutes"],
-                        metrics=["totalUsers"], date_range=(f"{WEEK}daysAgo", "yesterday"), limit=1000):
+                        metrics=["totalUsers"], date_range=date_range, limit=1000):
             g = r["customEvent:game"]
             if g not in GAME_NAMES:
                 continue
@@ -772,11 +779,23 @@ def fetch_weekly(client, target):
                 key = f"play_{r['customEvent:minutes']}"
             games.setdefault(g, {})[key] = games.get(g, {}).get(key, 0) + int(r["totalUsers"])
     except Exception:  # noqa: BLE001
-        games = {}
+        return {}
+    return games
 
-    return {"series": series, "cur": by_host((f"{WEEK}daysAgo", "yesterday")),
-            "prev": by_host((f"{WEEK * 2}daysAgo", f"{WEEK + 1}daysAgo")),
-            "sources": sources, "games": games}
+
+def game_stats(d):
+    top = next((m for m in MILESTONE_STEPS if d.get(f"play_{m}")), None)
+    return {"start": d.get("emulator_start", 0), "save": d.get("save_created", 0),
+            "restore": d.get("save_restored", 0),
+            "longest": {"minutes": top, "users": d[f"play_{top}"]} if top else None}
+
+
+def fetch_games(client, target, age):
+    day = fetch_game_events(client, target, day_range(age))
+    week = fetch_game_events(client, target, (f"{age + WEEK - 1}daysAgo", f"{age}daysAgo"))
+    rows = [{"game": GAME_NAMES[g], **game_stats(day.get(g, {})), "week": game_stats(d)}
+            for g, d in week.items() if d.get("emulator_start")]
+    return sorted(rows, key=lambda r: (-r["start"], -r["week"]["start"]))
 
 
 def weekly_insights(w, scope, recent_keys, said_today=()):
@@ -887,18 +906,6 @@ def weekly_insights(w, scope, recent_keys, said_today=()):
     return out
 
 
-def weekly_games(w):
-    rows = []
-    for g, d in w["games"].items():
-        if not d.get("emulator_start"):
-            continue
-        top = next((m for m in MILESTONE_STEPS if d.get(f"play_{m}")), None)
-        rows.append({"game": GAME_NAMES[g], "start": d["emulator_start"], "save": d.get("save_created", 0),
-                     "restore": d.get("save_restored", 0),
-                     "longest": {"minutes": top, "users": d[f"play_{top}"]} if top else None})
-    return sorted(rows, key=lambda r: -r["start"])
-
-
 SHEETS_SCOPE = "https://www.googleapis.com/auth/spreadsheets.readonly"
 FEEDBACK_RANGE = "A1:J1000"
 FEEDBACK_KEYS = ("시각", "분류", "게임", "확인")
@@ -988,7 +995,7 @@ def fetch_feedback(creds, sheet_id):
 
 HISTORY_KEEP = ("yesterday", "baseline", "ydayPages", "ydaySites",
                 "ydaySources", "ydayUnresolved", "ydayHours", "insights", "confirmed",
-                "longest")
+                "longest", "games")
 
 
 def snapshot_shape(data):
@@ -1025,7 +1032,6 @@ def main():
                        for i in h.get("insights", []) for k in (i.get("key") or "").split()}
         weekly = fetch_weekly(client, target)
         data["insights"] += weekly_insights(weekly, target.label, recent_keys, data["insights"])
-        data["games"] = weekly_games(weekly)
         if data["yesterday"]["date"]:
             history[data["yesterday"]["date"]] = snapshot_shape(data)
 

@@ -454,17 +454,20 @@
          <div class="hour-ticks">${hourTicks}</div>`));
 
     const games = data.games || [];
-    if (isLatest && games.length) {
+    if (games.length) {
+        const weekLabel = isLatest ? '최근 7일' : `${mmdd(y.date)}까지 7일`;
         const gameMax = Math.max(0, ...games.map((g) => g.start));
+        const longest = (l) => (l ? `${fmt(l.minutes)}분 넘게 ${fmt(l.users)}명` : '—');
+        const cell = (day, week) => `<td class="num">${day}<span class="week">/ ${week}</span></td>`;
         const gameRows = games.map((g) =>
             `<tr><td class="page bar" style="${barW(g.start, gameMax)}">` +
             `<span class="name">${esc(g.game)}</span></td>` +
-            `<td class="num">${fmt(g.start)}</td><td class="num">${fmt(g.save)}</td>` +
-            `<td class="num">${fmt(g.restore)}</td>` +
-            `<td class="num">${g.longest
-                ? `${fmt(g.longest.minutes)}분 넘게 ${fmt(g.longest.users)}명` : '—'}</td></tr>`).join('');
-        parts.push(mod(12, '게임 플레이 · 최근 7일',
-            '시작한 사람이 많은 순 · 사람 수는 7일 동안 중복 제외',
+            cell(fmt(g.start), fmt(g.week.start)) + cell(fmt(g.save), fmt(g.week.save)) +
+            cell(fmt(g.restore), fmt(g.week.restore)) +
+            cell(longest(g.longest), longest(g.week.longest)) + '</tr>').join('');
+        parts.push(mod(12, `${dayLabel} 게임 플레이`,
+            `${esc(dayLabel)} 시작한 사람이 많은 순 · 옅은 숫자는 ${esc(weekLabel)} ·
+             사람 수는 기간 안에서 중복 제외`,
             `<div class="scroll"><table class="rank pages"><thead><tr>
                 <th>게임</th><th class="num">시작</th><th class="num">세이브</th>
                 <th class="num">이어하기</th><th class="num">가장 긴 플레이</th>

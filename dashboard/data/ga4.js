@@ -225,56 +225,98 @@ window.DASHBOARD_DATA['ga4'] = {
   {
    "game": "환세취호전",
    "longest": {
-    "minutes": 120,
-    "users": 2
-   },
-   "restore": 12,
-   "save": 20,
-   "start": 34
-  },
-  {
-   "game": "환세희담",
-   "longest": {
-    "minutes": 60,
-    "users": 1
-   },
-   "restore": 0,
-   "save": 2,
-   "start": 10
-  },
-  {
-   "game": "환세풍광전",
-   "longest": {
     "minutes": 30,
     "users": 1
    },
-   "restore": 1,
-   "save": 2,
-   "start": 9
+   "restore": 5,
+   "save": 6,
+   "start": 9,
+   "week": {
+    "longest": {
+     "minutes": 120,
+     "users": 2
+    },
+    "restore": 12,
+    "save": 20,
+    "start": 34
+   }
+  },
+  {
+   "game": "환세희담",
+   "longest": null,
+   "restore": 0,
+   "save": 0,
+   "start": 1,
+   "week": {
+    "longest": {
+     "minutes": 60,
+     "users": 1
+    },
+    "restore": 0,
+    "save": 2,
+    "start": 10
+   }
+  },
+  {
+   "game": "환세풍광전",
+   "longest": null,
+   "restore": 0,
+   "save": 0,
+   "start": 1,
+   "week": {
+    "longest": {
+     "minutes": 30,
+     "users": 1
+    },
+    "restore": 1,
+    "save": 2,
+    "start": 9
+   }
   },
   {
    "game": "환세쾌도전",
    "longest": {
-    "minutes": 30,
+    "minutes": 5,
     "users": 1
    },
-   "restore": 1,
-   "save": 3,
-   "start": 4
+   "restore": 0,
+   "save": 1,
+   "start": 1,
+   "week": {
+    "longest": {
+     "minutes": 30,
+     "users": 1
+    },
+    "restore": 1,
+    "save": 3,
+    "start": 4
+   }
   },
   {
    "game": "환세포물장",
    "longest": null,
    "restore": 0,
    "save": 0,
-   "start": 3
+   "start": 1,
+   "week": {
+    "longest": null,
+    "restore": 0,
+    "save": 0,
+    "start": 3
+   }
   },
   {
    "game": "환세희담 오프닝",
    "longest": null,
    "restore": 0,
    "save": 0,
-   "start": 1
+   "start": 0,
+   "week": {
+    "longest": null,
+    "restore": 0,
+    "save": 0,
+    "start": 1
+   }
   }
  ],
  "history": {
@@ -330,6 +372,73 @@ window.DASHBOARD_DATA['ga4'] = {
     }
    },
    "confirmed": true,
+   "games": [
+    {
+     "game": "환세희담",
+     "longest": null,
+     "restore": 2,
+     "save": 4,
+     "start": 6,
+     "week": {
+      "longest": null,
+      "restore": 4,
+      "save": 8,
+      "start": 19
+     }
+    },
+    {
+     "game": "환세희담 오프닝",
+     "longest": null,
+     "restore": 0,
+     "save": 0,
+     "start": 2,
+     "week": {
+      "longest": null,
+      "restore": 0,
+      "save": 0,
+      "start": 6
+     }
+    },
+    {
+     "game": "환세풍광전",
+     "longest": null,
+     "restore": 0,
+     "save": 0,
+     "start": 1,
+     "week": {
+      "longest": null,
+      "restore": 2,
+      "save": 5,
+      "start": 17
+     }
+    },
+    {
+     "game": "환세포물장",
+     "longest": null,
+     "restore": 0,
+     "save": 0,
+     "start": 1,
+     "week": {
+      "longest": null,
+      "restore": 1,
+      "save": 1,
+      "start": 7
+     }
+    },
+    {
+     "game": "환세쾌도전",
+     "longest": null,
+     "restore": 0,
+     "save": 0,
+     "start": 1,
+     "week": {
+      "longest": null,
+      "restore": 1,
+      "save": 1,
+      "start": 4
+     }
+    }
+   ],
    "insights": [
     {
      "text": "10.02은 평소와 크게 다른 점이 없었습니다 — 방문자도 페이지별 조회수도 늘 보던 범위 안입니다.",
@@ -642,6 +751,73 @@ window.DASHBOARD_DATA['ga4'] = {
     }
    },
    "confirmed": true,
+   "games": [
+    {
+     "game": "환세희담",
+     "longest": null,
+     "restore": 1,
+     "save": 2,
+     "start": 4,
+     "week": {
+      "longest": null,
+      "restore": 5,
+      "save": 10,
+      "start": 21
+     }
+    },
+    {
+     "game": "환세쾌도전",
+     "longest": null,
+     "restore": 0,
+     "save": 0,
+     "start": 2,
+     "week": {
+      "longest": null,
+      "restore": 1,
+      "save": 1,
+      "start": 5
+     }
+    },
+    {
+     "game": "환세풍광전",
+     "longest": null,
+     "restore": 0,
+     "save": 0,
+     "start": 1,
+     "week": {
+      "longest": null,
+      "restore": 1,
+      "save": 2,
+      "start": 13
+     }
+    },
+    {
+     "game": "환세포물장",
+     "longest": null,
+     "restore": 0,
+     "save": 1,
+     "start": 1,
+     "week": {
+      "longest": null,
+      "restore": 1,
+      "save": 2,
+      "start": 8
+     }
+    },
+    {
+     "game": "환세희담 오프닝",
+     "longest": null,
+     "restore": 0,
+     "save": 0,
+     "start": 0,
+     "week": {
+      "longest": null,
+      "restore": 0,
+      "save": 0,
+      "start": 5
+     }
+    }
+   ],
    "insights": [
     {
      "text": "환세포물장은 최근 7일 하루 평균 **3.4회**로 늘었습니다 — 그 전 21일은 하루 1.5회였고, 7일 평균으로는 최근 28일 중 가장 높습니다.",
@@ -886,6 +1062,73 @@ window.DASHBOARD_DATA['ga4'] = {
     }
    },
    "confirmed": true,
+   "games": [
+    {
+     "game": "환세쾌도전",
+     "longest": null,
+     "restore": 1,
+     "save": 0,
+     "start": 3,
+     "week": {
+      "longest": null,
+      "restore": 1,
+      "save": 0,
+      "start": 7
+     }
+    },
+    {
+     "game": "환세희담",
+     "longest": null,
+     "restore": 0,
+     "save": 1,
+     "start": 2,
+     "week": {
+      "longest": null,
+      "restore": 5,
+      "save": 10,
+      "start": 22
+     }
+    },
+    {
+     "game": "환세풍광전",
+     "longest": null,
+     "restore": 0,
+     "save": 1,
+     "start": 1,
+     "week": {
+      "longest": null,
+      "restore": 1,
+      "save": 3,
+      "start": 14
+     }
+    },
+    {
+     "game": "환세포물장",
+     "longest": null,
+     "restore": 0,
+     "save": 0,
+     "start": 0,
+     "week": {
+      "longest": null,
+      "restore": 0,
+      "save": 1,
+      "start": 7
+     }
+    },
+    {
+     "game": "환세희담 오프닝",
+     "longest": null,
+     "restore": 0,
+     "save": 0,
+     "start": 0,
+     "week": {
+      "longest": null,
+      "restore": 0,
+      "save": 0,
+      "start": 5
+     }
+    }
+   ],
    "insights": [
     {
      "text": "10.04은 평소와 크게 다른 점이 없었습니다 — 방문자도 페이지별 조회수도 늘 보던 범위 안입니다.",
@@ -1149,6 +1392,73 @@ window.DASHBOARD_DATA['ga4'] = {
     }
    },
    "confirmed": true,
+   "games": [
+    {
+     "game": "환세희담",
+     "longest": null,
+     "restore": 0,
+     "save": 0,
+     "start": 9,
+     "week": {
+      "longest": null,
+      "restore": 5,
+      "save": 10,
+      "start": 29
+     }
+    },
+    {
+     "game": "환세쾌도전",
+     "longest": null,
+     "restore": 1,
+     "save": 2,
+     "start": 3,
+     "week": {
+      "longest": null,
+      "restore": 2,
+      "save": 2,
+      "start": 10
+     }
+    },
+    {
+     "game": "환세포물장",
+     "longest": null,
+     "restore": 0,
+     "save": 1,
+     "start": 3,
+     "week": {
+      "longest": null,
+      "restore": 0,
+      "save": 2,
+      "start": 8
+     }
+    },
+    {
+     "game": "환세풍광전",
+     "longest": null,
+     "restore": 0,
+     "save": 0,
+     "start": 2,
+     "week": {
+      "longest": null,
+      "restore": 1,
+      "save": 3,
+      "start": 13
+     }
+    },
+    {
+     "game": "환세희담 오프닝",
+     "longest": null,
+     "restore": 0,
+     "save": 0,
+     "start": 0,
+     "week": {
+      "longest": null,
+      "restore": 0,
+      "save": 0,
+      "start": 3
+     }
+    }
+   ],
    "insights": [
     {
      "text": "환세쾌도전이 10.05 9회 — 평소 하루 2.0회 보던 페이지라 **4.4배**로 뛰었습니다.",
@@ -1452,6 +1762,73 @@ window.DASHBOARD_DATA['ga4'] = {
     }
    },
    "confirmed": true,
+   "games": [
+    {
+     "game": "환세희담",
+     "longest": null,
+     "restore": 0,
+     "save": 1,
+     "start": 6,
+     "week": {
+      "longest": null,
+      "restore": 4,
+      "save": 10,
+      "start": 32
+     }
+    },
+    {
+     "game": "환세쾌도전",
+     "longest": null,
+     "restore": 1,
+     "save": 1,
+     "start": 2,
+     "week": {
+      "longest": null,
+      "restore": 2,
+      "save": 2,
+      "start": 10
+     }
+    },
+    {
+     "game": "환세희담 오프닝",
+     "longest": null,
+     "restore": 0,
+     "save": 0,
+     "start": 2,
+     "week": {
+      "longest": null,
+      "restore": 0,
+      "save": 0,
+      "start": 5
+     }
+    },
+    {
+     "game": "환세풍광전",
+     "longest": null,
+     "restore": 0,
+     "save": 0,
+     "start": 1,
+     "week": {
+      "longest": null,
+      "restore": 1,
+      "save": 1,
+      "start": 10
+     }
+    },
+    {
+     "game": "환세포물장",
+     "longest": null,
+     "restore": 0,
+     "save": 0,
+     "start": 0,
+     "week": {
+      "longest": null,
+      "restore": 0,
+      "save": 2,
+      "start": 7
+     }
+    }
+   ],
    "insights": [
     {
      "text": "10.06은 평소와 크게 다른 점이 없었습니다 — 방문자도 페이지별 조회수도 늘 보던 범위 안입니다.",
@@ -1684,6 +2061,73 @@ window.DASHBOARD_DATA['ga4'] = {
     }
    },
    "confirmed": true,
+   "games": [
+    {
+     "game": "환세희담",
+     "longest": null,
+     "restore": 0,
+     "save": 2,
+     "start": 3,
+     "week": {
+      "longest": null,
+      "restore": 3,
+      "save": 11,
+      "start": 34
+     }
+    },
+    {
+     "game": "환세풍광전",
+     "longest": null,
+     "restore": 0,
+     "save": 1,
+     "start": 1,
+     "week": {
+      "longest": null,
+      "restore": 1,
+      "save": 2,
+      "start": 9
+     }
+    },
+    {
+     "game": "환세쾌도전",
+     "longest": null,
+     "restore": 0,
+     "save": 0,
+     "start": 0,
+     "week": {
+      "longest": null,
+      "restore": 2,
+      "save": 2,
+      "start": 10
+     }
+    },
+    {
+     "game": "환세포물장",
+     "longest": null,
+     "restore": 0,
+     "save": 0,
+     "start": 0,
+     "week": {
+      "longest": null,
+      "restore": 0,
+      "save": 2,
+      "start": 7
+     }
+    },
+    {
+     "game": "환세희담 오프닝",
+     "longest": null,
+     "restore": 0,
+     "save": 0,
+     "start": 0,
+     "week": {
+      "longest": null,
+      "restore": 0,
+      "save": 0,
+      "start": 5
+     }
+    }
+   ],
    "insights": [
     {
      "text": "환세취호전이 10.07 29회 — 평소 하루 7.4회 보던 페이지라 **3.9배**로 뛰었습니다.",
@@ -1972,6 +2416,73 @@ window.DASHBOARD_DATA['ga4'] = {
     }
    },
    "confirmed": true,
+   "games": [
+    {
+     "game": "환세풍광전",
+     "longest": null,
+     "restore": 1,
+     "save": 1,
+     "start": 6,
+     "week": {
+      "longest": null,
+      "restore": 1,
+      "save": 2,
+      "start": 12
+     }
+    },
+    {
+     "game": "환세희담 오프닝",
+     "longest": null,
+     "restore": 0,
+     "save": 0,
+     "start": 6,
+     "week": {
+      "longest": null,
+      "restore": 0,
+      "save": 0,
+      "start": 10
+     }
+    },
+    {
+     "game": "환세희담",
+     "longest": null,
+     "restore": 1,
+     "save": 2,
+     "start": 5,
+     "week": {
+      "longest": null,
+      "restore": 4,
+      "save": 12,
+      "start": 35
+     }
+    },
+    {
+     "game": "환세쾌도전",
+     "longest": null,
+     "restore": 2,
+     "save": 1,
+     "start": 4,
+     "week": {
+      "longest": null,
+      "restore": 2,
+      "save": 2,
+      "start": 12
+     }
+    },
+    {
+     "game": "환세포물장",
+     "longest": null,
+     "restore": 0,
+     "save": 0,
+     "start": 2,
+     "week": {
+      "longest": null,
+      "restore": 0,
+      "save": 2,
+      "start": 6
+     }
+    }
+   ],
    "insights": [
     {
      "text": "PC98 웹 에뮬레이터가 10.08 31회 — 평소 하루 6.1회 보던 페이지라 **5.1배**로 뛰었습니다.",
@@ -2303,6 +2814,73 @@ window.DASHBOARD_DATA['ga4'] = {
     }
    },
    "confirmed": true,
+   "games": [
+    {
+     "game": "환세희담",
+     "longest": null,
+     "restore": 1,
+     "save": 2,
+     "start": 5,
+     "week": {
+      "longest": null,
+      "restore": 3,
+      "save": 9,
+      "start": 32
+     }
+    },
+    {
+     "game": "환세풍광전",
+     "longest": null,
+     "restore": 1,
+     "save": 1,
+     "start": 1,
+     "week": {
+      "longest": null,
+      "restore": 2,
+      "save": 3,
+      "start": 12
+     }
+    },
+    {
+     "game": "환세쾌도전",
+     "longest": null,
+     "restore": 1,
+     "save": 1,
+     "start": 1,
+     "week": {
+      "longest": null,
+      "restore": 2,
+      "save": 2,
+      "start": 11
+     }
+    },
+    {
+     "game": "환세희담 오프닝",
+     "longest": null,
+     "restore": 0,
+     "save": 0,
+     "start": 1,
+     "week": {
+      "longest": null,
+      "restore": 0,
+      "save": 0,
+      "start": 9
+     }
+    },
+    {
+     "game": "환세포물장",
+     "longest": null,
+     "restore": 0,
+     "save": 0,
+     "start": 0,
+     "week": {
+      "longest": null,
+      "restore": 0,
+      "save": 2,
+      "start": 6
+     }
+    }
+   ],
    "insights": [
     {
      "text": "환세취호전이 10.09 65회 — 평소 하루 9.2회 보던 페이지라 **7.0배**로 뛰었고, 최근 7일 하루 평균도 21.6회로 늘었습니다.",
@@ -2626,6 +3204,73 @@ window.DASHBOARD_DATA['ga4'] = {
     }
    },
    "confirmed": true,
+   "games": [
+    {
+     "game": "환세희담",
+     "longest": null,
+     "restore": 0,
+     "save": 1,
+     "start": 4,
+     "week": {
+      "longest": null,
+      "restore": 2,
+      "save": 8,
+      "start": 32
+     }
+    },
+    {
+     "game": "환세풍광전",
+     "longest": null,
+     "restore": 0,
+     "save": 1,
+     "start": 2,
+     "week": {
+      "longest": null,
+      "restore": 2,
+      "save": 4,
+      "start": 13
+     }
+    },
+    {
+     "game": "환세쾌도전",
+     "longest": null,
+     "restore": 0,
+     "save": 1,
+     "start": 2,
+     "week": {
+      "longest": null,
+      "restore": 2,
+      "save": 3,
+      "start": 11
+     }
+    },
+    {
+     "game": "환세희담 오프닝",
+     "longest": null,
+     "restore": 0,
+     "save": 0,
+     "start": 2,
+     "week": {
+      "longest": null,
+      "restore": 0,
+      "save": 0,
+      "start": 11
+     }
+    },
+    {
+     "game": "환세포물장",
+     "longest": null,
+     "restore": 0,
+     "save": 0,
+     "start": 2,
+     "week": {
+      "longest": null,
+      "restore": 0,
+      "save": 1,
+      "start": 6
+     }
+    }
+   ],
    "insights": [
     {
      "text": "환세포물장이 10.10 5회 — 평소 하루 2.4회 보던 페이지라 **2.1배**로 뛰었습니다.",
@@ -2942,6 +3587,73 @@ window.DASHBOARD_DATA['ga4'] = {
     }
    },
    "confirmed": true,
+   "games": [
+    {
+     "game": "환세희담",
+     "longest": null,
+     "restore": 0,
+     "save": 3,
+     "start": 8,
+     "week": {
+      "longest": null,
+      "restore": 2,
+      "save": 10,
+      "start": 38
+     }
+    },
+    {
+     "game": "환세풍광전",
+     "longest": null,
+     "restore": 0,
+     "save": 1,
+     "start": 2,
+     "week": {
+      "longest": null,
+      "restore": 2,
+      "save": 4,
+      "start": 14
+     }
+    },
+    {
+     "game": "환세희담 오프닝",
+     "longest": null,
+     "restore": 0,
+     "save": 0,
+     "start": 0,
+     "week": {
+      "longest": null,
+      "restore": 0,
+      "save": 0,
+      "start": 11
+     }
+    },
+    {
+     "game": "환세쾌도전",
+     "longest": null,
+     "restore": 0,
+     "save": 0,
+     "start": 0,
+     "week": {
+      "longest": null,
+      "restore": 2,
+      "save": 3,
+      "start": 9
+     }
+    },
+    {
+     "game": "환세포물장",
+     "longest": null,
+     "restore": 0,
+     "save": 0,
+     "start": 0,
+     "week": {
+      "longest": null,
+      "restore": 0,
+      "save": 1,
+      "start": 6
+     }
+    }
+   ],
    "insights": [
     {
      "text": "10.11은 평소와 크게 다른 점이 없었습니다 — 방문자도 페이지별 조회수도 늘 보던 범위 안입니다.",
@@ -3190,6 +3902,73 @@ window.DASHBOARD_DATA['ga4'] = {
     }
    },
    "confirmed": true,
+   "games": [
+    {
+     "game": "환세희담",
+     "longest": null,
+     "restore": 1,
+     "save": 2,
+     "start": 7,
+     "week": {
+      "longest": null,
+      "restore": 3,
+      "save": 12,
+      "start": 35
+     }
+    },
+    {
+     "game": "환세풍광전",
+     "longest": null,
+     "restore": 0,
+     "save": 1,
+     "start": 2,
+     "week": {
+      "longest": null,
+      "restore": 2,
+      "save": 5,
+      "start": 14
+     }
+    },
+    {
+     "game": "환세쾌도전",
+     "longest": null,
+     "restore": 1,
+     "save": 1,
+     "start": 1,
+     "week": {
+      "longest": null,
+      "restore": 2,
+      "save": 2,
+      "start": 7
+     }
+    },
+    {
+     "game": "환세포물장",
+     "longest": null,
+     "restore": 0,
+     "save": 0,
+     "start": 1,
+     "week": {
+      "longest": null,
+      "restore": 0,
+      "save": 0,
+      "start": 4
+     }
+    },
+    {
+     "game": "환세희담 오프닝",
+     "longest": null,
+     "restore": 0,
+     "save": 0,
+     "start": 0,
+     "week": {
+      "longest": null,
+      "restore": 0,
+      "save": 0,
+      "start": 11
+     }
+    }
+   ],
    "insights": [
     {
      "text": "10.12은 평소와 크게 다른 점이 없었습니다 — 방문자도 페이지별 조회수도 늘 보던 범위 안입니다.",
@@ -3426,6 +4205,73 @@ window.DASHBOARD_DATA['ga4'] = {
     }
    },
    "confirmed": true,
+   "games": [
+    {
+     "game": "환세풍광전",
+     "longest": null,
+     "restore": 1,
+     "save": 1,
+     "start": 3,
+     "week": {
+      "longest": null,
+      "restore": 3,
+      "save": 6,
+      "start": 16
+     }
+    },
+    {
+     "game": "환세희담",
+     "longest": null,
+     "restore": 0,
+     "save": 0,
+     "start": 2,
+     "week": {
+      "longest": null,
+      "restore": 3,
+      "save": 11,
+      "start": 31
+     }
+    },
+    {
+     "game": "환세희담 오프닝",
+     "longest": null,
+     "restore": 0,
+     "save": 0,
+     "start": 0,
+     "week": {
+      "longest": null,
+      "restore": 0,
+      "save": 0,
+      "start": 9
+     }
+    },
+    {
+     "game": "환세쾌도전",
+     "longest": null,
+     "restore": 0,
+     "save": 0,
+     "start": 0,
+     "week": {
+      "longest": null,
+      "restore": 2,
+      "save": 2,
+      "start": 6
+     }
+    },
+    {
+     "game": "환세포물장",
+     "longest": null,
+     "restore": 0,
+     "save": 0,
+     "start": 0,
+     "week": {
+      "longest": null,
+      "restore": 0,
+      "save": 0,
+      "start": 4
+     }
+    }
+   ],
    "insights": [
     {
      "text": "최근 28일 동안 없던 유입원이 10.13에 생겼습니다 — github.com.",
@@ -3710,6 +4556,73 @@ window.DASHBOARD_DATA['ga4'] = {
     }
    },
    "confirmed": true,
+   "games": [
+    {
+     "game": "환세희담",
+     "longest": null,
+     "restore": 0,
+     "save": 1,
+     "start": 7,
+     "week": {
+      "longest": null,
+      "restore": 3,
+      "save": 10,
+      "start": 35
+     }
+    },
+    {
+     "game": "환세풍광전",
+     "longest": null,
+     "restore": 1,
+     "save": 1,
+     "start": 4,
+     "week": {
+      "longest": null,
+      "restore": 4,
+      "save": 7,
+      "start": 19
+     }
+    },
+    {
+     "game": "환세희담 오프닝",
+     "longest": null,
+     "restore": 0,
+     "save": 0,
+     "start": 3,
+     "week": {
+      "longest": null,
+      "restore": 0,
+      "save": 0,
+      "start": 12
+     }
+    },
+    {
+     "game": "환세쾌도전",
+     "longest": null,
+     "restore": 0,
+     "save": 0,
+     "start": 2,
+     "week": {
+      "longest": null,
+      "restore": 2,
+      "save": 2,
+      "start": 8
+     }
+    },
+    {
+     "game": "환세포물장",
+     "longest": null,
+     "restore": 0,
+     "save": 0,
+     "start": 0,
+     "week": {
+      "longest": null,
+      "restore": 0,
+      "save": 0,
+      "start": 4
+     }
+    }
+   ],
    "insights": [
     {
      "text": "10.14은 평소와 크게 다른 점이 없었습니다 — 방문자도 페이지별 조회수도 늘 보던 범위 안입니다.",
@@ -4014,6 +4927,73 @@ window.DASHBOARD_DATA['ga4'] = {
     }
    },
    "confirmed": true,
+   "games": [
+    {
+     "game": "환세희담",
+     "longest": null,
+     "restore": 0,
+     "save": 1,
+     "start": 7,
+     "week": {
+      "longest": null,
+      "restore": 2,
+      "save": 10,
+      "start": 39
+     }
+    },
+    {
+     "game": "환세풍광전",
+     "longest": null,
+     "restore": 0,
+     "save": 0,
+     "start": 1,
+     "week": {
+      "longest": null,
+      "restore": 3,
+      "save": 6,
+      "start": 14
+     }
+    },
+    {
+     "game": "환세희담 오프닝",
+     "longest": null,
+     "restore": 0,
+     "save": 0,
+     "start": 1,
+     "week": {
+      "longest": null,
+      "restore": 0,
+      "save": 0,
+      "start": 7
+     }
+    },
+    {
+     "game": "환세쾌도전",
+     "longest": null,
+     "restore": 0,
+     "save": 0,
+     "start": 0,
+     "week": {
+      "longest": null,
+      "restore": 1,
+      "save": 2,
+      "start": 5
+     }
+    },
+    {
+     "game": "환세포물장",
+     "longest": null,
+     "restore": 0,
+     "save": 0,
+     "start": 0,
+     "week": {
+      "longest": null,
+      "restore": 0,
+      "save": 0,
+      "start": 3
+     }
+    }
+   ],
    "insights": [
     {
      "text": "10.15은 평소와 크게 다른 점이 없었습니다 — 방문자도 페이지별 조회수도 늘 보던 범위 안입니다.",
@@ -4298,6 +5278,73 @@ window.DASHBOARD_DATA['ga4'] = {
     }
    },
    "confirmed": true,
+   "games": [
+    {
+     "game": "환세희담",
+     "longest": null,
+     "restore": 1,
+     "save": 1,
+     "start": 4,
+     "week": {
+      "longest": null,
+      "restore": 2,
+      "save": 9,
+      "start": 38
+     }
+    },
+    {
+     "game": "환세포물장",
+     "longest": null,
+     "restore": 0,
+     "save": 1,
+     "start": 2,
+     "week": {
+      "longest": null,
+      "restore": 0,
+      "save": 1,
+      "start": 5
+     }
+    },
+    {
+     "game": "환세희담 오프닝",
+     "longest": null,
+     "restore": 0,
+     "save": 0,
+     "start": 1,
+     "week": {
+      "longest": null,
+      "restore": 0,
+      "save": 0,
+      "start": 7
+     }
+    },
+    {
+     "game": "환세쾌도전",
+     "longest": null,
+     "restore": 0,
+     "save": 0,
+     "start": 1,
+     "week": {
+      "longest": null,
+      "restore": 1,
+      "save": 2,
+      "start": 6
+     }
+    },
+    {
+     "game": "환세풍광전",
+     "longest": null,
+     "restore": 0,
+     "save": 0,
+     "start": 0,
+     "week": {
+      "longest": null,
+      "restore": 2,
+      "save": 5,
+      "start": 13
+     }
+    }
+   ],
    "insights": [
     {
      "text": "환세희담 오프닝이 10.16 6회 — 평소 하루 1.7회 보던 페이지라 **3.4배**로 뛰었습니다.",
@@ -4597,6 +5644,73 @@ window.DASHBOARD_DATA['ga4'] = {
     }
    },
    "confirmed": true,
+   "games": [
+    {
+     "game": "환세희담",
+     "longest": null,
+     "restore": 1,
+     "save": 1,
+     "start": 2,
+     "week": {
+      "longest": null,
+      "restore": 3,
+      "save": 9,
+      "start": 36
+     }
+    },
+    {
+     "game": "환세풍광전",
+     "longest": null,
+     "restore": 0,
+     "save": 1,
+     "start": 1,
+     "week": {
+      "longest": null,
+      "restore": 2,
+      "save": 5,
+      "start": 12
+     }
+    },
+    {
+     "game": "환세희담 오프닝",
+     "longest": null,
+     "restore": 0,
+     "save": 0,
+     "start": 1,
+     "week": {
+      "longest": null,
+      "restore": 0,
+      "save": 0,
+      "start": 6
+     }
+    },
+    {
+     "game": "환세쾌도전",
+     "longest": null,
+     "restore": 0,
+     "save": 0,
+     "start": 1,
+     "week": {
+      "longest": null,
+      "restore": 1,
+      "save": 1,
+      "start": 5
+     }
+    },
+    {
+     "game": "환세포물장",
+     "longest": null,
+     "restore": 0,
+     "save": 0,
+     "start": 1,
+     "week": {
+      "longest": null,
+      "restore": 0,
+      "save": 1,
+      "start": 4
+     }
+    }
+   ],
    "insights": [
     {
      "text": "최근 28일 동안 없던 유입원이 10.17에 생겼습니다 — bing.",
@@ -4876,6 +5990,73 @@ window.DASHBOARD_DATA['ga4'] = {
     }
    },
    "confirmed": true,
+   "games": [
+    {
+     "game": "환세풍광전",
+     "longest": null,
+     "restore": 2,
+     "save": 3,
+     "start": 4,
+     "week": {
+      "longest": null,
+      "restore": 3,
+      "save": 6,
+      "start": 13
+     }
+    },
+    {
+     "game": "환세희담",
+     "longest": null,
+     "restore": 0,
+     "save": 0,
+     "start": 3,
+     "week": {
+      "longest": null,
+      "restore": 3,
+      "save": 6,
+      "start": 31
+     }
+    },
+    {
+     "game": "환세쾌도전",
+     "longest": null,
+     "restore": 0,
+     "save": 0,
+     "start": 2,
+     "week": {
+      "longest": null,
+      "restore": 1,
+      "save": 1,
+      "start": 7
+     }
+    },
+    {
+     "game": "환세포물장",
+     "longest": null,
+     "restore": 0,
+     "save": 0,
+     "start": 2,
+     "week": {
+      "longest": null,
+      "restore": 0,
+      "save": 1,
+      "start": 6
+     }
+    },
+    {
+     "game": "환세희담 오프닝",
+     "longest": null,
+     "restore": 0,
+     "save": 0,
+     "start": 1,
+     "week": {
+      "longest": null,
+      "restore": 0,
+      "save": 0,
+      "start": 7
+     }
+    }
+   ],
    "insights": [
     {
      "text": "PC-98 환세 시리즈 웹 에뮬레이터가 10.18 22회 — 평소 하루 8.8회 보던 페이지라 **2.5배**로 뛰었습니다.",
@@ -5160,6 +6341,73 @@ window.DASHBOARD_DATA['ga4'] = {
     }
    },
    "confirmed": true,
+   "games": [
+    {
+     "game": "환세풍광전",
+     "longest": null,
+     "restore": 1,
+     "save": 1,
+     "start": 2,
+     "week": {
+      "longest": null,
+      "restore": 3,
+      "save": 6,
+      "start": 13
+     }
+    },
+    {
+     "game": "환세희담",
+     "longest": null,
+     "restore": 0,
+     "save": 0,
+     "start": 0,
+     "week": {
+      "longest": null,
+      "restore": 2,
+      "save": 4,
+      "start": 24
+     }
+    },
+    {
+     "game": "환세희담 오프닝",
+     "longest": null,
+     "restore": 0,
+     "save": 0,
+     "start": 0,
+     "week": {
+      "longest": null,
+      "restore": 0,
+      "save": 0,
+      "start": 7
+     }
+    },
+    {
+     "game": "환세쾌도전",
+     "longest": null,
+     "restore": 0,
+     "save": 0,
+     "start": 0,
+     "week": {
+      "longest": null,
+      "restore": 0,
+      "save": 0,
+      "start": 6
+     }
+    },
+    {
+     "game": "환세포물장",
+     "longest": null,
+     "restore": 0,
+     "save": 0,
+     "start": 0,
+     "week": {
+      "longest": null,
+      "restore": 0,
+      "save": 1,
+      "start": 5
+     }
+    }
+   ],
    "insights": [
     {
      "text": "10.19은 평소와 크게 다른 점이 없었습니다 — 방문자도 페이지별 조회수도 늘 보던 범위 안입니다.",
@@ -5383,6 +6631,73 @@ window.DASHBOARD_DATA['ga4'] = {
     }
    },
    "confirmed": true,
+   "games": [
+    {
+     "game": "환세희담",
+     "longest": null,
+     "restore": 1,
+     "save": 2,
+     "start": 2,
+     "week": {
+      "longest": null,
+      "restore": 3,
+      "save": 6,
+      "start": 24
+     }
+    },
+    {
+     "game": "환세풍광전",
+     "longest": null,
+     "restore": 1,
+     "save": 1,
+     "start": 2,
+     "week": {
+      "longest": null,
+      "restore": 2,
+      "save": 5,
+      "start": 11
+     }
+    },
+    {
+     "game": "환세희담 오프닝",
+     "longest": null,
+     "restore": 0,
+     "save": 0,
+     "start": 1,
+     "week": {
+      "longest": null,
+      "restore": 0,
+      "save": 0,
+      "start": 8
+     }
+    },
+    {
+     "game": "환세쾌도전",
+     "longest": null,
+     "restore": 0,
+     "save": 0,
+     "start": 0,
+     "week": {
+      "longest": null,
+      "restore": 0,
+      "save": 0,
+      "start": 6
+     }
+    },
+    {
+     "game": "환세포물장",
+     "longest": null,
+     "restore": 0,
+     "save": 0,
+     "start": 0,
+     "week": {
+      "longest": null,
+      "restore": 0,
+      "save": 1,
+      "start": 5
+     }
+    }
+   ],
    "insights": [
     {
      "text": "10.20은 평소와 크게 다른 점이 없었습니다 — 방문자도 페이지별 조회수도 늘 보던 범위 안입니다.",
@@ -5642,6 +6957,73 @@ window.DASHBOARD_DATA['ga4'] = {
     }
    },
    "confirmed": true,
+   "games": [
+    {
+     "game": "환세희담",
+     "longest": null,
+     "restore": 0,
+     "save": 0,
+     "start": 1,
+     "week": {
+      "longest": null,
+      "restore": 3,
+      "save": 5,
+      "start": 18
+     }
+    },
+    {
+     "game": "환세풍광전",
+     "longest": null,
+     "restore": 0,
+     "save": 0,
+     "start": 0,
+     "week": {
+      "longest": null,
+      "restore": 2,
+      "save": 4,
+      "start": 8
+     }
+    },
+    {
+     "game": "환세희담 오프닝",
+     "longest": null,
+     "restore": 0,
+     "save": 0,
+     "start": 0,
+     "week": {
+      "longest": null,
+      "restore": 0,
+      "save": 0,
+      "start": 5
+     }
+    },
+    {
+     "game": "환세포물장",
+     "longest": null,
+     "restore": 0,
+     "save": 0,
+     "start": 0,
+     "week": {
+      "longest": null,
+      "restore": 0,
+      "save": 1,
+      "start": 5
+     }
+    },
+    {
+     "game": "환세쾌도전",
+     "longest": null,
+     "restore": 0,
+     "save": 0,
+     "start": 0,
+     "week": {
+      "longest": null,
+      "restore": 0,
+      "save": 0,
+      "start": 4
+     }
+    }
+   ],
    "insights": [
     {
      "text": "환세취호전이 10.21 45회 — 평소 하루 16.4회 보던 페이지라 **2.7배**로 뛰었습니다.",
@@ -5826,6 +7208,92 @@ window.DASHBOARD_DATA['ga4'] = {
     }
    },
    "confirmed": true,
+   "games": [
+    {
+     "game": "환세취호전",
+     "longest": {
+      "minutes": 120,
+      "users": 1
+     },
+     "restore": 7,
+     "save": 8,
+     "start": 17,
+     "week": {
+      "longest": {
+       "minutes": 120,
+       "users": 1
+      },
+      "restore": 7,
+      "save": 8,
+      "start": 17
+     }
+    },
+    {
+     "game": "환세희담",
+     "longest": null,
+     "restore": 0,
+     "save": 0,
+     "start": 3,
+     "week": {
+      "longest": null,
+      "restore": 3,
+      "save": 4,
+      "start": 15
+     }
+    },
+    {
+     "game": "환세쾌도전",
+     "longest": null,
+     "restore": 1,
+     "save": 0,
+     "start": 2,
+     "week": {
+      "longest": null,
+      "restore": 1,
+      "save": 0,
+      "start": 6
+     }
+    },
+    {
+     "game": "환세풍광전",
+     "longest": null,
+     "restore": 0,
+     "save": 0,
+     "start": 0,
+     "week": {
+      "longest": null,
+      "restore": 2,
+      "save": 4,
+      "start": 7
+     }
+    },
+    {
+     "game": "환세포물장",
+     "longest": null,
+     "restore": 0,
+     "save": 0,
+     "start": 0,
+     "week": {
+      "longest": null,
+      "restore": 0,
+      "save": 1,
+      "start": 5
+     }
+    },
+    {
+     "game": "환세희담 오프닝",
+     "longest": null,
+     "restore": 0,
+     "save": 0,
+     "start": 0,
+     "week": {
+      "longest": null,
+      "restore": 0,
+      "save": 0,
+      "start": 4
+     }
+    }
+   ],
    "insights": [
     {
      "text": "환세취호전이 10.22 49회 — 평소 하루 17.7회 보던 페이지라 **2.8배**로 뛰었습니다.",
@@ -6074,6 +7542,92 @@ window.DASHBOARD_DATA['ga4'] = {
     }
    },
    "confirmed": true,
+   "games": [
+    {
+     "game": "환세취호전",
+     "longest": {
+      "minutes": 120,
+      "users": 2
+     },
+     "restore": 4,
+     "save": 7,
+     "start": 9,
+     "week": {
+      "longest": {
+       "minutes": 120,
+       "users": 3
+      },
+      "restore": 8,
+      "save": 14,
+      "start": 23
+     }
+    },
+    {
+     "game": "환세풍광전",
+     "longest": null,
+     "restore": 0,
+     "save": 0,
+     "start": 1,
+     "week": {
+      "longest": null,
+      "restore": 2,
+      "save": 4,
+      "start": 8
+     }
+    },
+    {
+     "game": "환세희담",
+     "longest": null,
+     "restore": 0,
+     "save": 0,
+     "start": 0,
+     "week": {
+      "longest": null,
+      "restore": 2,
+      "save": 3,
+      "start": 11
+     }
+    },
+    {
+     "game": "환세쾌도전",
+     "longest": null,
+     "restore": 0,
+     "save": 0,
+     "start": 0,
+     "week": {
+      "longest": null,
+      "restore": 1,
+      "save": 0,
+      "start": 5
+     }
+    },
+    {
+     "game": "환세희담 오프닝",
+     "longest": null,
+     "restore": 0,
+     "save": 0,
+     "start": 0,
+     "week": {
+      "longest": null,
+      "restore": 0,
+      "save": 0,
+      "start": 3
+     }
+    },
+    {
+     "game": "환세포물장",
+     "longest": null,
+     "restore": 0,
+     "save": 0,
+     "start": 0,
+     "week": {
+      "longest": null,
+      "restore": 0,
+      "save": 0,
+      "start": 3
+     }
+    }
+   ],
    "insights": [
     {
      "text": "10.23은 평소와 크게 다른 점이 없었습니다 — 방문자도 페이지별 조회수도 늘 보던 범위 안입니다.",
@@ -6369,6 +7923,98 @@ window.DASHBOARD_DATA['ga4'] = {
     }
    },
    "confirmed": true,
+   "games": [
+    {
+     "game": "환세취호전",
+     "longest": {
+      "minutes": 120,
+      "users": 1
+     },
+     "restore": 4,
+     "save": 4,
+     "start": 7,
+     "week": {
+      "longest": {
+       "minutes": 120,
+       "users": 3
+      },
+      "restore": 9,
+      "save": 15,
+      "start": 27
+     }
+    },
+    {
+     "game": "환세희담",
+     "longest": {
+      "minutes": 60,
+      "users": 1
+     },
+     "restore": 0,
+     "save": 1,
+     "start": 3,
+     "week": {
+      "longest": {
+       "minutes": 60,
+       "users": 1
+      },
+      "restore": 1,
+      "save": 3,
+      "start": 12
+     }
+    },
+    {
+     "game": "환세풍광전",
+     "longest": null,
+     "restore": 0,
+     "save": 0,
+     "start": 0,
+     "week": {
+      "longest": null,
+      "restore": 2,
+      "save": 3,
+      "start": 7
+     }
+    },
+    {
+     "game": "환세쾌도전",
+     "longest": null,
+     "restore": 0,
+     "save": 0,
+     "start": 0,
+     "week": {
+      "longest": null,
+      "restore": 1,
+      "save": 0,
+      "start": 4
+     }
+    },
+    {
+     "game": "환세희담 오프닝",
+     "longest": null,
+     "restore": 0,
+     "save": 0,
+     "start": 0,
+     "week": {
+      "longest": null,
+      "restore": 0,
+      "save": 0,
+      "start": 2
+     }
+    },
+    {
+     "game": "환세포물장",
+     "longest": null,
+     "restore": 0,
+     "save": 0,
+     "start": 0,
+     "week": {
+      "longest": null,
+      "restore": 0,
+      "save": 0,
+      "start": 2
+     }
+    }
+   ],
    "insights": [
     {
      "text": "10.24은 평소와 크게 다른 점이 없었습니다 — 방문자도 페이지별 조회수도 늘 보던 범위 안입니다.",
@@ -6613,6 +8259,101 @@ window.DASHBOARD_DATA['ga4'] = {
     }
    },
    "confirmed": true,
+   "games": [
+    {
+     "game": "환세취호전",
+     "longest": {
+      "minutes": 30,
+      "users": 1
+     },
+     "restore": 2,
+     "save": 2,
+     "start": 5,
+     "week": {
+      "longest": {
+       "minutes": 120,
+       "users": 3
+      },
+      "restore": 9,
+      "save": 16,
+      "start": 30
+     }
+    },
+    {
+     "game": "환세풍광전",
+     "longest": {
+      "minutes": 5,
+      "users": 1
+     },
+     "restore": 0,
+     "save": 0,
+     "start": 3,
+     "week": {
+      "longest": {
+       "minutes": 5,
+       "users": 1
+      },
+      "restore": 1,
+      "save": 1,
+      "start": 7
+     }
+    },
+    {
+     "game": "환세희담",
+     "longest": null,
+     "restore": 0,
+     "save": 0,
+     "start": 1,
+     "week": {
+      "longest": {
+       "minutes": 60,
+       "users": 1
+      },
+      "restore": 1,
+      "save": 3,
+      "start": 10
+     }
+    },
+    {
+     "game": "환세포물장",
+     "longest": null,
+     "restore": 0,
+     "save": 0,
+     "start": 1,
+     "week": {
+      "longest": null,
+      "restore": 0,
+      "save": 0,
+      "start": 1
+     }
+    },
+    {
+     "game": "환세쾌도전",
+     "longest": null,
+     "restore": 0,
+     "save": 0,
+     "start": 0,
+     "week": {
+      "longest": null,
+      "restore": 1,
+      "save": 0,
+      "start": 2
+     }
+    },
+    {
+     "game": "환세희담 오프닝",
+     "longest": null,
+     "restore": 0,
+     "save": 0,
+     "start": 0,
+     "week": {
+      "longest": null,
+      "restore": 0,
+      "save": 0,
+      "start": 1
+     }
+    }
+   ],
    "insights": [
     {
      "text": "환세풍광전이 10.25 10회 — 평소 하루 4.3회 보던 페이지라 **2.3배**로 뛰었습니다.",
@@ -6925,6 +8666,104 @@ window.DASHBOARD_DATA['ga4'] = {
     }
    },
    "confirmed": true,
+   "games": [
+    {
+     "game": "환세취호전",
+     "longest": {
+      "minutes": 60,
+      "users": 1
+     },
+     "restore": 2,
+     "save": 3,
+     "start": 6,
+     "week": {
+      "longest": {
+       "minutes": 120,
+       "users": 3
+      },
+      "restore": 9,
+      "save": 17,
+      "start": 34
+     }
+    },
+    {
+     "game": "환세풍광전",
+     "longest": {
+      "minutes": 30,
+      "users": 1
+     },
+     "restore": 1,
+     "save": 2,
+     "start": 3,
+     "week": {
+      "longest": {
+       "minutes": 30,
+       "users": 1
+      },
+      "restore": 2,
+      "save": 3,
+      "start": 9
+     }
+    },
+    {
+     "game": "환세희담",
+     "longest": {
+      "minutes": 5,
+      "users": 1
+     },
+     "restore": 0,
+     "save": 1,
+     "start": 1,
+     "week": {
+      "longest": {
+       "minutes": 60,
+       "users": 1
+      },
+      "restore": 1,
+      "save": 4,
+      "start": 11
+     }
+    },
+    {
+     "game": "환세쾌도전",
+     "longest": null,
+     "restore": 0,
+     "save": 0,
+     "start": 0,
+     "week": {
+      "longest": null,
+      "restore": 1,
+      "save": 0,
+      "start": 2
+     }
+    },
+    {
+     "game": "환세희담 오프닝",
+     "longest": null,
+     "restore": 0,
+     "save": 0,
+     "start": 0,
+     "week": {
+      "longest": null,
+      "restore": 0,
+      "save": 0,
+      "start": 1
+     }
+    },
+    {
+     "game": "환세포물장",
+     "longest": null,
+     "restore": 0,
+     "save": 0,
+     "start": 0,
+     "week": {
+      "longest": null,
+      "restore": 0,
+      "save": 0,
+      "start": 1
+     }
+    }
+   ],
    "insights": [
     {
      "text": "환세패유기 (웹)는 최근 7일 하루 평균 **2.1회**로 늘었습니다(그 전 21일 하루 0.3회).",
@@ -7198,6 +9037,104 @@ window.DASHBOARD_DATA['ga4'] = {
     }
    },
    "confirmed": true,
+   "games": [
+    {
+     "game": "환세취호전",
+     "longest": {
+      "minutes": 5,
+      "users": 1
+     },
+     "restore": 1,
+     "save": 2,
+     "start": 5,
+     "week": {
+      "longest": {
+       "minutes": 120,
+       "users": 3
+      },
+      "restore": 10,
+      "save": 18,
+      "start": 38
+     }
+    },
+    {
+     "game": "환세희담",
+     "longest": null,
+     "restore": 0,
+     "save": 0,
+     "start": 3,
+     "week": {
+      "longest": {
+       "minutes": 60,
+       "users": 1
+      },
+      "restore": 0,
+      "save": 2,
+      "start": 12
+     }
+    },
+    {
+     "game": "환세쾌도전",
+     "longest": {
+      "minutes": 15,
+      "users": 1
+     },
+     "restore": 1,
+     "save": 2,
+     "start": 3,
+     "week": {
+      "longest": {
+       "minutes": 15,
+       "users": 1
+      },
+      "restore": 2,
+      "save": 2,
+      "start": 5
+     }
+    },
+    {
+     "game": "환세풍광전",
+     "longest": null,
+     "restore": 0,
+     "save": 0,
+     "start": 1,
+     "week": {
+      "longest": {
+       "minutes": 30,
+       "users": 1
+      },
+      "restore": 1,
+      "save": 2,
+      "start": 8
+     }
+    },
+    {
+     "game": "환세포물장",
+     "longest": null,
+     "restore": 0,
+     "save": 0,
+     "start": 1,
+     "week": {
+      "longest": null,
+      "restore": 0,
+      "save": 0,
+      "start": 2
+     }
+    },
+    {
+     "game": "환세희담 오프닝",
+     "longest": null,
+     "restore": 0,
+     "save": 0,
+     "start": 1,
+     "week": {
+      "longest": null,
+      "restore": 0,
+      "save": 0,
+      "start": 1
+     }
+    }
+   ],
    "insights": [
     {
      "text": "메인 (아타호의 거처)이 10.27 17회 — 평소 하루 3.9회 보던 페이지라 **4.4배**로 뛰었고, 최근 7일 하루 평균도 7.1회로 늘었습니다.",
@@ -7526,6 +9463,104 @@ window.DASHBOARD_DATA['ga4'] = {
     }
    },
    "confirmed": true,
+   "games": [
+    {
+     "game": "환세취호전",
+     "longest": {
+      "minutes": 15,
+      "users": 1
+     },
+     "restore": 4,
+     "save": 2,
+     "start": 5,
+     "week": {
+      "longest": {
+       "minutes": 120,
+       "users": 3
+      },
+      "restore": 11,
+      "save": 20,
+      "start": 39
+     }
+    },
+    {
+     "game": "환세희담",
+     "longest": null,
+     "restore": 0,
+     "save": 0,
+     "start": 1,
+     "week": {
+      "longest": {
+       "minutes": 60,
+       "users": 1
+      },
+      "restore": 0,
+      "save": 2,
+      "start": 12
+     }
+    },
+    {
+     "game": "환세쾌도전",
+     "longest": {
+      "minutes": 30,
+      "users": 1
+     },
+     "restore": 1,
+     "save": 1,
+     "start": 1,
+     "week": {
+      "longest": {
+       "minutes": 30,
+       "users": 1
+      },
+      "restore": 2,
+      "save": 2,
+      "start": 5
+     }
+    },
+    {
+     "game": "환세풍광전",
+     "longest": null,
+     "restore": 0,
+     "save": 0,
+     "start": 0,
+     "week": {
+      "longest": {
+       "minutes": 30,
+       "users": 1
+      },
+      "restore": 1,
+      "save": 2,
+      "start": 8
+     }
+    },
+    {
+     "game": "환세포물장",
+     "longest": null,
+     "restore": 0,
+     "save": 0,
+     "start": 0,
+     "week": {
+      "longest": null,
+      "restore": 0,
+      "save": 0,
+      "start": 2
+     }
+    },
+    {
+     "game": "환세희담 오프닝",
+     "longest": null,
+     "restore": 0,
+     "save": 0,
+     "start": 0,
+     "week": {
+      "longest": null,
+      "restore": 0,
+      "save": 0,
+      "start": 1
+     }
+    }
+   ],
    "insights": [
     {
      "text": "10.28 한 사람당 본 장수가 최근 28일 중 **가장 적습니다**(다른 날 최저 2.2장).",
@@ -7850,6 +9885,104 @@ window.DASHBOARD_DATA['ga4'] = {
     }
    },
    "confirmed": false,
+   "games": [
+    {
+     "game": "환세취호전",
+     "longest": {
+      "minutes": 30,
+      "users": 1
+     },
+     "restore": 5,
+     "save": 6,
+     "start": 9,
+     "week": {
+      "longest": {
+       "minutes": 120,
+       "users": 2
+      },
+      "restore": 12,
+      "save": 20,
+      "start": 34
+     }
+    },
+    {
+     "game": "환세희담",
+     "longest": null,
+     "restore": 0,
+     "save": 0,
+     "start": 1,
+     "week": {
+      "longest": {
+       "minutes": 60,
+       "users": 1
+      },
+      "restore": 0,
+      "save": 2,
+      "start": 10
+     }
+    },
+    {
+     "game": "환세풍광전",
+     "longest": null,
+     "restore": 0,
+     "save": 0,
+     "start": 1,
+     "week": {
+      "longest": {
+       "minutes": 30,
+       "users": 1
+      },
+      "restore": 1,
+      "save": 2,
+      "start": 9
+     }
+    },
+    {
+     "game": "환세쾌도전",
+     "longest": {
+      "minutes": 5,
+      "users": 1
+     },
+     "restore": 0,
+     "save": 1,
+     "start": 1,
+     "week": {
+      "longest": {
+       "minutes": 30,
+       "users": 1
+      },
+      "restore": 1,
+      "save": 3,
+      "start": 4
+     }
+    },
+    {
+     "game": "환세포물장",
+     "longest": null,
+     "restore": 0,
+     "save": 0,
+     "start": 1,
+     "week": {
+      "longest": null,
+      "restore": 0,
+      "save": 0,
+      "start": 3
+     }
+    },
+    {
+     "game": "환세희담 오프닝",
+     "longest": null,
+     "restore": 0,
+     "save": 0,
+     "start": 0,
+     "week": {
+      "longest": null,
+      "restore": 0,
+      "save": 0,
+      "start": 1
+     }
+    }
+   ],
    "insights": [
     {
      "text": "어제는 평소와 크게 다른 점이 없었습니다 — 방문자도 페이지별 조회수도 늘 보던 범위 안입니다.",
