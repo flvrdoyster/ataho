@@ -372,7 +372,9 @@
     const pageRows = data.ydayPages.map((p) => {
         const label = p.section || p.title || p.name;
         const sub = label !== p.name ? p.name : '';
-        const usual = p.priorAvg > 0
+        const usual = p.fresh
+            ? `<span class="dim" title="${esc(mmdd(p.fresh))}에 처음 조회가 생긴 페이지">처음</span>`
+            : p.priorAvg > 0
             ? (p.priorAvg < 1 ? '&lt;1' : dec1(p.priorAvg)) + (p.spike
                 ? `<span class="ratio">${dec1(p.ratio)}배</span>` : '')
             : `<span class="dim" title="${esc(dayLabel)} 이전 구간에는 조회가 없던 페이지">처음</span>`;

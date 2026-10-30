@@ -16,7 +16,7 @@ PAGE_SIZE = 100000
 def report_all(client, target, **kw):
     rows, offset = [], 0
     while True:
-        chunk = ga4.report(client, target, limit=PAGE_SIZE, offset=offset, **kw)
+        chunk = ga4.report(client, target, limit=PAGE_SIZE, offset=offset, exclude_bots=False, **kw)
         rows += chunk
         if len(chunk) < PAGE_SIZE:
             return rows

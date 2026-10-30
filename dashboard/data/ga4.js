@@ -3,50 +3,50 @@ window.DASHBOARD_DATA['ga4'] = {
  "baseline": {
   "perUser": {
    "hi": 4.67,
-   "lo": 2.2694444444444444,
+   "lo": 2.3043859649122806,
    "max": 6.1923076923076925,
-   "median": 2.8689189189189186,
-   "min": 2.0,
+   "median": 2.9907407407407405,
+   "min": 2.2666666666666666,
    "n": 28,
    "rank": 27,
-   "value": 2.1875,
-   "vsMedian": -23.751766368346672,
+   "value": 2.2666666666666666,
+   "vsMedian": -24.21052631578947,
    "where": "low"
   },
   "sessions": {
-   "hi": 43.3,
+   "hi": 42.6,
    "lo": 20.4,
    "max": 59,
-   "median": 29.5,
+   "median": 29.0,
    "min": 16,
    "n": 28,
    "rank": 17,
-   "value": 27,
-   "vsMedian": -8.47457627118644,
+   "value": 26,
+   "vsMedian": -10.344827586206897,
    "where": "usual"
   },
   "users": {
-   "hi": 25.3,
+   "hi": 24.6,
    "lo": 13.4,
    "max": 37,
-   "median": 18.0,
+   "median": 16.5,
    "min": 10,
    "n": 28,
-   "rank": 16,
-   "value": 16,
-   "vsMedian": -11.11111111111111,
+   "rank": 15,
+   "value": 15,
+   "vsMedian": -9.090909090909092,
    "where": "usual"
   },
   "views": {
-   "hi": 91.0,
-   "lo": 35.0,
+   "hi": 90.3,
+   "lo": 34.0,
    "max": 161,
-   "median": 55.0,
+   "median": 53.5,
    "min": 31,
    "n": 28,
    "rank": 25,
-   "value": 35,
-   "vsMedian": -36.36363636363637,
+   "value": 34,
+   "vsMedian": -36.44859813084112,
    "where": "usual"
   }
  },
@@ -72,9 +72,9 @@ window.DASHBOARD_DATA['ga4'] = {
   },
   {
    "date": "2026-10-05",
-   "sessions": 36,
-   "users": 29,
-   "views": 81
+   "sessions": 34,
+   "users": 27,
+   "views": 79
   },
   {
    "date": "2026-10-06",
@@ -84,9 +84,9 @@ window.DASHBOARD_DATA['ga4'] = {
   },
   {
    "date": "2026-10-07",
-   "sessions": 35,
-   "users": 20,
-   "views": 64
+   "sessions": 34,
+   "users": 19,
+   "views": 63
   },
   {
    "date": "2026-10-08",
@@ -108,9 +108,9 @@ window.DASHBOARD_DATA['ga4'] = {
   },
   {
    "date": "2026-10-11",
-   "sessions": 30,
-   "users": 20,
-   "views": 45
+   "sessions": 29,
+   "users": 19,
+   "views": 44
   },
   {
    "date": "2026-10-12",
@@ -120,9 +120,9 @@ window.DASHBOARD_DATA['ga4'] = {
   },
   {
    "date": "2026-10-13",
-   "sessions": 43,
-   "users": 25,
-   "views": 85
+   "sessions": 42,
+   "users": 24,
+   "views": 84
   },
   {
    "date": "2026-10-14",
@@ -192,9 +192,9 @@ window.DASHBOARD_DATA['ga4'] = {
   },
   {
    "date": "2026-10-25",
-   "sessions": 32,
-   "users": 22,
-   "views": 59
+   "sessions": 28,
+   "users": 18,
+   "views": 55
   },
   {
    "date": "2026-10-26",
@@ -210,15 +210,15 @@ window.DASHBOARD_DATA['ga4'] = {
   },
   {
    "date": "2026-10-28",
-   "sessions": 26,
-   "users": 19,
-   "views": 38
+   "sessions": 22,
+   "users": 15,
+   "views": 34
   },
   {
    "date": "2026-10-29",
-   "sessions": 27,
-   "users": 16,
-   "views": 35
+   "sessions": 26,
+   "users": 15,
+   "views": 34
   }
  ],
  "games": [
@@ -236,9 +236,9 @@ window.DASHBOARD_DATA['ga4'] = {
      "minutes": 120,
      "users": 2
     },
-    "restore": 12,
-    "save": 20,
-    "start": 34
+    "restore": 10,
+    "save": 19,
+    "start": 32
    }
   },
   {
@@ -324,50 +324,50 @@ window.DASHBOARD_DATA['ga4'] = {
    "baseline": {
     "perUser": {
      "hi": 5.1,
-     "lo": 2.0875,
+     "lo": 1.9229166666666666,
      "max": 6.5,
-     "median": 3.0069930069930066,
+     "median": 3.1079545454545454,
      "min": 1.5333333333333334,
      "n": 28,
-     "rank": 11,
+     "rank": 13,
      "value": 3.466666666666667,
-     "vsMedian": 15.286821705426373,
+     "vsMedian": 11.541742839731876,
      "where": "usual"
     },
     "sessions": {
-     "hi": 31.0,
+     "hi": 29.6,
      "lo": 11.0,
-     "max": 36,
-     "median": 18.5,
+     "max": 32,
+     "median": 16.0,
      "min": 10,
      "n": 28,
-     "rank": 14,
+     "rank": 9,
      "value": 19,
-     "vsMedian": 2.7027027027027026,
+     "vsMedian": 18.75,
      "where": "usual"
     },
     "users": {
-     "hi": 17.3,
+     "hi": 16.0,
      "lo": 7.0,
-     "max": 29,
-     "median": 12.5,
+     "max": 19,
+     "median": 11.0,
      "min": 5,
      "n": 28,
-     "rank": 7,
+     "rank": 5,
      "value": 15,
-     "vsMedian": 20.0,
+     "vsMedian": 36.36363636363637,
      "where": "usual"
     },
     "views": {
-     "hi": 57.6,
-     "lo": 20.8,
+     "hi": 52.3,
+     "lo": 17.0,
      "max": 91,
-     "median": 38.0,
-     "min": 17,
+     "median": 32.5,
+     "min": 14,
      "n": 28,
-     "rank": 5,
+     "rank": 4,
      "value": 52,
-     "vsMedian": 36.84210526315789,
+     "vsMedian": 60.0,
      "where": "usual"
     }
    },
@@ -474,9 +474,10 @@ window.DASHBOARD_DATA['ga4'] = {
    ],
    "ydayPages": [
     {
+     "fresh": null,
      "host": "pc98.atah.io",
      "name": "/kitan.html",
-     "priorAvg": 8.666666666666666,
+     "priorAvg": 8.62962962962963,
      "ratio": 1.4,
      "rising": null,
      "section": "",
@@ -486,6 +487,7 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 12
     },
     {
+     "fresh": null,
      "host": "pc98.atah.io",
      "name": "/",
      "priorAvg": 4.481481481481482,
@@ -498,9 +500,10 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 8
     },
     {
+     "fresh": null,
      "host": "suiko.atah.io",
      "name": "/kr.html",
-     "priorAvg": 6.2592592592592595,
+     "priorAvg": 6.148148148148148,
      "ratio": 1.3,
      "rising": null,
      "section": "",
@@ -510,6 +513,7 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 8
     },
     {
+     "fresh": null,
      "host": "atah.io",
      "name": "/haiyuki_manual/index.html",
      "priorAvg": 0.8888888888888888,
@@ -522,6 +526,7 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 3
     },
     {
+     "fresh": null,
      "host": "atah.io",
      "name": "/kitan_manual/",
      "priorAvg": 1.1851851851851851,
@@ -534,6 +539,7 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 3
     },
     {
+     "fresh": null,
      "host": "pc98.atah.io",
      "name": "/hukyou.html",
      "priorAvg": 3.888888888888889,
@@ -546,6 +552,7 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 3
     },
     {
+     "fresh": null,
      "host": "atah.io",
      "name": "/haiyuki_web/",
      "priorAvg": 0.6666666666666666,
@@ -558,6 +565,7 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 2
     },
     {
+     "fresh": null,
      "host": "atah.io",
      "name": "/viewer/scene.html",
      "priorAvg": 0.2222222222222222,
@@ -570,9 +578,10 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 2
     },
     {
+     "fresh": null,
      "host": "pc98.atah.io",
      "name": "/kitan-opening.html",
-     "priorAvg": 1.962962962962963,
+     "priorAvg": 1.9259259259259258,
      "ratio": 1.0,
      "rising": null,
      "section": "",
@@ -582,6 +591,7 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 2
     },
     {
+     "fresh": null,
      "host": "atah.io",
      "name": "/",
      "priorAvg": 1.5185185185185186,
@@ -594,6 +604,7 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 1
     },
     {
+     "fresh": null,
      "host": "atah.io",
      "name": "/balance/index.html",
      "priorAvg": 0.1111111111111111,
@@ -606,6 +617,7 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 1
     },
     {
+     "fresh": null,
      "host": "atah.io",
      "name": "/index.html",
      "priorAvg": 0.07407407407407407,
@@ -618,6 +630,7 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 1
     },
     {
+     "fresh": null,
      "host": "atah.io",
      "name": "/kitan_manual/index.html",
      "priorAvg": 0.037037037037037035,
@@ -630,6 +643,7 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 1
     },
     {
+     "fresh": null,
      "host": "atah.io",
      "name": "/sweep/index.html",
      "priorAvg": 0.037037037037037035,
@@ -642,6 +656,7 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 1
     },
     {
+     "fresh": null,
      "host": "atah.io",
      "name": "/swim/index.html",
      "priorAvg": 0.0,
@@ -703,50 +718,50 @@ window.DASHBOARD_DATA['ga4'] = {
    "baseline": {
     "perUser": {
      "hi": 5.1,
-     "lo": 2.0875,
+     "lo": 1.9229166666666666,
      "max": 6.5,
-     "median": 3.0069930069930066,
+     "median": 3.1079545454545454,
      "min": 1.5333333333333334,
      "n": 28,
-     "rank": 20,
+     "rank": 19,
      "value": 2.533333333333333,
-     "vsMedian": -15.751937984496116,
+     "vsMedian": -18.48872638634979,
      "where": "usual"
     },
     "sessions": {
-     "hi": 31.0,
+     "hi": 29.6,
      "lo": 11.0,
-     "max": 36,
-     "median": 18.5,
+     "max": 32,
+     "median": 16.0,
      "min": 10,
      "n": 28,
-     "rank": 9,
+     "rank": 8,
      "value": 22,
-     "vsMedian": 18.91891891891892,
+     "vsMedian": 37.5,
      "where": "usual"
     },
     "users": {
-     "hi": 17.3,
+     "hi": 16.0,
      "lo": 7.0,
-     "max": 29,
-     "median": 12.5,
+     "max": 19,
+     "median": 11.0,
      "min": 5,
      "n": 28,
-     "rank": 7,
+     "rank": 5,
      "value": 15,
-     "vsMedian": 20.0,
+     "vsMedian": 36.36363636363637,
      "where": "usual"
     },
     "views": {
-     "hi": 57.6,
-     "lo": 20.8,
+     "hi": 52.3,
+     "lo": 17.0,
      "max": 91,
-     "median": 38.0,
-     "min": 17,
+     "median": 35.5,
+     "min": 14,
      "n": 28,
-     "rank": 13,
+     "rank": 12,
      "value": 38,
-     "vsMedian": 0.0,
+     "vsMedian": 7.042253521126761,
      "where": "usual"
     }
    },
@@ -820,7 +835,7 @@ window.DASHBOARD_DATA['ga4'] = {
    ],
    "insights": [
     {
-     "text": "환세포물장은 최근 7일 하루 평균 **3.4회**로 늘었습니다 — 그 전 21일은 하루 1.5회였고, 7일 평균으로는 최근 28일 중 가장 높습니다.",
+     "text": "환세포물장은 최근 7일 하루 평균 **3.4회**로 늘었습니다(그 전 21일 하루 1.5회).",
      "tone": "up"
     }
    ],
@@ -853,6 +868,7 @@ window.DASHBOARD_DATA['ga4'] = {
    ],
    "ydayPages": [
     {
+     "fresh": null,
      "host": "pc98.atah.io",
      "name": "/",
      "priorAvg": 4.703703703703703,
@@ -865,9 +881,10 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 10
     },
     {
+     "fresh": null,
      "host": "pc98.atah.io",
      "name": "/kitan.html",
-     "priorAvg": 8.88888888888889,
+     "priorAvg": 8.851851851851851,
      "ratio": 0.9,
      "rising": null,
      "section": "",
@@ -877,9 +894,10 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 8
     },
     {
+     "fresh": null,
      "host": "suiko.atah.io",
      "name": "/kr.html",
-     "priorAvg": 6.481481481481482,
+     "priorAvg": 6.37037037037037,
      "ratio": 1.1,
      "rising": null,
      "section": "",
@@ -889,6 +907,7 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 7
     },
     {
+     "fresh": null,
      "host": "pc98.atah.io",
      "name": "/torimono.html",
      "priorAvg": 1.8518518518518519,
@@ -905,6 +924,7 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 5
     },
     {
+     "fresh": null,
      "host": "pc98.atah.io",
      "name": "/hukyou.html",
      "priorAvg": 3.962962962962963,
@@ -917,6 +937,7 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 3
     },
     {
+     "fresh": null,
      "host": "pc98.atah.io",
      "name": "/kaitou.html",
      "priorAvg": 1.8518518518518519,
@@ -929,6 +950,7 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 3
     },
     {
+     "fresh": null,
      "host": "atah.io",
      "name": "/",
      "priorAvg": 1.5185185185185186,
@@ -941,6 +963,7 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 1
     },
     {
+     "fresh": null,
      "host": "atah.io",
      "name": "/haiyuki_manual/index.html",
      "priorAvg": 1.0,
@@ -1014,50 +1037,50 @@ window.DASHBOARD_DATA['ga4'] = {
    "baseline": {
     "perUser": {
      "hi": 5.1,
-     "lo": 2.0875,
+     "lo": 1.98125,
      "max": 6.5,
-     "median": 3.0069930069930066,
+     "median": 3.1079545454545454,
      "min": 1.5333333333333334,
      "n": 28,
-     "rank": 18,
+     "rank": 17,
      "value": 2.5833333333333335,
-     "vsMedian": -14.08914728682169,
+     "vsMedian": -16.879951249238264,
      "where": "usual"
     },
     "sessions": {
-     "hi": 31.0,
+     "hi": 29.6,
      "lo": 11.0,
-     "max": 36,
-     "median": 18.5,
+     "max": 32,
+     "median": 16.5,
      "min": 10,
      "n": 28,
-     "rank": 16,
+     "rank": 14,
      "value": 17,
-     "vsMedian": -8.108108108108109,
+     "vsMedian": 3.0303030303030303,
      "where": "usual"
     },
     "users": {
-     "hi": 17.3,
+     "hi": 16.0,
      "lo": 7.0,
-     "max": 29,
-     "median": 12.5,
+     "max": 19,
+     "median": 11.0,
      "min": 5,
      "n": 28,
-     "rank": 15,
+     "rank": 12,
      "value": 12,
-     "vsMedian": -4.0,
+     "vsMedian": 9.090909090909092,
      "where": "usual"
     },
     "views": {
-     "hi": 57.6,
-     "lo": 20.8,
+     "hi": 52.3,
+     "lo": 17.7,
      "max": 91,
-     "median": 38.0,
-     "min": 17,
+     "median": 35.5,
+     "min": 14,
      "n": 28,
-     "rank": 17,
+     "rank": 16,
      "value": 31,
-     "vsMedian": -18.421052631578945,
+     "vsMedian": -12.676056338028168,
      "where": "usual"
     }
    },
@@ -1171,6 +1194,7 @@ window.DASHBOARD_DATA['ga4'] = {
    ],
    "ydayPages": [
     {
+     "fresh": null,
      "host": "pc98.atah.io",
      "name": "/",
      "priorAvg": 5.037037037037037,
@@ -1183,9 +1207,10 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 8
     },
     {
+     "fresh": null,
      "host": "suiko.atah.io",
      "name": "/kr.html",
-     "priorAvg": 6.666666666666667,
+     "priorAvg": 6.555555555555555,
      "ratio": 1.1,
      "rising": null,
      "section": "",
@@ -1195,6 +1220,7 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 7
     },
     {
+     "fresh": null,
      "host": "pc98.atah.io",
      "name": "/kaitou.html",
      "priorAvg": 1.9259259259259258,
@@ -1207,9 +1233,10 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 4
     },
     {
+     "fresh": null,
      "host": "pc98.atah.io",
      "name": "/kitan.html",
-     "priorAvg": 9.11111111111111,
+     "priorAvg": 9.074074074074074,
      "ratio": 0.4,
      "rising": null,
      "section": "",
@@ -1219,6 +1246,7 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 4
     },
     {
+     "fresh": null,
      "host": "atah.io",
      "name": "/",
      "priorAvg": 1.4814814814814814,
@@ -1231,6 +1259,7 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 2
     },
     {
+     "fresh": null,
      "host": "pc98.atah.io",
      "name": "/hukyou.html",
      "priorAvg": 3.962962962962963,
@@ -1243,6 +1272,7 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 2
     },
     {
+     "fresh": null,
      "host": "atah.io",
      "name": "/haiyuki_manual/index.html",
      "priorAvg": 1.0,
@@ -1255,6 +1285,7 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 1
     },
     {
+     "fresh": "2026-09-29",
      "host": "atah.io",
      "name": "/haiyuki_web/index.html",
      "priorAvg": 0.1111111111111111,
@@ -1267,6 +1298,7 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 1
     },
     {
+     "fresh": null,
      "host": "atah.io",
      "name": "/kitan_manual/index.html",
      "priorAvg": 0.07407407407407407,
@@ -1279,6 +1311,7 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 1
     },
     {
+     "fresh": null,
      "host": "atah.io",
      "name": "/viewer/scene.html",
      "priorAvg": 0.2962962962962963,
@@ -1344,50 +1377,50 @@ window.DASHBOARD_DATA['ga4'] = {
    "baseline": {
     "perUser": {
      "hi": 5.1,
-     "lo": 2.0875,
+     "lo": 1.98125,
      "max": 6.5,
-     "median": 3.0069930069930066,
+     "median": 3.087121212121212,
      "min": 1.5333333333333334,
      "n": 28,
      "rank": 16,
-     "value": 2.793103448275862,
-     "vsMedian": -7.1130713712910865,
+     "value": 2.925925925925926,
+     "vsMedian": -5.221540558963862,
      "where": "usual"
     },
     "sessions": {
      "hi": 31.0,
      "lo": 11.0,
-     "max": 36,
-     "median": 18.5,
+     "max": 34,
+     "median": 17.5,
      "min": 10,
      "n": 28,
      "rank": 1,
-     "value": 36,
-     "vsMedian": 94.5945945945946,
+     "value": 34,
+     "vsMedian": 94.28571428571428,
      "where": "high"
     },
     "users": {
-     "hi": 17.3,
+     "hi": 16.3,
      "lo": 7.0,
-     "max": 29,
-     "median": 12.5,
+     "max": 27,
+     "median": 11.5,
      "min": 5,
      "n": 28,
      "rank": 1,
-     "value": 29,
-     "vsMedian": 132.0,
+     "value": 27,
+     "vsMedian": 134.7826086956522,
      "where": "high"
     },
     "views": {
-     "hi": 57.6,
-     "lo": 20.8,
+     "hi": 54.8,
+     "lo": 17.7,
      "max": 91,
-     "median": 38.0,
-     "min": 17,
+     "median": 35.5,
+     "min": 14,
      "n": 28,
      "rank": 2,
-     "value": 81,
-     "vsMedian": 113.1578947368421,
+     "value": 79,
+     "vsMedian": 122.53521126760563,
      "where": "high"
     }
    },
@@ -1465,7 +1498,7 @@ window.DASHBOARD_DATA['ga4'] = {
      "tone": "up"
     },
     {
-     "text": "10.05 방문자 **29명** — 최근 28일 중 가장 많습니다(다른 날 최고 19명).",
+     "text": "10.05 방문자가 최근 28일 중 **가장 많습니다**(다른 날 최고 19명).",
      "tone": "up"
     }
    ],
@@ -1498,16 +1531,17 @@ window.DASHBOARD_DATA['ga4'] = {
     4,
     3,
     1,
-    6,
+    4,
     3,
     2,
     2
    ],
    "ydayPages": [
     {
+     "fresh": null,
      "host": "pc98.atah.io",
      "name": "/kitan.html",
-     "priorAvg": 9.074074074074074,
+     "priorAvg": 9.037037037037036,
      "ratio": 1.5,
      "rising": null,
      "section": "",
@@ -1517,6 +1551,7 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 14
     },
     {
+     "fresh": null,
      "host": "pc98.atah.io",
      "name": "/",
      "priorAvg": 5.296296296296297,
@@ -1529,9 +1564,10 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 13
     },
     {
+     "fresh": null,
      "host": "suiko.atah.io",
      "name": "/kr.html",
-     "priorAvg": 6.888888888888889,
+     "priorAvg": 6.777777777777778,
      "ratio": 1.9,
      "rising": null,
      "section": "",
@@ -1541,6 +1577,7 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 13
     },
     {
+     "fresh": null,
      "host": "pc98.atah.io",
      "name": "/kaitou.html",
      "priorAvg": 2.037037037037037,
@@ -1553,6 +1590,7 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 9
     },
     {
+     "fresh": null,
      "host": "pc98.atah.io",
      "name": "/hukyou.html",
      "priorAvg": 3.962962962962963,
@@ -1565,18 +1603,7 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 6
     },
     {
-     "host": "suiko.atah.io",
-     "name": "/patch.html",
-     "priorAvg": 0.0,
-     "ratio": 6.0,
-     "rising": null,
-     "section": "",
-     "spike": false,
-     "title": "환세취호전 한국어판 개선 패치",
-     "users": 3,
-     "views": 6
-    },
-    {
+     "fresh": null,
      "host": "atah.io",
      "name": "/",
      "priorAvg": 1.3703703703703705,
@@ -1589,6 +1616,20 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 5
     },
     {
+     "fresh": null,
+     "host": "suiko.atah.io",
+     "name": "/patch.html",
+     "priorAvg": 0.0,
+     "ratio": 5.0,
+     "rising": null,
+     "section": "",
+     "spike": true,
+     "title": "환세취호전 한국어판 개선 패치",
+     "users": 2,
+     "views": 5
+    },
+    {
+     "fresh": null,
      "host": "atah.io",
      "name": "/kitan_manual/",
      "priorAvg": 0.8888888888888888,
@@ -1601,18 +1642,20 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 4
     },
     {
+     "fresh": null,
      "host": "pc98.atah.io",
      "name": "/torimono.html",
      "priorAvg": 2.037037037037037,
-     "ratio": 2.0,
+     "ratio": 1.5,
      "rising": null,
      "section": "",
      "spike": false,
      "title": "환세포물장",
-     "users": 4,
-     "views": 4
+     "users": 3,
+     "views": 3
     },
     {
+     "fresh": null,
      "host": "atah.io",
      "name": "/haiyuki_manual/index.html",
      "priorAvg": 0.8518518518518519,
@@ -1625,6 +1668,7 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 2
     },
     {
+     "fresh": null,
      "host": "atah.io",
      "name": "/viewer/scene.html",
      "priorAvg": 0.3333333333333333,
@@ -1637,9 +1681,10 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 2
     },
     {
+     "fresh": null,
      "host": "pc98.atah.io",
      "name": "/kitan-opening.html",
-     "priorAvg": 1.5555555555555556,
+     "priorAvg": 1.5185185185185186,
      "ratio": 1.3,
      "rising": null,
      "section": "",
@@ -1649,6 +1694,7 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 2
     },
     {
+     "fresh": null,
      "host": "atah.io",
      "name": "/haiyuki_web/",
      "priorAvg": 0.5555555555555556,
@@ -1664,11 +1710,11 @@ window.DASHBOARD_DATA['ga4'] = {
    "ydaySites": [
     {
      "name": "pc98.atah.io",
-     "views": 48
+     "views": 47
     },
     {
      "name": "suiko.atah.io",
-     "views": 19
+     "views": 18
     },
     {
      "name": "atah.io",
@@ -1689,10 +1735,6 @@ window.DASHBOARD_DATA['ga4'] = {
      "sessions": 3
     },
     {
-     "name": "daum",
-     "sessions": 2
-    },
-    {
      "name": "naver",
      "sessions": 2
     },
@@ -1704,10 +1746,10 @@ window.DASHBOARD_DATA['ga4'] = {
    "ydayUnresolved": 0,
    "yesterday": {
     "date": "2026-10-05",
-    "newUsers": 23,
-    "sessions": 36,
-    "users": 29,
-    "views": 81
+    "newUsers": 21,
+    "sessions": 34,
+    "users": 27,
+    "views": 79
    }
   },
   "2026-10-06": {
@@ -1716,48 +1758,48 @@ window.DASHBOARD_DATA['ga4'] = {
      "hi": 5.1,
      "lo": 2.0875,
      "max": 6.5,
-     "median": 3.0954545454545457,
+     "median": 3.087121212121212,
      "min": 1.5333333333333334,
      "n": 28,
-     "rank": 18,
+     "rank": 17,
      "value": 2.6,
-     "vsMedian": -16.005873715124817,
+     "vsMedian": -15.77914110429447,
      "where": "usual"
     },
     "sessions": {
-     "hi": 31.3,
-     "lo": 11.7,
-     "max": 36,
-     "median": 19.5,
+     "hi": 31.0,
+     "lo": 11.0,
+     "max": 34,
+     "median": 18.0,
      "min": 10,
      "n": 28,
-     "rank": 10,
+     "rank": 9,
      "value": 22,
-     "vsMedian": 12.82051282051282,
+     "vsMedian": 22.22222222222222,
      "where": "usual"
     },
     "users": {
-     "hi": 18.3,
+     "hi": 16.3,
      "lo": 7.0,
-     "max": 29,
-     "median": 13.0,
+     "max": 27,
+     "median": 12.0,
      "min": 5,
      "n": 28,
-     "rank": 8,
+     "rank": 6,
      "value": 15,
-     "vsMedian": 15.384615384615385,
+     "vsMedian": 25.0,
      "where": "usual"
     },
     "views": {
-     "hi": 59.9,
-     "lo": 22.7,
+     "hi": 54.8,
+     "lo": 20.8,
      "max": 91,
-     "median": 38.0,
+     "median": 37.5,
      "min": 17,
      "n": 28,
-     "rank": 12,
+     "rank": 11,
      "value": 39,
-     "vsMedian": 2.631578947368421,
+     "vsMedian": 4.0,
      "where": "usual"
     }
    },
@@ -1864,6 +1906,7 @@ window.DASHBOARD_DATA['ga4'] = {
    ],
    "ydayPages": [
     {
+     "fresh": null,
      "host": "pc98.atah.io",
      "name": "/",
      "priorAvg": 5.703703703703703,
@@ -1876,10 +1919,11 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 9
     },
     {
+     "fresh": null,
      "host": "pc98.atah.io",
      "name": "/kitan.html",
-     "priorAvg": 9.481481481481481,
-     "ratio": 0.9,
+     "priorAvg": 9.444444444444445,
+     "ratio": 1.0,
      "rising": null,
      "section": "",
      "spike": false,
@@ -1888,9 +1932,10 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 9
     },
     {
+     "fresh": null,
      "host": "suiko.atah.io",
      "name": "/kr.html",
-     "priorAvg": 7.185185185185185,
+     "priorAvg": 7.074074074074074,
      "ratio": 1.3,
      "rising": null,
      "section": "",
@@ -1900,6 +1945,7 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 9
     },
     {
+     "fresh": null,
      "host": "atah.io",
      "name": "/kitan_manual/",
      "priorAvg": 1.0,
@@ -1912,10 +1958,11 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 3
     },
     {
+     "fresh": null,
      "host": "pc98.atah.io",
      "name": "/kitan-opening.html",
-     "priorAvg": 1.6296296296296295,
-     "ratio": 1.8,
+     "priorAvg": 1.5925925925925926,
+     "ratio": 1.9,
      "rising": null,
      "section": "",
      "spike": false,
@@ -1924,9 +1971,10 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 3
     },
     {
+     "fresh": "2026-10-05",
      "host": "suiko.atah.io",
      "name": "/patch.html",
-     "priorAvg": 0.2222222222222222,
+     "priorAvg": 0.18518518518518517,
      "ratio": 3.0,
      "rising": null,
      "section": "",
@@ -1936,6 +1984,7 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 3
     },
     {
+     "fresh": null,
      "host": "pc98.atah.io",
      "name": "/kaitou.html",
      "priorAvg": 2.259259259259259,
@@ -1948,6 +1997,7 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 2
     },
     {
+     "fresh": null,
      "host": "pc98.atah.io",
      "name": "/hukyou.html",
      "priorAvg": 4.185185185185185,
@@ -2012,52 +2062,52 @@ window.DASHBOARD_DATA['ga4'] = {
   "2026-10-07": {
    "baseline": {
     "perUser": {
-     "hi": 5.404761904761905,
-     "lo": 2.110526315789474,
+     "hi": 5.1,
+     "lo": 2.0875,
      "max": 6.5,
-     "median": 3.145833333333333,
+     "median": 3.1079545454545454,
      "min": 1.5333333333333334,
      "n": 28,
      "rank": 13,
-     "value": 3.2,
-     "vsMedian": 1.7218543046357768,
+     "value": 3.3157894736842106,
+     "vsMedian": 6.6871933031848405,
      "where": "usual"
     },
     "sessions": {
-     "hi": 32.9,
-     "lo": 12.0,
-     "max": 51,
-     "median": 20.5,
-     "min": 11,
+     "hi": 31.3,
+     "lo": 11.7,
+     "max": 34,
+     "median": 18.5,
+     "min": 10,
      "n": 28,
-     "rank": 3,
-     "value": 35,
-     "vsMedian": 70.73170731707317,
+     "rank": 1,
+     "value": 34,
+     "vsMedian": 83.78378378378379,
      "where": "high"
     },
     "users": {
-     "hi": 19.3,
+     "hi": 17.6,
      "lo": 7.0,
-     "max": 29,
-     "median": 13.5,
+     "max": 27,
+     "median": 12.5,
      "min": 5,
      "n": 28,
-     "rank": 3,
-     "value": 20,
-     "vsMedian": 48.148148148148145,
+     "rank": 2,
+     "value": 19,
+     "vsMedian": 52.0,
      "where": "high"
     },
     "views": {
-     "hi": 69.1,
-     "lo": 25.8,
-     "max": 156,
-     "median": 38.5,
-     "min": 18,
+     "hi": 60.2,
+     "lo": 22.7,
+     "max": 91,
+     "median": 38.0,
+     "min": 17,
      "n": 28,
-     "rank": 4,
-     "value": 64,
-     "vsMedian": 66.23376623376623,
-     "where": "usual"
+     "rank": 3,
+     "value": 63,
+     "vsMedian": 65.78947368421053,
+     "where": "high"
     }
    },
    "confirmed": true,
@@ -2130,15 +2180,11 @@ window.DASHBOARD_DATA['ga4'] = {
    ],
    "insights": [
     {
-     "text": "환세취호전이 10.07 29회 — 평소 하루 7.4회 보던 페이지라 **3.9배**로 뛰었습니다.",
+     "text": "환세취호전이 10.07 29회 — 평소 하루 7.3회 보던 페이지라 **4.0배**로 뛰었습니다.",
      "tone": "up"
     },
     {
-     "text": "환세취호전 한국어판 개선 패치는 최근 7일 하루 평균 **2.0회**로 늘었습니다 — 그 전 21일은 거의 조회가 없었고, 7일 평균으로는 최근 28일 중 가장 높습니다.",
-     "tone": "up"
-    },
-    {
-     "text": "최근 28일 동안 없던 유입원이 10.07에 생겼습니다 — t.co.",
+     "text": "사이트에 최근 28일 동안 없던 유입원이 10.07에 생겼습니다 — t.co.",
      "tone": "up"
     }
    ],
@@ -2166,15 +2212,16 @@ window.DASHBOARD_DATA['ga4'] = {
     2,
     1,
     2,
-    3,
+    2,
     4
    ],
    "ydayPages": [
     {
+     "fresh": null,
      "host": "suiko.atah.io",
      "name": "/kr.html",
-     "priorAvg": 7.407407407407407,
-     "ratio": 3.9,
+     "priorAvg": 7.296296296296297,
+     "ratio": 4.0,
      "rising": null,
      "section": "",
      "spike": true,
@@ -2183,6 +2230,7 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 29
     },
     {
+     "fresh": null,
      "host": "atah.io",
      "name": "/",
      "priorAvg": 1.5555555555555556,
@@ -2195,6 +2243,7 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 9
     },
     {
+     "fresh": null,
      "host": "pc98.atah.io",
      "name": "/",
      "priorAvg": 5.962962962962963,
@@ -2207,6 +2256,7 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 6
     },
     {
+     "fresh": null,
      "host": "pc98.atah.io",
      "name": "/hukyou.html",
      "priorAvg": 4.074074074074074,
@@ -2219,15 +2269,12 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 5
     },
     {
+     "fresh": "2026-10-05",
      "host": "suiko.atah.io",
      "name": "/patch.html",
-     "priorAvg": 0.3333333333333333,
+     "priorAvg": 0.2962962962962963,
      "ratio": 5.0,
-     "rising": {
-      "avg7": 2.0,
-      "before": 0.0,
-      "beforeDays": 21
-     },
+     "rising": null,
      "section": "",
      "spike": true,
      "title": "환세취호전 한국어판 개선 패치",
@@ -2235,9 +2282,10 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 5
     },
     {
+     "fresh": null,
      "host": "pc98.atah.io",
      "name": "/kitan.html",
-     "priorAvg": 9.592592592592593,
+     "priorAvg": 9.555555555555555,
      "ratio": 0.3,
      "rising": null,
      "section": "",
@@ -2247,6 +2295,7 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 3
     },
     {
+     "fresh": null,
      "host": "atah.io",
      "name": "/haiyuki_manual/index.html",
      "priorAvg": 0.9259259259259259,
@@ -2259,6 +2308,7 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 2
     },
     {
+     "fresh": null,
      "host": "atah.io",
      "name": "/haiyuki_web/",
      "priorAvg": 0.5925925925925926,
@@ -2271,6 +2321,7 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 2
     },
     {
+     "fresh": null,
      "host": "atah.io",
      "name": "/kitan_manual/",
      "priorAvg": 1.1111111111111112,
@@ -2283,18 +2334,7 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 1
     },
     {
-     "host": "atah.io",
-     "name": "/viewer/ani.html",
-     "priorAvg": 0.5555555555555556,
-     "ratio": 1.0,
-     "rising": null,
-     "section": "장면 뷰어",
-     "spike": false,
-     "title": "환세 시리즈 부분 컷",
-     "users": 1,
-     "views": 1
-    },
-    {
+     "fresh": null,
      "host": "atah.io",
      "name": "/viewer/scene.html",
      "priorAvg": 0.4074074074074074,
@@ -2314,7 +2354,7 @@ window.DASHBOARD_DATA['ga4'] = {
     },
     {
      "name": "atah.io",
-     "views": 16
+     "views": 15
     },
     {
      "name": "pc98.atah.io",
@@ -2343,10 +2383,6 @@ window.DASHBOARD_DATA['ga4'] = {
      "sessions": 1
     },
     {
-     "name": "daum",
-     "sessions": 1
-    },
-    {
      "name": "google",
      "sessions": 1
     },
@@ -2358,60 +2394,60 @@ window.DASHBOARD_DATA['ga4'] = {
    "ydayUnresolved": 1,
    "yesterday": {
     "date": "2026-10-07",
-    "newUsers": 13,
-    "sessions": 35,
-    "users": 20,
-    "views": 64
+    "newUsers": 12,
+    "sessions": 34,
+    "users": 19,
+    "views": 63
    }
   },
   "2026-10-08": {
    "baseline": {
     "perUser": {
-     "hi": 5.475776397515529,
+     "hi": 5.404761904761905,
      "lo": 2.110526315789474,
      "max": 6.5,
-     "median": 3.145833333333333,
+     "median": 3.2203947368421053,
      "min": 1.5333333333333334,
      "n": 28,
      "rank": 2,
      "value": 6.1923076923076925,
-     "vsMedian": 96.84156902699952,
+     "vsMedian": 92.28412037400801,
      "where": "high"
     },
     "sessions": {
-     "hi": 35.3,
-     "lo": 12.7,
+     "hi": 32.6,
+     "lo": 12.0,
      "max": 51,
-     "median": 21.5,
+     "median": 19.0,
      "min": 11,
      "n": 28,
      "rank": 1,
      "value": 51,
-     "vsMedian": 137.2093023255814,
+     "vsMedian": 168.42105263157893,
      "where": "high"
     },
     "users": {
-     "hi": 20.9,
+     "hi": 19.0,
      "lo": 7.0,
-     "max": 29,
-     "median": 14.5,
+     "max": 27,
+     "median": 13.5,
      "min": 5,
      "n": 28,
      "rank": 2,
      "value": 26,
-     "vsMedian": 79.3103448275862,
+     "vsMedian": 92.5925925925926,
      "where": "high"
     },
     "views": {
-     "hi": 84.0,
+     "hi": 67.8,
      "lo": 25.8,
      "max": 161,
-     "median": 39.0,
+     "median": 38.5,
      "min": 18,
      "n": 28,
      "rank": 1,
      "value": 161,
-     "vsMedian": 312.8205128205128,
+     "vsMedian": 318.1818181818182,
      "where": "high"
     }
    },
@@ -2489,11 +2525,11 @@ window.DASHBOARD_DATA['ga4'] = {
      "tone": "up"
     },
     {
-     "text": "환세희담 취급설명서는 최근 7일 하루 평균 **2.7회**로 늘었습니다 — 그 전 21일은 하루 0.9회였고, 7일 평균으로는 최근 28일 중 가장 높습니다.",
+     "text": "환세취호전 한국어판 개선 패치는 최근 7일 하루 평균 **3.6회**로 늘었습니다(그 전 21일 거의 0회).",
      "tone": "up"
     },
     {
-     "text": "최근 28일 동안 없던 유입원이 10.08에 생겼습니다 — aimanhunt.online.",
+     "text": "사이트에 최근 28일 동안 없던 유입원이 10.08에 생겼습니다 — aimanhunt.online.",
      "tone": "up"
     }
    ],
@@ -2533,6 +2569,7 @@ window.DASHBOARD_DATA['ga4'] = {
    ],
    "ydayPages": [
     {
+     "fresh": null,
      "host": "pc98.atah.io",
      "name": "/",
      "priorAvg": 6.074074074074074,
@@ -2545,9 +2582,10 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 31
     },
     {
+     "fresh": null,
      "host": "pc98.atah.io",
      "name": "/kitan.html",
-     "priorAvg": 9.592592592592593,
+     "priorAvg": 9.555555555555555,
      "ratio": 2.6,
      "rising": null,
      "section": "",
@@ -2557,9 +2595,10 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 25
     },
     {
+     "fresh": null,
      "host": "suiko.atah.io",
      "name": "/kr.html",
-     "priorAvg": 8.481481481481481,
+     "priorAvg": 8.37037037037037,
      "ratio": 2.5,
      "rising": null,
      "section": "",
@@ -2569,6 +2608,7 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 21
     },
     {
+     "fresh": null,
      "host": "pc98.atah.io",
      "name": "/hukyou.html",
      "priorAvg": 4.148148148148148,
@@ -2581,11 +2621,16 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 14
     },
     {
+     "fresh": "2026-10-05",
      "host": "suiko.atah.io",
      "name": "/patch.html",
-     "priorAvg": 0.5185185185185185,
+     "priorAvg": 0.48148148148148145,
      "ratio": 12.0,
-     "rising": null,
+     "rising": {
+      "avg7": 3.6,
+      "before": 0.0,
+      "beforeDays": 21
+     },
      "section": "",
      "spike": true,
      "title": "환세취호전 한국어판 개선 패치",
@@ -2593,6 +2638,7 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 12
     },
     {
+     "fresh": null,
      "host": "atah.io",
      "name": "/",
      "priorAvg": 1.8888888888888888,
@@ -2605,10 +2651,11 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 11
     },
     {
+     "fresh": null,
      "host": "pc98.atah.io",
      "name": "/kitan-opening.html",
-     "priorAvg": 1.7407407407407407,
-     "ratio": 5.2,
+     "priorAvg": 1.7037037037037037,
+     "ratio": 5.3,
      "rising": null,
      "section": "",
      "spike": true,
@@ -2617,6 +2664,7 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 9
     },
     {
+     "fresh": null,
      "host": "atah.io",
      "name": "/kitan_manual/",
      "priorAvg": 1.0740740740740742,
@@ -2633,10 +2681,11 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 8
     },
     {
+     "fresh": null,
      "host": "pc98.atah.io",
      "name": "/torimono.html",
-     "priorAvg": 2.111111111111111,
-     "ratio": 3.8,
+     "priorAvg": 2.074074074074074,
+     "ratio": 3.9,
      "rising": null,
      "section": "",
      "spike": true,
@@ -2645,6 +2694,7 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 8
     },
     {
+     "fresh": null,
      "host": "pc98.atah.io",
      "name": "/kaitou.html",
      "priorAvg": 2.2962962962962963,
@@ -2657,6 +2707,7 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 6
     },
     {
+     "fresh": null,
      "host": "atah.io",
      "name": "/haiyuki_manual/",
      "priorAvg": 0.037037037037037035,
@@ -2669,9 +2720,10 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 4
     },
     {
+     "fresh": null,
      "host": "atah.io",
      "name": "/viewer/ani.html",
-     "priorAvg": 0.5925925925925926,
+     "priorAvg": 0.5185185185185185,
      "ratio": 4.0,
      "rising": null,
      "section": "장면 뷰어",
@@ -2681,6 +2733,7 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 4
     },
     {
+     "fresh": "2026-10-01",
      "host": "atah.io",
      "name": "/kitan_manual/index.html",
      "priorAvg": 0.1111111111111111,
@@ -2693,6 +2746,7 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 2
     },
     {
+     "fresh": null,
      "host": "atah.io",
      "name": "/viewer/scene.html",
      "priorAvg": 0.4444444444444444,
@@ -2705,6 +2759,7 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 2
     },
     {
+     "fresh": null,
      "host": "atah.io",
      "name": "/balance/index.html",
      "priorAvg": 0.14814814814814814,
@@ -2768,48 +2823,48 @@ window.DASHBOARD_DATA['ga4'] = {
      "hi": 5.595652173913043,
      "lo": 2.110526315789474,
      "max": 6.5,
-     "median": 3.145833333333333,
+     "median": 3.2203947368421053,
      "min": 1.5333333333333334,
      "n": 28,
      "rank": 3,
      "value": 5.6521739130434785,
-     "vsMedian": 79.67175352720993,
+     "vsMedian": 75.51183550206511,
      "where": "high"
     },
     "sessions": {
-     "hi": 36.0,
-     "lo": 13.0,
+     "hi": 34.0,
+     "lo": 12.0,
      "max": 51,
-     "median": 22.0,
+     "median": 20.0,
      "min": 11,
      "n": 28,
      "rank": 2,
      "value": 44,
-     "vsMedian": 100.0,
+     "vsMedian": 120.0,
      "where": "high"
     },
     "users": {
-     "hi": 20.9,
-     "lo": 8.4,
-     "max": 29,
-     "median": 15.0,
-     "min": 6,
+     "hi": 20.2,
+     "lo": 7.0,
+     "max": 27,
+     "median": 14.0,
+     "min": 5,
      "n": 28,
      "rank": 3,
      "value": 23,
-     "vsMedian": 53.333333333333336,
+     "vsMedian": 64.28571428571429,
      "where": "high"
     },
     "views": {
-     "hi": 84.0,
-     "lo": 27.7,
+     "hi": 82.6,
+     "lo": 25.8,
      "max": 161,
-     "median": 40.0,
+     "median": 39.0,
      "min": 18,
      "n": 28,
      "rank": 2,
      "value": 130,
-     "vsMedian": 225.0,
+     "vsMedian": 233.33333333333334,
      "where": "high"
     }
    },
@@ -2883,7 +2938,7 @@ window.DASHBOARD_DATA['ga4'] = {
    ],
    "insights": [
     {
-     "text": "환세취호전이 10.09 65회 — 평소 하루 9.2회 보던 페이지라 **7.0배**로 뛰었고, 최근 7일 하루 평균도 21.6회로 늘었습니다.",
+     "text": "환세취호전이 10.09 65회 — 평소 하루 9.1회 보던 페이지라 **7.1배**로 뛰었고, 최근 7일 하루 평균도 21.6회로 늘었습니다.",
      "tone": "up"
     }
    ],
@@ -2923,13 +2978,14 @@ window.DASHBOARD_DATA['ga4'] = {
    ],
    "ydayPages": [
     {
+     "fresh": null,
      "host": "suiko.atah.io",
      "name": "/kr.html",
-     "priorAvg": 9.222222222222221,
-     "ratio": 7.0,
+     "priorAvg": 9.11111111111111,
+     "ratio": 7.1,
      "rising": {
       "avg7": 21.6,
-      "before": 7.8,
+      "before": 7.6,
       "beforeDays": 21
      },
      "section": "",
@@ -2939,9 +2995,10 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 65
     },
     {
+     "fresh": null,
      "host": "pc98.atah.io",
      "name": "/kitan.html",
-     "priorAvg": 10.074074074074074,
+     "priorAvg": 10.037037037037036,
      "ratio": 1.2,
      "rising": null,
      "section": "",
@@ -2951,9 +3008,10 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 12
     },
     {
+     "fresh": "2026-10-05",
      "host": "suiko.atah.io",
      "name": "/patch.html",
-     "priorAvg": 0.9629629629629629,
+     "priorAvg": 0.9259259259259259,
      "ratio": 10.0,
      "rising": null,
      "section": "",
@@ -2963,6 +3021,7 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 10
     },
     {
+     "fresh": null,
      "host": "pc98.atah.io",
      "name": "/",
      "priorAvg": 7.148148148148148,
@@ -2975,6 +3034,7 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 8
     },
     {
+     "fresh": null,
      "host": "pc98.atah.io",
      "name": "/",
      "priorAvg": 7.148148148148148,
@@ -2987,6 +3047,7 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 6
     },
     {
+     "fresh": null,
      "host": "atah.io",
      "name": "/",
      "priorAvg": 2.2222222222222223,
@@ -2999,6 +3060,7 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 5
     },
     {
+     "fresh": null,
      "host": "atah.io",
      "name": "/haiyuki_manual/index.html",
      "priorAvg": 0.9259259259259259,
@@ -3011,6 +3073,7 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 3
     },
     {
+     "fresh": "2026-10-02",
      "host": "atah.io",
      "name": "/swim/index.html",
      "priorAvg": 0.037037037037037035,
@@ -3023,6 +3086,7 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 3
     },
     {
+     "fresh": null,
      "host": "pc98.atah.io",
      "name": "/hukyou.html",
      "priorAvg": 4.592592592592593,
@@ -3035,6 +3099,7 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 3
     },
     {
+     "fresh": null,
      "host": "atah.io",
      "name": "/balance/index.html",
      "priorAvg": 0.18518518518518517,
@@ -3047,6 +3112,7 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 2
     },
     {
+     "fresh": null,
      "host": "atah.io",
      "name": "/haiyuki_web/",
      "priorAvg": 0.6296296296296297,
@@ -3059,6 +3125,7 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 2
     },
     {
+     "fresh": null,
      "host": "atah.io",
      "name": "/sweep/index.html",
      "priorAvg": 0.07407407407407407,
@@ -3071,6 +3138,7 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 2
     },
     {
+     "fresh": null,
      "host": "pc98.atah.io",
      "name": "/kaitou.html",
      "priorAvg": 2.5185185185185186,
@@ -3083,9 +3151,10 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 2
     },
     {
+     "fresh": null,
      "host": "pc98.atah.io",
      "name": "/kitan-opening.html",
-     "priorAvg": 1.8518518518518519,
+     "priorAvg": 1.8148148148148149,
      "ratio": 1.1,
      "rising": null,
      "section": "",
@@ -3095,6 +3164,7 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 2
     },
     {
+     "fresh": null,
      "host": "atah.io",
      "name": "/haiyuki_manual/yaku-tester.html",
      "priorAvg": 0.0,
@@ -3155,51 +3225,51 @@ window.DASHBOARD_DATA['ga4'] = {
   "2026-10-10": {
    "baseline": {
     "perUser": {
-     "hi": 5.428985507246376,
-     "lo": 2.0,
+     "hi": 5.595652173913043,
+     "lo": 2.110526315789474,
      "max": 6.5,
-     "median": 3.1079545454545454,
+     "median": 3.2203947368421053,
      "min": 1.5333333333333334,
      "n": 28,
-     "rank": 6,
+     "rank": 7,
      "value": 4.2105263157894735,
-     "vsMedian": 35.47580101991725,
+     "vsMedian": 30.745658835546468,
      "where": "usual"
     },
     "sessions": {
-     "hi": 36.0,
-     "lo": 13.0,
+     "hi": 34.6,
+     "lo": 12.7,
      "max": 51,
-     "median": 22.0,
+     "median": 21.5,
      "min": 11,
      "n": 28,
      "rank": 3,
      "value": 36,
-     "vsMedian": 63.63636363636363,
-     "where": "usual"
+     "vsMedian": 67.44186046511628,
+     "where": "high"
     },
     "users": {
-     "hi": 20.9,
-     "lo": 9.0,
-     "max": 29,
-     "median": 15.0,
+     "hi": 20.2,
+     "lo": 8.4,
+     "max": 27,
+     "median": 14.5,
      "min": 6,
      "n": 28,
-     "rank": 6,
+     "rank": 4,
      "value": 19,
-     "vsMedian": 26.666666666666668,
+     "vsMedian": 31.03448275862069,
      "where": "usual"
     },
     "views": {
-     "hi": 84.0,
+     "hi": 83.3,
      "lo": 27.7,
      "max": 161,
-     "median": 40.5,
+     "median": 40.0,
      "min": 18,
      "n": 28,
-     "rank": 5,
+     "rank": 4,
      "value": 80,
-     "vsMedian": 97.53086419753086,
+     "vsMedian": 100.0,
      "where": "usual"
     }
    },
@@ -3273,11 +3343,11 @@ window.DASHBOARD_DATA['ga4'] = {
    ],
    "insights": [
     {
-     "text": "환세포물장이 10.10 5회 — 평소 하루 2.4회 보던 페이지라 **2.1배**로 뛰었습니다.",
+     "text": "환세포물장이 10.10 5회 — 평소 하루 2.3회 보던 페이지라 **2.1배**로 뛰었습니다.",
      "tone": "up"
     },
     {
-     "text": "환세희담 오프닝은 최근 7일 하루 평균 **2.7회**로 늘었습니다 — 그 전 21일은 하루 1.7회였고, 7일 평균으로는 최근 28일 중 가장 높습니다.",
+     "text": "환세희담 오프닝은 최근 7일 하루 평균 **2.7회**로 늘었습니다(그 전 21일 하루 1.7회).",
      "tone": "up"
     }
    ],
@@ -3310,9 +3380,10 @@ window.DASHBOARD_DATA['ga4'] = {
    ],
    "ydayPages": [
     {
+     "fresh": null,
      "host": "suiko.atah.io",
      "name": "/kr.html",
-     "priorAvg": 11.62962962962963,
+     "priorAvg": 11.518518518518519,
      "ratio": 1.7,
      "rising": null,
      "section": "",
@@ -3322,6 +3393,7 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 20
     },
     {
+     "fresh": null,
      "host": "pc98.atah.io",
      "name": "/",
      "priorAvg": 7.518518518518518,
@@ -3334,9 +3406,10 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 15
     },
     {
+     "fresh": null,
      "host": "pc98.atah.io",
      "name": "/kitan.html",
-     "priorAvg": 10.037037037037036,
+     "priorAvg": 10.0,
      "ratio": 1.1,
      "rising": null,
      "section": "",
@@ -3346,10 +3419,11 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 11
     },
     {
+     "fresh": "2026-10-05",
      "host": "suiko.atah.io",
      "name": "/patch.html",
-     "priorAvg": 1.3333333333333333,
-     "ratio": 6.0,
+     "priorAvg": 1.2962962962962963,
+     "ratio": 6.2,
      "rising": null,
      "section": "",
      "spike": false,
@@ -3358,9 +3432,10 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 8
     },
     {
+     "fresh": null,
      "host": "pc98.atah.io",
      "name": "/torimono.html",
-     "priorAvg": 2.3703703703703702,
+     "priorAvg": 2.3333333333333335,
      "ratio": 2.1,
      "rising": null,
      "section": "",
@@ -3370,6 +3445,7 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 5
     },
     {
+     "fresh": null,
      "host": "atah.io",
      "name": "/",
      "priorAvg": 2.4074074074074074,
@@ -3382,6 +3458,7 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 4
     },
     {
+     "fresh": null,
      "host": "pc98.atah.io",
      "name": "/hukyou.html",
      "priorAvg": 4.518518518518518,
@@ -3394,9 +3471,10 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 4
     },
     {
+     "fresh": null,
      "host": "pc98.atah.io",
      "name": "/kitan-opening.html",
-     "priorAvg": 1.9259259259259258,
+     "priorAvg": 1.8888888888888888,
      "ratio": 1.6,
      "rising": {
       "avg7": 2.7,
@@ -3410,6 +3488,7 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 3
     },
     {
+     "fresh": null,
      "host": "atah.io",
      "name": "/haiyuki_manual/index.html",
      "priorAvg": 1.037037037037037,
@@ -3422,6 +3501,7 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 2
     },
     {
+     "fresh": null,
      "host": "atah.io",
      "name": "/haiyuki_web/",
      "priorAvg": 0.7037037037037037,
@@ -3434,6 +3514,7 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 2
     },
     {
+     "fresh": null,
      "host": "pc98.atah.io",
      "name": "/kaitou.html",
      "priorAvg": 2.5925925925925926,
@@ -3446,6 +3527,7 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 2
     },
     {
+     "fresh": null,
      "host": "atah.io",
      "name": "/haiyuki_manual/",
      "priorAvg": 0.18518518518518517,
@@ -3458,6 +3540,7 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 1
     },
     {
+     "fresh": null,
      "host": "atah.io",
      "name": "/sweep/index.html",
      "priorAvg": 0.14814814814814814,
@@ -3470,6 +3553,7 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 1
     },
     {
+     "fresh": null,
      "host": "atah.io",
      "name": "/swim/index.html",
      "priorAvg": 0.14814814814814814,
@@ -3482,6 +3566,7 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 1
     },
     {
+     "fresh": null,
      "host": "suiko.atah.io",
      "name": "/demo.html",
      "priorAvg": 0.0,
@@ -3539,50 +3624,50 @@ window.DASHBOARD_DATA['ga4'] = {
    "baseline": {
     "perUser": {
      "hi": 5.428985507246376,
-     "lo": 2.2120743034055725,
+     "lo": 2.110526315789474,
      "max": 6.5,
      "median": 3.1079545454545454,
      "min": 1.5333333333333334,
      "n": 28,
-     "rank": 24,
-     "value": 2.25,
-     "vsMedian": -27.605118829981716,
+     "rank": 23,
+     "value": 2.3157894736842106,
+     "vsMedian": -25.48830943904551,
      "where": "usual"
     },
     "sessions": {
-     "hi": 36.0,
-     "lo": 13.7,
+     "hi": 34.6,
+     "lo": 12.7,
      "max": 51,
-     "median": 22.5,
+     "median": 22.0,
      "min": 11,
      "n": 28,
      "rank": 9,
-     "value": 30,
-     "vsMedian": 33.33333333333333,
+     "value": 29,
+     "vsMedian": 31.818181818181817,
      "where": "usual"
     },
     "users": {
-     "hi": 20.9,
-     "lo": 10.4,
-     "max": 29,
+     "hi": 20.2,
+     "lo": 9.0,
+     "max": 27,
      "median": 15.0,
      "min": 6,
      "n": 28,
      "rank": 4,
-     "value": 20,
-     "vsMedian": 33.33333333333333,
+     "value": 19,
+     "vsMedian": 26.666666666666668,
      "where": "usual"
     },
     "views": {
-     "hi": 84.0,
-     "lo": 28.7,
+     "hi": 83.3,
+     "lo": 27.7,
      "max": 161,
-     "median": 42.5,
-     "min": 23,
+     "median": 41.0,
+     "min": 18,
      "n": 28,
      "rank": 13,
-     "value": 45,
-     "vsMedian": 5.88235294117647,
+     "value": 44,
+     "vsMedian": 7.317073170731707,
      "where": "usual"
     }
    },
@@ -3671,7 +3756,7 @@ window.DASHBOARD_DATA['ga4'] = {
     1,
     1,
     0,
-    3,
+    2,
     1,
     2,
     0,
@@ -3689,9 +3774,10 @@ window.DASHBOARD_DATA['ga4'] = {
    ],
    "ydayPages": [
     {
+     "fresh": null,
      "host": "pc98.atah.io",
      "name": "/kitan.html",
-     "priorAvg": 9.814814814814815,
+     "priorAvg": 9.777777777777779,
      "ratio": 1.1,
      "rising": null,
      "section": "",
@@ -3701,6 +3787,7 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 11
     },
     {
+     "fresh": null,
      "host": "pc98.atah.io",
      "name": "/",
      "priorAvg": 8.0,
@@ -3713,9 +3800,10 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 9
     },
     {
+     "fresh": null,
      "host": "suiko.atah.io",
      "name": "/kr.html",
-     "priorAvg": 12.296296296296296,
+     "priorAvg": 12.185185185185185,
      "ratio": 0.7,
      "rising": null,
      "section": "",
@@ -3725,18 +3813,7 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 9
     },
     {
-     "host": "suiko.atah.io",
-     "name": "/patch.html",
-     "priorAvg": 1.6296296296296295,
-     "ratio": 3.7,
-     "rising": null,
-     "section": "",
-     "spike": false,
-     "title": "환세취호전 한국어판 개선 패치",
-     "users": 4,
-     "views": 6
-    },
-    {
+     "fresh": null,
      "host": "atah.io",
      "name": "/",
      "priorAvg": 2.5555555555555554,
@@ -3749,6 +3826,20 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 5
     },
     {
+     "fresh": "2026-10-05",
+     "host": "suiko.atah.io",
+     "name": "/patch.html",
+     "priorAvg": 1.5925925925925926,
+     "ratio": 3.1,
+     "rising": null,
+     "section": "",
+     "spike": false,
+     "title": "환세취호전 한국어판 개선 패치",
+     "users": 3,
+     "views": 5
+    },
+    {
+     "fresh": null,
      "host": "pc98.atah.io",
      "name": "/hukyou.html",
      "priorAvg": 4.481481481481482,
@@ -3761,6 +3852,7 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 2
     },
     {
+     "fresh": null,
      "host": "atah.io",
      "name": "/haiyuki_manual/index.html",
      "priorAvg": 1.0740740740740742,
@@ -3773,6 +3865,7 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 1
     },
     {
+     "fresh": null,
      "host": "atah.io",
      "name": "/haiyuki_web/",
      "priorAvg": 0.7407407407407407,
@@ -3785,10 +3878,11 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 1
     },
     {
+     "fresh": null,
      "host": "pc98.atah.io",
      "name": "/kitan-opening.html",
-     "priorAvg": 1.8518518518518519,
-     "ratio": 0.5,
+     "priorAvg": 1.8148148148148149,
+     "ratio": 0.6,
      "rising": null,
      "section": "",
      "spike": false,
@@ -3804,7 +3898,7 @@ window.DASHBOARD_DATA['ga4'] = {
     },
     {
      "name": "suiko.atah.io",
-     "views": 15
+     "views": 14
     },
     {
      "name": "atah.io",
@@ -3829,10 +3923,6 @@ window.DASHBOARD_DATA['ga4'] = {
      "sessions": 2
     },
     {
-     "name": "daum",
-     "sessions": 1
-    },
-    {
      "name": "naver",
      "sessions": 1
     },
@@ -3844,10 +3934,10 @@ window.DASHBOARD_DATA['ga4'] = {
    "ydayUnresolved": 1,
    "yesterday": {
     "date": "2026-10-11",
-    "newUsers": 15,
-    "sessions": 30,
-    "users": 20,
-    "views": 45
+    "newUsers": 14,
+    "sessions": 29,
+    "users": 19,
+    "views": 44
    }
   },
   "2026-10-12": {
@@ -3865,39 +3955,39 @@ window.DASHBOARD_DATA['ga4'] = {
      "where": "usual"
     },
     "sessions": {
-     "hi": 38.1,
-     "lo": 15.4,
+     "hi": 34.6,
+     "lo": 13.4,
      "max": 51,
-     "median": 23.5,
-     "min": 12,
+     "median": 22.5,
+     "min": 11,
      "n": 28,
-     "rank": 10,
+     "rank": 9,
      "value": 30,
-     "vsMedian": 27.659574468085108,
+     "vsMedian": 33.33333333333333,
      "where": "usual"
     },
     "users": {
-     "hi": 23.6,
-     "lo": 11.0,
-     "max": 29,
+     "hi": 20.2,
+     "lo": 10.4,
+     "max": 27,
      "median": 15.0,
      "min": 6,
      "n": 28,
-     "rank": 9,
+     "rank": 8,
      "value": 18,
      "vsMedian": 20.0,
      "where": "usual"
     },
     "views": {
-     "hi": 86.1,
-     "lo": 29.7,
+     "hi": 83.3,
+     "lo": 28.0,
      "max": 161,
-     "median": 46.5,
+     "median": 42.5,
      "min": 23,
      "n": 28,
-     "rank": 13,
+     "rank": 12,
      "value": 49,
-     "vsMedian": 5.376344086021505,
+     "vsMedian": 15.294117647058824,
      "where": "usual"
     }
    },
@@ -4004,6 +4094,7 @@ window.DASHBOARD_DATA['ga4'] = {
    ],
    "ydayPages": [
     {
+     "fresh": null,
      "host": "pc98.atah.io",
      "name": "/",
      "priorAvg": 8.25925925925926,
@@ -4016,9 +4107,10 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 13
     },
     {
+     "fresh": null,
      "host": "pc98.atah.io",
      "name": "/kitan.html",
-     "priorAvg": 10.074074074074074,
+     "priorAvg": 10.037037037037036,
      "ratio": 1.2,
      "rising": null,
      "section": "",
@@ -4028,9 +4120,10 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 12
     },
     {
+     "fresh": null,
      "host": "suiko.atah.io",
      "name": "/kr.html",
-     "priorAvg": 12.555555555555555,
+     "priorAvg": 12.444444444444445,
      "ratio": 0.8,
      "rising": null,
      "section": "",
@@ -4040,10 +4133,11 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 10
     },
     {
+     "fresh": "2026-10-05",
      "host": "suiko.atah.io",
      "name": "/patch.html",
-     "priorAvg": 1.8518518518518519,
-     "ratio": 2.7,
+     "priorAvg": 1.7777777777777777,
+     "ratio": 2.8,
      "rising": null,
      "section": "",
      "spike": false,
@@ -4052,6 +4146,7 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 5
     },
     {
+     "fresh": null,
      "host": "pc98.atah.io",
      "name": "/hukyou.html",
      "priorAvg": 4.481481481481482,
@@ -4064,6 +4159,7 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 4
     },
     {
+     "fresh": null,
      "host": "pc98.atah.io",
      "name": "/kaitou.html",
      "priorAvg": 2.4814814814814814,
@@ -4076,6 +4172,7 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 2
     },
     {
+     "fresh": null,
      "host": "atah.io",
      "name": "/",
      "priorAvg": 2.7037037037037037,
@@ -4088,6 +4185,7 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 1
     },
     {
+     "fresh": null,
      "host": "atah.io",
      "name": "/viewer/scene.html",
      "priorAvg": 0.5555555555555556,
@@ -4100,9 +4198,10 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 1
     },
     {
+     "fresh": null,
      "host": "pc98.atah.io",
      "name": "/torimono.html",
-     "priorAvg": 2.4814814814814814,
+     "priorAvg": 2.4444444444444446,
      "ratio": 0.4,
      "rising": null,
      "section": "",
@@ -4156,51 +4255,51 @@ window.DASHBOARD_DATA['ga4'] = {
   "2026-10-13": {
    "baseline": {
     "perUser": {
-     "hi": 5.195652173913044,
+     "hi": 5.428985507246376,
      "lo": 2.2120743034055725,
      "max": 6.5,
      "median": 3.1079545454545454,
      "min": 1.5333333333333334,
      "n": 28,
-     "rank": 10,
-     "value": 3.4,
-     "vsMedian": 9.39670932358318,
+     "rank": 11,
+     "value": 3.5,
+     "vsMedian": 12.614259597806218,
      "where": "usual"
     },
     "sessions": {
-     "hi": 38.1,
-     "lo": 16.0,
+     "hi": 37.8,
+     "lo": 15.4,
      "max": 51,
-     "median": 25.0,
+     "median": 23.5,
      "min": 12,
      "n": 28,
      "rank": 3,
-     "value": 43,
-     "vsMedian": 72.0,
+     "value": 42,
+     "vsMedian": 78.72340425531915,
      "where": "high"
     },
     "users": {
-     "hi": 23.6,
+     "hi": 23.3,
      "lo": 11.0,
-     "max": 29,
-     "median": 15.5,
+     "max": 27,
+     "median": 15.0,
      "min": 6,
      "n": 28,
      "rank": 3,
-     "value": 25,
-     "vsMedian": 61.29032258064516,
+     "value": 24,
+     "vsMedian": 60.0,
      "where": "high"
     },
     "views": {
-     "hi": 86.8,
-     "lo": 29.7,
+     "hi": 86.1,
+     "lo": 29.4,
      "max": 161,
-     "median": 47.0,
+     "median": 46.0,
      "min": 23,
      "n": 28,
      "rank": 4,
-     "value": 85,
-     "vsMedian": 80.85106382978722,
+     "value": 84,
+     "vsMedian": 82.6086956521739,
      "where": "usual"
     }
    },
@@ -4274,7 +4373,11 @@ window.DASHBOARD_DATA['ga4'] = {
    ],
    "insights": [
     {
-     "text": "최근 28일 동안 없던 유입원이 10.13에 생겼습니다 — github.com.",
+     "text": "환세쾌진극이 10.13 **47회** — 전에 조회가 없던 페이지입니다.",
+     "tone": "up"
+    },
+    {
+     "text": "사이트에 최근 28일 동안 없던 유입원이 10.13에 생겼습니다 — github.com.",
      "tone": "up"
     }
    ],
@@ -4294,7 +4397,7 @@ window.DASHBOARD_DATA['ga4'] = {
     1,
     1,
     2,
-    7,
+    6,
     1,
     5,
     2,
@@ -4307,21 +4410,23 @@ window.DASHBOARD_DATA['ga4'] = {
    ],
    "ydayPages": [
     {
+     "fresh": null,
      "host": "kaisin.atah.io",
      "name": "/",
      "priorAvg": 0.0,
-     "ratio": 48.0,
+     "ratio": 47.0,
      "rising": null,
      "section": "",
-     "spike": false,
+     "spike": true,
      "title": "환세쾌진극",
-     "users": 12,
-     "views": 48
+     "users": 11,
+     "views": 47
     },
     {
+     "fresh": null,
      "host": "suiko.atah.io",
      "name": "/kr.html",
-     "priorAvg": 12.925925925925926,
+     "priorAvg": 12.814814814814815,
      "ratio": 0.7,
      "rising": null,
      "section": "",
@@ -4331,6 +4436,7 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 9
     },
     {
+     "fresh": null,
      "host": "atah.io",
      "name": "/",
      "priorAvg": 2.740740740740741,
@@ -4343,6 +4449,7 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 8
     },
     {
+     "fresh": null,
      "host": "pc98.atah.io",
      "name": "/",
      "priorAvg": 8.666666666666666,
@@ -4355,6 +4462,7 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 6
     },
     {
+     "fresh": null,
      "host": "pc98.atah.io",
      "name": "/hukyou.html",
      "priorAvg": 4.333333333333333,
@@ -4367,9 +4475,10 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 5
     },
     {
+     "fresh": null,
      "host": "pc98.atah.io",
      "name": "/kitan.html",
-     "priorAvg": 10.148148148148149,
+     "priorAvg": 10.11111111111111,
      "ratio": 0.3,
      "rising": null,
      "section": "",
@@ -4379,6 +4488,7 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 3
     },
     {
+     "fresh": null,
      "host": "atah.io",
      "name": "/haiyuki_manual/index.html",
      "priorAvg": 1.037037037037037,
@@ -4391,6 +4501,7 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 1
     },
     {
+     "fresh": null,
      "host": "atah.io",
      "name": "/haiyuki_web/",
      "priorAvg": 0.7037037037037037,
@@ -4403,6 +4514,7 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 1
     },
     {
+     "fresh": null,
      "host": "atah.io",
      "name": "/kitan_manual/index.html",
      "priorAvg": 0.18518518518518517,
@@ -4415,9 +4527,10 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 1
     },
     {
+     "fresh": null,
      "host": "atah.io",
      "name": "/viewer/ani.html",
-     "priorAvg": 0.7777777777777778,
+     "priorAvg": 0.7037037037037037,
      "ratio": 1.0,
      "rising": null,
      "section": "장면 뷰어",
@@ -4427,9 +4540,10 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 1
     },
     {
+     "fresh": null,
      "host": "pc98.atah.io",
      "name": "/kitan-opening.html",
-     "priorAvg": 1.8148148148148149,
+     "priorAvg": 1.7777777777777777,
      "ratio": 0.6,
      "rising": null,
      "section": "",
@@ -4439,9 +4553,10 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 1
     },
     {
+     "fresh": null,
      "host": "suiko.atah.io",
      "name": "/patch.html",
-     "priorAvg": 2.037037037037037,
+     "priorAvg": 1.962962962962963,
      "ratio": 0.5,
      "rising": null,
      "section": "",
@@ -4454,7 +4569,7 @@ window.DASHBOARD_DATA['ga4'] = {
    "ydaySites": [
     {
      "name": "kaisin.atah.io",
-     "views": 48
+     "views": 47
     },
     {
      "name": "pc98.atah.io",
@@ -4489,19 +4604,15 @@ window.DASHBOARD_DATA['ga4'] = {
     {
      "name": "cafe.naver.com",
      "sessions": 1
-    },
-    {
-     "name": "daum",
-     "sessions": 1
     }
    ],
    "ydayUnresolved": 0,
    "yesterday": {
     "date": "2026-10-13",
-    "newUsers": 16,
-    "sessions": 43,
-    "users": 25,
-    "views": 85
+    "newUsers": 15,
+    "sessions": 42,
+    "users": 24,
+    "views": 84
    }
   },
   "2026-10-14": {
@@ -4510,48 +4621,48 @@ window.DASHBOARD_DATA['ga4'] = {
      "hi": 5.195652173913044,
      "lo": 2.2120743034055725,
      "max": 6.5,
-     "median": 3.0069930069930066,
+     "median": 3.1079545454545454,
      "min": 1.5333333333333334,
      "n": 28,
-     "rank": 8,
+     "rank": 10,
      "value": 3.6,
-     "vsMedian": 19.720930232558157,
+     "vsMedian": 15.831809872029254,
      "where": "usual"
     },
     "sessions": {
-     "hi": 38.1,
+     "hi": 37.8,
      "lo": 16.0,
      "max": 51,
-     "median": 27.5,
+     "median": 25.0,
      "min": 12,
      "n": 28,
-     "rank": 8,
+     "rank": 7,
      "value": 32,
-     "vsMedian": 16.363636363636363,
+     "vsMedian": 28.000000000000004,
      "where": "usual"
     },
     "users": {
-     "hi": 23.6,
+     "hi": 23.3,
      "lo": 11.0,
-     "max": 29,
-     "median": 16.0,
+     "max": 27,
+     "median": 15.0,
      "min": 6,
      "n": 28,
      "rank": 5,
      "value": 20,
-     "vsMedian": 25.0,
+     "vsMedian": 33.33333333333333,
      "where": "usual"
     },
     "views": {
-     "hi": 86.8,
-     "lo": 29.7,
+     "hi": 86.1,
+     "lo": 29.4,
      "max": 161,
-     "median": 47.0,
+     "median": 46.5,
      "min": 23,
      "n": 28,
      "rank": 7,
      "value": 72,
-     "vsMedian": 53.191489361702125,
+     "vsMedian": 54.83870967741935,
      "where": "usual"
     }
    },
@@ -4658,9 +4769,10 @@ window.DASHBOARD_DATA['ga4'] = {
    ],
    "ydayPages": [
     {
+     "fresh": null,
      "host": "suiko.atah.io",
      "name": "/kr.html",
-     "priorAvg": 13.074074074074074,
+     "priorAvg": 12.962962962962964,
      "ratio": 1.5,
      "rising": null,
      "section": "",
@@ -4670,10 +4782,11 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 20
     },
     {
+     "fresh": "2026-10-13",
      "host": "kaisin.atah.io",
      "name": "/",
-     "priorAvg": 1.7777777777777777,
-     "ratio": 5.6,
+     "priorAvg": 1.7407407407407407,
+     "ratio": 5.7,
      "rising": null,
      "section": "",
      "spike": false,
@@ -4682,6 +4795,7 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 10
     },
     {
+     "fresh": null,
      "host": "pc98.atah.io",
      "name": "/",
      "priorAvg": 8.37037037037037,
@@ -4694,9 +4808,10 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 10
     },
     {
+     "fresh": null,
      "host": "pc98.atah.io",
      "name": "/kitan.html",
-     "priorAvg": 9.962962962962964,
+     "priorAvg": 9.925925925925926,
      "ratio": 1.0,
      "rising": null,
      "section": "",
@@ -4706,6 +4821,7 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 10
     },
     {
+     "fresh": null,
      "host": "pc98.atah.io",
      "name": "/hukyou.html",
      "priorAvg": 4.296296296296297,
@@ -4718,6 +4834,7 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 5
     },
     {
+     "fresh": null,
      "host": "atah.io",
      "name": "/",
      "priorAvg": 3.037037037037037,
@@ -4730,9 +4847,10 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 3
     },
     {
+     "fresh": null,
      "host": "pc98.atah.io",
      "name": "/kitan-opening.html",
-     "priorAvg": 1.7777777777777777,
+     "priorAvg": 1.7407407407407407,
      "ratio": 1.7,
      "rising": null,
      "section": "",
@@ -4742,10 +4860,11 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 3
     },
     {
+     "fresh": null,
      "host": "suiko.atah.io",
      "name": "/patch.html",
-     "priorAvg": 2.074074074074074,
-     "ratio": 1.4,
+     "priorAvg": 2.0,
+     "ratio": 1.5,
      "rising": null,
      "section": "",
      "spike": false,
@@ -4754,6 +4873,7 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 3
     },
     {
+     "fresh": null,
      "host": "atah.io",
      "name": "/viewer/scene.html",
      "priorAvg": 0.5925925925925926,
@@ -4766,6 +4886,7 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 2
     },
     {
+     "fresh": null,
      "host": "pc98.atah.io",
      "name": "/kaitou.html",
      "priorAvg": 2.2222222222222223,
@@ -4778,6 +4899,7 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 2
     },
     {
+     "fresh": null,
      "host": "atah.io",
      "name": "/balance/index.html",
      "priorAvg": 0.25925925925925924,
@@ -4790,6 +4912,7 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 1
     },
     {
+     "fresh": null,
      "host": "atah.io",
      "name": "/haiyuki_manual/index.html",
      "priorAvg": 1.0740740740740742,
@@ -4802,6 +4925,7 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 1
     },
     {
+     "fresh": null,
      "host": "atah.io",
      "name": "/haiyuki_web/index.html",
      "priorAvg": 0.18518518518518517,
@@ -4814,6 +4938,7 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 1
     },
     {
+     "fresh": null,
      "host": "atah.io",
      "name": "/index.html",
      "priorAvg": 0.18518518518518517,
@@ -4879,50 +5004,50 @@ window.DASHBOARD_DATA['ga4'] = {
    "baseline": {
     "perUser": {
      "hi": 5.195652173913044,
-     "lo": 2.2455882352941177,
+     "lo": 2.2120743034055725,
      "max": 6.5,
-     "median": 3.1079545454545454,
-     "min": 1.9375,
+     "median": 3.087121212121212,
+     "min": 1.5333333333333334,
      "n": 28,
      "rank": 17,
      "value": 2.9,
-     "vsMedian": -6.691042047531995,
+     "vsMedian": -6.061349693251531,
      "where": "usual"
     },
     "sessions": {
-     "hi": 38.8,
-     "lo": 16.7,
+     "hi": 38.5,
+     "lo": 16.0,
      "max": 51,
-     "median": 29.0,
+     "median": 27.5,
      "min": 12,
      "n": 28,
      "rank": 4,
      "value": 37,
-     "vsMedian": 27.586206896551722,
+     "vsMedian": 34.54545454545455,
      "where": "usual"
     },
     "users": {
-     "hi": 23.6,
+     "hi": 23.3,
      "lo": 11.0,
-     "max": 29,
-     "median": 16.5,
+     "max": 27,
+     "median": 15.5,
      "min": 6,
      "n": 28,
      "rank": 5,
      "value": 20,
-     "vsMedian": 21.21212121212121,
+     "vsMedian": 29.03225806451613,
      "where": "usual"
     },
     "views": {
-     "hi": 86.8,
-     "lo": 30.7,
+     "hi": 86.1,
+     "lo": 29.4,
      "max": 161,
-     "median": 49.5,
-     "min": 28,
+     "median": 46.5,
+     "min": 23,
      "n": 28,
-     "rank": 11,
+     "rank": 10,
      "value": 58,
-     "vsMedian": 17.17171717171717,
+     "vsMedian": 24.731182795698924,
      "where": "usual"
     }
    },
@@ -5029,9 +5154,10 @@ window.DASHBOARD_DATA['ga4'] = {
    ],
    "ydayPages": [
     {
+     "fresh": null,
      "host": "suiko.atah.io",
      "name": "/kr.html",
-     "priorAvg": 13.814814814814815,
+     "priorAvg": 13.703703703703704,
      "ratio": 1.7,
      "rising": null,
      "section": "",
@@ -5041,9 +5167,10 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 23
     },
     {
+     "fresh": null,
      "host": "pc98.atah.io",
      "name": "/kitan.html",
-     "priorAvg": 9.88888888888889,
+     "priorAvg": 9.851851851851851,
      "ratio": 1.2,
      "rising": null,
      "section": "",
@@ -5053,6 +5180,7 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 12
     },
     {
+     "fresh": null,
      "host": "pc98.atah.io",
      "name": "/",
      "priorAvg": 8.222222222222221,
@@ -5065,6 +5193,7 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 4
     },
     {
+     "fresh": null,
      "host": "pc98.atah.io",
      "name": "/hukyou.html",
      "priorAvg": 4.296296296296297,
@@ -5077,6 +5206,7 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 4
     },
     {
+     "fresh": null,
      "host": "atah.io",
      "name": "/kitan_manual/",
      "priorAvg": 1.1851851851851851,
@@ -5089,9 +5219,10 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 3
     },
     {
+     "fresh": null,
      "host": "suiko.atah.io",
      "name": "/patch.html",
-     "priorAvg": 2.185185185185185,
+     "priorAvg": 2.111111111111111,
      "ratio": 1.4,
      "rising": null,
      "section": "",
@@ -5101,6 +5232,7 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 3
     },
     {
+     "fresh": null,
      "host": "atah.io",
      "name": "/",
      "priorAvg": 3.111111111111111,
@@ -5113,6 +5245,7 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 2
     },
     {
+     "fresh": null,
      "host": "atah.io",
      "name": "/haiyuki_manual/index.html",
      "priorAvg": 1.037037037037037,
@@ -5125,6 +5258,7 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 2
     },
     {
+     "fresh": null,
      "host": "atah.io",
      "name": "/haiyuki_web/",
      "priorAvg": 0.6666666666666666,
@@ -5137,9 +5271,10 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 2
     },
     {
+     "fresh": null,
      "host": "atah.io",
      "name": "/viewer/ani.html",
-     "priorAvg": 0.8148148148148148,
+     "priorAvg": 0.7407407407407407,
      "ratio": 1.0,
      "rising": null,
      "section": "장면 뷰어",
@@ -5149,9 +5284,10 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 1
     },
     {
+     "fresh": "2026-10-13",
      "host": "kaisin.atah.io",
      "name": "/",
-     "priorAvg": 2.1481481481481484,
+     "priorAvg": 2.111111111111111,
      "ratio": 0.5,
      "rising": null,
      "section": "",
@@ -5161,9 +5297,10 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 1
     },
     {
+     "fresh": null,
      "host": "pc98.atah.io",
      "name": "/kitan-opening.html",
-     "priorAvg": 1.7407407407407407,
+     "priorAvg": 1.7037037037037037,
      "ratio": 0.6,
      "rising": null,
      "section": "",
@@ -5230,46 +5367,46 @@ window.DASHBOARD_DATA['ga4'] = {
    "baseline": {
     "perUser": {
      "hi": 5.195652173913044,
-     "lo": 2.2455882352941177,
+     "lo": 2.291640866873065,
      "max": 6.5,
-     "median": 3.0240384615384617,
+     "median": 3.1079545454545454,
      "min": 1.9375,
      "n": 28,
      "rank": 6,
      "value": 3.9473684210526314,
-     "vsMedian": 30.533009789975722,
+     "vsMedian": 27.008563456172418,
      "where": "usual"
     },
     "sessions": {
-     "hi": 38.8,
+     "hi": 38.5,
      "lo": 16.7,
      "max": 51,
      "median": 29.0,
-     "min": 9,
+     "min": 12,
      "n": 28,
-     "rank": 14,
+     "rank": 13,
      "value": 29,
      "vsMedian": 0.0,
      "where": "usual"
     },
     "users": {
-     "hi": 23.6,
+     "hi": 23.3,
      "lo": 11.0,
-     "max": 29,
-     "median": 16.5,
+     "max": 27,
+     "median": 16.0,
      "min": 6,
      "n": 28,
-     "rank": 9,
+     "rank": 7,
      "value": 19,
-     "vsMedian": 15.151515151515152,
+     "vsMedian": 18.75,
      "where": "usual"
     },
     "views": {
-     "hi": 86.8,
-     "lo": 29.7,
+     "hi": 86.1,
+     "lo": 30.7,
      "max": 161,
      "median": 49.5,
-     "min": 23,
+     "min": 28,
      "n": 28,
      "rank": 7,
      "value": 75,
@@ -5347,11 +5484,11 @@ window.DASHBOARD_DATA['ga4'] = {
    ],
    "insights": [
     {
-     "text": "환세희담 오프닝이 10.16 6회 — 평소 하루 1.7회 보던 페이지라 **3.4배**로 뛰었습니다.",
+     "text": "환세희담 오프닝이 10.16 6회 — 평소 하루 1.7회 보던 페이지라 **3.5배**로 뛰었습니다.",
      "tone": "up"
     },
     {
-     "text": "환세쾌진극은 최근 7일 하루 평균 **8.7회**로 늘었습니다 — 그 전 21일은 거의 조회가 없었고, 7일 평균으로는 최근 28일 중 가장 높습니다.",
+     "text": "환세쾌진극은 최근 7일 하루 평균 **8.6회**로 늘었습니다(그 전 21일 거의 0회).",
      "tone": "up"
     }
    ],
@@ -5391,9 +5528,10 @@ window.DASHBOARD_DATA['ga4'] = {
    ],
    "ydayPages": [
     {
+     "fresh": null,
      "host": "suiko.atah.io",
      "name": "/kr.html",
-     "priorAvg": 14.555555555555555,
+     "priorAvg": 14.444444444444445,
      "ratio": 1.9,
      "rising": null,
      "section": "",
@@ -5403,9 +5541,10 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 28
     },
     {
+     "fresh": null,
      "host": "pc98.atah.io",
      "name": "/kitan.html",
-     "priorAvg": 9.962962962962964,
+     "priorAvg": 9.925925925925926,
      "ratio": 1.4,
      "rising": null,
      "section": "",
@@ -5415,10 +5554,11 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 14
     },
     {
+     "fresh": null,
      "host": "pc98.atah.io",
      "name": "/kitan-opening.html",
-     "priorAvg": 1.7407407407407407,
-     "ratio": 3.4,
+     "priorAvg": 1.7037037037037037,
+     "ratio": 3.5,
      "rising": null,
      "section": "",
      "spike": true,
@@ -5427,6 +5567,7 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 6
     },
     {
+     "fresh": null,
      "host": "atah.io",
      "name": "/haiyuki_manual/index.html",
      "priorAvg": 1.1111111111111112,
@@ -5439,6 +5580,7 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 4
     },
     {
+     "fresh": null,
      "host": "atah.io",
      "name": "/haiyuki_web/",
      "priorAvg": 0.7407407407407407,
@@ -5451,6 +5593,7 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 4
     },
     {
+     "fresh": null,
      "host": "pc98.atah.io",
      "name": "/",
      "priorAvg": 8.37037037037037,
@@ -5463,9 +5606,10 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 4
     },
     {
+     "fresh": null,
      "host": "pc98.atah.io",
      "name": "/torimono.html",
-     "priorAvg": 1.9259259259259258,
+     "priorAvg": 1.8888888888888888,
      "ratio": 2.1,
      "rising": null,
      "section": "",
@@ -5475,10 +5619,11 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 4
     },
     {
+     "fresh": null,
      "host": "suiko.atah.io",
      "name": "/patch.html",
-     "priorAvg": 2.2962962962962963,
-     "ratio": 1.7,
+     "priorAvg": 2.2222222222222223,
+     "ratio": 1.8,
      "rising": null,
      "section": "",
      "spike": false,
@@ -5487,12 +5632,13 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 4
     },
     {
+     "fresh": "2026-10-13",
      "host": "kaisin.atah.io",
      "name": "/",
-     "priorAvg": 2.185185185185185,
+     "priorAvg": 2.1481481481481484,
      "ratio": 0.9,
      "rising": {
-      "avg7": 8.7,
+      "avg7": 8.6,
       "before": 0.0,
       "beforeDays": 21
      },
@@ -5503,6 +5649,7 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 2
     },
     {
+     "fresh": null,
      "host": "pc98.atah.io",
      "name": "/hukyou.html",
      "priorAvg": 4.333333333333333,
@@ -5515,6 +5662,7 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 2
     },
     {
+     "fresh": null,
      "host": "pc98.atah.io",
      "name": "/kaitou.html",
      "priorAvg": 2.2222222222222223,
@@ -5527,9 +5675,10 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 2
     },
     {
+     "fresh": null,
      "host": "atah.io",
      "name": "/viewer/ani.html",
-     "priorAvg": 0.8518518518518519,
+     "priorAvg": 0.7777777777777778,
      "ratio": 1.0,
      "rising": null,
      "section": "장면 뷰어",
@@ -5596,22 +5745,22 @@ window.DASHBOARD_DATA['ga4'] = {
    "baseline": {
     "perUser": {
      "hi": 5.195652173913044,
-     "lo": 2.2455882352941177,
+     "lo": 2.265032679738562,
      "max": 6.5,
-     "median": 3.145833333333333,
+     "median": 3.104166666666667,
      "min": 1.9375,
      "n": 28,
-     "rank": 24,
+     "rank": 25,
      "value": 2.2777777777777777,
-     "vsMedian": -27.593818984547458,
+     "vsMedian": -26.621923937360187,
      "where": "usual"
     },
     "sessions": {
-     "hi": 38.8,
-     "lo": 19.7,
+     "hi": 38.5,
+     "lo": 17.7,
      "max": 51,
      "median": 29.0,
-     "min": 13,
+     "min": 12,
      "n": 28,
      "rank": 17,
      "value": 24,
@@ -5619,27 +5768,27 @@ window.DASHBOARD_DATA['ga4'] = {
      "where": "usual"
     },
     "users": {
-     "hi": 23.6,
-     "lo": 12.0,
-     "max": 29,
-     "median": 17.5,
+     "hi": 23.3,
+     "lo": 11.0,
+     "max": 27,
+     "median": 16.5,
      "min": 6,
      "n": 28,
      "rank": 12,
      "value": 18,
-     "vsMedian": 2.857142857142857,
+     "vsMedian": 9.090909090909092,
      "where": "usual"
     },
     "views": {
-     "hi": 86.8,
-     "lo": 31.0,
+     "hi": 86.1,
+     "lo": 30.7,
      "max": 161,
-     "median": 51.0,
-     "min": 29,
+     "median": 49.5,
+     "min": 28,
      "n": 28,
-     "rank": 18,
+     "rank": 17,
      "value": 41,
-     "vsMedian": -19.607843137254903,
+     "vsMedian": -17.17171717171717,
      "where": "usual"
     }
    },
@@ -5713,7 +5862,7 @@ window.DASHBOARD_DATA['ga4'] = {
    ],
    "insights": [
     {
-     "text": "최근 28일 동안 없던 유입원이 10.17에 생겼습니다 — bing.",
+     "text": "사이트에 최근 28일 동안 없던 유입원이 10.17에 생겼습니다 — bing.",
      "tone": "up"
     }
    ],
@@ -5753,9 +5902,10 @@ window.DASHBOARD_DATA['ga4'] = {
    ],
    "ydayPages": [
     {
+     "fresh": null,
      "host": "suiko.atah.io",
      "name": "/kr.html",
-     "priorAvg": 15.555555555555555,
+     "priorAvg": 15.444444444444445,
      "ratio": 0.9,
      "rising": null,
      "section": "",
@@ -5765,6 +5915,7 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 14
     },
     {
+     "fresh": null,
      "host": "pc98.atah.io",
      "name": "/",
      "priorAvg": 8.444444444444445,
@@ -5777,9 +5928,10 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 9
     },
     {
+     "fresh": null,
      "host": "pc98.atah.io",
      "name": "/kitan.html",
-     "priorAvg": 10.037037037037036,
+     "priorAvg": 10.0,
      "ratio": 0.4,
      "rising": null,
      "section": "",
@@ -5789,6 +5941,7 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 4
     },
     {
+     "fresh": null,
      "host": "pc98.atah.io",
      "name": "/hukyou.html",
      "priorAvg": 4.2592592592592595,
@@ -5801,6 +5954,7 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 3
     },
     {
+     "fresh": null,
      "host": "pc98.atah.io",
      "name": "/kaitou.html",
      "priorAvg": 2.259259259259259,
@@ -5813,9 +5967,10 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 3
     },
     {
+     "fresh": null,
      "host": "pc98.atah.io",
      "name": "/kitan-opening.html",
-     "priorAvg": 1.8888888888888888,
+     "priorAvg": 1.8518518518518519,
      "ratio": 1.1,
      "rising": null,
      "section": "",
@@ -5825,9 +5980,10 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 2
     },
     {
+     "fresh": null,
      "host": "pc98.atah.io",
      "name": "/torimono.html",
-     "priorAvg": 1.962962962962963,
+     "priorAvg": 1.9259259259259258,
      "ratio": 1.0,
      "rising": null,
      "section": "",
@@ -5837,6 +5993,7 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 2
     },
     {
+     "fresh": null,
      "host": "atah.io",
      "name": "/",
      "priorAvg": 3.1481481481481484,
@@ -5849,6 +6006,7 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 1
     },
     {
+     "fresh": null,
      "host": "atah.io",
      "name": "/haiyuki_manual/index.html",
      "priorAvg": 1.1111111111111112,
@@ -5861,6 +6019,7 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 1
     },
     {
+     "fresh": null,
      "host": "atah.io",
      "name": "/haiyuki_web/",
      "priorAvg": 0.7407407407407407,
@@ -5873,6 +6032,7 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 1
     },
     {
+     "fresh": null,
      "host": "atah.io",
      "name": "/viewer/scene.html",
      "priorAvg": 0.6666666666666666,
@@ -5942,46 +6102,46 @@ window.DASHBOARD_DATA['ga4'] = {
    "baseline": {
     "perUser": {
      "hi": 5.475652173913044,
-     "lo": 2.2455882352941177,
+     "lo": 2.265032679738562,
      "max": 6.5,
-     "median": 3.145833333333333,
+     "median": 3.2203947368421053,
      "min": 1.9375,
      "n": 28,
      "rank": 4,
      "value": 5.4,
-     "vsMedian": 71.65562913907287,
+     "vsMedian": 67.68130745658837,
      "where": "usual"
     },
     "sessions": {
-     "hi": 38.8,
-     "lo": 19.7,
+     "hi": 38.5,
+     "lo": 18.7,
      "max": 51,
-     "median": 29.5,
-     "min": 7,
+     "median": 29.0,
+     "min": 12,
      "n": 28,
      "rank": 12,
      "value": 30,
-     "vsMedian": 1.694915254237288,
+     "vsMedian": 3.4482758620689653,
      "where": "usual"
     },
     "users": {
-     "hi": 23.6,
+     "hi": 23.3,
      "lo": 11.7,
-     "max": 29,
-     "median": 17.5,
+     "max": 27,
+     "median": 16.5,
      "min": 6,
      "n": 28,
-     "rank": 18,
+     "rank": 17,
      "value": 15,
-     "vsMedian": -14.285714285714285,
+     "vsMedian": -9.090909090909092,
      "where": "usual"
     },
     "views": {
-     "hi": 86.8,
+     "hi": 86.1,
      "lo": 31.0,
      "max": 161,
      "median": 51.0,
-     "min": 15,
+     "min": 28,
      "n": 28,
      "rank": 5,
      "value": 81,
@@ -6092,6 +6252,7 @@ window.DASHBOARD_DATA['ga4'] = {
    ],
    "ydayPages": [
     {
+     "fresh": null,
      "host": "pc98.atah.io",
      "name": "/",
      "priorAvg": 8.777777777777779,
@@ -6104,6 +6265,7 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 22
     },
     {
+     "fresh": null,
      "host": "pc98.atah.io",
      "name": "/hukyou.html",
      "priorAvg": 4.148148148148148,
@@ -6116,9 +6278,10 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 17
     },
     {
+     "fresh": null,
      "host": "pc98.atah.io",
      "name": "/kitan.html",
-     "priorAvg": 9.851851851851851,
+     "priorAvg": 9.814814814814815,
      "ratio": 1.6,
      "rising": null,
      "section": "",
@@ -6128,9 +6291,10 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 16
     },
     {
+     "fresh": null,
      "host": "suiko.atah.io",
      "name": "/kr.html",
-     "priorAvg": 15.925925925925926,
+     "priorAvg": 15.814814814814815,
      "ratio": 0.7,
      "rising": null,
      "section": "",
@@ -6140,10 +6304,11 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 11
     },
     {
+     "fresh": null,
      "host": "suiko.atah.io",
      "name": "/patch.html",
-     "priorAvg": 2.4444444444444446,
-     "ratio": 2.0,
+     "priorAvg": 2.3703703703703702,
+     "ratio": 2.1,
      "rising": null,
      "section": "",
      "spike": false,
@@ -6152,6 +6317,7 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 5
     },
     {
+     "fresh": null,
      "host": "atah.io",
      "name": "/kitan_manual/",
      "priorAvg": 1.2962962962962963,
@@ -6164,6 +6330,7 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 2
     },
     {
+     "fresh": null,
      "host": "pc98.atah.io",
      "name": "/kaitou.html",
      "priorAvg": 2.3333333333333335,
@@ -6176,9 +6343,10 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 2
     },
     {
+     "fresh": null,
      "host": "pc98.atah.io",
      "name": "/torimono.html",
-     "priorAvg": 2.0,
+     "priorAvg": 1.962962962962963,
      "ratio": 1.0,
      "rising": null,
      "section": "",
@@ -6188,6 +6356,7 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 2
     },
     {
+     "fresh": null,
      "host": "atah.io",
      "name": "/haiyuki_manual/index.html",
      "priorAvg": 1.1111111111111112,
@@ -6200,6 +6369,7 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 1
     },
     {
+     "fresh": null,
      "host": "atah.io",
      "name": "/haiyuki_web/",
      "priorAvg": 0.7407407407407407,
@@ -6212,9 +6382,10 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 1
     },
     {
+     "fresh": "2026-10-13",
      "host": "kaisin.atah.io",
      "name": "/",
-     "priorAvg": 2.259259259259259,
+     "priorAvg": 2.2222222222222223,
      "ratio": 0.4,
      "rising": null,
      "section": "",
@@ -6224,9 +6395,10 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 1
     },
     {
+     "fresh": null,
      "host": "pc98.atah.io",
      "name": "/kitan-opening.html",
-     "priorAvg": 1.9259259259259258,
+     "priorAvg": 1.8888888888888888,
      "ratio": 0.5,
      "rising": null,
      "section": "",
@@ -6293,32 +6465,32 @@ window.DASHBOARD_DATA['ga4'] = {
    "baseline": {
     "perUser": {
      "hi": 5.475652173913044,
-     "lo": 2.2455882352941177,
+     "lo": 2.265032679738562,
      "max": 6.5,
-     "median": 3.0240384615384617,
+     "median": 3.2203947368421053,
      "min": 1.9375,
      "n": 28,
-     "rank": 19,
+     "rank": 20,
      "value": 2.642857142857143,
-     "vsMedian": -12.605042016806728,
+     "vsMedian": -17.933751641616812,
      "where": "usual"
     },
     "sessions": {
-     "hi": 38.8,
-     "lo": 19.7,
+     "hi": 38.5,
+     "lo": 18.7,
      "max": 51,
-     "median": 29.5,
+     "median": 29.0,
      "min": 16,
      "n": 28,
      "rank": 28,
      "value": 16,
-     "vsMedian": -45.76271186440678,
+     "vsMedian": -44.827586206896555,
      "where": "low"
     },
     "users": {
-     "hi": 23.6,
-     "lo": 12.7,
-     "max": 29,
+     "hi": 23.3,
+     "lo": 12.0,
+     "max": 27,
      "median": 16.5,
      "min": 6,
      "n": 28,
@@ -6328,15 +6500,15 @@ window.DASHBOARD_DATA['ga4'] = {
      "where": "usual"
     },
     "views": {
-     "hi": 86.8,
-     "lo": 33.8,
+     "hi": 86.1,
+     "lo": 35.2,
      "max": 161,
-     "median": 49.5,
+     "median": 51.0,
      "min": 30,
      "n": 28,
      "rank": 24,
      "value": 37,
-     "vsMedian": -25.252525252525253,
+     "vsMedian": -27.450980392156865,
      "where": "usual"
     }
    },
@@ -6450,9 +6622,10 @@ window.DASHBOARD_DATA['ga4'] = {
    ],
    "ydayPages": [
     {
+     "fresh": null,
      "host": "suiko.atah.io",
      "name": "/kr.html",
-     "priorAvg": 16.074074074074073,
+     "priorAvg": 16.0,
      "ratio": 1.1,
      "rising": null,
      "section": "",
@@ -6462,6 +6635,7 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 17
     },
     {
+     "fresh": null,
      "host": "pc98.atah.io",
      "name": "/",
      "priorAvg": 9.518518518518519,
@@ -6474,10 +6648,11 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 6
     },
     {
+     "fresh": null,
      "host": "suiko.atah.io",
      "name": "/patch.html",
-     "priorAvg": 2.6296296296296298,
-     "ratio": 1.9,
+     "priorAvg": 2.5555555555555554,
+     "ratio": 2.0,
      "rising": null,
      "section": "",
      "spike": false,
@@ -6486,6 +6661,7 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 5
     },
     {
+     "fresh": null,
      "host": "pc98.atah.io",
      "name": "/hukyou.html",
      "priorAvg": 4.666666666666667,
@@ -6498,9 +6674,10 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 3
     },
     {
+     "fresh": null,
      "host": "pc98.atah.io",
      "name": "/kitan.html",
-     "priorAvg": 10.185185185185185,
+     "priorAvg": 10.148148148148149,
      "ratio": 0.3,
      "rising": null,
      "section": "",
@@ -6510,6 +6687,7 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 3
     },
     {
+     "fresh": null,
      "host": "atah.io",
      "name": "/",
      "priorAvg": 3.1481481481481484,
@@ -6522,9 +6700,10 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 2
     },
     {
+     "fresh": null,
      "host": "pc98.atah.io",
      "name": "/torimono.html",
-     "priorAvg": 2.0,
+     "priorAvg": 1.962962962962963,
      "ratio": 0.5,
      "rising": null,
      "section": "",
@@ -6583,19 +6762,19 @@ window.DASHBOARD_DATA['ga4'] = {
    "baseline": {
     "perUser": {
      "hi": 5.475652173913044,
-     "lo": 2.2694444444444444,
+     "lo": 2.265032679738562,
      "max": 6.5,
-     "median": 3.1625,
+     "median": 3.104166666666667,
      "min": 1.9375,
      "n": 28,
-     "rank": 24,
+     "rank": 23,
      "value": 2.5,
-     "vsMedian": -20.948616600790515,
+     "vsMedian": -19.463087248322157,
      "where": "usual"
     },
     "sessions": {
-     "hi": 38.8,
-     "lo": 19.7,
+     "hi": 38.5,
+     "lo": 19.0,
      "max": 51,
      "median": 29.0,
      "min": 16,
@@ -6606,27 +6785,27 @@ window.DASHBOARD_DATA['ga4'] = {
      "where": "usual"
     },
     "users": {
-     "hi": 23.6,
-     "lo": 12.7,
-     "max": 29,
-     "median": 16.0,
+     "hi": 23.3,
+     "lo": 12.0,
+     "max": 27,
+     "median": 16.5,
      "min": 6,
      "n": 28,
-     "rank": 21,
+     "rank": 22,
      "value": 14,
-     "vsMedian": -12.5,
+     "vsMedian": -15.151515151515152,
      "where": "usual"
     },
     "views": {
-     "hi": 86.8,
+     "hi": 86.1,
      "lo": 33.8,
      "max": 161,
-     "median": 51.0,
+     "median": 49.5,
      "min": 30,
      "n": 28,
      "rank": 25,
      "value": 35,
-     "vsMedian": -31.372549019607842,
+     "vsMedian": -29.292929292929294,
      "where": "usual"
     }
    },
@@ -6740,9 +6919,10 @@ window.DASHBOARD_DATA['ga4'] = {
    ],
    "ydayPages": [
     {
+     "fresh": null,
      "host": "suiko.atah.io",
      "name": "/kr.html",
-     "priorAvg": 16.444444444444443,
+     "priorAvg": 16.40740740740741,
      "ratio": 0.7,
      "rising": null,
      "section": "",
@@ -6752,6 +6932,7 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 11
     },
     {
+     "fresh": null,
      "host": "pc98.atah.io",
      "name": "/",
      "priorAvg": 9.37037037037037,
@@ -6764,6 +6945,7 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 8
     },
     {
+     "fresh": null,
      "host": "pc98.atah.io",
      "name": "/kitan.html",
      "priorAvg": 9.925925925925926,
@@ -6776,10 +6958,11 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 5
     },
     {
+     "fresh": null,
      "host": "suiko.atah.io",
      "name": "/patch.html",
-     "priorAvg": 2.814814814814815,
-     "ratio": 1.4,
+     "priorAvg": 2.740740740740741,
+     "ratio": 1.5,
      "rising": null,
      "section": "",
      "spike": false,
@@ -6788,6 +6971,7 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 4
     },
     {
+     "fresh": null,
      "host": "pc98.atah.io",
      "name": "/hukyou.html",
      "priorAvg": 4.666666666666667,
@@ -6800,6 +6984,7 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 2
     },
     {
+     "fresh": null,
      "host": "atah.io",
      "name": "/",
      "priorAvg": 3.1481481481481484,
@@ -6812,6 +6997,7 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 1
     },
     {
+     "fresh": null,
      "host": "atah.io",
      "name": "/haiyuki_manual/index.html",
      "priorAvg": 1.1111111111111112,
@@ -6824,6 +7010,7 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 1
     },
     {
+     "fresh": null,
      "host": "atah.io",
      "name": "/haiyuki_web/",
      "priorAvg": 0.7407407407407407,
@@ -6836,6 +7023,7 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 1
     },
     {
+     "fresh": null,
      "host": "atah.io",
      "name": "/kitan_manual/",
      "priorAvg": 1.3333333333333333,
@@ -6848,6 +7036,7 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 1
     },
     {
+     "fresh": null,
      "host": "pc98.atah.io",
      "name": "/kitan-opening.html",
      "priorAvg": 1.7407407407407407,
@@ -6909,32 +7098,32 @@ window.DASHBOARD_DATA['ga4'] = {
    "baseline": {
     "perUser": {
      "hi": 5.475652173913044,
-     "lo": 2.433333333333333,
+     "lo": 2.3043859649122806,
      "max": 6.5,
-     "median": 3.1625,
+     "median": 3.2203947368421053,
      "min": 1.9375,
      "n": 28,
      "rank": 6,
      "value": 4.357142857142857,
-     "vsMedian": 37.775268210050804,
+     "vsMedian": 35.298409455712815,
      "where": "usual"
     },
     "sessions": {
-     "hi": 43.3,
-     "lo": 19.7,
-     "max": 59,
-     "median": 29.5,
+     "hi": 38.5,
+     "lo": 19.0,
+     "max": 51,
+     "median": 29.0,
      "min": 16,
      "n": 28,
-     "rank": 15,
+     "rank": 13,
      "value": 29,
-     "vsMedian": -1.694915254237288,
+     "vsMedian": 0.0,
      "where": "usual"
     },
     "users": {
-     "hi": 25.3,
-     "lo": 12.7,
-     "max": 37,
+     "hi": 23.3,
+     "lo": 12.0,
+     "max": 27,
      "median": 16.0,
      "min": 6,
      "n": 28,
@@ -6944,15 +7133,15 @@ window.DASHBOARD_DATA['ga4'] = {
      "where": "usual"
     },
     "views": {
-     "hi": 95.2,
+     "hi": 86.1,
      "lo": 33.8,
      "max": 161,
-     "median": 55.0,
+     "median": 51.0,
      "min": 30,
      "n": 28,
-     "rank": 12,
+     "rank": 11,
      "value": 61,
-     "vsMedian": 10.909090909090908,
+     "vsMedian": 19.607843137254903,
      "where": "usual"
     }
    },
@@ -7059,9 +7248,10 @@ window.DASHBOARD_DATA['ga4'] = {
    ],
    "ydayPages": [
     {
+     "fresh": null,
      "host": "suiko.atah.io",
      "name": "/kr.html",
-     "priorAvg": 16.444444444444443,
+     "priorAvg": 16.40740740740741,
      "ratio": 2.7,
      "rising": null,
      "section": "",
@@ -7071,10 +7261,11 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 45
     },
     {
+     "fresh": null,
      "host": "suiko.atah.io",
      "name": "/patch.html",
-     "priorAvg": 2.962962962962963,
-     "ratio": 2.7,
+     "priorAvg": 2.888888888888889,
+     "ratio": 2.8,
      "rising": null,
      "section": "",
      "spike": true,
@@ -7083,6 +7274,7 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 8
     },
     {
+     "fresh": null,
      "host": "atah.io",
      "name": "/",
      "priorAvg": 3.185185185185185,
@@ -7095,6 +7287,7 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 3
     },
     {
+     "fresh": null,
      "host": "pc98.atah.io",
      "name": "/",
      "priorAvg": 9.592592592592593,
@@ -7107,6 +7300,7 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 3
     },
     {
+     "fresh": null,
      "host": "pc98.atah.io",
      "name": "/kitan.html",
      "priorAvg": 9.518518518518519,
@@ -7160,38 +7354,38 @@ window.DASHBOARD_DATA['ga4'] = {
    "baseline": {
     "perUser": {
      "hi": 5.475652173913044,
-     "lo": 2.433333333333333,
+     "lo": 2.444736842105263,
      "max": 6.5,
-     "median": 3.1833333333333336,
+     "median": 3.2203947368421053,
      "min": 1.9375,
      "n": 28,
-     "rank": 18,
+     "rank": 19,
      "value": 2.8378378378378377,
-     "vsMedian": -10.853261638601964,
+     "vsMedian": -11.879192778069187,
      "where": "usual"
     },
     "sessions": {
-     "hi": 43.3,
-     "lo": 19.7,
+     "hi": 42.6,
+     "lo": 19.0,
      "max": 59,
-     "median": 29.5,
+     "median": 29.0,
      "min": 16,
      "n": 28,
      "rank": 1,
      "value": 59,
-     "vsMedian": 100.0,
+     "vsMedian": 103.44827586206897,
      "where": "high"
     },
     "users": {
-     "hi": 25.3,
+     "hi": 24.6,
      "lo": 12.0,
      "max": 37,
-     "median": 15.5,
+     "median": 16.0,
      "min": 6,
      "n": 28,
      "rank": 1,
      "value": 37,
-     "vsMedian": 138.70967741935485,
+     "vsMedian": 131.25,
      "where": "high"
     },
     "views": {
@@ -7300,11 +7494,7 @@ window.DASHBOARD_DATA['ga4'] = {
      "tone": "up"
     },
     {
-     "text": "최근 28일 동안 없던 유입원이 10.22에 생겼습니다 — tagassistant.google.com.",
-     "tone": "up"
-    },
-    {
-     "text": "10.22 방문자 **37명** — 최근 28일 중 가장 많습니다(다른 날 최고 29명).",
+     "text": "10.22 방문자가 최근 28일 중 **가장 많습니다**(다른 날 최고 27명).",
      "tone": "up"
     }
    ],
@@ -7337,9 +7527,10 @@ window.DASHBOARD_DATA['ga4'] = {
    ],
    "ydayPages": [
     {
+     "fresh": null,
      "host": "suiko.atah.io",
      "name": "/kr.html",
-     "priorAvg": 17.703703703703702,
+     "priorAvg": 17.666666666666668,
      "ratio": 2.8,
      "rising": null,
      "section": "",
@@ -7349,6 +7540,7 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 49
     },
     {
+     "fresh": null,
      "host": "atah.io",
      "name": "/",
      "priorAvg": 3.259259259259259,
@@ -7361,6 +7553,7 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 12
     },
     {
+     "fresh": null,
      "host": "atah.io",
      "name": "/haiyuki_manual/index.html",
      "priorAvg": 1.1481481481481481,
@@ -7373,6 +7566,7 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 11
     },
     {
+     "fresh": null,
      "host": "atah.io",
      "name": "/haiyuki_web/index.html",
      "priorAvg": 0.2222222222222222,
@@ -7385,6 +7579,7 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 11
     },
     {
+     "fresh": null,
      "host": "pc98.atah.io",
      "name": "/kitan.html",
      "priorAvg": 9.11111111111111,
@@ -7397,10 +7592,11 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 7
     },
     {
+     "fresh": null,
      "host": "suiko.atah.io",
      "name": "/patch.html",
-     "priorAvg": 3.259259259259259,
-     "ratio": 1.5,
+     "priorAvg": 3.185185185185185,
+     "ratio": 1.6,
      "rising": null,
      "section": "",
      "spike": false,
@@ -7409,6 +7605,7 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 5
     },
     {
+     "fresh": null,
      "host": "pc98.atah.io",
      "name": "/",
      "priorAvg": 9.555555555555555,
@@ -7421,6 +7618,7 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 4
     },
     {
+     "fresh": null,
      "host": "pc98.atah.io",
      "name": "/kaitou.html",
      "priorAvg": 2.259259259259259,
@@ -7433,6 +7631,7 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 4
     },
     {
+     "fresh": null,
      "host": "pc98.atah.io",
      "name": "/hukyou.html",
      "priorAvg": 4.407407407407407,
@@ -7494,43 +7693,43 @@ window.DASHBOARD_DATA['ga4'] = {
    "baseline": {
     "perUser": {
      "hi": 5.475652173913044,
-     "lo": 2.478571428571428,
+     "lo": 2.444736842105263,
      "max": 6.5,
-     "median": 3.1833333333333336,
-     "min": 2.25,
+     "median": 3.2412280701754383,
+     "min": 1.9375,
      "n": 28,
      "rank": 15,
      "value": 3.1666666666666665,
-     "vsMedian": -0.5235602094240959,
+     "vsMedian": -2.300405953991878,
      "where": "usual"
     },
     "sessions": {
-     "hi": 43.3,
-     "lo": 19.7,
+     "hi": 42.6,
+     "lo": 19.0,
      "max": 59,
-     "median": 29.5,
+     "median": 29.0,
      "min": 16,
      "n": 28,
      "rank": 10,
      "value": 31,
-     "vsMedian": 5.084745762711865,
+     "vsMedian": 6.896551724137931,
      "where": "usual"
     },
     "users": {
-     "hi": 25.3,
+     "hi": 24.6,
      "lo": 12.0,
      "max": 37,
-     "median": 15.0,
+     "median": 15.5,
      "min": 6,
      "n": 28,
-     "rank": 25,
+     "rank": 24,
      "value": 12,
-     "vsMedian": -20.0,
+     "vsMedian": -22.58064516129032,
      "where": "usual"
     },
     "views": {
      "hi": 95.2,
-     "lo": 34.7,
+     "lo": 33.8,
      "max": 161,
      "median": 55.0,
      "min": 30,
@@ -7670,9 +7869,10 @@ window.DASHBOARD_DATA['ga4'] = {
    ],
    "ydayPages": [
     {
+     "fresh": null,
      "host": "suiko.atah.io",
      "name": "/kr.html",
-     "priorAvg": 18.333333333333332,
+     "priorAvg": 18.296296296296298,
      "ratio": 1.0,
      "rising": null,
      "section": "",
@@ -7682,6 +7882,7 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 19
     },
     {
+     "fresh": null,
      "host": "atah.io",
      "name": "/",
      "priorAvg": 3.7037037037037037,
@@ -7694,6 +7895,7 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 4
     },
     {
+     "fresh": null,
      "host": "atah.io",
      "name": "/balance/index.html",
      "priorAvg": 0.25925925925925924,
@@ -7706,6 +7908,7 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 2
     },
     {
+     "fresh": null,
      "host": "atah.io",
      "name": "/index.html",
      "priorAvg": 0.18518518518518517,
@@ -7718,9 +7921,10 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 2
     },
     {
+     "fresh": null,
      "host": "kaisin.atah.io",
      "name": "/",
-     "priorAvg": 2.2962962962962963,
+     "priorAvg": 2.259259259259259,
      "ratio": 0.9,
      "rising": null,
      "section": "",
@@ -7730,6 +7934,7 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 2
     },
     {
+     "fresh": null,
      "host": "pc98.atah.io",
      "name": "/hukyou.html",
      "priorAvg": 4.407407407407407,
@@ -7742,6 +7947,7 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 2
     },
     {
+     "fresh": null,
      "host": "atah.io",
      "name": "/swim/index.html",
      "priorAvg": 0.18518518518518517,
@@ -7754,6 +7960,7 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 1
     },
     {
+     "fresh": null,
      "host": "pc98.atah.io",
      "name": "/",
      "priorAvg": 9.703703703703704,
@@ -7766,6 +7973,7 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 1
     },
     {
+     "fresh": null,
      "host": "pc98.atah.io",
      "name": "/kaitou.html",
      "priorAvg": 2.4074074074074074,
@@ -7778,6 +7986,7 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 1
     },
     {
+     "fresh": null,
      "host": "pc98.atah.io",
      "name": "/kitan-opening.html",
      "priorAvg": 1.5925925925925926,
@@ -7790,6 +7999,7 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 1
     },
     {
+     "fresh": null,
      "host": "pc98.atah.io",
      "name": "/kitan.html",
      "priorAvg": 8.925925925925926,
@@ -7802,9 +8012,10 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 1
     },
     {
+     "fresh": null,
      "host": "pc98.atah.io",
      "name": "/torimono.html",
-     "priorAvg": 1.962962962962963,
+     "priorAvg": 1.9259259259259258,
      "ratio": 0.5,
      "rising": null,
      "section": "",
@@ -7814,9 +8025,10 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 1
     },
     {
+     "fresh": null,
      "host": "suiko.atah.io",
      "name": "/patch.html",
-     "priorAvg": 3.4444444444444446,
+     "priorAvg": 3.3703703703703702,
      "ratio": 0.3,
      "rising": null,
      "section": "",
@@ -7877,48 +8089,48 @@ window.DASHBOARD_DATA['ga4'] = {
      "hi": 5.475652173913044,
      "lo": 2.478571428571428,
      "max": 6.5,
-     "median": 3.0448717948717947,
-     "min": 2.25,
+     "median": 3.2412280701754383,
+     "min": 2.2777777777777777,
      "n": 28,
      "rank": 26,
      "value": 2.4285714285714284,
-     "vsMedian": -20.2406015037594,
+     "vsMedian": -25.07249178426445,
      "where": "low"
     },
     "sessions": {
-     "hi": 43.3,
-     "lo": 19.7,
+     "hi": 42.6,
+     "lo": 19.0,
      "max": 59,
-     "median": 30.0,
+     "median": 29.0,
      "min": 16,
      "n": 28,
-     "rank": 18,
+     "rank": 17,
      "value": 26,
-     "vsMedian": -13.333333333333334,
+     "vsMedian": -10.344827586206897,
      "where": "usual"
     },
     "users": {
-     "hi": 25.3,
-     "lo": 12.7,
+     "hi": 24.6,
+     "lo": 12.0,
      "max": 37,
-     "median": 16.5,
-     "min": 11,
+     "median": 15.0,
+     "min": 6,
      "n": 28,
-     "rank": 20,
+     "rank": 19,
      "value": 14,
-     "vsMedian": -15.151515151515152,
+     "vsMedian": -6.666666666666667,
      "where": "usual"
     },
     "views": {
      "hi": 95.2,
-     "lo": 36.4,
+     "lo": 34.7,
      "max": 161,
-     "median": 58.5,
-     "min": 31,
+     "median": 55.0,
+     "min": 30,
      "n": 28,
-     "rank": 27,
+     "rank": 26,
      "value": 34,
-     "vsMedian": -41.88034188034188,
+     "vsMedian": -38.18181818181819,
      "where": "low"
     }
    },
@@ -8050,9 +8262,10 @@ window.DASHBOARD_DATA['ga4'] = {
    ],
    "ydayPages": [
     {
+     "fresh": null,
      "host": "suiko.atah.io",
      "name": "/kr.html",
-     "priorAvg": 18.77777777777778,
+     "priorAvg": 18.74074074074074,
      "ratio": 0.7,
      "rising": null,
      "section": "",
@@ -8062,10 +8275,11 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 13
     },
     {
+     "fresh": null,
      "host": "suiko.atah.io",
      "name": "/patch.html",
-     "priorAvg": 3.4814814814814814,
-     "ratio": 1.4,
+     "priorAvg": 3.4074074074074074,
+     "ratio": 1.5,
      "rising": null,
      "section": "",
      "spike": false,
@@ -8074,6 +8288,7 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 5
     },
     {
+     "fresh": null,
      "host": "atah.io",
      "name": "/",
      "priorAvg": 3.8518518518518516,
@@ -8086,6 +8301,7 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 4
     },
     {
+     "fresh": null,
      "host": "pc98.atah.io",
      "name": "/",
      "priorAvg": 9.74074074074074,
@@ -8098,6 +8314,7 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 3
     },
     {
+     "fresh": null,
      "host": "pc98.atah.io",
      "name": "/kitan.html",
      "priorAvg": 8.777777777777779,
@@ -8110,6 +8327,7 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 3
     },
     {
+     "fresh": null,
      "host": "atah.io",
      "name": "/haiyuki_manual/index.html",
      "priorAvg": 1.5555555555555556,
@@ -8122,6 +8340,7 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 2
     },
     {
+     "fresh": null,
      "host": "atah.io",
      "name": "/haiyuki_web/index.html",
      "priorAvg": 0.6296296296296297,
@@ -8134,9 +8353,10 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 2
     },
     {
+     "fresh": null,
      "host": "kaisin.atah.io",
      "name": "/",
-     "priorAvg": 2.3703703703703702,
+     "priorAvg": 2.3333333333333335,
      "ratio": 0.4,
      "rising": null,
      "section": "",
@@ -8146,6 +8366,7 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 1
     },
     {
+     "fresh": null,
      "host": "pc98.atah.io",
      "name": "/hukyou.html",
      "priorAvg": 4.222222222222222,
@@ -8213,48 +8434,48 @@ window.DASHBOARD_DATA['ga4'] = {
      "hi": 5.475652173913044,
      "lo": 2.478571428571428,
      "max": 6.5,
-     "median": 3.0448717948717947,
-     "min": 2.25,
+     "median": 3.125,
+     "min": 2.2777777777777777,
      "n": 28,
-     "rank": 20,
-     "value": 2.6818181818181817,
-     "vsMedian": -11.923444976076555,
+     "rank": 16,
+     "value": 3.0555555555555554,
+     "vsMedian": -2.2222222222222285,
      "where": "usual"
     },
     "sessions": {
-     "hi": 43.3,
-     "lo": 19.7,
+     "hi": 42.6,
+     "lo": 19.0,
      "max": 59,
-     "median": 30.0,
+     "median": 29.0,
      "min": 16,
      "n": 28,
-     "rank": 9,
-     "value": 32,
-     "vsMedian": 6.666666666666667,
+     "rank": 17,
+     "value": 28,
+     "vsMedian": -3.4482758620689653,
      "where": "usual"
     },
     "users": {
-     "hi": 25.3,
-     "lo": 12.7,
+     "hi": 24.6,
+     "lo": 12.0,
      "max": 37,
      "median": 16.5,
      "min": 11,
      "n": 28,
-     "rank": 6,
-     "value": 22,
-     "vsMedian": 33.33333333333333,
+     "rank": 12,
+     "value": 18,
+     "vsMedian": 9.090909090909092,
      "where": "usual"
     },
     "views": {
      "hi": 95.2,
      "lo": 36.4,
      "max": 161,
-     "median": 58.5,
+     "median": 56.5,
      "min": 31,
      "n": 28,
-     "rank": 13,
-     "value": 59,
-     "vsMedian": 0.8547008547008548,
+     "rank": 15,
+     "value": 55,
+     "vsMedian": -2.6548672566371683,
      "where": "usual"
     }
    },
@@ -8356,7 +8577,7 @@ window.DASHBOARD_DATA['ga4'] = {
    ],
    "insights": [
     {
-     "text": "환세풍광전이 10.25 10회 — 평소 하루 4.3회 보던 페이지라 **2.3배**로 뛰었습니다.",
+     "text": "환세풍광전이 10.25 9회 — 평소 하루 4.3회 보던 페이지라 **2.1배**로 뛰었습니다.",
      "tone": "up"
     }
    ],
@@ -8380,7 +8601,7 @@ window.DASHBOARD_DATA['ga4'] = {
     0,
     1,
     2,
-    5,
+    1,
     1,
     1,
     4,
@@ -8389,6 +8610,7 @@ window.DASHBOARD_DATA['ga4'] = {
    ],
    "ydayPages": [
     {
+     "fresh": null,
      "host": "pc98.atah.io",
      "name": "/",
      "priorAvg": 9.777777777777779,
@@ -8401,21 +8623,10 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 13
     },
     {
-     "host": "pc98.atah.io",
-     "name": "/hukyou.html",
-     "priorAvg": 4.2592592592592595,
-     "ratio": 2.3,
-     "rising": null,
-     "section": "",
-     "spike": true,
-     "title": "환세풍광전",
-     "users": 4,
-     "views": 10
-    },
-    {
+     "fresh": null,
      "host": "suiko.atah.io",
      "name": "/kr.html",
-     "priorAvg": 19.14814814814815,
+     "priorAvg": 19.11111111111111,
      "ratio": 0.5,
      "rising": null,
      "section": "",
@@ -8425,6 +8636,20 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 10
     },
     {
+     "fresh": null,
+     "host": "pc98.atah.io",
+     "name": "/hukyou.html",
+     "priorAvg": 4.2592592592592595,
+     "ratio": 2.1,
+     "rising": null,
+     "section": "",
+     "spike": true,
+     "title": "환세풍광전",
+     "users": 3,
+     "views": 9
+    },
+    {
+     "fresh": null,
      "host": "atah.io",
      "name": "/",
      "priorAvg": 3.925925925925926,
@@ -8437,6 +8662,7 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 6
     },
     {
+     "fresh": null,
      "host": "pc98.atah.io",
      "name": "/kitan.html",
      "priorAvg": 8.74074074074074,
@@ -8449,21 +8675,10 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 4
     },
     {
-     "host": "pc98.atah.io",
-     "name": "/torimono.html",
-     "priorAvg": 1.6666666666666667,
-     "ratio": 2.4,
-     "rising": null,
-     "section": "",
-     "spike": false,
-     "title": "환세포물장",
-     "users": 2,
-     "views": 4
-    },
-    {
+     "fresh": null,
      "host": "suiko.atah.io",
      "name": "/patch.html",
-     "priorAvg": 3.6666666666666665,
+     "priorAvg": 3.5925925925925926,
      "ratio": 1.1,
      "rising": null,
      "section": "",
@@ -8473,6 +8688,20 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 4
     },
     {
+     "fresh": null,
+     "host": "pc98.atah.io",
+     "name": "/torimono.html",
+     "priorAvg": 1.6296296296296295,
+     "ratio": 1.8,
+     "rising": null,
+     "section": "",
+     "spike": false,
+     "title": "환세포물장",
+     "users": 1,
+     "views": 3
+    },
+    {
+     "fresh": null,
      "host": "atah.io",
      "name": "/kitan_manual/",
      "priorAvg": 1.1851851851851851,
@@ -8485,6 +8714,7 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 2
     },
     {
+     "fresh": null,
      "host": "atah.io",
      "name": "/haiyuki_manual/index.html",
      "priorAvg": 1.6296296296296295,
@@ -8497,6 +8727,7 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 1
     },
     {
+     "fresh": null,
      "host": "atah.io",
      "name": "/haiyuki_web/",
      "priorAvg": 0.7777777777777778,
@@ -8509,6 +8740,7 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 1
     },
     {
+     "fresh": null,
      "host": "atah.io",
      "name": "/viewer/scene.html",
      "priorAvg": 0.5555555555555556,
@@ -8521,9 +8753,10 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 1
     },
     {
+     "fresh": null,
      "host": "kaisin.atah.io",
      "name": "/",
-     "priorAvg": 2.4074074074074074,
+     "priorAvg": 2.3703703703703702,
      "ratio": 0.4,
      "rising": null,
      "section": "",
@@ -8531,36 +8764,12 @@ window.DASHBOARD_DATA['ga4'] = {
      "title": "환세쾌진극",
      "users": 1,
      "views": 1
-    },
-    {
-     "host": "pc98.atah.io",
-     "name": "/kaitou.html",
-     "priorAvg": 1.8518518518518519,
-     "ratio": 0.5,
-     "rising": null,
-     "section": "",
-     "spike": false,
-     "title": "환세쾌도전",
-     "users": 1,
-     "views": 1
-    },
-    {
-     "host": "pc98.atah.io",
-     "name": "/kitan-opening.html",
-     "priorAvg": 1.5925925925925926,
-     "ratio": 0.6,
-     "rising": null,
-     "section": "",
-     "spike": false,
-     "title": "환세희담 오프닝",
-     "users": 1,
-     "views": 1
     }
    ],
    "ydaySites": [
     {
      "name": "pc98.atah.io",
-     "views": 33
+     "views": 29
     },
     {
      "name": "suiko.atah.io",
@@ -8585,10 +8794,6 @@ window.DASHBOARD_DATA['ga4'] = {
      "sessions": 6
     },
     {
-     "name": "daum",
-     "sessions": 4
-    },
-    {
      "name": "oysterbay.tistory.com",
      "sessions": 4
     },
@@ -8608,10 +8813,10 @@ window.DASHBOARD_DATA['ga4'] = {
    "ydayUnresolved": 0,
    "yesterday": {
     "date": "2026-10-25",
-    "newUsers": 19,
-    "sessions": 32,
-    "users": 22,
-    "views": 59
+    "newUsers": 15,
+    "sessions": 28,
+    "users": 18,
+    "views": 55
    }
   },
   "2026-10-26": {
@@ -8620,28 +8825,28 @@ window.DASHBOARD_DATA['ga4'] = {
      "hi": 4.67,
      "lo": 2.478571428571428,
      "max": 6.1923076923076925,
-     "median": 3.0448717948717947,
-     "min": 2.25,
+     "median": 3.125,
+     "min": 2.2777777777777777,
      "n": 28,
      "rank": 8,
      "value": 3.8,
-     "vsMedian": 24.8,
+     "vsMedian": 21.599999999999994,
      "where": "usual"
     },
     "sessions": {
-     "hi": 43.3,
-     "lo": 19.7,
+     "hi": 42.6,
+     "lo": 19.0,
      "max": 59,
-     "median": 29.5,
+     "median": 29.0,
      "min": 16,
      "n": 28,
      "rank": 19,
      "value": 25,
-     "vsMedian": -15.254237288135593,
+     "vsMedian": -13.793103448275861,
      "where": "usual"
     },
     "users": {
-     "hi": 25.3,
+     "hi": 24.6,
      "lo": 12.0,
      "max": 37,
      "median": 16.5,
@@ -8653,15 +8858,15 @@ window.DASHBOARD_DATA['ga4'] = {
      "where": "low"
     },
     "views": {
-     "hi": 91.0,
+     "hi": 90.3,
      "lo": 36.4,
      "max": 161,
-     "median": 55.0,
+     "median": 53.5,
      "min": 31,
      "n": 28,
      "rank": 21,
      "value": 38,
-     "vsMedian": -30.909090909090907,
+     "vsMedian": -28.971962616822427,
      "where": "usual"
     }
    },
@@ -8816,6 +9021,7 @@ window.DASHBOARD_DATA['ga4'] = {
    ],
    "ydayPages": [
     {
+     "fresh": null,
      "host": "pc98.atah.io",
      "name": "/",
      "priorAvg": 9.222222222222221,
@@ -8828,9 +9034,10 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 8
     },
     {
+     "fresh": null,
      "host": "suiko.atah.io",
      "name": "/kr.html",
-     "priorAvg": 18.74074074074074,
+     "priorAvg": 18.703703703703702,
      "ratio": 0.4,
      "rising": null,
      "section": "",
@@ -8840,9 +9047,10 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 8
     },
     {
+     "fresh": null,
      "host": "pc98.atah.io",
      "name": "/hukyou.html",
-     "priorAvg": 4.222222222222222,
+     "priorAvg": 4.185185185185185,
      "ratio": 1.7,
      "rising": null,
      "section": "",
@@ -8852,6 +9060,7 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 7
     },
     {
+     "fresh": null,
      "host": "atah.io",
      "name": "/",
      "priorAvg": 3.7777777777777777,
@@ -8864,6 +9073,7 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 4
     },
     {
+     "fresh": null,
      "host": "atah.io",
      "name": "/haiyuki_manual/index.html",
      "priorAvg": 1.6666666666666667,
@@ -8876,6 +9086,7 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 2
     },
     {
+     "fresh": null,
      "host": "atah.io",
      "name": "/haiyuki_web/index.html",
      "priorAvg": 0.7037037037037037,
@@ -8892,6 +9103,7 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 2
     },
     {
+     "fresh": null,
      "host": "atah.io",
      "name": "/kitan_manual/",
      "priorAvg": 1.1481481481481481,
@@ -8904,6 +9116,7 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 2
     },
     {
+     "fresh": null,
      "host": "pc98.atah.io",
      "name": "/kitan.html",
      "priorAvg": 8.555555555555555,
@@ -8916,9 +9129,10 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 2
     },
     {
+     "fresh": null,
      "host": "suiko.atah.io",
      "name": "/patch.html",
-     "priorAvg": 3.814814814814815,
+     "priorAvg": 3.740740740740741,
      "ratio": 0.5,
      "rising": null,
      "section": "",
@@ -8928,9 +9142,10 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 2
     },
     {
+     "fresh": null,
      "host": "atah.io",
      "name": "/viewer/ani.html",
-     "priorAvg": 0.4074074074074074,
+     "priorAvg": 0.37037037037037035,
      "ratio": 1.0,
      "rising": null,
      "section": "장면 뷰어",
@@ -8991,28 +9206,28 @@ window.DASHBOARD_DATA['ga4'] = {
      "hi": 4.67,
      "lo": 2.478571428571428,
      "max": 6.1923076923076925,
-     "median": 3.1833333333333336,
-     "min": 2.25,
+     "median": 3.2412280701754383,
+     "min": 2.2777777777777777,
      "n": 28,
      "rank": 6,
      "value": 4.066666666666666,
-     "vsMedian": 27.748691099476424,
+     "vsMedian": 25.46684709066306,
      "where": "usual"
     },
     "sessions": {
-     "hi": 43.3,
+     "hi": 42.6,
      "lo": 20.4,
      "max": 59,
-     "median": 29.5,
+     "median": 29.0,
      "min": 16,
      "n": 28,
      "rank": 20,
      "value": 24,
-     "vsMedian": -18.64406779661017,
+     "vsMedian": -17.24137931034483,
      "where": "usual"
     },
     "users": {
-     "hi": 25.3,
+     "hi": 24.6,
      "lo": 12.0,
      "max": 37,
      "median": 16.5,
@@ -9024,15 +9239,15 @@ window.DASHBOARD_DATA['ga4'] = {
      "where": "usual"
     },
     "views": {
-     "hi": 91.0,
+     "hi": 90.3,
      "lo": 36.4,
      "max": 161,
-     "median": 58.5,
+     "median": 56.5,
      "min": 31,
      "n": 28,
      "rank": 11,
      "value": 61,
-     "vsMedian": 4.273504273504273,
+     "vsMedian": 7.964601769911504,
      "where": "usual"
     }
    },
@@ -9174,6 +9389,7 @@ window.DASHBOARD_DATA['ga4'] = {
    ],
    "ydayPages": [
     {
+     "fresh": null,
      "host": "atah.io",
      "name": "/",
      "priorAvg": 3.8518518518518516,
@@ -9190,6 +9406,7 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 17
     },
     {
+     "fresh": null,
      "host": "suiko.atah.io",
      "name": "/kr.html",
      "priorAvg": 18.59259259259259,
@@ -9202,6 +9419,7 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 7
     },
     {
+     "fresh": null,
      "host": "atah.io",
      "name": "/haiyuki_manual/index.html",
      "priorAvg": 1.6666666666666667,
@@ -9218,10 +9436,11 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 5
     },
     {
+     "fresh": null,
      "host": "pc98.atah.io",
      "name": "/kaitou.html",
-     "priorAvg": 1.7777777777777777,
-     "ratio": 2.8,
+     "priorAvg": 1.7407407407407407,
+     "ratio": 2.9,
      "rising": null,
      "section": "",
      "spike": true,
@@ -9230,6 +9449,7 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 5
     },
     {
+     "fresh": null,
      "host": "atah.io",
      "name": "/haiyuki_web/index.html",
      "priorAvg": 0.7407407407407407,
@@ -9242,6 +9462,7 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 4
     },
     {
+     "fresh": null,
      "host": "pc98.atah.io",
      "name": "/",
      "priorAvg": 9.333333333333334,
@@ -9254,6 +9475,7 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 4
     },
     {
+     "fresh": null,
      "host": "pc98.atah.io",
      "name": "/kitan.html",
      "priorAvg": 8.37037037037037,
@@ -9266,6 +9488,7 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 3
     },
     {
+     "fresh": null,
      "host": "atah.io",
      "name": "/kitan_manual/",
      "priorAvg": 1.1851851851851851,
@@ -9278,6 +9501,7 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 2
     },
     {
+     "fresh": null,
      "host": "atah.io",
      "name": "/viewer/scene.html",
      "priorAvg": 0.5555555555555556,
@@ -9290,9 +9514,10 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 2
     },
     {
+     "fresh": null,
      "host": "pc98.atah.io",
      "name": "/hukyou.html",
-     "priorAvg": 4.333333333333333,
+     "priorAvg": 4.296296296296297,
      "ratio": 0.5,
      "rising": null,
      "section": "",
@@ -9302,6 +9527,7 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 2
     },
     {
+     "fresh": null,
      "host": "atah.io",
      "name": "/balance/index.html",
      "priorAvg": 0.2962962962962963,
@@ -9314,6 +9540,7 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 1
     },
     {
+     "fresh": null,
      "host": "atah.io",
      "name": "/haiyuki_web/",
      "priorAvg": 0.7777777777777778,
@@ -9326,6 +9553,7 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 1
     },
     {
+     "fresh": null,
      "host": "atah.io",
      "name": "/index.html",
      "priorAvg": 0.25925925925925924,
@@ -9338,6 +9566,7 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 1
     },
     {
+     "fresh": null,
      "host": "atah.io",
      "name": "/sweep/index.html",
      "priorAvg": 0.14814814814814814,
@@ -9350,6 +9579,7 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 1
     },
     {
+     "fresh": null,
      "host": "atah.io",
      "name": "/swim/index.html",
      "priorAvg": 0.2222222222222222,
@@ -9415,51 +9645,51 @@ window.DASHBOARD_DATA['ga4'] = {
    "baseline": {
     "perUser": {
      "hi": 4.67,
-     "lo": 2.3833333333333333,
+     "lo": 2.394736842105263,
      "max": 6.1923076923076925,
-     "median": 3.033333333333333,
-     "min": 2.0,
+     "median": 3.1111111111111107,
+     "min": 2.2666666666666666,
      "n": 28,
      "rank": 28,
-     "value": 2.0,
-     "vsMedian": -34.06593406593406,
+     "value": 2.2666666666666666,
+     "vsMedian": -27.142857142857135,
      "where": "low"
     },
     "sessions": {
-     "hi": 43.3,
+     "hi": 42.6,
      "lo": 20.4,
      "max": 59,
-     "median": 29.5,
+     "median": 29.0,
      "min": 16,
      "n": 28,
-     "rank": 17,
-     "value": 26,
-     "vsMedian": -11.864406779661017,
+     "rank": 22,
+     "value": 22,
+     "vsMedian": -24.137931034482758,
      "where": "usual"
     },
     "users": {
-     "hi": 25.3,
+     "hi": 24.6,
      "lo": 13.4,
      "max": 37,
-     "median": 18.0,
+     "median": 16.5,
      "min": 10,
      "n": 28,
-     "rank": 11,
-     "value": 19,
-     "vsMedian": 5.555555555555555,
+     "rank": 15,
+     "value": 15,
+     "vsMedian": -9.090909090909092,
      "where": "usual"
     },
     "views": {
-     "hi": 91.0,
-     "lo": 36.4,
+     "hi": 90.3,
+     "lo": 34.7,
      "max": 161,
-     "median": 58.5,
+     "median": 56.5,
      "min": 31,
      "n": 28,
-     "rank": 21,
-     "value": 38,
-     "vsMedian": -35.04273504273504,
-     "where": "usual"
+     "rank": 26,
+     "value": 34,
+     "vsMedian": -39.823008849557525,
+     "where": "low"
     }
    },
    "confirmed": true,
@@ -9563,13 +9793,13 @@ window.DASHBOARD_DATA['ga4'] = {
    ],
    "insights": [
     {
-     "text": "10.28 한 사람당 본 장수가 최근 28일 중 **가장 적습니다**(다른 날 최저 2.2장).",
+     "text": "10.28 한 사람당 본 장수가 최근 28일 중 **가장 적습니다**(다른 날 최저 2.3장).",
      "tone": "flat"
     }
    ],
    "longest": null,
    "ydayHours": [
-    8,
+    4,
     1,
     0,
     0,
@@ -9596,6 +9826,7 @@ window.DASHBOARD_DATA['ga4'] = {
    ],
    "ydayPages": [
     {
+     "fresh": null,
      "host": "suiko.atah.io",
      "name": "/kr.html",
      "priorAvg": 18.444444444444443,
@@ -9608,6 +9839,7 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 8
     },
     {
+     "fresh": null,
      "host": "atah.io",
      "name": "/",
      "priorAvg": 4.333333333333333,
@@ -9620,6 +9852,7 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 7
     },
     {
+     "fresh": null,
      "host": "atah.io",
      "name": "/haiyuki_manual/index.html",
      "priorAvg": 1.8518518518518519,
@@ -9632,6 +9865,7 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 3
     },
     {
+     "fresh": null,
      "host": "pc98.atah.io",
      "name": "/kitan.html",
      "priorAvg": 8.185185185185185,
@@ -9644,6 +9878,7 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 3
     },
     {
+     "fresh": null,
      "host": "atah.io",
      "name": "/haiyuki_web/index.html",
      "priorAvg": 0.8888888888888888,
@@ -9656,6 +9891,7 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 2
     },
     {
+     "fresh": null,
      "host": "pc98.atah.io",
      "name": "/",
      "priorAvg": 9.11111111111111,
@@ -9668,33 +9904,10 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 2
     },
     {
-     "host": "pc98.atah.io",
-     "name": "/hukyou.html",
-     "priorAvg": 4.296296296296297,
-     "ratio": 0.5,
-     "rising": null,
-     "section": "",
-     "spike": false,
-     "title": "환세풍광전",
-     "users": 2,
-     "views": 2
-    },
-    {
-     "host": "pc98.atah.io",
-     "name": "/kaitou.html",
-     "priorAvg": 1.9259259259259258,
-     "ratio": 1.0,
-     "rising": null,
-     "section": "",
-     "spike": false,
-     "title": "환세쾌도전",
-     "users": 2,
-     "views": 2
-    },
-    {
+     "fresh": null,
      "host": "suiko.atah.io",
      "name": "/patch.html",
-     "priorAvg": 3.925925925925926,
+     "priorAvg": 3.8518518518518516,
      "ratio": 0.5,
      "rising": null,
      "section": "",
@@ -9704,6 +9917,7 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 2
     },
     {
+     "fresh": null,
      "host": "atah.io",
      "name": "/balance/index.html",
      "priorAvg": 0.3333333333333333,
@@ -9716,6 +9930,7 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 1
     },
     {
+     "fresh": null,
      "host": "atah.io",
      "name": "/haiyuki_web/",
      "priorAvg": 0.8148148148148148,
@@ -9728,6 +9943,7 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 1
     },
     {
+     "fresh": null,
      "host": "atah.io",
      "name": "/index.html",
      "priorAvg": 0.2962962962962963,
@@ -9740,6 +9956,7 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 1
     },
     {
+     "fresh": null,
      "host": "atah.io",
      "name": "/sweep/index.html",
      "priorAvg": 0.18518518518518517,
@@ -9752,9 +9969,10 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 1
     },
     {
+     "fresh": null,
      "host": "atah.io",
      "name": "/viewer/ani.html",
-     "priorAvg": 0.4444444444444444,
+     "priorAvg": 0.4074074074074074,
      "ratio": 1.0,
      "rising": null,
      "section": "장면 뷰어",
@@ -9764,14 +9982,28 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 1
     },
     {
+     "fresh": null,
      "host": "pc98.atah.io",
-     "name": "/kitan-opening.html",
-     "priorAvg": 1.5925925925925926,
-     "ratio": 0.6,
+     "name": "/hukyou.html",
+     "priorAvg": 4.2592592592592595,
+     "ratio": 0.2,
      "rising": null,
      "section": "",
      "spike": false,
-     "title": "환세희담 오프닝",
+     "title": "환세풍광전",
+     "users": 1,
+     "views": 1
+    },
+    {
+     "fresh": null,
+     "host": "pc98.atah.io",
+     "name": "/kaitou.html",
+     "priorAvg": 1.8888888888888888,
+     "ratio": 0.5,
+     "rising": null,
+     "section": "",
+     "spike": false,
+     "title": "환세쾌도전",
      "users": 1,
      "views": 1
     }
@@ -9782,12 +10014,12 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 17
     },
     {
-     "name": "pc98.atah.io",
-     "views": 11
-    },
-    {
      "name": "suiko.atah.io",
      "views": 10
+    },
+    {
+     "name": "pc98.atah.io",
+     "views": 7
     }
    ],
    "ydaySources": [
@@ -9798,10 +10030,6 @@ window.DASHBOARD_DATA['ga4'] = {
     {
      "name": "직접 방문",
      "sessions": 7
-    },
-    {
-     "name": "daum",
-     "sessions": 4
     },
     {
      "name": "cafe.naver.com",
@@ -9827,60 +10055,60 @@ window.DASHBOARD_DATA['ga4'] = {
    "ydayUnresolved": 0,
    "yesterday": {
     "date": "2026-10-28",
-    "newUsers": 10,
-    "sessions": 26,
-    "users": 19,
-    "views": 38
+    "newUsers": 6,
+    "sessions": 22,
+    "users": 15,
+    "views": 34
    }
   },
   "2026-10-29": {
    "baseline": {
     "perUser": {
      "hi": 4.67,
-     "lo": 2.2694444444444444,
+     "lo": 2.3043859649122806,
      "max": 6.1923076923076925,
-     "median": 2.8689189189189186,
-     "min": 2.0,
+     "median": 2.9907407407407405,
+     "min": 2.2666666666666666,
      "n": 28,
      "rank": 27,
-     "value": 2.1875,
-     "vsMedian": -23.751766368346672,
+     "value": 2.2666666666666666,
+     "vsMedian": -24.21052631578947,
      "where": "low"
     },
     "sessions": {
-     "hi": 43.3,
+     "hi": 42.6,
      "lo": 20.4,
      "max": 59,
-     "median": 29.5,
+     "median": 29.0,
      "min": 16,
      "n": 28,
      "rank": 17,
-     "value": 27,
-     "vsMedian": -8.47457627118644,
+     "value": 26,
+     "vsMedian": -10.344827586206897,
      "where": "usual"
     },
     "users": {
-     "hi": 25.3,
+     "hi": 24.6,
      "lo": 13.4,
      "max": 37,
-     "median": 18.0,
+     "median": 16.5,
      "min": 10,
      "n": 28,
-     "rank": 16,
-     "value": 16,
-     "vsMedian": -11.11111111111111,
+     "rank": 15,
+     "value": 15,
+     "vsMedian": -9.090909090909092,
      "where": "usual"
     },
     "views": {
-     "hi": 91.0,
-     "lo": 35.0,
+     "hi": 90.3,
+     "lo": 34.0,
      "max": 161,
-     "median": 55.0,
+     "median": 53.5,
      "min": 31,
      "n": 28,
      "rank": 25,
-     "value": 35,
-     "vsMedian": -36.36363636363637,
+     "value": 34,
+     "vsMedian": -36.44859813084112,
      "where": "usual"
     }
    },
@@ -9900,9 +10128,9 @@ window.DASHBOARD_DATA['ga4'] = {
        "minutes": 120,
        "users": 2
       },
-      "restore": 12,
-      "save": 20,
-      "start": 34
+      "restore": 10,
+      "save": 19,
+      "start": 32
      }
     },
     {
@@ -9989,14 +10217,21 @@ window.DASHBOARD_DATA['ga4'] = {
      "tone": "flat"
     }
    ],
-   "longest": null,
+   "longest": {
+    "device": "데스크톱",
+    "engagementSeconds": 3750,
+    "landing": "/kr.html",
+    "pageViews": 3,
+    "seconds": 6287,
+    "source": "직접 방문"
+   },
    "ydayHours": [
     3,
     0,
     0,
     0,
     0,
-    1,
+    0,
     0,
     0,
     0,
@@ -10018,6 +10253,7 @@ window.DASHBOARD_DATA['ga4'] = {
    ],
    "ydayPages": [
     {
+     "fresh": null,
      "host": "suiko.atah.io",
      "name": "/kr.html",
      "priorAvg": 18.14814814814815,
@@ -10030,10 +10266,11 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 20
     },
     {
+     "fresh": null,
      "host": "pc98.atah.io",
      "name": "/hukyou.html",
-     "priorAvg": 4.222222222222222,
-     "ratio": 0.9,
+     "priorAvg": 4.148148148148148,
+     "ratio": 1.0,
      "rising": null,
      "section": "",
      "spike": false,
@@ -10042,18 +10279,20 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 4
     },
     {
+     "fresh": null,
      "host": "atah.io",
      "name": "/",
      "priorAvg": 4.37037037037037,
-     "ratio": 0.7,
+     "ratio": 0.5,
      "rising": null,
      "section": "메인 (아타호의 거처)",
      "spike": false,
      "title": "아타호의 거처",
-     "users": 2,
-     "views": 3
+     "users": 1,
+     "views": 2
     },
     {
+     "fresh": null,
      "host": "pc98.atah.io",
      "name": "/",
      "priorAvg": 9.0,
@@ -10066,6 +10305,7 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 2
     },
     {
+     "fresh": null,
      "host": "pc98.atah.io",
      "name": "/kitan.html",
      "priorAvg": 7.888888888888889,
@@ -10078,9 +10318,10 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 2
     },
     {
+     "fresh": null,
      "host": "kaisin.atah.io",
      "name": "/",
-     "priorAvg": 2.4814814814814814,
+     "priorAvg": 2.4444444444444446,
      "ratio": 0.4,
      "rising": null,
      "section": "",
@@ -10090,9 +10331,10 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 1
     },
     {
+     "fresh": null,
      "host": "pc98.atah.io",
      "name": "/kaitou.html",
-     "priorAvg": 1.962962962962963,
+     "priorAvg": 1.8888888888888888,
      "ratio": 0.5,
      "rising": null,
      "section": "",
@@ -10102,9 +10344,10 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 1
     },
     {
+     "fresh": null,
      "host": "pc98.atah.io",
      "name": "/torimono.html",
-     "priorAvg": 1.4814814814814814,
+     "priorAvg": 1.3703703703703705,
      "ratio": 0.7,
      "rising": null,
      "section": "",
@@ -10114,10 +10357,11 @@ window.DASHBOARD_DATA['ga4'] = {
      "views": 1
     },
     {
+     "fresh": null,
      "host": "suiko.atah.io",
      "name": "/patch.html",
-     "priorAvg": 4.0,
-     "ratio": 0.2,
+     "priorAvg": 3.925925925925926,
+     "ratio": 0.3,
      "rising": null,
      "section": "",
      "spike": false,
@@ -10137,7 +10381,7 @@ window.DASHBOARD_DATA['ga4'] = {
     },
     {
      "name": "atah.io",
-     "views": 3
+     "views": 2
     },
     {
      "name": "kaisin.atah.io",
@@ -10147,7 +10391,7 @@ window.DASHBOARD_DATA['ga4'] = {
    "ydaySources": [
     {
      "name": "직접 방문",
-     "sessions": 12
+     "sessions": 11
     },
     {
      "name": "google",
@@ -10166,40 +10410,40 @@ window.DASHBOARD_DATA['ga4'] = {
      "sessions": 2
     }
    ],
-   "ydayUnresolved": 1,
+   "ydayUnresolved": 0,
    "yesterday": {
     "date": "2026-10-29",
-    "newUsers": 12,
-    "sessions": 27,
-    "users": 16,
-    "views": 35
+    "newUsers": 11,
+    "sessions": 26,
+    "users": 15,
+    "views": 34
    }
   }
  },
  "hourPattern": [
-  1.82,
+  1.68,
   1.21,
   0.61,
   0.79,
   0.54,
-  0.54,
+  0.5,
   0.39,
   0.75,
   0.75,
-  1.32,
+  1.29,
   1.79,
   1.61,
   1.36,
   1.96,
-  1.89,
+  1.86,
   1.61,
   1.82,
   1.43,
-  1.54,
+  1.39,
   1.25,
-  1.71,
+  1.64,
   2.18,
-  2.25,
+  2.21,
   2.04
  ],
  "insights": [
@@ -10208,14 +10452,21 @@ window.DASHBOARD_DATA['ga4'] = {
    "tone": "flat"
   }
  ],
- "longest": null,
+ "longest": {
+  "device": "데스크톱",
+  "engagementSeconds": 3750,
+  "landing": "/kr.html",
+  "pageViews": 3,
+  "seconds": 6287,
+  "source": "직접 방문"
+ },
  "meta": {
   "key": "ga4",
   "label": "사이트",
   "propertyId": "516513119",
   "settledDays": 7,
   "trendDays": 28,
-  "updatedAt": "2026-10-30 10:45"
+  "updatedAt": "2026-10-30 14:02"
  },
  "months": [
   {
@@ -10250,8 +10501,8 @@ window.DASHBOARD_DATA['ga4'] = {
    "days": 30,
    "month": "2026-04",
    "partial": false,
-   "users": 1.5,
-   "views": 4.4
+   "users": 1.4,
+   "views": 4.3
   },
   {
    "days": 31,
@@ -10264,15 +10515,15 @@ window.DASHBOARD_DATA['ga4'] = {
    "days": 30,
    "month": "2026-06",
    "partial": false,
-   "users": 11.3,
-   "views": 47.4
+   "users": 11.0,
+   "views": 47.1
   },
   {
    "days": 31,
    "month": "2026-07",
    "partial": false,
-   "users": 27.9,
-   "views": 81.9
+   "users": 27.7,
+   "views": 81.6
   },
   {
    "days": 31,
@@ -10285,29 +10536,29 @@ window.DASHBOARD_DATA['ga4'] = {
    "days": 30,
    "month": "2026-09",
    "partial": false,
-   "users": 11.0,
-   "views": 34.4
+   "users": 10.8,
+   "views": 34.1
   },
   {
    "days": 29,
    "month": "2026-10",
    "partial": true,
-   "users": 18.3,
-   "views": 61.4
+   "users": 17.8,
+   "views": 61.0
   }
  ],
  "settled": {
-  "avgDuration": 447.7201963119266,
-  "engagementRate": 0.518348623853211,
+  "avgDuration": 464.7760412095238,
+  "engagementRate": 0.5380952380952381,
   "from": "8daysAgo",
-  "sessions": 218,
+  "sessions": 210,
   "to": "2daysAgo"
  },
  "weekCompare": {
   "prevUsers": 18.7,
   "prevViews": 62.1,
-  "users": 15.4,
-  "views": 43.3
+  "users": 14.1,
+  "views": 42.0
  },
  "ydayHours": [
   3,
@@ -10315,7 +10566,7 @@ window.DASHBOARD_DATA['ga4'] = {
   0,
   0,
   0,
-  1,
+  0,
   0,
   0,
   0,
@@ -10337,6 +10588,7 @@ window.DASHBOARD_DATA['ga4'] = {
  ],
  "ydayPages": [
   {
+   "fresh": null,
    "host": "suiko.atah.io",
    "name": "/kr.html",
    "priorAvg": 18.14814814814815,
@@ -10349,10 +10601,11 @@ window.DASHBOARD_DATA['ga4'] = {
    "views": 20
   },
   {
+   "fresh": null,
    "host": "pc98.atah.io",
    "name": "/hukyou.html",
-   "priorAvg": 4.222222222222222,
-   "ratio": 0.9,
+   "priorAvg": 4.148148148148148,
+   "ratio": 1.0,
    "rising": null,
    "section": "",
    "spike": false,
@@ -10361,18 +10614,20 @@ window.DASHBOARD_DATA['ga4'] = {
    "views": 4
   },
   {
+   "fresh": null,
    "host": "atah.io",
    "name": "/",
    "priorAvg": 4.37037037037037,
-   "ratio": 0.7,
+   "ratio": 0.5,
    "rising": null,
    "section": "메인 (아타호의 거처)",
    "spike": false,
    "title": "아타호의 거처",
-   "users": 2,
-   "views": 3
+   "users": 1,
+   "views": 2
   },
   {
+   "fresh": null,
    "host": "pc98.atah.io",
    "name": "/",
    "priorAvg": 9.0,
@@ -10385,6 +10640,7 @@ window.DASHBOARD_DATA['ga4'] = {
    "views": 2
   },
   {
+   "fresh": null,
    "host": "pc98.atah.io",
    "name": "/kitan.html",
    "priorAvg": 7.888888888888889,
@@ -10397,9 +10653,10 @@ window.DASHBOARD_DATA['ga4'] = {
    "views": 2
   },
   {
+   "fresh": null,
    "host": "kaisin.atah.io",
    "name": "/",
-   "priorAvg": 2.4814814814814814,
+   "priorAvg": 2.4444444444444446,
    "ratio": 0.4,
    "rising": null,
    "section": "",
@@ -10409,9 +10666,10 @@ window.DASHBOARD_DATA['ga4'] = {
    "views": 1
   },
   {
+   "fresh": null,
    "host": "pc98.atah.io",
    "name": "/kaitou.html",
-   "priorAvg": 1.962962962962963,
+   "priorAvg": 1.8888888888888888,
    "ratio": 0.5,
    "rising": null,
    "section": "",
@@ -10421,9 +10679,10 @@ window.DASHBOARD_DATA['ga4'] = {
    "views": 1
   },
   {
+   "fresh": null,
    "host": "pc98.atah.io",
    "name": "/torimono.html",
-   "priorAvg": 1.4814814814814814,
+   "priorAvg": 1.3703703703703705,
    "ratio": 0.7,
    "rising": null,
    "section": "",
@@ -10433,10 +10692,11 @@ window.DASHBOARD_DATA['ga4'] = {
    "views": 1
   },
   {
+   "fresh": null,
    "host": "suiko.atah.io",
    "name": "/patch.html",
-   "priorAvg": 4.0,
-   "ratio": 0.2,
+   "priorAvg": 3.925925925925926,
+   "ratio": 0.3,
    "rising": null,
    "section": "",
    "spike": false,
@@ -10456,7 +10716,7 @@ window.DASHBOARD_DATA['ga4'] = {
   },
   {
    "name": "atah.io",
-   "views": 3
+   "views": 2
   },
   {
    "name": "kaisin.atah.io",
@@ -10466,7 +10726,7 @@ window.DASHBOARD_DATA['ga4'] = {
  "ydaySources": [
   {
    "name": "직접 방문",
-   "sessions": 12
+   "sessions": 11
   },
   {
    "name": "google",
@@ -10485,12 +10745,12 @@ window.DASHBOARD_DATA['ga4'] = {
    "sessions": 2
   }
  ],
- "ydayUnresolved": 1,
+ "ydayUnresolved": 0,
  "yesterday": {
   "date": "2026-10-29",
-  "newUsers": 12,
-  "sessions": 27,
-  "users": 16,
-  "views": 35
+  "newUsers": 11,
+  "sessions": 26,
+  "users": 15,
+  "views": 34
  }
 };

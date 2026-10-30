@@ -57,6 +57,10 @@ def host_regex(pattern):
     ))
 
 
+BOT_BROWSER = "Mozilla Compatible Agent"
+NOT_BOT = FilterExpression(not_expression=FilterExpression(filter=Filter(
+    field_name="browser", string_filter=Filter.StringFilter(value=BOT_BROWSER))))
+
 SITE_HOSTS = host_regex(r"^([a-z0-9-]+\.)*atah\.io$")
 BLOG_HOSTS = host_regex(r"^([a-z0-9-]+\.)*tistory\.com$")
 MAIN_HOST = "atah.io"
@@ -120,13 +124,15 @@ def load_credentials():
 
 
 def report(client, target, *, dimensions=(), metrics, date_range, dimension_filter=None,
-           order_by=None, limit=None, offset=None):
+           order_by=None, limit=None, offset=None, exclude_bots=True):
     start, end = date_range
-    if dimension_filter is None:
-        dimension_filter = target.hosts
-    else:
-        dimension_filter = FilterExpression(and_group=FilterExpressionList(
-            expressions=[target.hosts, dimension_filter]))
+    expressions = [target.hosts]
+    if dimension_filter is not None:
+        expressions.append(dimension_filter)
+    if exclude_bots:
+        expressions.append(NOT_BOT)
+    dimension_filter = (expressions[0] if len(expressions) == 1 else
+                        FilterExpression(and_group=FilterExpressionList(expressions=expressions)))
 
     order_bys = []
     if order_by:
@@ -432,6 +438,9 @@ def fetch(client, target, age=1, include_settled=True):
         series_all = p.pop("_series") or [0] * len(prior_dates)
         series = series_all[-prior_days:]
         p["priorAvg"] = sum(series) / prior_days
+        first = next((i for i, v in enumerate(series_all) if v), None)
+        p["fresh"] = (prior_dates[first] if first is not None
+                      and first >= len(series_all) - RECENT_DAYS else None)
         recent = series[-RECENT_DAYS:]
         recent_avg = sum(recent) / len(recent) if recent else 0.0
         ratio = p["views"] / max(p["priorAvg"], RATIO_FLOOR)
@@ -589,6 +598,9 @@ def build_insights(data, day_label="어제", confirmed=False):
                      if rise else "")
         if top["priorAvg"] == 0:
             text = (head + f"**{top['views']:,}회** — 전에 조회가 없던 페이지"
+                    + ("인데," + rise_tail if rise else "입니다."))
+        elif top.get("fresh"):
+            text = (head + f"**{top['views']:,}회** — {mmdd(top['fresh'])}에 처음 조회가 생긴 페이지"
                     + ("인데," + rise_tail if rise else "입니다."))
         elif top["priorAvg"] < RATIO_FLOOR:
             text = (head + f"**{top['views']:,}회** — 평소 하루 1회도 안 보던 페이지"
