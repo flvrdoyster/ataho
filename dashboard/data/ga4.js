@@ -8082,7 +8082,7 @@ window.DASHBOARD_DATA['ga4'] = {
   "propertyId": "516513119",
   "settledDays": 7,
   "trendDays": 28,
-  "updatedAt": "2026-10-30 10:06"
+  "updatedAt": "2026-10-30 10:29"
  },
  "months": [
   {
