@@ -7,6 +7,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script>
         if (location.pathname.indexOf('/haiyuki_web/') === 0) {
+            document.documentElement.style.background = 'rgba(26, 26, 26, 1)';
+            document.documentElement.style.visibility = 'hidden';
             location.replace('https://haiyuki.atah.io/' + location.pathname.slice('/haiyuki_web/'.length) + location.search + location.hash);
         }
     </script>
