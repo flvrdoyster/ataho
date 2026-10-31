@@ -5,6 +5,11 @@
     <meta charset="UTF-8">
     <link rel="icon" href="https://atah.io/favicon.ico">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script>
+        if (location.pathname.indexOf('/haiyuki_web/') === 0) {
+            location.replace('https://haiyuki.atah.io/' + location.pathname.slice('/haiyuki_web/'.length) + location.search + location.hash);
+        }
+    </script>
     <link rel="preload"
         href="https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2105_2@1.0/KoddiUDOnGothic-Regular.woff" as="font"
         type="font/woff" crossorigin>
