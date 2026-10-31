@@ -83,7 +83,7 @@ window.MAP_DATA.triggers = [
     "items": [
       {
         "label": "환세패유기",
-        "href": "haiyuki_web/index.html",
+        "href": "https://haiyuki.atah.io/",
         "target": "_blank",
         "group": "웹 포팅"
       }

@@ -198,7 +198,7 @@ main section>*:not(iframe),
     }
 }
 
-/* 좁은 iframe 환경 (haiyuki_web 역 일람 패널 등) */
+/* 좁은 iframe 환경 (haiyuki 역 일람 패널 등) */
 @media (max-width: 420px) {
     .container {
         padding: 10px;

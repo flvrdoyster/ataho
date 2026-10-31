@@ -1,6 +1,6 @@
 # atah.io 노트
 
-코드에 두지 않는 설명(배경·결정 이유·측정값)을 모아 둔다. 대시보드는 `dashboard/NOTES.md`, 패유기 웹 버전은 `haiyuki_web/STRUCTURE.md`에 따로 있다.
+코드에 두지 않는 설명(배경·결정 이유·측정값)을 모아 둔다. 대시보드는 `dashboard/NOTES.md`, 패유기 웹 버전은 별도 저장소 `haiyuki`(`haiyuki.atah.io`)의 `docs/STRUCTURE.md`에 따로 있다.
 
 ## 월드 트리거 데이터 (`world/maps/cave/triggers.js`)
 
@@ -57,7 +57,7 @@
 - 분류는 항목의 `group`, 없으면 트리거의 `title`. 그래서 "게임 플레이" 같은 상위 제목은 목록에 나오지 않는다
 - 순서는 트리거 파일에 처음 나오는 순서. 순서표를 따로 두면 그게 또 어긋날 곳이 된다
 - `itemsFrom` 트리거(공식 일러스트)와 `href` 없는 항목(술 마시기 등)은 뺀다
-- `index.html`로 끝나는 주소는 폴더 주소로(`haiyuki_web/`), 두 줄 라벨은 한 줄로
+- `index.html`로 끝나는 주소는 폴더 주소로(`index.html`을 뗀 주소), 두 줄 라벨은 한 줄로
 - atah.io 주소인데 `sitemap.xml`에 없으면 경고만 한다. 사이트맵은 손으로 관리한다
 
 ```bash
@@ -89,8 +89,8 @@ node scripts/gen_site_index.js --check  # 어긋나면 exit 1
 - 공개 페이지 메타 — description, `og:title`·`type`·`url`·`description`·`site_name`·`locale`, canonical. pc98 페이지들과 같은 구성이다
   - `og:image`는 1200×630 썸네일이 있는 패유기 웹에만
   - `viewer/scene.html`은 `?story=`로 여러 장면을 보여 주므로 canonical을 두지 않는다. 하나로 모으면 나머지 장면 주소가 색인에서 빠진다
-  - 패유기 웹의 canonical·`og:url`은 끝에 `/`까지. `/haiyuki_web`은 서버가 `/haiyuki_web/`로 301 돌려보낸다
-- 패유기 해설서의 패 이미지 337개에 alt. 이름은 게임의 `haiyuki_web/js/data/paiData.js`에서 가져왔다
+  - 패유기 웹의 canonical·`og:url`은 끝에 `/`까지. `haiyuki.atah.io` 주소는 끝에 `/`가 붙는다
+- 패유기 해설서의 패 이미지 337개에 alt. 이름은 별도 저장소 `haiyuki`의 `docs/js/data/paiData.js`에서 가져왔다
 - 희담 취급설명서 머리 부분(`translator-info`)에 pc98 환세희담 링크
 - 검색엔진 등록 — 네이버 서치어드바이저는 atah.io·pc98·suiko 세 사이트를 따로 등록하고 HTML 파일 방식으로 소유 확인했다(확인 파일 `naver6ecd505c49bf822cb1185ddef5bce20b.html`은 레포 루트, 사이트맵에는 넣지 않는다). 구글 서치콘솔은 도메인 속성(`atah.io`)을 Route 53 TXT 레코드로 확인했고 사이트맵 세 개를 모두 제출했다
 - `www.atah.io` — CNAME이 apex(`atah.io`)를 가리키면 GitHub Pages 인증서에 www가 안 들어가(GitHub 문서가 경고하는 설정) https로 들어오면 경고가 떴다. 2026-09-30 Route 53에서 `flvrdoyster.github.io`로 바꿨고, 자동 갱신 때(2026-10-01) 인증서에 www가 들어갔다(만료 2026-12-30). 지금은 `https://www.atah.io`가 301로 `atah.io`에 간다

@@ -4,7 +4,6 @@
 **/.claude/
 
 # Playwright
-haiyuki_web/tests/
 .ga4_creds/
 
 # Python
