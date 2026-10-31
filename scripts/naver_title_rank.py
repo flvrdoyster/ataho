@@ -24,11 +24,12 @@ def fetch(title):
 
 
 def parse(raw):
+    metas = [(m.start(), m.group(1)) for m in re.finditer(r'data-meta-area="([^"]+)"', raw)]
     blocks = []
-    for m in re.finditer(r'data-meta-area="([^"]+)"', raw):
-        if m.group(1) not in blocks:
-            blocks.append(m.group(1))
-    cards, after_keep = [], False
+    for _, b in metas:
+        if b not in blocks:
+            blocks.append(b)
+    cards, top, after_keep = [], [], False
     for m in re.finditer(r"<a [^>]*>", raw):
         tag = m.group(0)
         area = re.search(r'data-nlog-area="([^"]+)"', tag)
@@ -40,11 +41,15 @@ def parse(raw):
             continue
         if after_keep and (area.group(1).endswith(".link") or area.group(1).endswith(".title")):
             p = urllib.parse.urlparse(html.unescape(href.group(1)))
-            cards.append(p.netloc + urllib.parse.unquote(p.path).rstrip("/"))
+            card = p.netloc + urllib.parse.unquote(p.path).rstrip("/")
+            cards.append(card)
+            block = next((b for pos, b in reversed(metas) if pos < m.start()), "")
+            if block == "urB_coR":
+                top.append(card)
             after_keep = False
     first_web = next((b for b in blocks if b.startswith("urB_co") or b.startswith("urB_bo")), None)
     above_web = [AREA.get(b, b) for b in blocks[:blocks.index(first_web)]] if first_web else []
-    return cards, above_web
+    return cards, above_web, top
 
 
 def main():
@@ -60,15 +65,17 @@ def main():
         raw = fetch(title)
         if save:
             (save / f"naver_{title}.html").write_text(raw, encoding="utf-8")
-        cards, above_web = parse(raw)
+        cards, above_web, top = parse(raw)
         rank = next((i for i, c in enumerate(cards, 1) if c == f"{BLOG}/{post}"), None)
         ours = [(i, c) for i, c in enumerate(cards, 1) if c.split("/")[0].endswith(OURS)]
-        out[title] = {"post": post, "rank": rank, "ours": ours, "above_web": above_web, "cards": cards[:12]}
-        print(f"== {title} (소개 /{post}) → {rank or '없음'} | 웹문서 위 영역: {', '.join(above_web) or '없음'}")
+        out[title] = {"post": post, "rank": rank, "ours": ours, "above_web": above_web,
+                      "top": top, "cards": cards[:12]}
+        print(f"== {title} (소개 /{post}) → {rank or '없음'} | 상단 블록 {len(top)}개"
+              f" | 웹문서 위 영역: {', '.join(above_web) or '없음'}")
         for i, c in ours:
-            print(f"   우리: {i:2}. {c}")
+            print(f"   우리: {i:2}. {'상단' if c in top else '아래'} {c}")
         for i, c in enumerate(cards[:10], 1):
-            print(f"   {i:2}. {c[:70]}")
+            print(f"   {i:2}. {'상단' if c in top else '    '} {c[:70]}")
     if save:
         (save / "naver_rank.json").write_text(json.dumps(out, ensure_ascii=False, indent=1), encoding="utf-8")
 
