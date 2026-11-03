@@ -742,7 +742,9 @@ ENGINE_LABELS = {"naver": "네이버", "m.search.naver.com": "네이버", "searc
                  "google": "구글", "daum": "다음", "bing": "빙"}
 GAME_NAMES = {"suiko": "환세취호전", "suiko-jp": "환세취호전 일본어 원판", "suiko-demo": "환세취호전 체험판",
               "hukyou": "환세풍광전", "kitan": "환세희담", "kitan-opening": "환세희담 오프닝",
-              "kaitou": "환세쾌도전", "torimono": "환세포물장", "kaisin": "환세쾌진극"}
+              "kaitou": "환세쾌도전", "torimono": "환세포물장", "kaisin": "환세쾌진극",
+              "haiyuki": "환세패유기"}
+START_EVENTS = ("emulator_start", "play_start")
 MILESTONE_STEPS = (120, 60, 30, 15, 5)
 
 
@@ -797,7 +799,7 @@ def fetch_game_events(client, target, date_range):
 
 def game_stats(d):
     top = next((m for m in MILESTONE_STEPS if d.get(f"play_{m}")), None)
-    return {"start": d.get("emulator_start", 0), "save": d.get("save_created", 0),
+    return {"start": max((d.get(e, 0) for e in START_EVENTS), default=0), "save": d.get("save_created", 0),
             "restore": d.get("save_restored", 0),
             "longest": {"minutes": top, "users": d[f"play_{top}"]} if top else None}
 
@@ -806,7 +808,7 @@ def fetch_games(client, target, age):
     day = fetch_game_events(client, target, day_range(age))
     week = fetch_game_events(client, target, (f"{age + WEEK - 1}daysAgo", f"{age}daysAgo"))
     rows = [{"game": GAME_NAMES[g], **game_stats(day.get(g, {})), "week": game_stats(d)}
-            for g, d in week.items() if d.get("emulator_start")]
+            for g, d in week.items() if game_stats(d)["start"]]
     return sorted(rows, key=lambda r: (-r["start"], -r["week"]["start"]))
 
 
