@@ -7010,7 +7010,7 @@ window.DASHBOARD_DATA['blog'] = {
   "propertyId": "549191220",
   "settledDays": 7,
   "trendDays": 28,
-  "updatedAt": "2026-11-04 08:01"
+  "updatedAt": "2026-11-04 09:27"
  },
  "months": [
   {
@@ -7043,7 +7043,7 @@ window.DASHBOARD_DATA['blog'] = {
   }
  ],
  "settled": {
-  "avgDuration": 629.6867058550724,
+  "avgDuration": 629.6867058550725,
   "engagementRate": 0.5362318840579711,
   "from": "8daysAgo",
   "sessions": 69,

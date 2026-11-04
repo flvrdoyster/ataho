@@ -10741,7 +10741,7 @@ window.DASHBOARD_DATA['ga4'] = {
   "propertyId": "516513119",
   "settledDays": 7,
   "trendDays": 28,
-  "updatedAt": "2026-11-04 08:00"
+  "updatedAt": "2026-11-04 09:26"
  },
  "months": [
   {
@@ -10830,7 +10830,7 @@ window.DASHBOARD_DATA['ga4'] = {
   }
  ],
  "settled": {
-  "avgDuration": 507.81966604464276,
+  "avgDuration": 507.8196660446429,
   "engagementRate": 0.5580357142857143,
   "from": "8daysAgo",
   "sessions": 224,
