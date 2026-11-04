@@ -10,16 +10,39 @@
 	<link rel="stylesheet" href="manual.css">
 	<style>
 		body {
-			background-image: none;
+			background: linear-gradient(to bottom, rgb(228, 249, 253), rgb(196, 238, 248));
+			color: rgb(36, 56, 60);
 			-webkit-text-size-adjust: 100%;
 			text-size-adjust: 100%;
 		}
 
 		.char-container {
+			--x: calc(100% / 4803);
+			--y: calc(100% / 1493);
+			--edge: 72;
+			--overflow: 454;
 			position: relative;
 			display: flex;
 			width: 100%;
-			padding: 0 1vw 3vw;
+			margin: calc(var(--edge) * var(--x)) 0 calc((var(--overflow) + var(--edge)) * var(--x));
+		}
+
+		.group-fari-pet {
+			width: calc(1129 * var(--x));
+		}
+
+		.group-rin-ata {
+			width: calc(793 * var(--x));
+			margin-left: calc(577 * var(--x));
+		}
+
+		.group-yuri-smsh {
+			width: calc(1220 * var(--x));
+			margin-left: calc(468 * var(--x));
+		}
+
+		.group-mayu {
+			width: calc(616 * var(--x));
 		}
 
 		.group-img {
@@ -30,11 +53,19 @@
 			pointer-events: none;
 		}
 
+		.group-fari-pet .group-img {
+			top: calc(120 * var(--y));
+		}
+
+		.group-rin-ata .group-img {
+			top: calc(380 * var(--y));
+		}
+
 		.char-info {
 			position: absolute;
 			z-index: 10;
-			width: 9.2%;
-			font-size: 0.75vw;
+			width: 11%;
+			font-size: 1vw;
 			line-height: 1.2;
 		}
 
@@ -55,22 +86,21 @@
 				radial-gradient(circle at 17% 88%, var(--tc) 0%, transparent var(--tr)) fixed,
 				radial-gradient(circle at 67% 82%, var(--tc) 0%, transparent var(--tr)) fixed,
 				linear-gradient(to right, transparent, rgba(18, 13, 61, 0.92), transparent),
-				linear-gradient(to bottom, rgba(5, 5, 15, 1), rgba(13, 26, 94, 1));
+				linear-gradient(to bottom, rgb(5, 5, 15), rgb(13, 26, 94));
 		}
 
 		.char-desc {
 			margin-bottom: 0.2em;
 			font-size: 0.8em;
-			font-weight: normal;
 			line-height: 1.4;
-			color: rgba(49, 27, 77, 1);
+			color: rgb(49, 27, 77);
 		}
 
 		.char-desc-mayu {
 			margin-bottom: 0.2em;
 			font-size: 1.2em;
 			font-weight: bold;
-			color: rgba(122, 24, 40, 1);
+			color: rgb(122, 24, 40);
 		}
 
 		.char-skills {
@@ -81,14 +111,13 @@
 			display: flex;
 			justify-content: space-between;
 			align-items: center;
-			background: rgba(250, 249, 208, 1);
-			font-size: 1em;
+			background: rgb(250, 249, 208);
 			white-space: nowrap;
 		}
 
 		.skill-header b {
 			flex-shrink: 0;
-			margin-right: 8px;
+			margin-right: 0.5em;
 		}
 
 		.skill-header span {
@@ -101,56 +130,53 @@
 		}
 
 		.skill-desc {
-			margin-top: 0.2em;
-			margin-right: 0;
-			margin-bottom: 0.4em;
-			margin-left: 1em;
+			margin: 0.2em 0 0.4em 1em;
 			font-size: 0.8em;
 		}
 
 		.char-fari {
-			top: 7%;
-			left: 13.2%;
-		}
-
-		.char-rin {
-			top: 7%;
-			left: 24%;
+			top: 0;
+			left: calc(598 * var(--x));
 		}
 
 		.char-pet {
-			bottom: 10%;
-			left: 24.2%;
+			bottom: calc(-103 * var(--y));
+			left: calc(1137 * var(--x));
+		}
+
+		.char-rin {
+			top: 0;
+			left: calc(2221 * var(--x));
 		}
 
 		.char-ata {
-			bottom: 10%;
-			left: 49.3%;
-		}
-
-		.char-smsh {
-			bottom: 0%;
-			left: 62.5%;
-			width: 15%;
+			bottom: calc(-363 * var(--y));
+			left: calc(2507 * var(--x));
 		}
 
 		.char-yuri {
-			top: 7%;
-			right: 3.5%;
+			top: calc(115 * var(--y));
+			right: calc(62 * var(--x));
+		}
+
+		.char-smsh {
+			bottom: calc(var(--overflow) * -1 * var(--y));
+			left: calc(3074 * var(--x));
+			width: 15%;
 		}
 
 		.char-mayu {
-			bottom: 0%;
-			right: 4%;
+			bottom: calc(var(--overflow) * -1 * var(--y));
+			right: calc(147 * var(--x));
 			width: 16%;
 		}
 
 		.char-mayu-img {
 			position: absolute;
 			z-index: 1;
-			right: 4%;
-			bottom: 16%;
-			width: calc(781 / 4803 * 100%);
+			right: calc(147 * var(--x));
+			bottom: calc(9 * var(--y));
+			width: calc(781 * var(--x));
 			opacity: 0;
 			transition: opacity 0.3s ease-in-out;
 		}
@@ -160,84 +186,78 @@
 			opacity: 1;
 		}
 
-
 		@media (max-width: 800px) {
-
 			.char-container {
-				display: flex;
 				flex-direction: column;
+				margin: 0;
 				padding: 20px 10px 40px;
 			}
 
-			.char-group,
-			.spacer.char-group-mayu {
+			.char-group {
+				--u: calc(min(100%, 480px) / 1220);
 				display: grid;
 				grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
 				gap: 0 4%;
-				width: 100% !important;
+				width: 100%;
 				max-width: 760px;
 				margin: 0 auto;
-			}
-
-			.spacer:not(.char-group-mayu) {
-				display: none;
 			}
 
 			.group-img {
 				grid-column: 1 / -1;
 				justify-self: center;
-				width: 100%;
 				margin-bottom: 20px;
 			}
 
 			.group-fari-pet .group-img {
-				width: calc(1129 / 1220 * 100%);
+				top: 0;
+				width: calc(1129 * var(--u));
+				margin-top: calc(-353 * var(--u));
 			}
 
 			.group-rin-ata .group-img {
-				width: calc(793 / 1220 * 100%);
+				top: 0;
+				width: calc(793 * var(--u));
+				margin-top: calc(-39 * var(--u));
+				margin-bottom: calc(20px - 72 * var(--u));
 			}
 
 			.group-yuri-smsh .group-img {
-				width: 100%;
+				width: calc(1220 * var(--u));
+				margin-top: calc(-118 * var(--u));
+				margin-bottom: calc(20px - 299 * var(--u));
 			}
 
 			.char-info {
 				position: relative;
-				top: auto !important;
-				bottom: auto !important;
-				left: auto !important;
-				right: auto !important;
+				inset: auto;
 				display: grid;
 				grid-template-rows: subgrid;
 				grid-row: span 3;
 				width: auto;
+				min-width: 0;
 				margin-bottom: 30px;
 				font-size: clamp(14px, 4vw, 18px);
 			}
 
-			.char-info,
 			.char-info>div {
 				min-width: 0;
 			}
 
-			.spacer.char-group-mayu .char-info {
+			.group-mayu .char-info {
 				grid-column: 1 / -1;
 			}
-
 
 			.char-mayu-img {
 				position: relative;
-				bottom: auto !important;
-				right: auto !important;
+				inset: auto;
 				grid-column: 1 / -1;
 				justify-self: center;
-				width: calc(781 / 1220 * 100%);
-				margin-top: 10px;
+				width: calc(781 * var(--u));
+				margin-top: calc(10px - 39 * var(--u));
+				margin-bottom: calc(-31 * var(--u));
 				opacity: 1;
-				pointer-events: auto;
 			}
-
 		}
 	</style>
 </head>
@@ -245,112 +265,118 @@
 <body>
 	<div class="char-container">
 
-		<div class="char-group group-fari-pet" style="width: calc(1129 / 4803 * 100%)">
+		<div class="char-group group-fari-pet">
 			<img src="img/char_fari_pet.png" class="group-img" alt="">
 			<div class="char-info char-fari">
 				<div class="char-desc">
-					여우 민족의 마술사. 느긋하고 엉뚱한 분위기의 소녀.<br>
+					여우 민족의 마술사.<br>
+					느긋하고 엉뚱한 분위기의 소녀.<br>
 					패 운이 좋아, 초반부터 리치를 걸어온다.
 				</div>
 				<div class="char-name">화린</div>
 				<div class="char-skills">
-					<div class="skill-header"><b>■ 회복</b><span>소비 MP 24</span></div>
+					<div class="skill-header"><b>회복</b><span>소비 MP 24</span></div>
 					<div class="skill-desc">HP를 조금 회복한다. 한 라운드에 몇 번이고 사용 가능.</div>
-					<div class="skill-header"><b>■ 버린 패 방어</b><span>소비 MP 18</span></div>
+					<div class="skill-header"><b>버린 패 방어</b><span>소비 MP 18</span></div>
 					<div class="skill-desc">5턴 간 상대가 자신이 버린 패로 펑·론을 할 수 없게 한다. 한 라운드에 몇 번이고 사용 가능.</div>
 				</div>
 			</div>
 
 			<div class="char-info char-pet">
 				<div class="char-desc">
-					마술사. 대식가에 술꾼, 애연가로 불건강한 생활을 하고 있다.<br>
+					마술사.<br>
+					대식가에 술꾼, 애연가로 불건강한 생활을 하고 있다.<br>
 					패를 잘 못 뽑는다. 날 수 있는 기회가 2배가 되는 비기를 지녔다.
 				</div>
 				<div class="char-name">페톰</div>
 				<div class="char-skills">
-					<div class="skill-header"><b>■ 크리티컬</b><span>소비 MP 24</span></div>
+					<div class="skill-header"><b>크리티컬</b><span>소비 MP 24</span></div>
 					<div class="skill-desc">났을 때 상대에게 주는 데미지를 25퍼센트 증가시킨다.</div>
-					<div class="skill-header"><b>■ 라스트 찬스</b><span>소비 MP 18</span></div>
+					<div class="skill-header"><b>라스트 찬스</b><span>소비 MP 18</span></div>
 					<div class="skill-desc">텐파이인 상태에서 나가리일 경우 남은 패 룰렛에 도전할 수 있다. 역을 완성시키는 패에서 룰렛이 멈추면 난다.</div>
 				</div>
 			</div>
 		</div>
 
-		<div class="spacer" style="width: calc(437 / 4803 * 100%)"></div>
-
-		<div class="char-group group-rin-ata" style="width: calc(793 / 4803 * 100%)">
+		<div class="char-group group-rin-ata">
 			<img src="img/char_rin_ata.png" class="group-img" alt="">
 			<div class="char-info char-rin">
 				<div class="char-desc">
-					고양이 민족의 여권사. 아타호에게 연심을 품고 있다.<br>
-					평균적인 실력을 지녔다. 숨김 도라를 자유자재로 다뤄 점수를 쌓는다.
+					고양이 민족의 여권사.<br>
+					아타호에게 연심을 품고 있다.<br>
+					평균적인 실력을 지녔다.<br>
+					숨김 도라를 자유자재로 다뤄 점수를 쌓는다.
 				</div>
 				<div class="char-name">린샹</div>
 				<div class="char-skills">
-					<div class="skill-header"><b>■ 수경</b><span>소비 MP 22</span></div>
+					<div class="skill-header"><b>수경</b><span>소비 MP 22</span></div>
 					<div class="skill-desc">상대가 났을 때 자신이 받는 데미지를 25퍼센트 감소시킨다.</div>
-					<div class="skill-header"><b>■ 도라폭진</b><span>소비 MP 32</span></div>
+					<div class="skill-header"><b>도라폭진</b><span>소비 MP 32</span></div>
 					<div class="skill-desc">리치로 났을 때 숨김 도라를 자신이 가지고 있는 패로 바꾼다.</div>
 				</div>
 			</div>
 
 			<div class="char-info char-ata">
 				<div class="char-desc">
-					호랑이 민족의 권사. 술을 매우 좋아하며 취권의 달인이기도 하다.<br>
-					한 방에 날 수 있는 「맹호일발권」이 강력.
+					호랑이 민족의 권사.<br>
+					술을 매우 좋아하며 취권의 달인이기도 하다.<br>
+					한 방에 날 수 있는<br>
+					「맹호일발권」이 강력.
 				</div>
 				<div class="char-name">아타호</div>
 				<div class="char-skills">
-					<div class="skill-header"><b>■ 맹호일발권</b><span>소비 MP 100</span></div>
+					<div class="skill-header"><b>맹호일발권</b><span>소비 MP 100</span></div>
 					<div class="skill-desc">리치를 걸 수 있을 때 사용하면 다음 쯔모로 반드시 난다. 20턴 째엔 사용할 수 없다.</div>
-					<div class="skill-header"><b>■ 지옥 쌓기</b><span>소비 MP 18</span></div>
+					<div class="skill-header"><b>지옥 쌓기</b><span>소비 MP 18</span></div>
 					<div class="skill-desc">3턴 간 상대가 받는 패를 쓸모 없는 패로 바꿔 쯔모로 나는 것을 막는다.</div>
 				</div>
 			</div>
 		</div>
 
-		<div class="spacer" style="width: calc(628 / 4803 * 100%)"></div>
-
-		<div class="char-group group-yuri-smsh" style="width: calc(1220 / 4803 * 100%)">
+		<div class="char-group group-yuri-smsh">
 			<img src="img/char_yuri_smsh.png" class="group-img" alt="">
 			<div class="char-info char-yuri">
 				<div class="char-desc">
-					남장을 한 여성 사무라이. 자기주장이 강하고 화려한 복장을 즐긴다.<br>
-					상대의 론을 무효화하는 「초 거합베기」로 역전하기 쉽다.
+					남장을 한 여성 사무라이.<br>
+					자기주장이 강하고 화려한 복장을 즐긴다.<br>
+					상대의 론을 무효화하는<br>
+					「초 거합베기」로 역전하기 쉽다.
 				</div>
 				<div class="char-name">유리와카마루</div>
 				<div class="char-skills">
-					<div class="skill-header"><b>■ 초 거합베기</b><span>소비 MP 22</span></div>
+					<div class="skill-header"><b>초 거합베기</b><span>소비 MP 22</span></div>
 					<div class="skill-desc">상대가 론이 되었을 때 버린 패를 거합 발도로 베어내 론을 무효화한다. 자신이 리치를 걸고 있을 경우에는 사용할 수 없다.</div>
-					<div class="skill-header"><b>■ 기합 리치</b><span>소비 MP 24</span></div>
+					<div class="skill-header"><b>기합 리치</b><span>소비 MP 24</span></div>
 					<div class="skill-desc">리치를 걸 수 있을 때 사용하면 5턴 후 쯔모로 반드시 난다. 16턴 째 이후에는 사용할 수 없다.</div>
 				</div>
 			</div>
 
 			<div class="char-info char-smsh">
 				<div class="char-desc">
-					개 민족의 닌자 검사. 예쁜 여자를 밝히는 변태 개.<br>
-					「패 교환」이 강력하지만, MP 소비가 심해 장기전에는 불리하다.
+					개 민족의 닌자 검사.<br>
+					예쁜 여자를 밝히는 변태 개.<br>
+					「패 교환」이 강력하지만,<br>
+					MP 소비가 심해 장기전에는 불리하다.
 				</div>
 				<div class="char-name">스마슈</div>
 				<div class="char-skills">
-					<div class="skill-header"><b>■ 패 교환</b><span>소비 MP 6×교환한 패 수</span></div>
+					<div class="skill-header"><b>패 교환</b><span>소비 MP 6×교환한 패 수</span></div>
 					<div class="skill-desc">라운드가 시작할 때 필요 없는 패를 골라 ESC키를 누르거나 오른쪽 클릭하면, 다른 패로 교환할 수 있다.</div>
-					<div class="skill-header"><b>■ 론패 교환</b><span>소비 MP 10</span></div>
-					<div class="skill-desc">상대가 론이 되었을 때 버린 패를 자신이 가진 다른 패로 교환해 론을 무효로 한다. 자신이 리치를 걸고 있을 경우에는 사용할 수 없다.
-					</div>
+					<div class="skill-header"><b>론패 교환</b><span>소비 MP 10</span></div>
+					<div class="skill-desc">상대가 론이 되었을 때 버린 패를 자신이 가진 다른 패로 교환해 론을 무효로 한다. 자신이 리치를 걸고 있을 경우에는 사용할 수 없다.</div>
 				</div>
 			</div>
 		</div>
 
-		<div class="spacer char-group-mayu" style="width: calc(596 / 4803 * 100%)">
+		<div class="char-group group-mayu">
 			<div class="char-info char-mayu">
 				<div class="char-desc-mayu">
-					우승자를 기다리는 수수께끼의 인(?)물.
+					우승자를 기다리는<br>
+					수수께끼의 인(?)물.
 				</div>
 				<div class="char-name">???</div>
 				<div class="char-skills">
-					<div class="skill-header"><b>■ 패 덧칠</b><span>소비 MP 4×교환한 패 수</span></div>
+					<div class="skill-header"><b>패 덧칠</b><span>소비 MP 4×교환한 패 수</span></div>
 					<div class="skill-desc">라운드가 시작할 때 필요 없는 패를 골라 ESC키를 누르거나 오른쪽 클릭하면, 다른 패로 교환할 수 있다.</div>
 				</div>
 			</div>
@@ -362,26 +388,27 @@
 			var h = document.documentElement.getBoundingClientRect().height;
 			window.parent.postMessage({ charIframeHeight: Math.ceil(h) }, '*');
 		}
-		var ro = new ResizeObserver(reportHeight);
-		ro.observe(document.documentElement);
+
+		function updateCursor() {
+			document.body.style.cursor = window.innerWidth > 800 ? 'pointer' : 'default';
+		}
+
+		function openPopup() {
+			if (window.innerWidth <= 800) return;
+			var maxWidth = window.screen.availWidth || window.screen.width || 1800;
+			var popupWidth = Math.min(1800, maxWidth);
+			var ratio = document.documentElement.getBoundingClientRect().height / window.innerWidth;
+			var popupHeight = Math.ceil(popupWidth * ratio);
+			window.open('char.html', 'charPopup', 'width=' + popupWidth + ',height=' + popupHeight + ',scrollbars=yes,resizable=yes,location=no,toolbar=no,menubar=no,status=no');
+		}
+
+		new ResizeObserver(reportHeight).observe(document.documentElement);
 		window.addEventListener('load', reportHeight);
 
 		if (window !== window.parent) {
-			function updateCursor() {
-				document.body.style.cursor = window.innerWidth > 800 ? 'pointer' : 'default';
-			}
 			updateCursor();
 			window.addEventListener('resize', updateCursor);
-
-			document.body.addEventListener('click', function () {
-				if (window.innerWidth > 800) {
-					var maxWidth = window.screen.availWidth || window.screen.width || 1800;
-					var popupWidth = Math.min(1800, maxWidth);
-					var ratio = document.documentElement.getBoundingClientRect().height / window.innerWidth;
-					var popupHeight = Math.ceil(popupWidth * ratio);
-					window.open('char.html', 'charPopup', 'width=' + popupWidth + ',height=' + popupHeight + ',scrollbars=yes,resizable=yes,location=no,toolbar=no,menubar=no,status=no');
-				}
-			});
+			document.body.addEventListener('click', openPopup);
 		}
 	</script>
 </body>
