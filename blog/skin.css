@@ -20,6 +20,7 @@
   --fs-credit: 12px;
   --disabled: #ccc;
   --space-y: 1;
+  --gutter-body: 70px;
   --pixel-notch: polygon(4px 0, calc(100% - 4px) 0, calc(100% - 4px) 2px, calc(100% - 2px) 2px, calc(100% - 2px) 4px, 100% 4px,
     100% calc(100% - 4px), calc(100% - 2px) calc(100% - 4px), calc(100% - 2px) calc(100% - 2px), calc(100% - 4px) calc(100% - 2px),
     calc(100% - 4px) 100%, 4px 100%, 4px calc(100% - 2px), 2px calc(100% - 2px), 2px calc(100% - 4px), 0 calc(100% - 4px),
@@ -188,7 +189,8 @@
     --fs-post-title: 24px;
     --fs-section: 18px;
     --fs-credit: 11px;
-    --space-y: .6
+    --space-y: .6;
+    --gutter-body: 20px
   }
 }
 
@@ -1185,7 +1187,8 @@ address, caption, cite, code, dfn, em, var {
 .skin_view .area_etc {
   overflow: hidden;
   min-height: 29px;
-  margin-top: 20px
+  margin-top: 20px;
+  padding: 0 var(--gutter-body)
 }
 
 .skin_view .area_etc .list_tag {
@@ -1239,14 +1242,11 @@ address, caption, cite, code, dfn, em, var {
 
 /* 댓글영역 */
 .skin_view .area_reply {
-  margin-top: calc(40px * var(--space-y))
+  margin-top: calc(40px * var(--space-y));
+  padding: 0 var(--gutter-body)
 }
 
-.area_reply .tt_box_namecard {
-  min-height: 0
-}
-
-.tt_box_namecard .tt_desc {
+[data-tistory-react-app="Namecard"] {
   display: none
 }
 
@@ -1412,7 +1412,7 @@ address, caption, cite, code, dfn, em, var {
 #article-view {
   margin: 0;
 
-  padding: 20px 70px 50px;
+  padding: 20px var(--gutter-body) 50px;
   word-wrap: break-word;
   color: var(--text-primary, #1a1a1a);
   min-height: 370px;
@@ -1424,7 +1424,7 @@ address, caption, cite, code, dfn, em, var {
 }
 
 @media only screen and (max-width:820px) {
-  .tt-comment-cont {
+  .skin_visitor .tt-comment-cont {
     padding: 0 15px
   }
 
@@ -1519,14 +1519,6 @@ address, caption, cite, code, dfn, em, var {
 
   .skin_view .tit_post {
     padding: 0 5px
-  }
-
-  .skin_view .area_etc .list_tag {
-    padding: 0 15px
-  }
-
-  #article-view {
-    padding: 20px 20px 50px
   }
 
   /* 푸터 */
