@@ -113,6 +113,20 @@
             '<span class="dim">GitHub Actions의 ga4-dashboard 실행 기록을 확인하세요</span></p>');
     }
 
+    const tis = window.DASHBOARD_TISTORY || null;
+    const tisLast = tis && tis.lastFetch ? tis.lastFetch : '';
+    const tisAge = tisLast ? Math.round((Date.parse(`${kstToday}T00:00:00Z`) -
+        Date.parse(`${tisLast.slice(0, 10)}T00:00:00Z`)) / 86400000) : 0;
+    if (tisAge >= 2) {
+        const lostFrom = mmdd(tisLast.slice(0, 10));
+        nav.insertAdjacentHTML('beforebegin',
+            `<p class="reminder"><b>${tisAge === 2
+                ? `오늘 티스토리 유입 경로를 받지 않으면 ${lostFrom} 기록 일부를 놓칩니다`
+                : `티스토리 유입 경로를 ${fmt(tisAge)}일째 받지 않아 ${lostFrom}부터 빠진 기록이 생겼습니다`}</b>` +
+            `<span class="dim">마지막으로 받은 때 ${esc(mmdd(tisLast.slice(0, 10)))}${esc(tisLast.slice(10))} · ` +
+            '블로그에서 유입 경로 북마크를 누르세요</span></p>');
+    }
+
     if (!views.length) {
         panelRoot.innerHTML = '<p class="empty">아직 수집된 데이터가 없습니다.' +
             '<br>GitHub Actions의 <b>ga4-dashboard</b> 워크플로우가 한 번 돌면 채워집니다.</p>';
@@ -430,6 +444,38 @@
             '<tr><td colspan="2" class="dim">분류된 유입원이 없습니다.</td></tr>'}
          </tbody></table></div>
          ${unresolved}`));
+
+    const td = key === 'blog' && tis && tis.days ? tis.days[y.date] : null;
+    if (key === 'blog' && tis && tis.firstDay && y.date >= tis.firstDay) {
+        let body;
+        if (!td) {
+            body = `<p class="note-line">${esc(dayLabel)} 기록은 받지 못했습니다 — 티스토리는 ` +
+                '그저께 0시부터의 기록만 보여 줘서, 그 안에 받지 않은 날은 비어 있습니다.</p>';
+        } else {
+            const refMax = Math.max(0, ...td.domains.map((d) => d[2]));
+            const refRows = td.domains.map(([dom, , n]) =>
+                `<tr><td class="name bar" style="${barW(n, refMax)}">${esc(dom)}</td>` +
+                `<td class="num">${fmt(n)}</td></tr>`).join('');
+            const kwRows = td.keywords.map(([kw, cat, n]) =>
+                `<tr><td class="name">${esc(kw)}<span class="host">${esc(cat)}</span></td>` +
+                `<td class="num">${fmt(n)}</td></tr>`).join('');
+            const notes = [
+                td.inner ? `블로그 안에서 옮겨 다닌 조회 <b>${fmt(td.inner)}</b>회는 뺐습니다` : '',
+                td.until !== '24:00' ? `${esc(td.until)}까지만 받은 기록입니다` : '',
+            ].filter(Boolean).join(' · ');
+            body = `<div class="scroll"><table class="rank"><thead><tr>
+                    <th>들어온 곳</th><th class="num">조회</th></tr></thead><tbody>${refRows ||
+                    '<tr><td colspan="2" class="dim">바깥에서 들어온 조회가 없습니다.</td></tr>'}
+                 </tbody></table></div>` +
+                (kwRows ? `<div class="scroll"><table class="rank"><thead><tr>
+                    <th>검색어</th><th class="num">조회</th></tr></thead><tbody>${kwRows}
+                 </tbody></table></div>` : '') +
+                (notes ? `<p class="note-line">${notes}</p>` : '');
+        }
+        parts.push(mod(12, `${dayLabel} 들어온 경로`,
+            `티스토리 관리 화면의 유입 로그로 센 조회 · GA와 세는 기준이 달라 「${esc(dayLabel)} 온 곳」과
+             수가 다릅니다 · 검색어는 검색 엔진이 넘겨줄 때만 남습니다`, body));
+    }
 
     const hours = data.ydayHours || [];
     const pattern = data.hourPattern || [];

@@ -338,3 +338,26 @@ flvrdoyster/ataho`)으로 메꾼다 — 수동 실행은 지연 없이 바로 �
 이 파일들은 항상 로컬을 유지하고 충돌 표시 없이 넘어간다 — 단 신선도를 비교하지 않으므로, 머지/푸시 전에
 `ga4_dashboard.py`를 한 번 재실행해 로컬 데이터를 최신으로 만들어 두거나 pre-push 훅에 맡겨야 한다. 클론마다
 `git config merge.ours.driver true`를 한 번 등록해야 실제로 동작한다. CI는 머지하지 않아 필요 없다.
+
+## 11. 티스토리 유입 경로
+GA4에 안 남는 네이버·다음 검색어와 참조 주소를 티스토리 관리 화면에서 받아 블로그 탭에 붙인다.
+- 티스토리 Open API는 없어졌다. 관리 화면의 유입 경로 페이지는 `/manage/statistics/referrer/latest/log.json`
+  (한 건씩: 시각·분류 `definedDomain`·도메인·참조 주소·검색어)과 `/top/domain.json`(도메인 합계)만 부르고 기간
+  파라미터가 없다. 로그인 쿠키로만 열리므로 CI가 아니라 브라우저에서 받는다
+- 북마클릿(`scripts/tistory_referrer_bookmarklet.js`) 하나가 받기·병합·쓰기를 다 한다. 블로그
+  (`oysterbay.tistory.com` 아래 아무 페이지)에서 누르면 File System Access API로 저장소의
+  `dashboard/archive/tistory.json`을 읽어 합치고, 그것과 `dashboard/data/tistory.js`(최근 28일)를 쓴다.
+  처음엔 저장소 폴더를 고르고, 그 핸들은 티스토리 출처의 IndexedDB(`atah-referrer`)에 둔다. 고른 폴더에
+  `dashboard/archive`가 없으면 핸들을 지우고 다음에 다시 고르게 한다. 같은 기록은 시각+참조 주소로 거른다.
+  두 파일은 다른 커밋에 섞어 올린다
+- 로직을 고치면 북마크 주소도 다시 넣어야 한다. 줄바꿈과 들여쓰기를 지워 한 줄로 만들므로 `//` 주석을 쓰지
+  않고 문장마다 세미콜론을 붙인다:
+  `node -e "process.stdout.write('javascript:'+require('fs').readFileSync('scripts/tistory_referrer_bookmarklet.js','utf8').replace(/\\s*\\n\\s*/g,''))"`
+- 로그 창은 그저께 0시부터 받은 시각까지로 보인다(첫 관찰에서 가장 이른 기록이 그저께 00:06). 그래서 이틀 안에
+  한 번은 받아야 빈 구간이 없다. 날짜마다 `until`에 어디까지 받았는지 적고("24:00"이면 하루 전부), 창 밖 날짜의
+  기록은 넣되 다 받은 날로 치지 않는다. 화면은 마지막으로 받은 날로부터 이틀째면 경고 띠를, 그 뒤엔 빠진 구간이
+  생겼다는 띠를 띄운다. 창이 실제로 이보다 짧으면 `WINDOW_DAYS`를 줄여야 한다
+- 보관에는 참조 주소의 쿼리·조각을 잘라 넣는다 — 검색 주소의 쿼리엔 검색어 말고도 세션 값이 섞이고, 레포가 공개다.
+  `filterTarget`은 뜻을 몰라 담지 않는다
+- 화면에선 블로그 안에서 옮겨 다닌 조회(도메인이 블로그 자신)를 표에서 빼고 개수만 적는다. 티스토리 집계는
+  GA와 기준이 달라 「온 곳」의 세션 수와 맞지 않는다
