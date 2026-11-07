@@ -46,6 +46,9 @@
         return color + a.toString(16).padStart(2, '0');
     }
 
+    const MONTHS_SHOWN = 6;
+    const shownMonths = (d) => (d.months || []).slice(-MONTHS_SHOWN);
+    const monthLabel = (m) => m.month.slice(2).replace('-', '.');
     const nf = new Intl.NumberFormat('ko-KR');
     const fmt = (n) => nf.format(Math.round(n));
     const dec1 = (n) => n.toFixed(1);
@@ -123,7 +126,7 @@
             `<p class="reminder"><b>${tisAge === 2
                 ? `오늘 티스토리 유입 경로를 받지 않으면 ${lostFrom} 기록 일부를 놓칩니다`
                 : `티스토리 유입 경로를 ${fmt(tisAge)}일째 받지 않아 ${lostFrom}부터 빠진 기록이 생겼습니다`}</b>` +
-            `<span class="dim">마지막으로 받은 때 ${esc(mmdd(tisLast.slice(0, 10)))}${esc(tisLast.slice(10))} · ` +
+            `<span class="dim">마지막 수신 ${esc(mmdd(tisLast.slice(0, 10)))}${esc(tisLast.slice(10))} · ` +
             '블로그에서 유입 경로 북마크를 누르세요</span></p>');
     }
 
@@ -188,8 +191,9 @@
         },
     };
 
-    function lineChart(canvas, labels, datasets, extraPlugins) {
-        return new Chart(canvas, {
+    function lineChart(canvas, labels, datasets, extraPlugins, opts) {
+        const o = opts || {};
+        const chart = {
             type: 'line',
             data: {
                 labels,
@@ -205,8 +209,9 @@
                     cubicInterpolationMode: G.tension > 0 ? 'monotone' : 'default',
                     fill: !!d.fill,
                     pointRadius: d.pointRadius === undefined ? 0 : d.pointRadius,
-                    pointBackgroundColor: line,
-                    pointBorderColor: C.surface,
+                    pointBackgroundColor: d.pointBackgroundColor || line,
+                    pointBorderColor: d.pointBorderColor || C.surface,
+                    segment: d.segment,
                     pointBorderWidth: G.lineW,
                     pointHoverRadius: G.pointR,
                     pointHoverBorderColor: C.surface,
@@ -218,7 +223,7 @@
             options: {
                 responsive: true,
                 interaction: { mode: 'index', intersect: false },
-                layout: { padding: { top: 8, right: 8 } },
+                layout: { padding: o.padding || { top: 8, right: 8 } },
                 plugins: {
                     legend: {
                         display: datasets.length > 1,
@@ -239,12 +244,39 @@
                     },
                 },
                 scales: {
-                    x: { grid: { display: false }, border: axisStyle, ticks: { maxRotation: 0, autoSkipPadding: 16 } },
-                    y: { beginAtZero: true, grid: gridStyle, border: { display: false }, ticks: { precision: 0 } },
+                    x: { grid: { display: false }, border: axisStyle, offset: !!o.offsetX,
+                         ticks: { maxRotation: 0, autoSkipPadding: 16, autoSkip: !o.allTicks } },
+                    y: { beginAtZero: true, grid: gridStyle, border: { display: false }, ticks: { precision: 0 },
+                         grace: o.grace || 0 },
                 },
             },
             plugins: [crosshair, lineEndLabels].concat(extraPlugins || []),
-        });
+        };
+        if (o.still) chart.options.events = [];
+        return new Chart(canvas, chart);
+    }
+
+    function pointValues(fmtValue) {
+        return {
+            id: 'pointValues',
+            afterDatasetsDraw(chart) {
+                const ctx = chart.ctx;
+                chart.getDatasetMeta(0).data.forEach((el, i) => {
+                    ctx.save();
+                    ctx.fillStyle = C.textSecondary;
+                    ctx.font = `bold ${G.fontSize}px ${FONT}`;
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'bottom';
+                    const txt = fmtValue(chart.data.datasets[0].data[i]), ty = el.y - G.pointR - 4;
+                    ctx.lineJoin = 'round';
+                    ctx.lineWidth = 4;
+                    ctx.strokeStyle = C.surface;
+                    ctx.strokeText(txt, el.x, ty);
+                    ctx.fillText(txt, el.x, ty);
+                    ctx.restore();
+                });
+            },
+        };
     }
 
     function normalBand(box) {
@@ -319,30 +351,42 @@
     }
 
     const pu = base.perUser;
-    const newSub = y.newUsers <= y.users ? `새로 온 사람 ${fmt(y.newUsers)}명` : '';
+    const newSub = y.newUsers <= y.users ? `새 방문자 ${fmt(y.newUsers)}명` : '';
     parts.push(mod(5, '', '', `
         <div class="yday-title">
             <button type="button" class="date-nav" data-nav="prev" aria-label="이전 날짜">◀</button>
             ${esc(heroWord)} <span class="tag">${esc(mmdd(y.date))}</span>
             <button type="button" class="date-nav" data-nav="next" aria-label="다음 날짜"${isLatest ? ' disabled' : ''}>▶</button>
         </div>
-        <p class="meta-line">마지막 갱신 ${esc(data.meta.updatedAt)} KST ·
-            매일 아침 어제 하루치를 모읍니다.${data.confirmed ? '' :
-                ' 어제 수치는 잠정이라 내일 아침 수집 때 바로잡힙니다.'}</p>
+        <p class="meta-line">갱신 ${esc(data.meta.updatedAt)} KST ·
+            매일 아침 어제분을 모읍니다.${data.confirmed ? '' :
+                ' 어제 수치는 잠정이며 내일 아침 바로잡힙니다.'}</p>
         <div class="stat-grid">
             ${stat('방문자', base.users, '명', fmt, newSub)}
             ${stat('페이지 조회', base.views, '회', fmt)}
             ${stat('세션', base.sessions, '', fmt)}
-            ${stat('한 사람당', pu, '장', dec1)}
+            ${stat('방문자당 페이지', pu, '장', dec1)}
         </div>`, 'accent stretch'));
 
     parts.push(mod(7, '평소와 견주면',
         `최근 ${data.daily.length}일 일별 방문자 ·
-         띠는 열흘 중 여드레가 들어오는 구간, 점선은 중앙값`,
+         띠는 평소 범위(열흘 중 8일이 들어오는 구간), 점선은 중앙값`,
         `<div class="chart-box"><canvas id="c-trend-${key}"></canvas></div>
-         ${tableView('표로 보기', ['날짜', '방문자', '세션', '조회'],
+         ${tableView('표로 보기', ['날짜', '방문자', '세션', '페이지 조회'],
              data.daily.slice().reverse().map((d) => [
                  d.date, fmt(d.users), fmt(d.sessions), fmt(d.views)]))}`, 'stretch'));
+
+    const months = shownMonths(data);
+    if (isLatest && months.length) {
+        const wc = data.weekCompare;
+        const diff = (a, b) => (b > 0 ? ` (${a >= b ? '+' : ''}${Math.round((a - b) / b * 100)}%)` : '');
+        const wcLine = wc ? `<p class="note-line">최근 7일 하루 평균 방문자 <b>${dec1(wc.users)}명</b>` +
+            `${diff(wc.users, wc.prevUsers)} · 그 전 7일 ${dec1(wc.prevUsers)}명 · ` +
+            `하루 평균 조회 ${dec1(wc.views)}회 (그 전 ${dec1(wc.prevViews)}회)</p>` : '';
+        parts.push(mod(12, '긴 흐름',
+            `최근 ${months.length}개월 달별 하루 평균 방문자 · 점선과 빈 점은 아직 한 달이 안 찬 달(측정 시작 달·이번 달)`,
+            `${wcLine}<div class="chart-box"><canvas id="c-months-${key}"></canvas></div>`));
+    }
 
     if (data.insights && data.insights.length) {
         const emph = (t) => esc(t).replace(/\*\*(.+?)\*\*/g, '<b>$1</b>');
@@ -362,8 +406,8 @@
               (fbPending.oldestDays ? ` (${fmt(fbPending.oldestDays)}일 전)` : ' (오늘)')
             : '';
         parts.push(mod(12, '확인 안 한 피드백',
-            `gensei-pc98 게임 페이지에서 온 제보 중 시트의 「확인」칸이 안 찍힌 것 ·
-             내용은 공개 페이지에 싣지 않으니 시트에서 보세요`,
+            `gensei-pc98 게임 페이지 제보 중 시트 「확인」칸이 비어 있는 것 ·
+             내용은 시트에서 보세요(공개 페이지에는 싣지 않음)`,
             `<div class="settled-row">
                 <div><div class="label">미확인</div>
                      <div class="value">${fmt(fbPending.count)}건</div></div>
@@ -373,7 +417,7 @@
                      <div class="value">${tally(fbPending.byGame) || '—'}</div></div>
              </div>
              <p class="note-line">${[oldest, fbAsOf, fb.sheetUrl
-                ? `<a href="${esc(fb.sheetUrl)}" target="_blank" rel="noopener noreferrer">시트에서 확인하기</a>`
+                ? `<a href="${esc(fb.sheetUrl)}" target="_blank" rel="noopener noreferrer">시트 열기</a>`
                 : ''].filter(Boolean).join(' · ')}</p>`));
     } else if (primary && isLatest && fbFailed) {
         parts.push(mod(12, '확인 안 한 피드백', '',
@@ -410,17 +454,6 @@
             `<span><i class="key" style="background:${C.series[n]}"></i>${esc(s.name)} ` +
             `<b>${fmt(s.views)}</b> (${pct(share(s.views, siteTotal))})</span>`).join('')}</div>` : '';
 
-    parts.push(mod(7, `${dayLabel} 본 페이지`,
-        `조회수 순${data.ydaySites.length ? ' · atah.io 안은 코너 이름으로 묶어 표시' : ''} ·
-         「평소/일」은 ${dayLabel} 이전 ${data.daily.length - 1}일의 하루 평균`,
-        `${siteBar}
-         <div class="scroll"><table class="rank pages"><thead><tr>
-            <th>페이지</th><th class="num">${esc(dayLabel)} 조회</th>
-            <th class="num">평소/일</th><th class="num">사람</th>
-         </tr></thead><tbody>${pageRows ||
-            `<tr><td colspan="4" class="dim">${esc(dayLabel)} 조회된 페이지가 없습니다.</td></tr>`}
-         </tbody></table></div>`));
-
     const srcMax = Math.max(0, ...data.ydaySources.map((s) => s.sessions));
     const srcRows = data.ydaySources.map((s) =>
         `<tr><td class="name bar" style="${barW(s.sessions, srcMax)}">${esc(s.name)}</td>` +
@@ -428,25 +461,51 @@
 
     const unresolved = data.ydayUnresolved
         ? `<p class="note-line">${data.confirmed
-            ? `출처를 끝내 알 수 없었던 세션 <b>${fmt(data.ydayUnresolved)}</b>건입니다 — ` +
-              `GA4가 재처리를 마친 뒤에도 남은 값이라, 흔치 않지만 영영 분류되지 않는 ` +
-              `경우입니다.`
-            : `아직 분류 중 <b>${fmt(data.ydayUnresolved)}</b>건 — GA4가 세션 속성을 ` +
-              `확정하는 데 하루 이상 걸립니다. 이 값은 내일 자동으로 다시 확인됩니다.`
+            ? `끝내 출처를 알 수 없는 세션 <b>${fmt(data.ydayUnresolved)}</b>건 — ` +
+              `GA4 재처리 뒤에도 남은 값입니다.`
+            : `출처 분류 중인 세션 <b>${fmt(data.ydayUnresolved)}</b>건 — ` +
+              `GA4 확정에 하루 이상 걸려 내일 다시 확인합니다.`
           }</p>`
         : '';
 
-    parts.push(mod(5, `${dayLabel} 온 곳`,
-        `유입원별 세션 · 한 세션에 출처가 여럿 붙는 경우가 있어
+    const twoHour = (a) => Array.from({ length: 12 }, (_, n) => (a[n * 2] || 0) + (a[n * 2 + 1] || 0));
+    const hours = twoHour(data.ydayHours || []);
+    const pattern = twoHour(data.hourPattern || []);
+    const hourMax = Math.max(...hours, ...pattern, 0);
+    const ydayMax = Math.max(...hours, 0);
+    const peakAt = ydayMax > 0 ? hours.indexOf(ydayMax) : -1;
+    const hgt = (v) => (hourMax > 0 ? (v / hourMax * 100).toFixed(1) : 0);
+    const cols = hours.map((v, n) => {
+        const usual = pattern[n] || 0;
+        return '<div class="hour-col">' +
+            (usual > 0 ? `<span class="bar usual" style="height:${hgt(usual)}%"></span>` : '') +
+            (v > 0 ? `<span class="bar yday" style="height:${hgt(v)}%"></span>` : '') +
+            (n === peakAt ? `<b class="peak" style="bottom:${hgt(v)}%">${fmt(v)}</b>` : '') +
+            '</div>';
+    }).join('');
+    const hourTicks = hours.map((_, n) =>
+        `<div class="collabel">${n % 3 === 0 ? `${n * 2}시` : ''}</div>`).join('');
+
+    const hoursMod = mod(12, `${dayLabel} 시간대`,
+        `2시간 단위 세션 · 진한 막대는 ${esc(dayLabel)}, 옅은 막대는 최근 ${data.daily.length}일 평균 ·
+         여러 시간에 걸친 세션은 시간마다 셉니다`,
+        `<div class="hour-chart">${cols}</div>
+         <div class="hour-ticks">${hourTicks}</div>`);
+
+    const srcMod = mod(5, `${dayLabel} 온 곳`,
+        `유입원별 세션 · 출처가 여럿 붙는 세션이 있어
          합계가 ${dayLabel} 세션 수와 다를 수 있습니다`,
         `<div class="scroll"><table class="rank"><thead><tr>
             <th>출처</th><th class="num">세션</th></tr></thead><tbody>${srcRows ||
             '<tr><td colspan="2" class="dim">분류된 유입원이 없습니다.</td></tr>'}
          </tbody></table></div>
-         ${unresolved}`));
+         ${unresolved}`);
+
+    const hasRoute = key === 'blog' && tis && tis.firstDay && y.date >= tis.firstDay;
+    if (hasRoute) parts.push(srcMod);
 
     const td = key === 'blog' && tis && tis.days ? tis.days[y.date] : null;
-    if (key === 'blog' && tis && tis.firstDay && y.date >= tis.firstDay) {
+    if (hasRoute) {
         let body;
         if (!td) {
             body = `<p class="note-line">${esc(dayLabel)} 기록은 받지 못했습니다 — 티스토리는 ` +
@@ -460,7 +519,7 @@
                 `<tr><td class="name">${esc(kw)}<span class="host">${esc(cat)}</span></td>` +
                 `<td class="num">${fmt(n)}</td></tr>`).join('');
             const notes = [
-                td.inner ? `블로그 안에서 옮겨 다닌 조회 <b>${fmt(td.inner)}</b>회는 뺐습니다` : '',
+                td.inner ? `블로그 안 이동 <b>${fmt(td.inner)}</b>회는 뺐습니다` : '',
                 td.until !== '24:00' ? `${esc(td.until)}까지만 받은 기록입니다` : '',
             ].filter(Boolean).join(' · ');
             body = `<div class="scroll"><table class="rank"><thead><tr>
@@ -472,34 +531,27 @@
                  </tbody></table></div>` : '') +
                 (notes ? `<p class="note-line">${notes}</p>` : '');
         }
-        parts.push(mod(12, `${dayLabel} 들어온 경로`,
-            `티스토리 관리 화면의 유입 로그로 센 조회 · GA와 세는 기준이 달라 「${esc(dayLabel)} 온 곳」과
+        parts.push(mod(7, `${dayLabel} 들어온 경로`,
+            `티스토리 유입 로그로 센 조회 · GA와 기준이 달라 「${esc(dayLabel)} 온 곳」과
              수가 다릅니다 · 검색어는 검색 엔진이 넘겨줄 때만 남습니다`, body));
     }
 
-    const hours = data.ydayHours || [];
-    const pattern = data.hourPattern || [];
-    const hourMax = Math.max(...hours, ...pattern, 0);
-    const ydayMax = Math.max(...hours, 0);
-    const peakAt = ydayMax > 0 ? hours.indexOf(ydayMax) : -1;
-    const hgt = (v) => (hourMax > 0 ? (v / hourMax * 100).toFixed(1) : 0);
-    const cols = hours.map((v, hh) => {
-        const usual = pattern[hh] || 0;
-        return `<div class="hour-col" title="${hh}시 · ${esc(dayLabel)} ${fmt(v)}세션 · ` +
-            `평소 ${dec1(usual)}">` +
-            (usual > 0 ? `<span class="bar usual" style="height:${hgt(usual)}%"></span>` : '') +
-            (v > 0 ? `<span class="bar yday" style="height:${hgt(v)}%"></span>` : '') +
-            (hh === peakAt ? `<b class="peak" style="bottom:${hgt(v)}%">${fmt(v)}</b>` : '') +
-            '</div>';
-    }).join('');
-    const hourTicks = hours.map((_, hh) =>
-        `<div class="collabel">${hh % 6 === 0 ? `${hh}시` : ''}</div>`).join('');
+    const pagesMod = (span) => mod(span, `${dayLabel} 본 페이지`,
+        `조회 많은 순${data.ydaySites.length ? ' · atah.io는 코너별로 묶음' : ''} ·
+         평소/일 = ${dayLabel} 앞 ${data.daily.length - 1}일의 하루 평균`,
+        `${siteBar}
+         <div class="scroll"><table class="rank pages"><thead><tr>
+            <th>페이지</th><th class="num">${esc(dayLabel)} 조회</th>
+            <th class="num">평소/일</th><th class="num">방문자</th>
+         </tr></thead><tbody>${pageRows ||
+            `<tr><td colspan="4" class="dim">${esc(dayLabel)} 조회된 페이지가 없습니다.</td></tr>`}
+         </tbody></table></div>`);
 
-    parts.push(mod(12, `${dayLabel} 시간대`,
-        `시각별 세션 · 옅은 막대는 최근 ${data.daily.length}일의 시각별 하루 평균, 진한 막대는
-         ${esc(dayLabel)} · 여러 시간에 걸친 세션은 시간마다 셉니다`,
-        `<div class="hour-chart">${cols}</div>
-         <div class="hour-ticks">${hourTicks}</div>`));
+    if (hasRoute) {
+        parts.push(pagesMod(12), hoursMod);
+    } else {
+        parts.push(`<div class="stack span-5">${srcMod}${hoursMod}</div>`, pagesMod(7));
+    }
 
     const games = data.games || [];
     if (games.length) {
@@ -507,18 +559,22 @@
         const gameMax = Math.max(0, ...games.map((g) => g.start));
         const longest = (l) => (l ? `${fmt(l.minutes)}분 넘게 ${fmt(l.users)}명` : '—');
         const cell = (day, week) => `<td class="num">${day}<span class="week">/ ${week}</span></td>`;
-        const gameRows = games.map((g) =>
-            `<tr><td class="page bar" style="${barW(g.start, gameMax)}">` +
-            `<span class="name">${esc(g.game)}</span></td>` +
-            cell(fmt(g.start), fmt(g.week.start)) + cell(fmt(g.save), fmt(g.week.save)) +
-            cell(fmt(g.restore), fmt(g.week.restore)) +
-            cell(longest(g.longest), longest(g.week.longest)) + '</tr>').join('');
+        const gameRows = games.map((g) => {
+            const hasLong = g.longest || g.week.longest;
+            return `<tr${hasLong ? ' class="has-sub"' : ''}>` +
+                `<td class="page bar" style="${barW(g.start, gameMax)}">` +
+                `<span class="name">${esc(g.game)}</span></td>` +
+                cell(fmt(g.start), fmt(g.week.start)) + cell(fmt(g.save), fmt(g.week.save)) +
+                cell(fmt(g.restore), fmt(g.week.restore)) + '</tr>' +
+                (hasLong ? `<tr class="sub"><td colspan="4">최장 플레이 ${longest(g.longest)}` +
+                    `<span class="week">/ ${longest(g.week.longest)}</span></td></tr>` : '');
+        }).join('');
         parts.push(mod(12, `${dayLabel} 게임 플레이`,
-            `${esc(dayLabel)} 시작한 사람이 많은 순 · 옅은 숫자는 ${esc(weekLabel)} ·
-             사람 수는 기간 안에서 중복 제외`,
+            `시작한 방문자 많은 순 · 옅은 숫자는 ${esc(weekLabel)} ·
+             방문자는 기간 안에서 중복 제외`,
             `<div class="scroll"><table class="rank pages"><thead><tr>
                 <th>게임</th><th class="num">시작</th><th class="num">세이브</th>
-                <th class="num">이어하기</th><th class="num">가장 긴 플레이</th>
+                <th class="num">이어하기</th>
              </tr></thead><tbody>${gameRows}</tbody></table></div>`));
     }
 
@@ -526,46 +582,21 @@
     if (st) {
         const long_ = longestInSettled(data);
         const longRow = long_ ? `
-            <p class="note-line">가장 오래 머문 방문 <b>${dur(long_.longest.seconds)}</b>
+            <p class="note-line">가장 오래 머문 세션 <b>${dur(long_.longest.seconds)}</b>
              · ${esc(mmdd(long_.date))} · ${esc(long_.longest.source)}에서
              ${esc(long_.longest.device)}로 ${esc(long_.longest.landing)}
-             ${fmt(long_.longest.pageViews)}번 열어봄
+             조회 ${fmt(long_.longest.pageViews)}회
              (실제 참여 ${dur(long_.longest.engagementSeconds)})</p>` : '';
 
         parts.push(mod(12, '참여율 · 체류시간',
-            `어제를 뺀 마지막 ${data.meta.settledDays || 7}일 기준
-             (세션 ${fmt(st.sessions)}건). GA4가 참여 여부를 하루 이상 뒤에
-             확정하므로 어제 칸에는 올리지 않습니다.`,
+            `어제 제외 최근 ${data.meta.settledDays || 7}일 기준(세션 ${fmt(st.sessions)}건) ·
+             GA4가 참여 여부를 하루 이상 뒤에 확정해서 어제는 넣지 않습니다.`,
             `<div class="settled-row">
                 <div><div class="label">참여율</div>
                      <div class="value">${pct(st.engagementRate * 100, 1)}</div></div>
                 <div><div class="label">평균 체류시간</div>
                      <div class="value">${dur(st.avgDuration)}</div></div>
              </div>${longRow}`));
-    }
-
-    const months = data.months || [];
-    if (isLatest && months.length) {
-        const mMax = Math.max(...months.map((m) => m.users), 0);
-        const mCols = months.map((m) => {
-            const h = mMax > 0 ? (m.users / mMax * 100).toFixed(1) : 0;
-            return `<div class="month-col${m.partial ? ' partial' : ''}" ` +
-                `title="${esc(m.month)} · 하루 평균 방문자 ${dec1(m.users)}명 · 조회 ${dec1(m.views)}회 · ` +
-                `${fmt(m.days)}일${m.partial ? ' (일부)' : ''}">` +
-                `<b class="val" style="bottom:${h}%">${dec1(m.users)}</b>` +
-                `<span class="bar" style="height:${h}%"></span></div>`;
-        }).join('');
-        const mTicks = months.map((m) =>
-            `<div class="collabel">${esc(m.month.slice(2).replace('-', '.'))}</div>`).join('');
-        const wc = data.weekCompare;
-        const diff = (a, b) => (b > 0 ? ` (${a >= b ? '+' : ''}${Math.round((a - b) / b * 100)}%)` : '');
-        const wcLine = wc ? `<p class="note-line">최근 7일 하루 평균 방문자 <b>${dec1(wc.users)}명</b>` +
-            `${diff(wc.users, wc.prevUsers)} · 그 전 7일 ${dec1(wc.prevUsers)}명 · ` +
-            `조회 ${dec1(wc.views)}회 / ${dec1(wc.prevViews)}회</p>` : '';
-        parts.push(mod(12, '긴 흐름',
-            `달마다 하루 평균 방문자 · 흐린 막대는 아직 다 차지 않은 달(측정 시작 달·이번 달)`,
-            `${wcLine}<div class="month-chart" style="--n:${months.length}">${mCols}</div>
-             <div class="month-ticks" style="--n:${months.length}">${mTicks}</div>`));
     }
 
     parts.push(`<p class="meta-line span-12">GA4 속성 ${esc(data.meta.propertyId)} · ` +
@@ -579,6 +610,11 @@
         if (!at('c-trend')) return;
 
         if (!hasChart) {
+            const mBox = at('c-months');
+            if (mBox) {
+                mBox.parentElement.outerHTML = '<p class="note-line">차트를 불러오지 못했습니다 — ' +
+                    shownMonths(data).map((m) => `${monthLabel(m)} ${dec1(m.users)}명`).join(' · ') + '</p>';
+            }
             const box = at('c-trend').parentElement;
             box.outerHTML = '<p class="note-line">차트를 불러오지 못했습니다 — ' +
                 '아래 표에 같은 값이 있습니다.</p>';
@@ -595,6 +631,21 @@
               color: C.accent,
               pointRadius: data.daily.map((_, i) => (i === at_ ? G.pointR : 0)) },
         ], [normalBand(data.baseline && data.baseline.users)]);
+
+        if (at('c-months')) {
+            const ms = shownMonths(data);
+            const part = (i) => ms[i] && ms[i].partial;
+            lineChart(at('c-months'), ms.map(monthLabel), [
+                { label: '방문자', data: ms.map((m) => m.users), fill: true, color: C.accent,
+                  pointRadius: G.pointR,
+                  pointBackgroundColor: ms.map((m) => (m.partial ? C.surface : C.accent)),
+                  pointBorderColor: ms.map(() => C.accent),
+                  segment: { borderDash: (c) => (part(c.p0DataIndex) || part(c.p1DataIndex) ? [5, 4] : undefined) } },
+            ], [pointValues(dec1)], {
+                still: true, offsetX: true, allTicks: true, grace: '20%',
+                padding: { top: 8, right: 8 },
+            });
+        }
     }
 
     views.forEach((v) => {

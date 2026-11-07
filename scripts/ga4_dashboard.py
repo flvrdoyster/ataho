@@ -639,7 +639,7 @@ def build_insights(data, day_label="어제", confirmed=False):
         edge = max(pu_others) if deeper else min(pu_others)
         out.append({
             "tone": "flat",
-            "text": f"{day_label} 한 사람당 본 장수가 최근 {len(pu_others) + 1}일 중 "
+            "text": f"{day_label} 방문자당 페이지가 최근 {len(pu_others) + 1}일 중 "
                     f"**가장 {'많습니다' if deeper else '적습니다'}**"
                     f"(다른 날 {'최고' if deeper else '최저'} {edge:.1f}장).",
         })
@@ -669,7 +669,7 @@ def build_insights(data, day_label="어제", confirmed=False):
             "text": f"{day_label} 조회 가운데 재방문자 몫이 **{share * 100:.0f}%**입니다 — "
                     f"{span} 중 가장 {'높습니다' if high else '낮습니다'}"
                     f"(다른 날 {'최고' if high else '최저'} {edge * 100:.0f}%)."
-                    + ("" if high else " 새로 온 사람들이 대부분을 봤습니다."),
+                    + ("" if high else " 새 방문자가 대부분을 봤습니다."),
         })
 
     prior = set(data.get("_priorSources", []))
@@ -700,14 +700,14 @@ def build_insights(data, day_label="어제", confirmed=False):
         if confirmed:
             out.append({
                 "tone": "down",
-                "text": f"{day_label} 유입 가운데 **{data['ydayUnresolved']:,}건**은 GA4가 재처리를 "
+                "text": f"{day_label} 세션 가운데 **{data['ydayUnresolved']:,}건**은 GA4가 재처리를 "
                         f"마친 뒤에도 출처가 끝내 분류되지 않았습니다(분류된 것은 {resolved:,}건) — "
                         f"흔치 않은 일이니 계측(GTM) 설정을 점검해 볼 만합니다.",
             })
         else:
             out.append({
                 "tone": "down",
-                "text": f"{day_label} 유입 가운데 **{data['ydayUnresolved']:,}건**은 출처가 아직 "
+                "text": f"{day_label} 세션 가운데 **{data['ydayUnresolved']:,}건**은 출처가 아직 "
                         f"분류되지 않았습니다(분류된 것은 {resolved:,}건) — GA4가 세션 속성을 "
                         f"확정하는 데 하루 이상 걸립니다. 이 값은 내일 자동으로 다시 확인됩니다.",
             })
@@ -724,7 +724,7 @@ def build_insights(data, day_label="어제", confirmed=False):
             out.append({
                 "tone": "flat",
                 "text": f"{day_label}{'는' if day_label == '어제' else '은'} 평소와 크게 다른 점이 없었습니다 — 방문자도 "
-                        "페이지별 조회수도 늘 보던 범위 안입니다.",
+                        "페이지별 조회도 늘 보던 범위 안입니다.",
             })
 
     return out
@@ -736,8 +736,8 @@ SHIFT_RATIO = 2.0
 SHIFT_MIN = 15
 SEARCH_RATIO = 1.5
 SEARCH_MIN = 5
-CHANNEL_LABELS = {"Direct": "직접 들어온 방문", "Referral": "다른 사이트 링크로 온 방문",
-                  "Organic Social": "소셜에서 온 방문"}
+CHANNEL_LABELS = {"Direct": "직접 유입", "Referral": "다른 사이트 링크 유입",
+                  "Organic Social": "소셜 유입"}
 ENGINE_LABELS = {"naver": "네이버", "m.search.naver.com": "네이버", "search.naver.com": "네이버",
                  "google": "구글", "daum": "다음", "bing": "빙"}
 GAME_NAMES = {"suiko": "환세취호전", "suiko-jp": "환세취호전 일본어 원판", "suiko-demo": "환세취호전 체험판",
@@ -915,7 +915,7 @@ def weekly_insights(w, scope, recent_keys, said_today=()):
         mx = max(win("AI Assistant", 0, b) for b in (1, 2, 3))
         before = f"주 최대 {mx}세션이었습니다" if mx else "없었습니다"
         out.append({"tone": "up", "key": "ai:up", "span": "week",
-                    "text": f"{scope}에 AI 어시스턴트에서 온 방문이 **{cur}세션**입니다"
+                    "text": f"{scope}에 AI 어시스턴트에서 온 **{cur}세션**입니다"
                             + (f"({', '.join(ai_srcs)})" if ai_srcs else "") + f" — 그 전 3주에는 {before}."})
     return out
 
