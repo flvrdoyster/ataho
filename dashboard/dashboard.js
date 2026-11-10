@@ -377,27 +377,27 @@
                  d.date, fmt(d.users), fmt(d.sessions), fmt(d.views)]))}`, 'stretch'));
 
     const months = shownMonths(data);
+    let longMod = '';
     if (isLatest && months.length) {
         const wc = data.weekCompare;
         const diff = (a, b) => (b > 0 ? ` (${a >= b ? '+' : ''}${Math.round((a - b) / b * 100)}%)` : '');
         const wcLine = wc ? `<p class="note-line">최근 7일 하루 평균 방문자 <b>${dec1(wc.users)}명</b>` +
             `${diff(wc.users, wc.prevUsers)} · 그 전 7일 ${dec1(wc.prevUsers)}명 · ` +
             `하루 평균 조회 ${dec1(wc.views)}회 (그 전 ${dec1(wc.prevViews)}회)</p>` : '';
-        parts.push(mod(12, '긴 흐름',
+        longMod = mod(12, '긴 흐름',
             `최근 ${months.length}개월 달별 하루 평균 방문자 · 점선과 빈 점은 아직 한 달이 안 찬 달(측정 시작 달·이번 달)`,
-            `${wcLine}<div class="chart-box"><canvas id="c-months-${key}"></canvas></div>`));
+            `${wcLine}<div class="chart-box"><canvas id="c-months-${key}"></canvas></div>`);
     }
 
+    let weekMod = '';
     if (data.insights && data.insights.length) {
         const emph = (t) => esc(t).replace(/\*\*(.+?)\*\*/g, '<b>$1</b>');
         const weekly = (i) => i.span === 'week' || !!i.key;
-        const groups = [
-            [dayLabel, data.insights.filter((i) => !weekly(i))],
-            [isLatest ? '최근 7일' : `${mmdd(y.date)}까지 7일`, data.insights.filter(weekly)],
-        ].filter(([, items]) => items.length);
-        parts.push(mod(12, '', '', groups.map(([title, items]) =>
+        const box = (title, items) => items.length ? mod(12, '', '',
             `<div class="insight-group"><h3>${esc(title)}</h3><ul class="insights">${items
-                .map((i) => `<li>${emph(i.text)}</li>`).join('')}</ul></div>`).join('')));
+                .map((i) => `<li>${emph(i.text)}</li>`).join('')}</ul></div>`) : '';
+        parts.push(box(dayLabel, data.insights.filter((i) => !weekly(i))));
+        weekMod = box(isLatest ? '최근 7일' : `${mmdd(y.date)}까지 7일`, data.insights.filter(weekly));
     }
 
     if (primary && isLatest && fbPending) {
@@ -577,6 +577,8 @@
                 <th class="num">이어하기</th>
              </tr></thead><tbody>${gameRows}</tbody></table></div>`));
     }
+
+    parts.push(weekMod, longMod);
 
     const st = data.settled;
     if (st) {

@@ -588,35 +588,29 @@ def build_insights(data, day_label="어제", confirmed=False):
 
     pages = [p for p in data["ydayPages"] if not p.get("list")]
     spikes = [p for p in pages if p["spike"]]
-    top = None
     if spikes:
         top = max(spikes, key=lambda p: p["views"] - p["priorAvg"])
         label = page_label(top)
         head = f"{label}{josa(label, '이', '가')} {day_label} "
-        rise = top.get("rising")
-        rise_tail = (f" 최근 {RECENT_DAYS}일 하루 평균도 {rise['avg7']:.1f}회로 늘었습니다."
-                     if rise else "")
         if top["priorAvg"] == 0:
-            text = (head + f"**{top['views']:,}회** — 전에 조회가 없던 페이지"
-                    + ("인데," + rise_tail if rise else "입니다."))
+            text = head + f"**{top['views']:,}회** — 전에 조회가 없던 페이지입니다."
         elif top.get("fresh"):
-            text = (head + f"**{top['views']:,}회** — {mmdd(top['fresh'])}에 처음 조회가 생긴 페이지"
-                    + ("인데," + rise_tail if rise else "입니다."))
+            text = head + f"**{top['views']:,}회** — {mmdd(top['fresh'])}에 처음 조회가 생긴 페이지입니다."
         elif top["priorAvg"] < RATIO_FLOOR:
-            text = (head + f"**{top['views']:,}회** — 평소 하루 1회도 안 보던 페이지"
-                    + ("인데," + rise_tail if rise else "입니다."))
+            text = head + f"**{top['views']:,}회** — 평소 하루 1회도 안 보던 페이지입니다."
         else:
             text = (head + f"{top['views']:,}회 — 평소 하루 {top['priorAvg']:.1f}회 보던 페이지라 "
-                    f"**{top['ratio']:.1f}배**로 " + ("뛰었고," + rise_tail if rise else "뛰었습니다."))
+                    f"**{top['ratio']:.1f}배**로 뛰었습니다.")
         out.append({"tone": "up", "text": text})
 
-    risers = [p for p in pages if p.get("rising") and p is not top]
+    risers = [p for p in pages if p.get("rising")]
     if risers:
         r = max(risers, key=lambda p: p["rising"]["avg7"] - p["rising"]["before"])
         label, ri = page_label(r), r["rising"]
         out.append({
             "tone": "up",
-            "text": f"{label}{josa(label, '은', '는')} 최근 {RECENT_DAYS}일 하루 평균 "
+            "span": "week",
+            "text": f"{label}{josa(label, '은', '는')} 하루 평균 "
                     f"**{ri['avg7']:.1f}회**로 늘었습니다(그 전 {ri['beforeDays']}일 "
                     + (f"하루 {ri['before']:.1f}회)." if ri["before"] >= 0.1 else "거의 0회)."),
         })

@@ -247,10 +247,6 @@ a:hover {
     color: var(--text-muted);
 }
 
-.insight-group + .insight-group {
-    margin-top: var(--gap-tight);
-}
-
 .insights {
     margin: 0;
     padding: 2px 0 2px 18px;
