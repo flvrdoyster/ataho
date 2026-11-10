@@ -10,3 +10,6 @@
 __pycache__/
 *.pyc
 .venv/
+
+# 소개글 미리보기 생성물 (blog/post/build_preview.py)
+blog/post/preview/
