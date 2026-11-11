@@ -221,6 +221,338 @@ window.DASHBOARD_DATA['blog'] = {
    "views": 44
   }
  ],
+ "dailyLong": [
+  {
+   "date": "2026-09-17",
+   "sessions": 8,
+   "users": 3,
+   "views": 16
+  },
+  {
+   "date": "2026-09-18",
+   "sessions": 4,
+   "users": 3,
+   "views": 31
+  },
+  {
+   "date": "2026-09-19",
+   "sessions": 7,
+   "users": 4,
+   "views": 13
+  },
+  {
+   "date": "2026-09-20",
+   "sessions": 6,
+   "users": 6,
+   "views": 8
+  },
+  {
+   "date": "2026-09-21",
+   "sessions": 12,
+   "users": 7,
+   "views": 50
+  },
+  {
+   "date": "2026-09-22",
+   "sessions": 8,
+   "users": 6,
+   "views": 24
+  },
+  {
+   "date": "2026-09-23",
+   "sessions": 5,
+   "users": 3,
+   "views": 8
+  },
+  {
+   "date": "2026-09-24",
+   "sessions": 2,
+   "users": 2,
+   "views": 3
+  },
+  {
+   "date": "2026-09-25",
+   "sessions": 5,
+   "users": 3,
+   "views": 5
+  },
+  {
+   "date": "2026-09-26",
+   "sessions": 6,
+   "users": 6,
+   "views": 11
+  },
+  {
+   "date": "2026-09-27",
+   "sessions": 8,
+   "users": 2,
+   "views": 6
+  },
+  {
+   "date": "2026-09-28",
+   "sessions": 6,
+   "users": 3,
+   "views": 8
+  },
+  {
+   "date": "2026-09-29",
+   "sessions": 6,
+   "users": 5,
+   "views": 7
+  },
+  {
+   "date": "2026-09-30",
+   "sessions": 9,
+   "users": 7,
+   "views": 21
+  },
+  {
+   "date": "2026-10-01",
+   "sessions": 11,
+   "users": 7,
+   "views": 28
+  },
+  {
+   "date": "2026-10-02",
+   "sessions": 6,
+   "users": 5,
+   "views": 7
+  },
+  {
+   "date": "2026-10-03",
+   "sessions": 4,
+   "users": 4,
+   "views": 6
+  },
+  {
+   "date": "2026-10-04",
+   "sessions": 0,
+   "users": 0,
+   "views": 0
+  },
+  {
+   "date": "2026-10-05",
+   "sessions": 6,
+   "users": 6,
+   "views": 17
+  },
+  {
+   "date": "2026-10-06",
+   "sessions": 12,
+   "users": 8,
+   "views": 16
+  },
+  {
+   "date": "2026-10-07",
+   "sessions": 16,
+   "users": 7,
+   "views": 60
+  },
+  {
+   "date": "2026-10-08",
+   "sessions": 21,
+   "users": 13,
+   "views": 85
+  },
+  {
+   "date": "2026-10-09",
+   "sessions": 10,
+   "users": 6,
+   "views": 28
+  },
+  {
+   "date": "2026-10-10",
+   "sessions": 13,
+   "users": 10,
+   "views": 41
+  },
+  {
+   "date": "2026-10-11",
+   "sessions": 9,
+   "users": 7,
+   "views": 16
+  },
+  {
+   "date": "2026-10-12",
+   "sessions": 9,
+   "users": 5,
+   "views": 16
+  },
+  {
+   "date": "2026-10-13",
+   "sessions": 14,
+   "users": 7,
+   "views": 39
+  },
+  {
+   "date": "2026-10-14",
+   "sessions": 3,
+   "users": 2,
+   "views": 3
+  },
+  {
+   "date": "2026-10-15",
+   "sessions": 9,
+   "users": 6,
+   "views": 11
+  },
+  {
+   "date": "2026-10-16",
+   "sessions": 13,
+   "users": 11,
+   "views": 40
+  },
+  {
+   "date": "2026-10-17",
+   "sessions": 4,
+   "users": 4,
+   "views": 8
+  },
+  {
+   "date": "2026-10-18",
+   "sessions": 12,
+   "users": 7,
+   "views": 16
+  },
+  {
+   "date": "2026-10-19",
+   "sessions": 3,
+   "users": 3,
+   "views": 46
+  },
+  {
+   "date": "2026-10-20",
+   "sessions": 3,
+   "users": 2,
+   "views": 3
+  },
+  {
+   "date": "2026-10-21",
+   "sessions": 1,
+   "users": 1,
+   "views": 2
+  },
+  {
+   "date": "2026-10-22",
+   "sessions": 8,
+   "users": 7,
+   "views": 22
+  },
+  {
+   "date": "2026-10-23",
+   "sessions": 4,
+   "users": 4,
+   "views": 30
+  },
+  {
+   "date": "2026-10-24",
+   "sessions": 5,
+   "users": 5,
+   "views": 29
+  },
+  {
+   "date": "2026-10-25",
+   "sessions": 9,
+   "users": 7,
+   "views": 29
+  },
+  {
+   "date": "2026-10-26",
+   "sessions": 5,
+   "users": 2,
+   "views": 5
+  },
+  {
+   "date": "2026-10-27",
+   "sessions": 12,
+   "users": 6,
+   "views": 20
+  },
+  {
+   "date": "2026-10-28",
+   "sessions": 9,
+   "users": 7,
+   "views": 23
+  },
+  {
+   "date": "2026-10-29",
+   "sessions": 5,
+   "users": 4,
+   "views": 7
+  },
+  {
+   "date": "2026-10-30",
+   "sessions": 16,
+   "users": 11,
+   "views": 28
+  },
+  {
+   "date": "2026-10-31",
+   "sessions": 8,
+   "users": 4,
+   "views": 17
+  },
+  {
+   "date": "2026-11-01",
+   "sessions": 10,
+   "users": 5,
+   "views": 27
+  },
+  {
+   "date": "2026-11-02",
+   "sessions": 9,
+   "users": 5,
+   "views": 18
+  },
+  {
+   "date": "2026-11-03",
+   "sessions": 8,
+   "users": 5,
+   "views": 31
+  },
+  {
+   "date": "2026-11-04",
+   "sessions": 10,
+   "users": 6,
+   "views": 24
+  },
+  {
+   "date": "2026-11-05",
+   "sessions": 11,
+   "users": 9,
+   "views": 27
+  },
+  {
+   "date": "2026-11-06",
+   "sessions": 12,
+   "users": 8,
+   "views": 28
+  },
+  {
+   "date": "2026-11-07",
+   "sessions": 10,
+   "users": 7,
+   "views": 67
+  },
+  {
+   "date": "2026-11-08",
+   "sessions": 6,
+   "users": 4,
+   "views": 9
+  },
+  {
+   "date": "2026-11-09",
+   "sessions": 4,
+   "users": 3,
+   "views": 24
+  },
+  {
+   "date": "2026-11-10",
+   "sessions": 10,
+   "users": 6,
+   "views": 44
+  }
+ ],
  "games": [],
  "history": {
   "2026-10-14": {
@@ -276,6 +608,32 @@ window.DASHBOARD_DATA['blog'] = {
    },
    "confirmed": true,
    "games": [],
+   "hourPattern": [
+    0.54,
+    0.25,
+    0.14,
+    0.18,
+    0.07,
+    0.11,
+    0.07,
+    0.07,
+    0.14,
+    0.14,
+    0.39,
+    0.21,
+    0.43,
+    0.46,
+    0.5,
+    0.82,
+    0.57,
+    0.39,
+    0.29,
+    0.25,
+    0.57,
+    0.82,
+    0.64,
+    0.61
+   ],
    "insights": [
     {
      "text": "10.14은 평소와 크게 다른 점이 없었습니다 — 방문자도 페이지별 조회도 늘 보던 범위 안입니다.",
@@ -290,6 +648,23 @@ window.DASHBOARD_DATA['blog'] = {
     "seconds": 1055,
     "source": "google"
    },
+   "settled": {
+    "avgDuration": 227.8503799888889,
+    "engagementRate": 0.5777777777777777,
+    "from": "2026-10-07",
+    "longest": {
+     "date": "2026-10-08",
+     "device": "데스크톱",
+     "engagementSeconds": 431,
+     "landing": "/135",
+     "pageViews": 8,
+     "seconds": 3123,
+     "source": "namu.wiki"
+    },
+    "sessions": 90,
+    "to": "2026-10-13"
+   },
+   "updatedAt": "2026-11-11 12:08",
    "ydayHours": [
     1,
     0,
@@ -423,6 +798,32 @@ window.DASHBOARD_DATA['blog'] = {
    },
    "confirmed": true,
    "games": [],
+   "hourPattern": [
+    0.57,
+    0.25,
+    0.14,
+    0.18,
+    0.11,
+    0.11,
+    0.11,
+    0.14,
+    0.14,
+    0.18,
+    0.36,
+    0.25,
+    0.39,
+    0.46,
+    0.46,
+    0.82,
+    0.64,
+    0.36,
+    0.25,
+    0.25,
+    0.57,
+    0.82,
+    0.57,
+    0.61
+   ],
    "insights": [
     {
      "text": "10.15은 평소와 크게 다른 점이 없었습니다 — 방문자도 페이지별 조회도 늘 보던 범위 안입니다.",
@@ -430,6 +831,23 @@ window.DASHBOARD_DATA['blog'] = {
     }
    ],
    "longest": null,
+   "settled": {
+    "avgDuration": 252.98514532051283,
+    "engagementRate": 0.6025641025641025,
+    "from": "2026-10-08",
+    "longest": {
+     "date": "2026-10-08",
+     "device": "데스크톱",
+     "engagementSeconds": 431,
+     "landing": "/135",
+     "pageViews": 8,
+     "seconds": 3123,
+     "source": "namu.wiki"
+    },
+    "sessions": 78,
+    "to": "2026-10-14"
+   },
+   "updatedAt": "2026-11-11 12:08",
    "ydayHours": [
     1,
     0,
@@ -605,6 +1023,32 @@ window.DASHBOARD_DATA['blog'] = {
    },
    "confirmed": true,
    "games": [],
+   "hourPattern": [
+    0.64,
+    0.25,
+    0.14,
+    0.21,
+    0.11,
+    0.14,
+    0.11,
+    0.14,
+    0.07,
+    0.18,
+    0.43,
+    0.25,
+    0.39,
+    0.5,
+    0.5,
+    0.86,
+    0.68,
+    0.39,
+    0.25,
+    0.25,
+    0.57,
+    0.82,
+    0.57,
+    0.61
+   ],
    "insights": [
     {
      "text": "환세쾌진극 웹 버전이 10.16 **6회** — 10.13에 처음 조회가 생긴 페이지입니다.",
@@ -619,6 +1063,23 @@ window.DASHBOARD_DATA['blog'] = {
     "seconds": 1117,
     "source": "naver"
    },
+   "settled": {
+    "avgDuration": 223.3848262121212,
+    "engagementRate": 0.5454545454545454,
+    "from": "2026-10-09",
+    "longest": {
+     "date": "2026-10-09",
+     "device": "데스크톱",
+     "engagementSeconds": 67,
+     "landing": "/tag/환세쾌도전",
+     "pageViews": 5,
+     "seconds": 1384,
+     "source": "직접 방문"
+    },
+    "sessions": 66,
+    "to": "2026-10-15"
+   },
+   "updatedAt": "2026-11-11 12:08",
    "ydayHours": [
     2,
     0,
@@ -924,6 +1385,32 @@ window.DASHBOARD_DATA['blog'] = {
    },
    "confirmed": true,
    "games": [],
+   "hourPattern": [
+    0.61,
+    0.25,
+    0.14,
+    0.21,
+    0.18,
+    0.18,
+    0.11,
+    0.14,
+    0.07,
+    0.18,
+    0.43,
+    0.25,
+    0.36,
+    0.5,
+    0.46,
+    0.86,
+    0.68,
+    0.39,
+    0.21,
+    0.25,
+    0.57,
+    0.79,
+    0.57,
+    0.61
+   ],
    "insights": [
     {
      "text": "10.17은 평소와 크게 다른 점이 없었습니다 — 방문자도 페이지별 조회도 늘 보던 범위 안입니다.",
@@ -938,6 +1425,23 @@ window.DASHBOARD_DATA['blog'] = {
     "seconds": 1345,
     "source": "namu.wiki"
    },
+   "settled": {
+    "avgDuration": 223.06064269565218,
+    "engagementRate": 0.5797101449275363,
+    "from": "2026-10-10",
+    "longest": {
+     "date": "2026-10-16",
+     "device": "데스크톱",
+     "engagementSeconds": 97,
+     "landing": "/100",
+     "pageViews": 3,
+     "seconds": 1117,
+     "source": "naver"
+    },
+    "sessions": 69,
+    "to": "2026-10-16"
+   },
+   "updatedAt": "2026-11-11 12:08",
    "ydayHours": [
     0,
     0,
@@ -1113,6 +1617,32 @@ window.DASHBOARD_DATA['blog'] = {
    },
    "confirmed": true,
    "games": [],
+   "hourPattern": [
+    0.57,
+    0.25,
+    0.14,
+    0.21,
+    0.18,
+    0.18,
+    0.11,
+    0.14,
+    0.07,
+    0.18,
+    0.46,
+    0.25,
+    0.36,
+    0.46,
+    0.54,
+    0.86,
+    0.71,
+    0.46,
+    0.25,
+    0.29,
+    0.57,
+    0.82,
+    0.54,
+    0.61
+   ],
    "insights": [
     {
      "text": "PC98 환세 시리즈 한글화가 10.18 9회 — 평소 하루 3.7회 보던 페이지라 **2.4배**로 뛰었습니다.",
@@ -1120,6 +1650,23 @@ window.DASHBOARD_DATA['blog'] = {
     }
    ],
    "longest": null,
+   "settled": {
+    "avgDuration": 261.9684636833333,
+    "engagementRate": 0.5833333333333334,
+    "from": "2026-10-11",
+    "longest": {
+     "date": "2026-10-17",
+     "device": "데스크톱",
+     "engagementSeconds": 89,
+     "landing": "/100",
+     "pageViews": 3,
+     "seconds": 1345,
+     "source": "namu.wiki"
+    },
+    "sessions": 60,
+    "to": "2026-10-17"
+   },
+   "updatedAt": "2026-11-11 12:08",
    "ydayHours": [
     0,
     0,
@@ -1313,6 +1860,32 @@ window.DASHBOARD_DATA['blog'] = {
    },
    "confirmed": true,
    "games": [],
+   "hourPattern": [
+    0.5,
+    0.25,
+    0.14,
+    0.21,
+    0.18,
+    0.18,
+    0.11,
+    0.14,
+    0.11,
+    0.14,
+    0.43,
+    0.25,
+    0.36,
+    0.36,
+    0.46,
+    0.86,
+    0.64,
+    0.43,
+    0.21,
+    0.29,
+    0.57,
+    0.86,
+    0.54,
+    0.61
+   ],
    "insights": [
     {
      "text": "OYSTER BAY가 10.19 19회 — 평소 하루 3.0회 보던 페이지라 **6.3배**로 뛰었습니다.",
@@ -1327,6 +1900,23 @@ window.DASHBOARD_DATA['blog'] = {
     "seconds": 223,
     "source": "namu.wiki"
    },
+   "settled": {
+    "avgDuration": 257.52507995238096,
+    "engagementRate": 0.5873015873015873,
+    "from": "2026-10-12",
+    "longest": {
+     "date": "2026-10-17",
+     "device": "데스크톱",
+     "engagementSeconds": 89,
+     "landing": "/100",
+     "pageViews": 3,
+     "seconds": 1345,
+     "source": "namu.wiki"
+    },
+    "sessions": 63,
+    "to": "2026-10-18"
+   },
+   "updatedAt": "2026-11-11 12:08",
    "ydayHours": [
     0,
     0,
@@ -1620,6 +2210,32 @@ window.DASHBOARD_DATA['blog'] = {
    },
    "confirmed": true,
    "games": [],
+   "hourPattern": [
+    0.5,
+    0.25,
+    0.14,
+    0.21,
+    0.18,
+    0.18,
+    0.11,
+    0.14,
+    0.07,
+    0.07,
+    0.39,
+    0.21,
+    0.36,
+    0.39,
+    0.46,
+    0.82,
+    0.64,
+    0.39,
+    0.18,
+    0.29,
+    0.57,
+    0.86,
+    0.5,
+    0.61
+   ],
    "insights": [
     {
      "text": "10.20은 평소와 크게 다른 점이 없었습니다 — 방문자도 페이지별 조회도 늘 보던 범위 안입니다.",
@@ -1634,6 +2250,23 @@ window.DASHBOARD_DATA['blog'] = {
     "seconds": 9,
     "source": "google"
    },
+   "settled": {
+    "avgDuration": 267.6820128965517,
+    "engagementRate": 0.6206896551724138,
+    "from": "2026-10-13",
+    "longest": {
+     "date": "2026-10-17",
+     "device": "데스크톱",
+     "engagementSeconds": 89,
+     "landing": "/100",
+     "pageViews": 3,
+     "seconds": 1345,
+     "source": "namu.wiki"
+    },
+    "sessions": 58,
+    "to": "2026-10-19"
+   },
+   "updatedAt": "2026-11-11 12:08",
    "ydayHours": [
     0,
     0,
@@ -1767,6 +2400,32 @@ window.DASHBOARD_DATA['blog'] = {
    },
    "confirmed": true,
    "games": [],
+   "hourPattern": [
+    0.5,
+    0.25,
+    0.14,
+    0.21,
+    0.18,
+    0.18,
+    0.11,
+    0.14,
+    0.07,
+    0.07,
+    0.36,
+    0.21,
+    0.36,
+    0.43,
+    0.43,
+    0.79,
+    0.64,
+    0.39,
+    0.18,
+    0.25,
+    0.57,
+    0.82,
+    0.5,
+    0.61
+   ],
    "insights": [
     {
      "text": "10.21은 평소와 크게 다른 점이 없었습니다 — 방문자도 페이지별 조회도 늘 보던 범위 안입니다.",
@@ -1781,6 +2440,23 @@ window.DASHBOARD_DATA['blog'] = {
     "seconds": 12,
     "source": "google"
    },
+   "settled": {
+    "avgDuration": 196.6895236595745,
+    "engagementRate": 0.6382978723404256,
+    "from": "2026-10-14",
+    "longest": {
+     "date": "2026-10-17",
+     "device": "데스크톱",
+     "engagementSeconds": 89,
+     "landing": "/100",
+     "pageViews": 3,
+     "seconds": 1345,
+     "source": "namu.wiki"
+    },
+    "sessions": 47,
+    "to": "2026-10-20"
+   },
+   "updatedAt": "2026-11-11 12:08",
    "ydayHours": [
     0,
     0,
@@ -1906,6 +2582,32 @@ window.DASHBOARD_DATA['blog'] = {
    },
    "confirmed": true,
    "games": [],
+   "hourPattern": [
+    0.54,
+    0.25,
+    0.14,
+    0.21,
+    0.18,
+    0.18,
+    0.07,
+    0.14,
+    0.07,
+    0.11,
+    0.39,
+    0.21,
+    0.36,
+    0.43,
+    0.46,
+    0.75,
+    0.64,
+    0.39,
+    0.21,
+    0.25,
+    0.57,
+    0.89,
+    0.5,
+    0.68
+   ],
    "insights": [
     {
      "text": "환세취호전 웹 에뮬레이터 및 개선 패치가 10.22 8회 — 평소 하루 2.1회 보던 페이지라 **3.8배**로 뛰었습니다.",
@@ -1920,6 +2622,23 @@ window.DASHBOARD_DATA['blog'] = {
     "seconds": 1964,
     "source": "google"
    },
+   "settled": {
+    "avgDuration": 182.24718271111112,
+    "engagementRate": 0.6666666666666666,
+    "from": "2026-10-15",
+    "longest": {
+     "date": "2026-10-17",
+     "device": "데스크톱",
+     "engagementSeconds": 89,
+     "landing": "/100",
+     "pageViews": 3,
+     "seconds": 1345,
+     "source": "namu.wiki"
+    },
+    "sessions": 45,
+    "to": "2026-10-21"
+   },
+   "updatedAt": "2026-11-11 12:08",
    "ydayHours": [
     1,
     0,
@@ -2109,6 +2828,32 @@ window.DASHBOARD_DATA['blog'] = {
    },
    "confirmed": true,
    "games": [],
+   "hourPattern": [
+    0.54,
+    0.25,
+    0.14,
+    0.21,
+    0.18,
+    0.18,
+    0.07,
+    0.14,
+    0.07,
+    0.11,
+    0.43,
+    0.21,
+    0.32,
+    0.43,
+    0.46,
+    0.79,
+    0.61,
+    0.39,
+    0.21,
+    0.29,
+    0.61,
+    0.89,
+    0.46,
+    0.64
+   ],
    "insights": [
     {
      "text": "10.23은 평소와 크게 다른 점이 없었습니다 — 방문자도 페이지별 조회도 늘 보던 범위 안입니다.",
@@ -2123,6 +2868,23 @@ window.DASHBOARD_DATA['blog'] = {
     "seconds": 1575,
     "source": "직접 방문"
    },
+   "settled": {
+    "avgDuration": 207.58812272727272,
+    "engagementRate": 0.6818181818181818,
+    "from": "2026-10-16",
+    "longest": {
+     "date": "2026-10-22",
+     "device": "데스크톱",
+     "engagementSeconds": 49,
+     "landing": "/",
+     "pageViews": 12,
+     "seconds": 1964,
+     "source": "google"
+    },
+    "sessions": 44,
+    "to": "2026-10-22"
+   },
+   "updatedAt": "2026-11-11 12:08",
    "ydayHours": [
     1,
     0,
@@ -2434,6 +3196,32 @@ window.DASHBOARD_DATA['blog'] = {
    },
    "confirmed": true,
    "games": [],
+   "hourPattern": [
+    0.5,
+    0.25,
+    0.11,
+    0.21,
+    0.18,
+    0.18,
+    0.07,
+    0.11,
+    0.07,
+    0.11,
+    0.43,
+    0.21,
+    0.32,
+    0.43,
+    0.46,
+    0.75,
+    0.61,
+    0.39,
+    0.25,
+    0.25,
+    0.64,
+    0.93,
+    0.5,
+    0.64
+   ],
    "insights": [
     {
      "text": "환세취호전 웹 에뮬레이터 및 개선 패치가 10.24 6회 — 평소 하루 2.5회 보던 페이지라 **2.4배**로 뛰었습니다.",
@@ -2452,6 +3240,23 @@ window.DASHBOARD_DATA['blog'] = {
     "seconds": 514,
     "source": "google"
    },
+   "settled": {
+    "avgDuration": 235.43586448571432,
+    "engagementRate": 0.6285714285714286,
+    "from": "2026-10-17",
+    "longest": {
+     "date": "2026-10-22",
+     "device": "데스크톱",
+     "engagementSeconds": 49,
+     "landing": "/",
+     "pageViews": 12,
+     "seconds": 1964,
+     "source": "google"
+    },
+    "sessions": 35,
+    "to": "2026-10-23"
+   },
+   "updatedAt": "2026-11-11 12:08",
    "ydayHours": [
     0,
     1,
@@ -2711,6 +3516,32 @@ window.DASHBOARD_DATA['blog'] = {
    },
    "confirmed": true,
    "games": [],
+   "hourPattern": [
+    0.5,
+    0.25,
+    0.11,
+    0.25,
+    0.18,
+    0.18,
+    0.07,
+    0.11,
+    0.07,
+    0.14,
+    0.43,
+    0.25,
+    0.32,
+    0.39,
+    0.5,
+    0.75,
+    0.54,
+    0.36,
+    0.25,
+    0.29,
+    0.64,
+    0.96,
+    0.5,
+    0.61
+   ],
    "insights": [
     {
      "text": "10.25은 평소와 크게 다른 점이 없었습니다 — 방문자도 페이지별 조회도 늘 보던 범위 안입니다.",
@@ -2725,6 +3556,23 @@ window.DASHBOARD_DATA['blog'] = {
     "seconds": 325,
     "source": "namu.wiki"
    },
+   "settled": {
+    "avgDuration": 191.0465181666667,
+    "engagementRate": 0.6388888888888888,
+    "from": "2026-10-18",
+    "longest": {
+     "date": "2026-10-22",
+     "device": "데스크톱",
+     "engagementSeconds": 49,
+     "landing": "/",
+     "pageViews": 12,
+     "seconds": 1964,
+     "source": "google"
+    },
+    "sessions": 36,
+    "to": "2026-10-24"
+   },
+   "updatedAt": "2026-11-11 12:08",
    "ydayHours": [
     0,
     1,
@@ -3016,6 +3864,32 @@ window.DASHBOARD_DATA['blog'] = {
    },
    "confirmed": true,
    "games": [],
+   "hourPattern": [
+    0.46,
+    0.21,
+    0.07,
+    0.25,
+    0.18,
+    0.18,
+    0.07,
+    0.11,
+    0.07,
+    0.14,
+    0.39,
+    0.25,
+    0.32,
+    0.39,
+    0.46,
+    0.71,
+    0.57,
+    0.36,
+    0.25,
+    0.32,
+    0.64,
+    1.0,
+    0.54,
+    0.64
+   ],
    "insights": [
     {
      "text": "10.26은 평소와 크게 다른 점이 없었습니다 — 방문자도 페이지별 조회도 늘 보던 범위 안입니다.",
@@ -3029,6 +3903,23 @@ window.DASHBOARD_DATA['blog'] = {
     }
    ],
    "longest": null,
+   "settled": {
+    "avgDuration": 183.53916415151517,
+    "engagementRate": 0.6666666666666666,
+    "from": "2026-10-19",
+    "longest": {
+     "date": "2026-10-22",
+     "device": "데스크톱",
+     "engagementSeconds": 49,
+     "landing": "/",
+     "pageViews": 12,
+     "seconds": 1964,
+     "source": "google"
+    },
+    "sessions": 33,
+    "to": "2026-10-25"
+   },
+   "updatedAt": "2026-11-11 12:08",
    "ydayHours": [
     0,
     0,
@@ -3172,6 +4063,32 @@ window.DASHBOARD_DATA['blog'] = {
    },
    "confirmed": true,
    "games": [],
+   "hourPattern": [
+    0.46,
+    0.21,
+    0.07,
+    0.29,
+    0.18,
+    0.14,
+    0.07,
+    0.11,
+    0.07,
+    0.14,
+    0.43,
+    0.25,
+    0.39,
+    0.36,
+    0.46,
+    0.68,
+    0.61,
+    0.32,
+    0.25,
+    0.46,
+    0.64,
+    1.04,
+    0.57,
+    0.64
+   ],
    "insights": [
     {
      "text": "지도로 보는 환세 시리즈 세계관이 10.27 **10회** — 전에 조회가 없던 페이지입니다.",
@@ -3179,6 +4096,23 @@ window.DASHBOARD_DATA['blog'] = {
     }
    ],
    "longest": null,
+   "settled": {
+    "avgDuration": 162.4796898857143,
+    "engagementRate": 0.5428571428571428,
+    "from": "2026-10-20",
+    "longest": {
+     "date": "2026-10-22",
+     "device": "데스크톱",
+     "engagementSeconds": 49,
+     "landing": "/",
+     "pageViews": 12,
+     "seconds": 1964,
+     "source": "google"
+    },
+    "sessions": 35,
+    "to": "2026-10-26"
+   },
+   "updatedAt": "2026-11-11 12:08",
    "ydayHours": [
     0,
     0,
@@ -3372,6 +4306,32 @@ window.DASHBOARD_DATA['blog'] = {
    },
    "confirmed": true,
    "games": [],
+   "hourPattern": [
+    0.54,
+    0.25,
+    0.07,
+    0.29,
+    0.18,
+    0.18,
+    0.07,
+    0.11,
+    0.11,
+    0.14,
+    0.46,
+    0.25,
+    0.39,
+    0.36,
+    0.46,
+    0.61,
+    0.54,
+    0.32,
+    0.25,
+    0.46,
+    0.64,
+    1.0,
+    0.61,
+    0.57
+   ],
    "insights": [
     {
      "text": "지도로 보는 환세 시리즈 세계관이 10.28 **8회** — 10.27에 처음 조회가 생긴 페이지입니다.",
@@ -3383,6 +4343,23 @@ window.DASHBOARD_DATA['blog'] = {
     }
    ],
    "longest": null,
+   "settled": {
+    "avgDuration": 193.38392870454544,
+    "engagementRate": 0.5681818181818182,
+    "from": "2026-10-21",
+    "longest": {
+     "date": "2026-10-22",
+     "device": "데스크톱",
+     "engagementSeconds": 49,
+     "landing": "/",
+     "pageViews": 12,
+     "seconds": 1964,
+     "source": "google"
+    },
+    "sessions": 44,
+    "to": "2026-10-27"
+   },
+   "updatedAt": "2026-11-11 12:08",
    "ydayHours": [
     2,
     1,
@@ -3626,6 +4603,32 @@ window.DASHBOARD_DATA['blog'] = {
    },
    "confirmed": true,
    "games": [],
+   "hourPattern": [
+    0.61,
+    0.25,
+    0.07,
+    0.29,
+    0.18,
+    0.18,
+    0.07,
+    0.11,
+    0.11,
+    0.14,
+    0.46,
+    0.25,
+    0.39,
+    0.29,
+    0.43,
+    0.57,
+    0.5,
+    0.32,
+    0.29,
+    0.46,
+    0.64,
+    1.0,
+    0.57,
+    0.5
+   ],
    "insights": [
     {
      "text": "10.29은 평소와 크게 다른 점이 없었습니다 — 방문자도 페이지별 조회도 늘 보던 범위 안입니다.",
@@ -3646,6 +4649,23 @@ window.DASHBOARD_DATA['blog'] = {
     "seconds": 314,
     "source": "google"
    },
+   "settled": {
+    "avgDuration": 210.26810505769234,
+    "engagementRate": 0.5769230769230769,
+    "from": "2026-10-22",
+    "longest": {
+     "date": "2026-10-22",
+     "device": "데스크톱",
+     "engagementSeconds": 49,
+     "landing": "/",
+     "pageViews": 12,
+     "seconds": 1964,
+     "source": "google"
+    },
+    "sessions": 52,
+    "to": "2026-10-28"
+   },
+   "updatedAt": "2026-11-11 12:08",
    "ydayHours": [
     2,
     0,
@@ -3817,6 +4837,32 @@ window.DASHBOARD_DATA['blog'] = {
    },
    "confirmed": true,
    "games": [],
+   "hourPattern": [
+    0.68,
+    0.36,
+    0.07,
+    0.25,
+    0.18,
+    0.18,
+    0.07,
+    0.11,
+    0.11,
+    0.14,
+    0.5,
+    0.25,
+    0.32,
+    0.39,
+    0.46,
+    0.61,
+    0.5,
+    0.39,
+    0.29,
+    0.46,
+    0.64,
+    0.93,
+    0.61,
+    0.54
+   ],
    "insights": [
     {
      "span": "week",
@@ -3832,6 +4878,23 @@ window.DASHBOARD_DATA['blog'] = {
     "seconds": 1189,
     "source": "namu.wiki"
    },
+   "settled": {
+    "avgDuration": 189.91348812244897,
+    "engagementRate": 0.5918367346938775,
+    "from": "2026-10-23",
+    "longest": {
+     "date": "2026-10-23",
+     "device": "데스크톱",
+     "engagementSeconds": 1143,
+     "landing": "/129",
+     "pageViews": 22,
+     "seconds": 1575,
+     "source": "직접 방문"
+    },
+    "sessions": 49,
+    "to": "2026-10-29"
+   },
+   "updatedAt": "2026-11-11 12:08",
    "ydayHours": [
     2,
     3,
@@ -4145,6 +5208,32 @@ window.DASHBOARD_DATA['blog'] = {
    },
    "confirmed": true,
    "games": [],
+   "hourPattern": [
+    0.7,
+    0.37,
+    0.04,
+    0.26,
+    0.19,
+    0.19,
+    0.07,
+    0.11,
+    0.11,
+    0.15,
+    0.52,
+    0.22,
+    0.33,
+    0.41,
+    0.52,
+    0.63,
+    0.56,
+    0.48,
+    0.3,
+    0.48,
+    0.67,
+    1.0,
+    0.7,
+    0.56
+   ],
    "insights": [
     {
      "text": "10.31은 평소와 크게 다른 점이 없었습니다 — 방문자도 페이지별 조회도 늘 보던 범위 안입니다.",
@@ -4165,6 +5254,23 @@ window.DASHBOARD_DATA['blog'] = {
     "seconds": 2132,
     "source": "namu.wiki"
    },
+   "settled": {
+    "avgDuration": 190.1792200491803,
+    "engagementRate": 0.5901639344262295,
+    "from": "2026-10-24",
+    "longest": {
+     "date": "2026-10-30",
+     "device": "데스크톱",
+     "engagementSeconds": 12,
+     "landing": "/131",
+     "pageViews": 1,
+     "seconds": 1189,
+     "source": "namu.wiki"
+    },
+    "sessions": 61,
+    "to": "2026-10-30"
+   },
+   "updatedAt": "2026-11-11 12:08",
    "ydayHours": [
     0,
     0,
@@ -4368,6 +5474,32 @@ window.DASHBOARD_DATA['blog'] = {
    },
    "confirmed": true,
    "games": [],
+   "hourPattern": [
+    0.71,
+    0.36,
+    0.07,
+    0.25,
+    0.18,
+    0.18,
+    0.07,
+    0.11,
+    0.11,
+    0.14,
+    0.5,
+    0.25,
+    0.32,
+    0.43,
+    0.54,
+    0.61,
+    0.54,
+    0.46,
+    0.29,
+    0.46,
+    0.68,
+    1.04,
+    0.71,
+    0.57
+   ],
    "insights": [
     {
      "text": "11.01은 평소와 크게 다른 점이 없었습니다 — 방문자도 페이지별 조회도 늘 보던 범위 안입니다.",
@@ -4381,6 +5513,23 @@ window.DASHBOARD_DATA['blog'] = {
     }
    ],
    "longest": null,
+   "settled": {
+    "avgDuration": 204.07033728124998,
+    "engagementRate": 0.546875,
+    "from": "2026-10-25",
+    "longest": {
+     "date": "2026-10-31",
+     "device": "모바일",
+     "engagementSeconds": 3,
+     "landing": "/",
+     "pageViews": 3,
+     "seconds": 2132,
+     "source": "namu.wiki"
+    },
+    "sessions": 64,
+    "to": "2026-10-31"
+   },
+   "updatedAt": "2026-11-11 12:08",
    "ydayHours": [
     1,
     0,
@@ -4598,6 +5747,32 @@ window.DASHBOARD_DATA['blog'] = {
    },
    "confirmed": true,
    "games": [],
+   "hourPattern": [
+    0.71,
+    0.39,
+    0.07,
+    0.25,
+    0.18,
+    0.18,
+    0.07,
+    0.11,
+    0.18,
+    0.14,
+    0.5,
+    0.29,
+    0.32,
+    0.43,
+    0.54,
+    0.57,
+    0.54,
+    0.46,
+    0.32,
+    0.5,
+    0.71,
+    1.0,
+    0.75,
+    0.5
+   ],
    "insights": [
     {
      "text": "환세패유기 웹 버전이 11.02 **7회** — 평소 하루 1회도 안 보던 페이지입니다.",
@@ -4612,6 +5787,23 @@ window.DASHBOARD_DATA['blog'] = {
     "seconds": 28777,
     "source": "namu.wiki"
    },
+   "settled": {
+    "avgDuration": 203.74364216923078,
+    "engagementRate": 0.5076923076923077,
+    "from": "2026-10-26",
+    "longest": {
+     "date": "2026-10-31",
+     "device": "모바일",
+     "engagementSeconds": 3,
+     "landing": "/",
+     "pageViews": 3,
+     "seconds": 2132,
+     "source": "namu.wiki"
+    },
+    "sessions": 65,
+    "to": "2026-11-01"
+   },
+   "updatedAt": "2026-11-11 12:08",
    "ydayHours": [
     1,
     1,
@@ -4815,6 +6007,32 @@ window.DASHBOARD_DATA['blog'] = {
    },
    "confirmed": true,
    "games": [],
+   "hourPattern": [
+    0.71,
+    0.36,
+    0.07,
+    0.21,
+    0.14,
+    0.18,
+    0.07,
+    0.11,
+    0.18,
+    0.14,
+    0.5,
+    0.18,
+    0.29,
+    0.43,
+    0.54,
+    0.57,
+    0.57,
+    0.46,
+    0.32,
+    0.54,
+    0.68,
+    1.0,
+    0.79,
+    0.46
+   ],
    "insights": [
     {
      "text": "11.03은 평소와 크게 다른 점이 없었습니다 — 방문자도 페이지별 조회도 늘 보던 범위 안입니다.",
@@ -4829,6 +6047,23 @@ window.DASHBOARD_DATA['blog'] = {
     "seconds": 408,
     "source": "google"
    },
+   "settled": {
+    "avgDuration": 629.6867058550724,
+    "engagementRate": 0.5362318840579711,
+    "from": "2026-10-27",
+    "longest": {
+     "date": "2026-11-02",
+     "device": "모바일",
+     "engagementSeconds": 42,
+     "landing": "/",
+     "pageViews": 5,
+     "seconds": 28777,
+     "source": "namu.wiki"
+    },
+    "sessions": 69,
+    "to": "2026-11-02"
+   },
+   "updatedAt": "2026-11-11 12:08",
    "ydayHours": [
     1,
     0,
@@ -5064,6 +6299,32 @@ window.DASHBOARD_DATA['blog'] = {
    },
    "confirmed": true,
    "games": [],
+   "hourPattern": [
+    0.75,
+    0.36,
+    0.04,
+    0.21,
+    0.11,
+    0.18,
+    0.11,
+    0.11,
+    0.18,
+    0.14,
+    0.46,
+    0.18,
+    0.29,
+    0.43,
+    0.5,
+    0.43,
+    0.57,
+    0.46,
+    0.36,
+    0.54,
+    0.68,
+    1.0,
+    0.75,
+    0.43
+   ],
    "insights": [
     {
      "text": "11.04은 평소와 크게 다른 점이 없었습니다 — 방문자도 페이지별 조회도 늘 보던 범위 안입니다.",
@@ -5078,6 +6339,23 @@ window.DASHBOARD_DATA['blog'] = {
     "seconds": 679,
     "source": "google"
    },
+   "settled": {
+    "avgDuration": 633.6723094153847,
+    "engagementRate": 0.5230769230769231,
+    "from": "2026-10-28",
+    "longest": {
+     "date": "2026-11-02",
+     "device": "모바일",
+     "engagementSeconds": 42,
+     "landing": "/",
+     "pageViews": 5,
+     "seconds": 28777,
+     "source": "namu.wiki"
+    },
+    "sessions": 65,
+    "to": "2026-11-03"
+   },
+   "updatedAt": "2026-11-11 12:08",
    "ydayHours": [
     1,
     0,
@@ -5337,6 +6615,32 @@ window.DASHBOARD_DATA['blog'] = {
    },
    "confirmed": true,
    "games": [],
+   "hourPattern": [
+    0.71,
+    0.36,
+    0.07,
+    0.18,
+    0.11,
+    0.18,
+    0.11,
+    0.11,
+    0.18,
+    0.14,
+    0.39,
+    0.21,
+    0.32,
+    0.43,
+    0.46,
+    0.36,
+    0.5,
+    0.39,
+    0.29,
+    0.57,
+    0.61,
+    0.89,
+    0.75,
+    0.46
+   ],
    "insights": [
     {
      "text": "PC98 환세 시리즈 한글화가 11.05 10회 — 평소 하루 3.9회 보던 페이지라 **2.6배**로 뛰었습니다.",
@@ -5344,6 +6648,23 @@ window.DASHBOARD_DATA['blog'] = {
     }
    ],
    "longest": null,
+   "settled": {
+    "avgDuration": 602.4138965000001,
+    "engagementRate": 0.48484848484848486,
+    "from": "2026-10-29",
+    "longest": {
+     "date": "2026-11-02",
+     "device": "모바일",
+     "engagementSeconds": 42,
+     "landing": "/",
+     "pageViews": 5,
+     "seconds": 28777,
+     "source": "namu.wiki"
+    },
+    "sessions": 66,
+    "to": "2026-11-04"
+   },
+   "updatedAt": "2026-11-11 12:08",
    "ydayHours": [
     0,
     0,
@@ -5603,6 +6924,32 @@ window.DASHBOARD_DATA['blog'] = {
    },
    "confirmed": true,
    "games": [],
+   "hourPattern": [
+    0.71,
+    0.32,
+    0.07,
+    0.18,
+    0.11,
+    0.14,
+    0.14,
+    0.11,
+    0.18,
+    0.14,
+    0.43,
+    0.29,
+    0.29,
+    0.43,
+    0.46,
+    0.36,
+    0.54,
+    0.43,
+    0.29,
+    0.57,
+    0.57,
+    0.89,
+    0.68,
+    0.5
+   ],
    "insights": [
     {
      "text": "11.06은 평소와 크게 다른 점이 없었습니다 — 방문자도 페이지별 조회도 늘 보던 범위 안입니다.",
@@ -5617,6 +6964,23 @@ window.DASHBOARD_DATA['blog'] = {
     "seconds": 840,
     "source": "namu.wiki"
    },
+   "settled": {
+    "avgDuration": 567.227012875,
+    "engagementRate": 0.5,
+    "from": "2026-10-30",
+    "longest": {
+     "date": "2026-11-02",
+     "device": "모바일",
+     "engagementSeconds": 42,
+     "landing": "/",
+     "pageViews": 5,
+     "seconds": 28777,
+     "source": "namu.wiki"
+    },
+    "sessions": 72,
+    "to": "2026-11-05"
+   },
+   "updatedAt": "2026-11-11 12:08",
    "ydayHours": [
     0,
     0,
@@ -5918,6 +7282,32 @@ window.DASHBOARD_DATA['blog'] = {
    },
    "confirmed": true,
    "games": [],
+   "hourPattern": [
+    0.68,
+    0.36,
+    0.07,
+    0.18,
+    0.11,
+    0.11,
+    0.11,
+    0.11,
+    0.18,
+    0.21,
+    0.39,
+    0.29,
+    0.29,
+    0.43,
+    0.46,
+    0.43,
+    0.54,
+    0.5,
+    0.25,
+    0.61,
+    0.54,
+    0.89,
+    0.64,
+    0.36
+   ],
    "insights": [
     {
      "text": "OYSTER BAY가 11.07 11회 — 평소 하루 3.4회 보던 페이지라 **3.3배**로 뛰었습니다.",
@@ -5937,6 +7327,23 @@ window.DASHBOARD_DATA['blog'] = {
     "seconds": 375,
     "source": "google"
    },
+   "settled": {
+    "avgDuration": 578.9479268970588,
+    "engagementRate": 0.47058823529411764,
+    "from": "2026-10-31",
+    "longest": {
+     "date": "2026-11-02",
+     "device": "모바일",
+     "engagementSeconds": 42,
+     "landing": "/",
+     "pageViews": 5,
+     "seconds": 28777,
+     "source": "namu.wiki"
+    },
+    "sessions": 68,
+    "to": "2026-11-06"
+   },
+   "updatedAt": "2026-11-11 12:08",
    "ydayHours": [
     0,
     1,
@@ -6260,6 +7667,32 @@ window.DASHBOARD_DATA['blog'] = {
    },
    "confirmed": true,
    "games": [],
+   "hourPattern": [
+    0.64,
+    0.39,
+    0.11,
+    0.14,
+    0.11,
+    0.11,
+    0.11,
+    0.07,
+    0.21,
+    0.21,
+    0.39,
+    0.29,
+    0.29,
+    0.36,
+    0.46,
+    0.43,
+    0.57,
+    0.5,
+    0.29,
+    0.64,
+    0.46,
+    0.89,
+    0.61,
+    0.36
+   ],
    "insights": [
     {
      "span": "week",
@@ -6275,6 +7708,23 @@ window.DASHBOARD_DATA['blog'] = {
     "seconds": 999,
     "source": "google"
    },
+   "settled": {
+    "avgDuration": 539.4486953714286,
+    "engagementRate": 0.5142857142857142,
+    "from": "2026-11-01",
+    "longest": {
+     "date": "2026-11-02",
+     "device": "모바일",
+     "engagementSeconds": 42,
+     "landing": "/",
+     "pageViews": 5,
+     "seconds": 28777,
+     "source": "namu.wiki"
+    },
+    "sessions": 70,
+    "to": "2026-11-07"
+   },
+   "updatedAt": "2026-11-11 12:08",
    "ydayHours": [
     0,
     1,
@@ -6454,6 +7904,32 @@ window.DASHBOARD_DATA['blog'] = {
    },
    "confirmed": true,
    "games": [],
+   "hourPattern": [
+    0.61,
+    0.39,
+    0.11,
+    0.18,
+    0.11,
+    0.11,
+    0.11,
+    0.07,
+    0.18,
+    0.21,
+    0.39,
+    0.29,
+    0.29,
+    0.36,
+    0.46,
+    0.43,
+    0.5,
+    0.5,
+    0.29,
+    0.64,
+    0.46,
+    0.86,
+    0.64,
+    0.32
+   ],
    "insights": [
     {
      "text": "11.09은 평소와 크게 다른 점이 없었습니다 — 방문자도 페이지별 조회도 늘 보던 범위 안입니다.",
@@ -6480,6 +7956,23 @@ window.DASHBOARD_DATA['blog'] = {
     "seconds": 98,
     "source": "google"
    },
+   "settled": {
+    "avgDuration": 580.1846757878789,
+    "engagementRate": 0.5303030303030303,
+    "from": "2026-11-02",
+    "longest": {
+     "date": "2026-11-02",
+     "device": "모바일",
+     "engagementSeconds": 42,
+     "landing": "/",
+     "pageViews": 5,
+     "seconds": 28777,
+     "source": "namu.wiki"
+    },
+    "sessions": 66,
+    "to": "2026-11-08"
+   },
+   "updatedAt": "2026-11-11 12:08",
    "ydayHours": [
     0,
     1,

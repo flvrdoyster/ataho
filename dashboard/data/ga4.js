@@ -221,6 +221,338 @@ window.DASHBOARD_DATA['ga4'] = {
    "views": 97
   }
  ],
+ "dailyLong": [
+  {
+   "date": "2026-09-17",
+   "sessions": 18,
+   "users": 13,
+   "views": 51
+  },
+  {
+   "date": "2026-09-18",
+   "sessions": 16,
+   "users": 15,
+   "views": 23
+  },
+  {
+   "date": "2026-09-19",
+   "sessions": 12,
+   "users": 11,
+   "views": 34
+  },
+  {
+   "date": "2026-09-20",
+   "sessions": 16,
+   "users": 11,
+   "views": 28
+  },
+  {
+   "date": "2026-09-21",
+   "sessions": 12,
+   "users": 11,
+   "views": 28
+  },
+  {
+   "date": "2026-09-22",
+   "sessions": 18,
+   "users": 14,
+   "views": 53
+  },
+  {
+   "date": "2026-09-23",
+   "sessions": 31,
+   "users": 19,
+   "views": 41
+  },
+  {
+   "date": "2026-09-24",
+   "sessions": 23,
+   "users": 17,
+   "views": 38
+  },
+  {
+   "date": "2026-09-25",
+   "sessions": 32,
+   "users": 16,
+   "views": 50
+  },
+  {
+   "date": "2026-09-26",
+   "sessions": 29,
+   "users": 16,
+   "views": 31
+  },
+  {
+   "date": "2026-09-27",
+   "sessions": 21,
+   "users": 6,
+   "views": 30
+  },
+  {
+   "date": "2026-09-28",
+   "sessions": 31,
+   "users": 14,
+   "views": 91
+  },
+  {
+   "date": "2026-09-29",
+   "sessions": 19,
+   "users": 12,
+   "views": 37
+  },
+  {
+   "date": "2026-09-30",
+   "sessions": 24,
+   "users": 11,
+   "views": 41
+  },
+  {
+   "date": "2026-10-01",
+   "sessions": 26,
+   "users": 15,
+   "views": 59
+  },
+  {
+   "date": "2026-10-02",
+   "sessions": 19,
+   "users": 15,
+   "views": 52
+  },
+  {
+   "date": "2026-10-03",
+   "sessions": 22,
+   "users": 15,
+   "views": 38
+  },
+  {
+   "date": "2026-10-04",
+   "sessions": 17,
+   "users": 12,
+   "views": 31
+  },
+  {
+   "date": "2026-10-05",
+   "sessions": 34,
+   "users": 27,
+   "views": 79
+  },
+  {
+   "date": "2026-10-06",
+   "sessions": 22,
+   "users": 15,
+   "views": 39
+  },
+  {
+   "date": "2026-10-07",
+   "sessions": 34,
+   "users": 19,
+   "views": 63
+  },
+  {
+   "date": "2026-10-08",
+   "sessions": 51,
+   "users": 26,
+   "views": 161
+  },
+  {
+   "date": "2026-10-09",
+   "sessions": 44,
+   "users": 23,
+   "views": 130
+  },
+  {
+   "date": "2026-10-10",
+   "sessions": 36,
+   "users": 19,
+   "views": 80
+  },
+  {
+   "date": "2026-10-11",
+   "sessions": 29,
+   "users": 19,
+   "views": 44
+  },
+  {
+   "date": "2026-10-12",
+   "sessions": 30,
+   "users": 18,
+   "views": 49
+  },
+  {
+   "date": "2026-10-13",
+   "sessions": 42,
+   "users": 24,
+   "views": 84
+  },
+  {
+   "date": "2026-10-14",
+   "sessions": 32,
+   "users": 20,
+   "views": 72
+  },
+  {
+   "date": "2026-10-15",
+   "sessions": 37,
+   "users": 20,
+   "views": 58
+  },
+  {
+   "date": "2026-10-16",
+   "sessions": 29,
+   "users": 19,
+   "views": 75
+  },
+  {
+   "date": "2026-10-17",
+   "sessions": 24,
+   "users": 18,
+   "views": 41
+  },
+  {
+   "date": "2026-10-18",
+   "sessions": 30,
+   "users": 15,
+   "views": 81
+  },
+  {
+   "date": "2026-10-19",
+   "sessions": 16,
+   "users": 14,
+   "views": 37
+  },
+  {
+   "date": "2026-10-20",
+   "sessions": 21,
+   "users": 14,
+   "views": 35
+  },
+  {
+   "date": "2026-10-21",
+   "sessions": 29,
+   "users": 14,
+   "views": 61
+  },
+  {
+   "date": "2026-10-22",
+   "sessions": 59,
+   "users": 37,
+   "views": 105
+  },
+  {
+   "date": "2026-10-23",
+   "sessions": 31,
+   "users": 12,
+   "views": 38
+  },
+  {
+   "date": "2026-10-24",
+   "sessions": 26,
+   "users": 14,
+   "views": 34
+  },
+  {
+   "date": "2026-10-25",
+   "sessions": 28,
+   "users": 18,
+   "views": 55
+  },
+  {
+   "date": "2026-10-26",
+   "sessions": 25,
+   "users": 10,
+   "views": 38
+  },
+  {
+   "date": "2026-10-27",
+   "sessions": 24,
+   "users": 15,
+   "views": 61
+  },
+  {
+   "date": "2026-10-28",
+   "sessions": 22,
+   "users": 15,
+   "views": 34
+  },
+  {
+   "date": "2026-10-29",
+   "sessions": 26,
+   "users": 15,
+   "views": 34
+  },
+  {
+   "date": "2026-10-30",
+   "sessions": 41,
+   "users": 25,
+   "views": 55
+  },
+  {
+   "date": "2026-10-31",
+   "sessions": 64,
+   "users": 39,
+   "views": 126
+  },
+  {
+   "date": "2026-11-01",
+   "sessions": 20,
+   "users": 10,
+   "views": 42
+  },
+  {
+   "date": "2026-11-02",
+   "sessions": 32,
+   "users": 16,
+   "views": 102
+  },
+  {
+   "date": "2026-11-03",
+   "sessions": 33,
+   "users": 22,
+   "views": 89
+  },
+  {
+   "date": "2026-11-04",
+   "sessions": 25,
+   "users": 14,
+   "views": 61
+  },
+  {
+   "date": "2026-11-05",
+   "sessions": 24,
+   "users": 16,
+   "views": 49
+  },
+  {
+   "date": "2026-11-06",
+   "sessions": 36,
+   "users": 25,
+   "views": 60
+  },
+  {
+   "date": "2026-11-07",
+   "sessions": 36,
+   "users": 26,
+   "views": 63
+  },
+  {
+   "date": "2026-11-08",
+   "sessions": 34,
+   "users": 27,
+   "views": 47
+  },
+  {
+   "date": "2026-11-09",
+   "sessions": 21,
+   "users": 15,
+   "views": 33
+  },
+  {
+   "date": "2026-11-10",
+   "sessions": 40,
+   "users": 28,
+   "views": 97
+  }
+ ],
  "games": [
   {
    "game": "환세취호전",
@@ -452,6 +784,32 @@ window.DASHBOARD_DATA['ga4'] = {
      }
     }
    ],
+   "hourPattern": [
+    1.5,
+    0.89,
+    0.75,
+    0.64,
+    0.21,
+    0.43,
+    0.36,
+    0.82,
+    0.86,
+    1.11,
+    1.36,
+    1.57,
+    1.36,
+    1.5,
+    1.68,
+    1.64,
+    1.43,
+    1.32,
+    1.43,
+    0.71,
+    1.21,
+    1.96,
+    2.0,
+    1.96
+   ],
    "insights": [
     {
      "text": "10.14은 평소와 크게 다른 점이 없었습니다 — 방문자도 페이지별 조회도 늘 보던 범위 안입니다.",
@@ -459,6 +817,23 @@ window.DASHBOARD_DATA['ga4'] = {
     }
    ],
    "longest": null,
+   "settled": {
+    "avgDuration": 421.0973768365019,
+    "engagementRate": 0.5741444866920152,
+    "from": "2026-10-07",
+    "longest": {
+     "date": "2026-10-09",
+     "device": "모바일",
+     "engagementSeconds": 0,
+     "landing": "/kr.html",
+     "pageViews": 1,
+     "seconds": 11409,
+     "source": "m.search.naver.com"
+    },
+    "sessions": 263,
+    "to": "2026-10-13"
+   },
+   "updatedAt": "2026-11-11 12:04",
    "ydayHours": [
     1,
     1,
@@ -837,6 +1212,32 @@ window.DASHBOARD_DATA['ga4'] = {
      }
     }
    ],
+   "hourPattern": [
+    1.5,
+    0.96,
+    0.75,
+    0.64,
+    0.25,
+    0.39,
+    0.43,
+    0.82,
+    0.89,
+    1.21,
+    1.39,
+    1.57,
+    1.32,
+    1.61,
+    1.64,
+    1.61,
+    1.54,
+    1.36,
+    1.46,
+    0.75,
+    1.25,
+    1.96,
+    2.04,
+    2.04
+   ],
    "insights": [
     {
      "text": "10.15은 평소와 크게 다른 점이 없었습니다 — 방문자도 페이지별 조회도 늘 보던 범위 안입니다.",
@@ -844,6 +1245,23 @@ window.DASHBOARD_DATA['ga4'] = {
     }
    ],
    "longest": null,
+   "settled": {
+    "avgDuration": 435.775023065134,
+    "engagementRate": 0.5823754789272031,
+    "from": "2026-10-08",
+    "longest": {
+     "date": "2026-10-09",
+     "device": "모바일",
+     "engagementSeconds": 0,
+     "landing": "/kr.html",
+     "pageViews": 1,
+     "seconds": 11409,
+     "source": "m.search.naver.com"
+    },
+    "sessions": 261,
+    "to": "2026-10-14"
+   },
+   "updatedAt": "2026-11-11 12:04",
    "ydayHours": [
     1,
     2,
@@ -1200,6 +1618,32 @@ window.DASHBOARD_DATA['ga4'] = {
      }
     }
    ],
+   "hourPattern": [
+    1.54,
+    0.96,
+    0.75,
+    0.68,
+    0.25,
+    0.43,
+    0.43,
+    0.82,
+    0.89,
+    1.29,
+    1.54,
+    1.57,
+    1.36,
+    1.68,
+    1.61,
+    1.64,
+    1.57,
+    1.46,
+    1.43,
+    0.71,
+    1.29,
+    1.93,
+    2.0,
+    2.0
+   ],
    "insights": [
     {
      "text": "환세희담 오프닝이 10.16 6회 — 평소 하루 1.7회 보던 페이지라 **3.5배**로 뛰었습니다.",
@@ -1219,6 +1663,23 @@ window.DASHBOARD_DATA['ga4'] = {
     "seconds": 2417,
     "source": "직접 방문"
    },
+   "settled": {
+    "avgDuration": 394.14686315725805,
+    "engagementRate": 0.5524193548387096,
+    "from": "2026-10-09",
+    "longest": {
+     "date": "2026-10-09",
+     "device": "모바일",
+     "engagementSeconds": 0,
+     "landing": "/kr.html",
+     "pageViews": 1,
+     "seconds": 11409,
+     "source": "m.search.naver.com"
+    },
+    "sessions": 248,
+    "to": "2026-10-15"
+   },
+   "updatedAt": "2026-11-11 12:04",
    "ydayHours": [
     2,
     1,
@@ -1579,6 +2040,32 @@ window.DASHBOARD_DATA['ga4'] = {
      }
     }
    ],
+   "hourPattern": [
+    1.5,
+    0.96,
+    0.75,
+    0.68,
+    0.43,
+    0.54,
+    0.43,
+    0.82,
+    0.93,
+    1.25,
+    1.57,
+    1.61,
+    1.32,
+    1.57,
+    1.61,
+    1.64,
+    1.61,
+    1.5,
+    1.43,
+    0.75,
+    1.32,
+    2.04,
+    2.04,
+    2.07
+   ],
    "insights": [
     {
      "text": "사이트에 최근 28일 동안 없던 유입원이 10.17에 생겼습니다 — bing.",
@@ -1593,6 +2080,23 @@ window.DASHBOARD_DATA['ga4'] = {
     "seconds": 1594,
     "source": "namu.wiki"
    },
+   "settled": {
+    "avgDuration": 303.3360668540773,
+    "engagementRate": 0.5064377682403434,
+    "from": "2026-10-10",
+    "longest": {
+     "date": "2026-10-16",
+     "device": "모바일",
+     "engagementSeconds": 0,
+     "landing": "/kr.html",
+     "pageViews": 1,
+     "seconds": 2417,
+     "source": "직접 방문"
+    },
+    "sessions": 233,
+    "to": "2026-10-16"
+   },
+   "updatedAt": "2026-11-11 12:04",
    "ydayHours": [
     0,
     0,
@@ -1936,6 +2440,32 @@ window.DASHBOARD_DATA['ga4'] = {
      }
     }
    ],
+   "hourPattern": [
+    1.54,
+    0.93,
+    0.71,
+    0.71,
+    0.46,
+    0.5,
+    0.43,
+    0.82,
+    0.93,
+    1.25,
+    1.61,
+    1.54,
+    1.25,
+    1.61,
+    1.75,
+    1.71,
+    1.64,
+    1.5,
+    1.54,
+    0.82,
+    1.36,
+    2.07,
+    2.07,
+    2.11
+   ],
    "insights": [
     {
      "text": "PC-98 환세 시리즈 웹 에뮬레이터가 10.18 22회 — 평소 하루 8.8회 보던 페이지라 **2.5배**로 뛰었습니다.",
@@ -1943,6 +2473,23 @@ window.DASHBOARD_DATA['ga4'] = {
     }
    ],
    "longest": null,
+   "settled": {
+    "avgDuration": 291.7359192352941,
+    "engagementRate": 0.5067873303167421,
+    "from": "2026-10-11",
+    "longest": {
+     "date": "2026-10-16",
+     "device": "모바일",
+     "engagementSeconds": 0,
+     "landing": "/kr.html",
+     "pageViews": 1,
+     "seconds": 2417,
+     "source": "직접 방문"
+    },
+    "sessions": 221,
+    "to": "2026-10-17"
+   },
+   "updatedAt": "2026-11-11 12:04",
    "ydayHours": [
     1,
     0,
@@ -2299,6 +2846,32 @@ window.DASHBOARD_DATA['ga4'] = {
      }
     }
    ],
+   "hourPattern": [
+    1.46,
+    1.0,
+    0.68,
+    0.71,
+    0.46,
+    0.5,
+    0.43,
+    0.82,
+    0.89,
+    1.14,
+    1.61,
+    1.54,
+    1.25,
+    1.61,
+    1.75,
+    1.71,
+    1.75,
+    1.5,
+    1.5,
+    0.96,
+    1.36,
+    2.14,
+    2.0,
+    2.11
+   ],
    "insights": [
     {
      "text": "10.19은 평소와 크게 다른 점이 없었습니다 — 방문자도 페이지별 조회도 늘 보던 범위 안입니다.",
@@ -2313,6 +2886,23 @@ window.DASHBOARD_DATA['ga4'] = {
     "seconds": 707,
     "source": "직접 방문"
    },
+   "settled": {
+    "avgDuration": 310.905449927928,
+    "engagementRate": 0.527027027027027,
+    "from": "2026-10-12",
+    "longest": {
+     "date": "2026-10-16",
+     "device": "모바일",
+     "engagementSeconds": 0,
+     "landing": "/kr.html",
+     "pageViews": 1,
+     "seconds": 2417,
+     "source": "직접 방문"
+    },
+    "sessions": 222,
+    "to": "2026-10-18"
+   },
+   "updatedAt": "2026-11-11 12:04",
    "ydayHours": [
     0,
     2,
@@ -2596,6 +3186,32 @@ window.DASHBOARD_DATA['ga4'] = {
      }
     }
    ],
+   "hourPattern": [
+    1.5,
+    1.07,
+    0.71,
+    0.79,
+    0.5,
+    0.46,
+    0.43,
+    0.82,
+    0.89,
+    1.14,
+    1.71,
+    1.5,
+    1.25,
+    1.57,
+    1.75,
+    1.71,
+    1.82,
+    1.46,
+    1.43,
+    1.0,
+    1.29,
+    2.07,
+    2.0,
+    2.07
+   ],
    "insights": [
     {
      "text": "10.20은 평소와 크게 다른 점이 없었습니다 — 방문자도 페이지별 조회도 늘 보던 범위 안입니다.",
@@ -2610,6 +3226,23 @@ window.DASHBOARD_DATA['ga4'] = {
     "seconds": 1461,
     "source": "namu.wiki"
    },
+   "settled": {
+    "avgDuration": 299.2148432248804,
+    "engagementRate": 0.5454545454545454,
+    "from": "2026-10-13",
+    "longest": {
+     "date": "2026-10-16",
+     "device": "모바일",
+     "engagementSeconds": 0,
+     "landing": "/kr.html",
+     "pageViews": 1,
+     "seconds": 2417,
+     "source": "직접 방문"
+    },
+    "sessions": 209,
+    "to": "2026-10-19"
+   },
+   "updatedAt": "2026-11-11 12:04",
    "ydayHours": [
     1,
     2,
@@ -2932,6 +3565,32 @@ window.DASHBOARD_DATA['ga4'] = {
      }
     }
    ],
+   "hourPattern": [
+    1.43,
+    1.07,
+    0.75,
+    0.79,
+    0.54,
+    0.46,
+    0.43,
+    0.82,
+    0.86,
+    1.07,
+    1.75,
+    1.36,
+    1.18,
+    1.57,
+    1.79,
+    1.79,
+    1.89,
+    1.43,
+    1.43,
+    1.04,
+    1.39,
+    2.07,
+    2.04,
+    2.14
+   ],
    "insights": [
     {
      "text": "환세취호전이 10.21 45회 — 평소 하루 16.4회 보던 페이지라 **2.7배**로 뛰었습니다.",
@@ -2939,6 +3598,23 @@ window.DASHBOARD_DATA['ga4'] = {
     }
    ],
    "longest": null,
+   "settled": {
+    "avgDuration": 256.97367536702126,
+    "engagementRate": 0.5691489361702128,
+    "from": "2026-10-14",
+    "longest": {
+     "date": "2026-10-16",
+     "device": "모바일",
+     "engagementSeconds": 0,
+     "landing": "/kr.html",
+     "pageViews": 1,
+     "seconds": 2417,
+     "source": "직접 방문"
+    },
+    "sessions": 188,
+    "to": "2026-10-20"
+   },
+   "updatedAt": "2026-11-11 12:04",
    "ydayHours": [
     1,
     1,
@@ -3207,6 +3883,32 @@ window.DASHBOARD_DATA['ga4'] = {
      }
     }
    ],
+   "hourPattern": [
+    1.46,
+    1.14,
+    0.71,
+    0.79,
+    0.57,
+    0.43,
+    0.43,
+    0.79,
+    0.93,
+    1.14,
+    1.79,
+    1.39,
+    1.54,
+    2.18,
+    1.93,
+    1.79,
+    1.96,
+    1.46,
+    1.39,
+    1.11,
+    1.54,
+    2.07,
+    2.04,
+    2.14
+   ],
    "insights": [
     {
      "text": "환세취호전이 10.22 49회 — 평소 하루 17.7회 보던 페이지라 **2.8배**로 뛰었습니다.",
@@ -3218,6 +3920,23 @@ window.DASHBOARD_DATA['ga4'] = {
     }
    ],
    "longest": null,
+   "settled": {
+    "avgDuration": 297.6803512810811,
+    "engagementRate": 0.5783783783783784,
+    "from": "2026-10-15",
+    "longest": {
+     "date": "2026-10-16",
+     "device": "모바일",
+     "engagementSeconds": 0,
+     "landing": "/kr.html",
+     "pageViews": 1,
+     "seconds": 2417,
+     "source": "직접 방문"
+    },
+    "sessions": 185,
+    "to": "2026-10-21"
+   },
+   "updatedAt": "2026-11-11 12:04",
    "ydayHours": [
     1,
     2,
@@ -3546,6 +4265,32 @@ window.DASHBOARD_DATA['ga4'] = {
      }
     }
    ],
+   "hourPattern": [
+    1.5,
+    1.18,
+    0.71,
+    0.71,
+    0.61,
+    0.46,
+    0.39,
+    0.79,
+    0.93,
+    1.11,
+    1.82,
+    1.39,
+    1.5,
+    2.25,
+    1.89,
+    1.79,
+    2.04,
+    1.46,
+    1.43,
+    1.07,
+    1.54,
+    2.07,
+    2.0,
+    2.11
+   ],
    "insights": [
     {
      "text": "10.23은 평소와 크게 다른 점이 없었습니다 — 방문자도 페이지별 조회도 늘 보던 범위 안입니다.",
@@ -3560,6 +4305,23 @@ window.DASHBOARD_DATA['ga4'] = {
     "seconds": 10158,
     "source": "직접 방문"
    },
+   "settled": {
+    "avgDuration": 391.84199775961537,
+    "engagementRate": 0.6057692307692307,
+    "from": "2026-10-16",
+    "longest": {
+     "date": "2026-10-16",
+     "device": "모바일",
+     "engagementSeconds": 0,
+     "landing": "/kr.html",
+     "pageViews": 1,
+     "seconds": 2417,
+     "source": "직접 방문"
+    },
+    "sessions": 208,
+    "to": "2026-10-22"
+   },
+   "updatedAt": "2026-11-11 12:04",
    "ydayHours": [
     2,
     1,
@@ -3946,6 +4708,32 @@ window.DASHBOARD_DATA['ga4'] = {
      }
     }
    ],
+   "hourPattern": [
+    1.43,
+    1.18,
+    0.75,
+    0.82,
+    0.57,
+    0.5,
+    0.39,
+    0.75,
+    0.89,
+    1.18,
+    1.82,
+    1.5,
+    1.54,
+    2.21,
+    1.86,
+    1.75,
+    2.0,
+    1.43,
+    1.39,
+    1.04,
+    1.54,
+    1.96,
+    2.0,
+    2.11
+   ],
    "insights": [
     {
      "text": "10.24은 평소와 크게 다른 점이 없었습니다 — 방문자도 페이지별 조회도 늘 보던 범위 안입니다.",
@@ -3953,6 +4741,23 @@ window.DASHBOARD_DATA['ga4'] = {
     }
    ],
    "longest": null,
+   "settled": {
+    "avgDuration": 461.8320757081339,
+    "engagementRate": 0.5980861244019139,
+    "from": "2026-10-17",
+    "longest": {
+     "date": "2026-10-23",
+     "device": "모바일",
+     "engagementSeconds": 9549,
+     "landing": "/kr.html",
+     "pageViews": 3,
+     "seconds": 10158,
+     "source": "직접 방문"
+    },
+    "sessions": 209,
+    "to": "2026-10-23"
+   },
+   "updatedAt": "2026-11-11 12:04",
    "ydayHours": [
     2,
     1,
@@ -4294,6 +5099,32 @@ window.DASHBOARD_DATA['ga4'] = {
      }
     }
    ],
+   "hourPattern": [
+    1.43,
+    1.29,
+    0.71,
+    0.82,
+    0.57,
+    0.5,
+    0.39,
+    0.75,
+    0.89,
+    1.21,
+    1.82,
+    1.54,
+    1.43,
+    2.14,
+    1.96,
+    1.71,
+    1.93,
+    1.43,
+    1.39,
+    1.07,
+    1.5,
+    2.07,
+    2.0,
+    2.07
+   ],
    "insights": [
     {
      "text": "환세풍광전이 10.25 9회 — 평소 하루 4.3회 보던 페이지라 **2.1배**로 뛰었습니다.",
@@ -4301,6 +5132,23 @@ window.DASHBOARD_DATA['ga4'] = {
     }
    ],
    "longest": null,
+   "settled": {
+    "avgDuration": 458.81447610476187,
+    "engagementRate": 0.5523809523809524,
+    "from": "2026-10-18",
+    "longest": {
+     "date": "2026-10-23",
+     "device": "모바일",
+     "engagementSeconds": 9549,
+     "landing": "/kr.html",
+     "pageViews": 3,
+     "seconds": 10158,
+     "source": "직접 방문"
+    },
+    "sessions": 210,
+    "to": "2026-10-24"
+   },
+   "updatedAt": "2026-11-11 12:04",
    "ydayHours": [
     0,
     4,
@@ -4688,6 +5536,32 @@ window.DASHBOARD_DATA['ga4'] = {
      }
     }
    ],
+   "hourPattern": [
+    1.46,
+    1.21,
+    0.61,
+    0.79,
+    0.54,
+    0.5,
+    0.39,
+    0.71,
+    0.86,
+    1.21,
+    1.75,
+    1.5,
+    1.39,
+    2.11,
+    1.93,
+    1.64,
+    2.0,
+    1.43,
+    1.39,
+    1.11,
+    1.57,
+    2.14,
+    2.11,
+    2.11
+   ],
    "insights": [
     {
      "span": "week",
@@ -4713,6 +5587,23 @@ window.DASHBOARD_DATA['ga4'] = {
     "seconds": 5123,
     "source": "직접 방문"
    },
+   "settled": {
+    "avgDuration": 443.87707950000004,
+    "engagementRate": 0.5240384615384616,
+    "from": "2026-10-19",
+    "longest": {
+     "date": "2026-10-23",
+     "device": "모바일",
+     "engagementSeconds": 9549,
+     "landing": "/kr.html",
+     "pageViews": 3,
+     "seconds": 10158,
+     "source": "직접 방문"
+    },
+    "sessions": 208,
+    "to": "2026-10-25"
+   },
+   "updatedAt": "2026-11-11 12:04",
    "ydayHours": [
     3,
     0,
@@ -5070,6 +5961,32 @@ window.DASHBOARD_DATA['ga4'] = {
      }
     }
    ],
+   "hourPattern": [
+    1.5,
+    1.18,
+    0.61,
+    0.79,
+    0.54,
+    0.5,
+    0.39,
+    0.68,
+    0.82,
+    1.21,
+    1.82,
+    1.54,
+    1.39,
+    2.0,
+    1.86,
+    1.71,
+    2.0,
+    1.46,
+    1.39,
+    1.18,
+    1.68,
+    2.14,
+    2.21,
+    2.11
+   ],
    "insights": [
     {
      "text": "메인 (아타호의 거처)이 10.27 17회 — 평소 하루 3.9회 보던 페이지라 **4.4배**로 뛰었습니다.",
@@ -5082,6 +5999,23 @@ window.DASHBOARD_DATA['ga4'] = {
     }
    ],
    "longest": null,
+   "settled": {
+    "avgDuration": 478.32878381018514,
+    "engagementRate": 0.5092592592592593,
+    "from": "2026-10-20",
+    "longest": {
+     "date": "2026-10-23",
+     "device": "모바일",
+     "engagementSeconds": 9549,
+     "landing": "/kr.html",
+     "pageViews": 3,
+     "seconds": 10158,
+     "source": "직접 방문"
+    },
+    "sessions": 216,
+    "to": "2026-10-26"
+   },
+   "updatedAt": "2026-11-11 12:04",
    "ydayHours": [
     2,
     0,
@@ -5512,6 +6446,32 @@ window.DASHBOARD_DATA['ga4'] = {
      }
     }
    ],
+   "hourPattern": [
+    1.64,
+    1.21,
+    0.61,
+    0.79,
+    0.54,
+    0.5,
+    0.39,
+    0.75,
+    0.82,
+    1.21,
+    1.82,
+    1.61,
+    1.36,
+    1.93,
+    1.86,
+    1.61,
+    1.82,
+    1.46,
+    1.46,
+    1.18,
+    1.64,
+    2.21,
+    2.25,
+    2.0
+   ],
    "insights": [
     {
      "text": "10.28 방문자당 페이지가 최근 28일 중 **가장 적습니다**(다른 날 최저 2.3장).",
@@ -5519,6 +6479,23 @@ window.DASHBOARD_DATA['ga4'] = {
     }
    ],
    "longest": null,
+   "settled": {
+    "avgDuration": 493.4124716467889,
+    "engagementRate": 0.5275229357798165,
+    "from": "2026-10-21",
+    "longest": {
+     "date": "2026-10-23",
+     "device": "모바일",
+     "engagementSeconds": 9549,
+     "landing": "/kr.html",
+     "pageViews": 3,
+     "seconds": 10158,
+     "source": "직접 방문"
+    },
+    "sessions": 218,
+    "to": "2026-10-27"
+   },
+   "updatedAt": "2026-11-11 12:04",
    "ydayHours": [
     4,
     1,
@@ -5932,6 +6909,32 @@ window.DASHBOARD_DATA['ga4'] = {
      }
     }
    ],
+   "hourPattern": [
+    1.68,
+    1.21,
+    0.61,
+    0.79,
+    0.54,
+    0.5,
+    0.39,
+    0.75,
+    0.75,
+    1.29,
+    1.79,
+    1.61,
+    1.36,
+    1.96,
+    1.86,
+    1.61,
+    1.82,
+    1.43,
+    1.39,
+    1.25,
+    1.64,
+    2.18,
+    2.21,
+    2.04
+   ],
    "insights": [
     {
      "text": "10.29은 평소와 크게 다른 점이 없었습니다 — 방문자도 페이지별 조회도 늘 보던 범위 안입니다.",
@@ -5946,6 +6949,23 @@ window.DASHBOARD_DATA['ga4'] = {
     "seconds": 6287,
     "source": "직접 방문"
    },
+   "settled": {
+    "avgDuration": 464.7760412095238,
+    "engagementRate": 0.5380952380952381,
+    "from": "2026-10-22",
+    "longest": {
+     "date": "2026-10-23",
+     "device": "모바일",
+     "engagementSeconds": 9549,
+     "landing": "/kr.html",
+     "pageViews": 3,
+     "seconds": 10158,
+     "source": "직접 방문"
+    },
+    "sessions": 210,
+    "to": "2026-10-28"
+   },
+   "updatedAt": "2026-11-11 12:04",
    "ydayHours": [
     3,
     0,
@@ -6287,6 +7307,32 @@ window.DASHBOARD_DATA['ga4'] = {
      }
     }
    ],
+   "hourPattern": [
+    1.68,
+    1.18,
+    0.61,
+    0.79,
+    0.54,
+    0.5,
+    0.39,
+    0.79,
+    0.75,
+    1.29,
+    1.82,
+    1.71,
+    1.39,
+    2.25,
+    2.04,
+    1.71,
+    1.79,
+    1.61,
+    1.39,
+    1.29,
+    1.64,
+    2.14,
+    2.29,
+    2.07
+   ],
    "insights": [
     {
      "text": "환세쾌도전이 10.30 8회 — 평소 하루 1.9회 보던 페이지라 **4.2배**로 뛰었습니다.",
@@ -6302,6 +7348,23 @@ window.DASHBOARD_DATA['ga4'] = {
     }
    ],
    "longest": null,
+   "settled": {
+    "avgDuration": 431.795874747191,
+    "engagementRate": 0.5337078651685393,
+    "from": "2026-10-23",
+    "longest": {
+     "date": "2026-10-23",
+     "device": "모바일",
+     "engagementSeconds": 9549,
+     "landing": "/kr.html",
+     "pageViews": 3,
+     "seconds": 10158,
+     "source": "직접 방문"
+    },
+    "sessions": 178,
+    "to": "2026-10-29"
+   },
+   "updatedAt": "2026-11-11 12:04",
    "ydayHours": [
     1,
     1,
@@ -6668,6 +7731,32 @@ window.DASHBOARD_DATA['ga4'] = {
      }
     }
    ],
+   "hourPattern": [
+    1.71,
+    1.25,
+    0.61,
+    0.79,
+    0.5,
+    0.46,
+    0.32,
+    0.75,
+    0.86,
+    1.39,
+    1.93,
+    1.75,
+    1.46,
+    2.25,
+    2.0,
+    1.71,
+    2.11,
+    2.0,
+    1.61,
+    1.46,
+    1.61,
+    2.25,
+    2.36,
+    2.18
+   ],
    "insights": [
     {
      "text": "환세패유기 웹 버전이 10.31 **41회** — 전에 조회가 없던 페이지입니다.",
@@ -6685,6 +7774,23 @@ window.DASHBOARD_DATA['ga4'] = {
     }
    ],
    "longest": null,
+   "settled": {
+    "avgDuration": 411.24998906914897,
+    "engagementRate": 0.5478723404255319,
+    "from": "2026-10-24",
+    "longest": {
+     "date": "2026-10-29",
+     "device": "데스크톱",
+     "engagementSeconds": 3750,
+     "landing": "/kr.html",
+     "pageViews": 3,
+     "seconds": 6287,
+     "source": "직접 방문"
+    },
+    "sessions": 188,
+    "to": "2026-10-30"
+   },
+   "updatedAt": "2026-11-11 12:04",
    "ydayHours": [
     2,
     4,
@@ -7111,6 +8217,32 @@ window.DASHBOARD_DATA['ga4'] = {
      }
     }
    ],
+   "hourPattern": [
+    1.75,
+    1.18,
+    0.61,
+    0.82,
+    0.5,
+    0.46,
+    0.32,
+    0.75,
+    0.86,
+    1.46,
+    1.89,
+    1.79,
+    1.46,
+    2.29,
+    2.07,
+    1.75,
+    2.04,
+    1.96,
+    1.68,
+    1.46,
+    1.57,
+    2.21,
+    2.36,
+    2.25
+   ],
    "insights": [
     {
      "text": "환세패유기 역 계산기가 11.01 **9회** — 전에 조회가 없던 페이지입니다.",
@@ -7118,6 +8250,23 @@ window.DASHBOARD_DATA['ga4'] = {
     }
    ],
    "longest": null,
+   "settled": {
+    "avgDuration": 399.37907657333335,
+    "engagementRate": 0.5422222222222223,
+    "from": "2026-10-25",
+    "longest": {
+     "date": "2026-10-29",
+     "device": "데스크톱",
+     "engagementSeconds": 3750,
+     "landing": "/kr.html",
+     "pageViews": 3,
+     "seconds": 6287,
+     "source": "직접 방문"
+    },
+    "sessions": 225,
+    "to": "2026-10-31"
+   },
+   "updatedAt": "2026-11-11 12:04",
    "ydayHours": [
     2,
     0,
@@ -7457,6 +8606,32 @@ window.DASHBOARD_DATA['ga4'] = {
      }
     }
    ],
+   "hourPattern": [
+    1.89,
+    1.25,
+    0.64,
+    0.82,
+    0.46,
+    0.46,
+    0.32,
+    0.68,
+    0.89,
+    1.61,
+    1.89,
+    1.75,
+    1.61,
+    2.39,
+    2.14,
+    1.79,
+    1.93,
+    1.86,
+    1.61,
+    1.46,
+    1.46,
+    2.14,
+    2.36,
+    2.21
+   ],
    "insights": [
     {
      "text": "환세패유기 역 계산기가 11.02 **35회** — 11.01에 처음 조회가 생긴 페이지입니다.",
@@ -7483,6 +8658,23 @@ window.DASHBOARD_DATA['ga4'] = {
     }
    ],
    "longest": null,
+   "settled": {
+    "avgDuration": 437.6469483532109,
+    "engagementRate": 0.5596330275229358,
+    "from": "2026-10-26",
+    "longest": {
+     "date": "2026-10-29",
+     "device": "데스크톱",
+     "engagementSeconds": 3750,
+     "landing": "/kr.html",
+     "pageViews": 3,
+     "seconds": 6287,
+     "source": "직접 방문"
+    },
+    "sessions": 218,
+    "to": "2026-11-01"
+   },
+   "updatedAt": "2026-11-11 12:04",
    "ydayHours": [
     4,
     2,
@@ -7864,6 +9056,32 @@ window.DASHBOARD_DATA['ga4'] = {
      }
     }
    ],
+   "hourPattern": [
+    1.82,
+    1.18,
+    0.64,
+    0.79,
+    0.46,
+    0.46,
+    0.32,
+    0.64,
+    0.89,
+    1.68,
+    1.93,
+    1.79,
+    1.68,
+    2.43,
+    2.07,
+    1.82,
+    2.0,
+    1.96,
+    1.68,
+    1.54,
+    1.61,
+    2.29,
+    2.29,
+    2.18
+   ],
    "insights": [
     {
      "text": "환세패유기 VS MODE가 11.03 **12회** — 전에 조회가 없던 페이지입니다.",
@@ -7876,6 +9094,23 @@ window.DASHBOARD_DATA['ga4'] = {
     }
    ],
    "longest": null,
+   "settled": {
+    "avgDuration": 507.81966604464276,
+    "engagementRate": 0.5580357142857143,
+    "from": "2026-10-27",
+    "longest": {
+     "date": "2026-10-29",
+     "device": "데스크톱",
+     "engagementSeconds": 3750,
+     "landing": "/kr.html",
+     "pageViews": 3,
+     "seconds": 6287,
+     "source": "직접 방문"
+    },
+    "sessions": 224,
+    "to": "2026-11-02"
+   },
+   "updatedAt": "2026-11-11 12:04",
    "ydayHours": [
     0,
     0,
@@ -8315,6 +9550,32 @@ window.DASHBOARD_DATA['ga4'] = {
      }
     }
    ],
+   "hourPattern": [
+    1.82,
+    1.18,
+    0.54,
+    0.71,
+    0.46,
+    0.43,
+    0.32,
+    0.64,
+    0.89,
+    1.68,
+    2.0,
+    1.79,
+    1.64,
+    2.39,
+    2.18,
+    1.86,
+    1.93,
+    2.0,
+    1.64,
+    1.46,
+    1.75,
+    2.25,
+    2.21,
+    2.07
+   ],
    "insights": [
     {
      "text": "환세패유기 해설서가 11.04 **6회** — 평소 하루 1회도 안 보던 페이지입니다.",
@@ -8327,6 +9588,23 @@ window.DASHBOARD_DATA['ga4'] = {
     }
    ],
    "longest": null,
+   "settled": {
+    "avgDuration": 496.6844391410257,
+    "engagementRate": 0.5512820512820513,
+    "from": "2026-10-28",
+    "longest": {
+     "date": "2026-10-29",
+     "device": "데스크톱",
+     "engagementSeconds": 3750,
+     "landing": "/kr.html",
+     "pageViews": 3,
+     "seconds": 6287,
+     "source": "직접 방문"
+    },
+    "sessions": 234,
+    "to": "2026-11-03"
+   },
+   "updatedAt": "2026-11-11 12:04",
    "ydayHours": [
     2,
     1,
@@ -8713,6 +9991,32 @@ window.DASHBOARD_DATA['ga4'] = {
      }
     }
    ],
+   "hourPattern": [
+    1.71,
+    1.14,
+    0.54,
+    0.68,
+    0.46,
+    0.46,
+    0.32,
+    0.71,
+    0.86,
+    1.75,
+    1.89,
+    1.75,
+    1.64,
+    2.29,
+    2.14,
+    1.75,
+    1.82,
+    1.89,
+    1.5,
+    1.46,
+    1.71,
+    2.07,
+    2.14,
+    2.11
+   ],
    "insights": [
     {
      "text": "환세패유기 대전 모드가 11.05 **5회** — 11.03에 처음 조회가 생긴 페이지입니다.",
@@ -8724,6 +10028,23 @@ window.DASHBOARD_DATA['ga4'] = {
     }
    ],
    "longest": null,
+   "settled": {
+    "avgDuration": 514.0830945949367,
+    "engagementRate": 0.5232067510548524,
+    "from": "2026-10-29",
+    "longest": {
+     "date": "2026-10-29",
+     "device": "데스크톱",
+     "engagementSeconds": 3750,
+     "landing": "/kr.html",
+     "pageViews": 3,
+     "seconds": 6287,
+     "source": "직접 방문"
+    },
+    "sessions": 237,
+    "to": "2026-11-04"
+   },
+   "updatedAt": "2026-11-11 12:04",
    "ydayHours": [
     1,
     0,
@@ -9084,6 +10405,32 @@ window.DASHBOARD_DATA['ga4'] = {
      }
     }
    ],
+   "hourPattern": [
+    1.68,
+    1.07,
+    0.43,
+    0.68,
+    0.46,
+    0.43,
+    0.32,
+    0.61,
+    0.71,
+    1.71,
+    2.0,
+    1.71,
+    1.54,
+    2.32,
+    2.14,
+    1.75,
+    1.93,
+    1.96,
+    1.57,
+    1.61,
+    1.71,
+    2.14,
+    2.04,
+    1.96
+   ],
    "insights": [
     {
      "text": "환세희담이 11.06 15회 — 평소 하루 5.3회 보던 페이지라 **2.8배**로 뛰었습니다.",
@@ -9097,6 +10444,15 @@ window.DASHBOARD_DATA['ga4'] = {
     }
    ],
    "longest": null,
+   "settled": {
+    "avgDuration": 528.5279609106383,
+    "engagementRate": 0.5148936170212766,
+    "from": "2026-10-30",
+    "longest": null,
+    "sessions": 235,
+    "to": "2026-11-05"
+   },
+   "updatedAt": "2026-11-11 12:04",
    "ydayHours": [
     1,
     0,
@@ -9413,6 +10769,32 @@ window.DASHBOARD_DATA['ga4'] = {
      }
     }
    ],
+   "hourPattern": [
+    1.5,
+    1.18,
+    0.39,
+    0.68,
+    0.43,
+    0.36,
+    0.29,
+    0.61,
+    0.75,
+    1.75,
+    2.0,
+    1.79,
+    1.54,
+    2.21,
+    2.21,
+    1.89,
+    2.07,
+    2.07,
+    1.5,
+    1.64,
+    1.79,
+    2.18,
+    1.89,
+    2.0
+   ],
    "insights": [
     {
      "text": "11.07은 평소와 크게 다른 점이 없었습니다 — 방문자도 페이지별 조회도 늘 보던 범위 안입니다.",
@@ -9420,6 +10802,15 @@ window.DASHBOARD_DATA['ga4'] = {
     }
    ],
    "longest": null,
+   "settled": {
+    "avgDuration": 490.2884353116883,
+    "engagementRate": 0.5021645021645021,
+    "from": "2026-10-31",
+    "longest": null,
+    "sessions": 231,
+    "to": "2026-11-06"
+   },
+   "updatedAt": "2026-11-11 12:04",
    "ydayHours": [
     0,
     3,
@@ -9817,6 +11208,32 @@ window.DASHBOARD_DATA['ga4'] = {
      }
     }
    ],
+   "hourPattern": [
+    1.54,
+    1.29,
+    0.5,
+    0.68,
+    0.43,
+    0.32,
+    0.25,
+    0.57,
+    0.79,
+    1.75,
+    1.96,
+    1.75,
+    1.57,
+    2.18,
+    2.21,
+    1.89,
+    2.07,
+    2.04,
+    1.5,
+    1.75,
+    1.89,
+    2.18,
+    1.86,
+    1.96
+   ],
    "insights": [
     {
      "span": "week",
@@ -9842,6 +11259,15 @@ window.DASHBOARD_DATA['ga4'] = {
     "seconds": 3666,
     "source": "namu.wiki"
    },
+   "settled": {
+    "avgDuration": 583.3423913103447,
+    "engagementRate": 0.5467980295566502,
+    "from": "2026-11-01",
+    "longest": null,
+    "sessions": 203,
+    "to": "2026-11-07"
+   },
+   "updatedAt": "2026-11-11 12:04",
    "ydayHours": [
     2,
     3,
@@ -10223,6 +11649,32 @@ window.DASHBOARD_DATA['ga4'] = {
      }
     }
    ],
+   "hourPattern": [
+    1.43,
+    1.36,
+    0.5,
+    0.68,
+    0.43,
+    0.32,
+    0.25,
+    0.57,
+    0.75,
+    1.71,
+    1.93,
+    1.75,
+    1.5,
+    2.25,
+    2.32,
+    1.79,
+    2.11,
+    2.04,
+    1.5,
+    1.86,
+    1.86,
+    2.14,
+    1.75,
+    1.96
+   ],
    "insights": [
     {
      "text": "11.09은 평소와 크게 다른 점이 없었습니다 — 방문자도 페이지별 조회도 늘 보던 범위 안입니다.",
@@ -10230,6 +11682,23 @@ window.DASHBOARD_DATA['ga4'] = {
     }
    ],
    "longest": null,
+   "settled": {
+    "avgDuration": 563.2679822785389,
+    "engagementRate": 0.5525114155251142,
+    "from": "2026-11-02",
+    "longest": {
+     "date": "2026-11-08",
+     "device": "데스크톱",
+     "engagementSeconds": 3559,
+     "landing": "/kitan.html",
+     "pageViews": 1,
+     "seconds": 3666,
+     "source": "namu.wiki"
+    },
+    "sessions": 219,
+    "to": "2026-11-08"
+   },
+   "updatedAt": "2026-11-11 12:04",
    "ydayHours": [
     0,
     2,

@@ -358,9 +358,9 @@
             ${esc(heroWord)} <span class="tag">${esc(mmdd(y.date))}</span>
             <button type="button" class="date-nav" data-nav="next" aria-label="다음 날짜"${isLatest ? ' disabled' : ''}>▶</button>
         </div>
-        <p class="meta-line">갱신 ${esc(data.meta.updatedAt)} KST ·
+        <p class="meta-line">갱신 ${esc(data.meta.updatedAt)} KST${isLatest ? ` ·
             매일 아침 어제분을 모읍니다.${data.confirmed ? '' :
-                ' 어제 수치는 잠정이며 내일 아침 바로잡힙니다.'}</p>
+                ' 어제 수치는 잠정이며 내일 아침 바로잡힙니다.'}` : ''}</p>
         <div class="stat-grid">
             ${stat('방문자', base.users, '명', fmt, newSub)}
             ${stat('페이지 조회', base.views, '회', fmt)}
@@ -582,7 +582,8 @@
 
     const st = data.settled;
     if (st) {
-        const long_ = longestInSettled(data);
+        const long_ = isLatest ? longestInSettled(data)
+            : (st.longest ? { date: st.longest.date, longest: st.longest } : null);
         const longRow = long_ ? `
             <p class="note-line">가장 오래 머문 세션 <b>${dur(long_.longest.seconds)}</b>
              · ${esc(mmdd(long_.date))} · ${esc(long_.longest.source)}에서
@@ -591,8 +592,8 @@
              (실제 참여 ${dur(long_.longest.engagementSeconds)})</p>` : '';
 
         parts.push(mod(12, '참여율 · 체류시간',
-            `어제 제외 최근 ${data.meta.settledDays || 7}일 기준(세션 ${fmt(st.sessions)}건) ·
-             GA4가 참여 여부를 하루 이상 뒤에 확정해서 어제는 넣지 않습니다.`,
+            `${dayLabel} 제외 최근 ${data.meta.settledDays || 7}일 기준(세션 ${fmt(st.sessions)}건)` +
+            (isLatest ? ' · GA4가 참여 여부를 하루 이상 뒤에 확정해서 어제는 넣지 않습니다.' : ''),
             `<div class="settled-row">
                 <div><div class="label">참여율</div>
                      <div class="value">${pct(st.engagementRate * 100, 1)}</div></div>
@@ -661,9 +662,11 @@
         if (date === latestDate) return { snap: viewData, isLatest: true, date };
         const h = viewData.history && viewData.history[date];
         if (!h) return null;
+        const days = (viewData.meta && viewData.meta.trendDays) || 28;
         return {
             snap: Object.assign({}, h, {
-                daily: viewData.daily, meta: viewData.meta, hourPattern: viewData.hourPattern }),
+                daily: (viewData.dailyLong || []).filter((d) => d.date <= date).slice(-days),
+                meta: Object.assign({}, viewData.meta, h.updatedAt ? { updatedAt: h.updatedAt } : {}) }),
             isLatest: false, date,
         };
     }

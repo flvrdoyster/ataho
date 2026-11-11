@@ -24,7 +24,8 @@ KST = timezone(timedelta(hours=9))
 
 TREND_DAYS = 28
 
-SETTLED = ("8daysAgo", "2daysAgo")
+SETTLED_DAYS = 7
+LONG_DAILY = TREND_DAYS * 2 - 1
 
 LONGEST_DIMS = ("sessionSource", "deviceCategory", "city", "browser",
                 "screenResolution", "operatingSystemVersion", "language",
@@ -44,6 +45,10 @@ def trend_range(age):
 
 def prior_range(age):
     return (f"{TREND_DAYS + age - 1}daysAgo", f"{age + 1}daysAgo")
+
+
+def settled_range(age):
+    return (f"{age + SETTLED_DAYS}daysAgo", f"{age + 1}daysAgo")
 
 
 def mmdd(iso):
@@ -342,25 +347,43 @@ def rising_state(full):
     return None
 
 
-def fetch(client, target, age=1, include_settled=True):
+def daily_series(client, target, age, days, from_start=False):
+    rows = report(client, target, dimensions=["date"],
+                  metrics=["activeUsers", "sessions", "screenPageViews"],
+                  date_range=(f"{days + age - 1}daysAgo", f"{age}daysAgo"),
+                  order_by=("date", False))
+    got = {date_key(r["date"]): r for r in rows}
+    out = []
+    if got:
+        first = datetime.now(KST).date() - timedelta(days=days + age - 1)
+        day = first if from_start else date.fromisoformat(min(got))
+        end = max(date.fromisoformat(max(got)), datetime.now(KST).date() - timedelta(days=age))
+        while day <= end:
+            r = got.get(day.isoformat(), {})
+            out.append({"date": day.isoformat(), "users": int(r.get("activeUsers", 0)),
+                        "sessions": int(r.get("sessions", 0)),
+                        "views": int(r.get("screenPageViews", 0))})
+            day += timedelta(days=1)
+    return out
+
+
+def settled_longest(day_longest, day):
+    d0 = date.fromisoformat(day)
+    best = None
+    for k in range(SETTLED_DAYS, 0, -1):
+        iso = (d0 - timedelta(days=k)).isoformat()
+        one = day_longest.get(iso)
+        if one and one.get("seconds") and (best is None or one["seconds"] > best["seconds"]):
+            best = dict(one, date=iso)
+    return best
+
+
+def fetch(client, target, age=1, include_long=True):
     data = {}
 
     yday = totals(client, target, day_range(age),
                   ["activeUsers", "newUsers", "sessions", "screenPageViews"])
-    daily_rows = report(client, target, dimensions=["date"],
-                        metrics=["activeUsers", "sessions", "screenPageViews"],
-                        date_range=trend_range(age), order_by=("date", False))
-    got = {date_key(r["date"]): r for r in daily_rows}
-    data["daily"] = []
-    if got:
-        day = date.fromisoformat(min(got))
-        end = max(date.fromisoformat(max(got)), datetime.now(KST).date() - timedelta(days=age))
-        while day <= end:
-            r = got.get(day.isoformat(), {})
-            data["daily"].append({"date": day.isoformat(), "users": int(r.get("activeUsers", 0)),
-                                  "sessions": int(r.get("sessions", 0)),
-                                  "views": int(r.get("screenPageViews", 0))})
-            day += timedelta(days=1)
+    data["daily"] = daily_series(client, target, age, TREND_DAYS)
 
     yday_date = data["daily"][-1]["date"] if data["daily"] else None
     data["yesterday"] = {
@@ -515,19 +538,19 @@ def fetch(client, target, age=1, include_settled=True):
             hours[hh] = int(r["sessions"])
     data["ydayHours"] = hours
 
-    if include_settled:
-        pattern = [0.0] * 24
-        for r in report(client, target, dimensions=["hour"], metrics=["sessions"],
-                        date_range=trend_range(age), limit=24):
-            try:
-                hh = int(r["hour"])
-            except ValueError:
-                continue
-            if 0 <= hh < 24:
-                pattern[hh] = r["sessions"]
-        n_days = max(1, len(data["daily"]))
-        data["hourPattern"] = [round(v / n_days, 2) for v in pattern]
+    pattern = [0.0] * 24
+    for r in report(client, target, dimensions=["hour"], metrics=["sessions"],
+                    date_range=trend_range(age), limit=24):
+        try:
+            hh = int(r["hour"])
+        except ValueError:
+            continue
+        if 0 <= hh < 24:
+            pattern[hh] = r["sessions"]
+    n_days = max(1, len(data["daily"]))
+    data["hourPattern"] = [round(v / n_days, 2) for v in pattern]
 
+    if include_long:
         got = {date_key(r["date"]): (int(r["activeUsers"]), int(r["screenPageViews"]))
                for r in report(client, target, dimensions=["date"],
                                metrics=["activeUsers", "screenPageViews"],
@@ -562,15 +585,19 @@ def fetch(client, target, age=1, include_settled=True):
     data["longest"] = fetch_longest_visit(client, target, day_range(age))
     data["games"] = fetch_games(client, target, age)
 
-    if include_settled:
-        settled = totals(client, target, SETTLED,
-                         ["engagementRate", "averageSessionDuration", "sessions"])
-        data["settled"] = {
-            "engagementRate": settled["engagementRate"],
-            "avgDuration": settled["averageSessionDuration"],
-            "sessions": int(settled["sessions"]),
-            "from": SETTLED[0], "to": SETTLED[1],
-        }
+    settled = totals(client, target, settled_range(age),
+                     ["engagementRate", "averageSessionDuration", "sessions"])
+    window = settled_range(age)
+    if yday_date:
+        y0 = date.fromisoformat(yday_date)
+        window = ((y0 - timedelta(days=SETTLED_DAYS)).isoformat(),
+                  (y0 - timedelta(days=1)).isoformat())
+    data["settled"] = {
+        "engagementRate": settled["engagementRate"],
+        "avgDuration": settled["averageSessionDuration"],
+        "sessions": int(settled["sessions"]),
+        "from": window[0], "to": window[1],
+    }
 
     return data
 
@@ -1003,11 +1030,14 @@ def fetch_feedback(creds, sheet_id):
 
 HISTORY_KEEP = ("yesterday", "baseline", "ydayPages", "ydaySites",
                 "ydaySources", "ydayUnresolved", "ydayHours", "insights", "confirmed",
-                "longest", "games")
+                "longest", "games", "hourPattern", "settled")
 
 
-def snapshot_shape(data):
-    return {k: data[k] for k in HISTORY_KEEP if k in data}
+def snapshot_shape(data, updated_at=None):
+    out = {k: data[k] for k in HISTORY_KEEP if k in data}
+    if updated_at:
+        out["updatedAt"] = updated_at
+    return out
 
 
 def _load_prior_history(path):
@@ -1032,7 +1062,9 @@ def main():
         path = OUTPUT_DIR / f"{target.key}.js"
         history = _load_prior_history(path)
 
+        now_label = datetime.now(KST).strftime("%Y-%m-%d %H:%M")
         data = fetch(client, target, age=1)
+        data["dailyLong"] = daily_series(client, target, 1, LONG_DAILY, from_start=True)
         data["confirmed"] = False
         data["insights"] = build_insights(data, day_label="어제", confirmed=False)
         week_cut = (datetime.now(KST).date() - timedelta(days=WEEK)).isoformat()
@@ -1041,16 +1073,18 @@ def main():
         weekly = fetch_weekly(client, target)
         data["insights"] += weekly_insights(weekly, target.label, recent_keys, data["insights"])
         if data["yesterday"]["date"]:
-            history[data["yesterday"]["date"]] = snapshot_shape(data)
+            history[data["yesterday"]["date"]] = snapshot_shape(data, now_label)
 
-        day2 = fetch(client, target, age=HISTORY_REFRESH_AGE, include_settled=False)
+        day2 = fetch(client, target, age=HISTORY_REFRESH_AGE, include_long=False)
         day2_date = day2["yesterday"]["date"]
         if day2_date:
             day2_label = mmdd(day2_date)
             day2["confirmed"] = True
             day2["insights"] = build_insights(day2, day_label=day2_label, confirmed=True) + [
                 i for i in history.get(day2_date, {}).get("insights", []) if i.get("key")]
-            history[day2_date] = snapshot_shape(day2)
+            day2["settled"]["longest"] = settled_longest(
+                {d: h.get("longest") for d, h in history.items()}, day2_date)
+            history[day2_date] = snapshot_shape(day2, now_label)
 
         cutoff = (datetime.now(KST).date() - timedelta(days=TREND_DAYS)).isoformat()
         data["history"] = {d: v for d, v in history.items() if d >= cutoff}
@@ -1058,7 +1092,7 @@ def main():
         data["meta"] = {
             "key": target.key,
             "label": target.label,
-            "updatedAt": datetime.now(KST).strftime("%Y-%m-%d %H:%M"),
+            "updatedAt": now_label,
             "propertyId": target.property_id,
             "trendDays": TREND_DAYS,
             "settledDays": 7,

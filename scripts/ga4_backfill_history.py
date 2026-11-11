@@ -20,9 +20,10 @@ def backfill_target(client, target, refresh=False):
     on_disk = json.loads(body)
     history = on_disk.get("history", {})
 
-    filled, skipped = 0, 0
+    now_label = ga4.datetime.now(ga4.KST).strftime("%Y-%m-%d %H:%M")
+    filled, skipped, touched = 0, 0, []
     for age in range(2 if refresh else 3, ga4.TREND_DAYS + 1):
-        d = ga4.fetch(client, target, age=age, include_settled=False)
+        d = ga4.fetch(client, target, age=age, include_long=False)
         date = d["yesterday"]["date"]
         if not date:
             print(f"  {target.key}: age={age}부터 실 데이터가 없어 멈춥니다 "
@@ -35,12 +36,24 @@ def backfill_target(client, target, refresh=False):
         d["confirmed"] = True
         d["insights"] = ga4.build_insights(d, day_label=day_label, confirmed=True) + [
             i for i in history.get(date, {}).get("insights", []) if i.get("key")]
-        history[date] = ga4.snapshot_shape(d)
+        history[date] = ga4.snapshot_shape(d, now_label)
+        touched.append(date)
         filled += 1
         print(f"  {target.key}: {date} {'다시 씀' if refresh else '채움'} (age={age})")
 
-    cutoff = (ga4.datetime.now(ga4.KST).date()
-              - ga4.timedelta(days=ga4.TREND_DAYS)).isoformat()
+    today = ga4.datetime.now(ga4.KST).date()
+    day_longest = {dt: h.get("longest") for dt, h in history.items()}
+    need = {(ga4.date.fromisoformat(dt) - ga4.timedelta(days=k)).isoformat()
+            for dt in touched for k in range(1, ga4.SETTLED_DAYS + 1)} - set(day_longest)
+    for iso in sorted(need):
+        gap = (today - ga4.date.fromisoformat(iso)).days
+        day_longest[iso] = ga4.fetch_longest_visit(client, target, ga4.day_range(gap))
+        print(f"  {target.key}: {iso} 최장 방문만 받음 (age={gap})")
+    for dt in touched:
+        history[dt]["settled"]["longest"] = ga4.settled_longest(day_longest, dt)
+    on_disk["dailyLong"] = ga4.daily_series(client, target, 1, ga4.LONG_DAILY, from_start=True)
+
+    cutoff = (today - ga4.timedelta(days=ga4.TREND_DAYS)).isoformat()
     on_disk["history"] = {dt: v for dt, v in history.items() if dt >= cutoff}
 
     out_body = json.dumps(on_disk, ensure_ascii=False, indent=1, sort_keys=True)
