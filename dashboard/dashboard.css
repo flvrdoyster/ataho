@@ -33,7 +33,12 @@ a:hover {
 
 .dash-header h1 {
     margin: 0;
+    font-family: var(--font-em);
+    -webkit-font-smoothing: none;
+    font-smooth: never;
+    font-synthesis: none;
     font-size: var(--fs-h1);
+    line-height: 40px;
 }
 
 .dash-sub {
@@ -44,16 +49,27 @@ a:hover {
 
 .dash-nav {
     display: flex;
-    gap: 4px;
-    border-bottom: var(--rule);
+    gap: 16px;
 }
 
 .dash-nav a {
-    padding: 8px 14px;
-    color: var(--text-muted);
-    font-size: var(--fs-sm);
-    border-bottom: 2px solid transparent;
-    margin-bottom: -1px;
+    padding: 6px 0;
+    color: var(--plane-muted);
+    font-family: var(--font-em);
+    -webkit-font-smoothing: none;
+    font-smooth: never;
+    font-synthesis: none;
+    font-size: var(--fs-em);
+    font-weight: var(--font-weight-bold);
+}
+
+.dash-nav a::before {
+    content: '';
+    display: inline-block;
+    width: 12px;
+    height: 16px;
+    margin-right: 8px;
+    vertical-align: -2px;
 }
 
 .dash-nav a:hover {
@@ -63,7 +79,11 @@ a:hover {
 
 .dash-nav a.active {
     color: var(--text-primary);
-    border-bottom-color: var(--accent);
+}
+
+.dash-nav a.active::before {
+    background: url('../world/ui/cursor.png') no-repeat center / contain;
+    image-rendering: var(--img-rendering);
 }
 
 .reminder {
@@ -138,9 +158,11 @@ a:hover {
     grid-column: span 12;
     min-width: 0;
     padding: var(--panel-pad);
-    border: var(--panel-border);
+    border: 16px solid transparent;
+    border-image: url('../world/ui/frame.png') 16 fill / 16px round;
     border-radius: var(--panel-radius);
     background: var(--panel-bg);
+    image-rendering: var(--img-rendering);
 }
 
 .span-4 { grid-column: span 4; }
@@ -152,7 +174,6 @@ a:hover {
 
 .module.accent {
     background: var(--panel-bg-accent);
-    border-color: var(--panel-border-accent);
 }
 
 .meta-line {
@@ -171,42 +192,51 @@ a:hover {
     display: flex;
     align-items: center;
     gap: 6px;
+    font-family: var(--font-em);
+    -webkit-font-smoothing: none;
+    font-smooth: never;
+    font-synthesis: none;
     font-size: var(--fs-h1);
     font-weight: var(--font-weight-bold);
-    line-height: 1.2;
+    line-height: 40px;
 }
 
 .yday-title .tag {
-    padding: 2px 8px;
-    border: 1px solid var(--border);
-    border-radius: var(--radius-pill);
+    padding: 0 4px;
     color: var(--text-muted);
-    font-size: var(--fs-micro);
+    font-size: var(--fs-em);
     font-weight: 400;
 }
 
 .date-nav {
     appearance: none;
+    font-family: var(--font-em);
+    -webkit-font-smoothing: none;
+    font-smooth: never;
+    font-synthesis: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     width: 26px;
     height: 26px;
-    border: 1px solid var(--border);
+    padding: 0 0 6px;
+    border: 1px solid var(--text-primary);
     border-radius: var(--radius-sm);
-    background: var(--panel-bg);
-    color: var(--text-secondary);
-    font-size: var(--fs-note);
+    background: transparent;
+    color: var(--text-primary);
+    font-size: var(--fs-em);
     font-weight: 400;
-    line-height: 1;
+    line-height: 16px;
     cursor: pointer;
 }
 
 .date-nav:hover:not(:disabled) {
     background: var(--panel-bg-accent);
-    border-color: var(--panel-border-accent);
     color: var(--text-primary);
 }
 
 .date-nav:disabled {
-    opacity: 0.35;
+    visibility: hidden;
     cursor: default;
 }
 
@@ -216,6 +246,7 @@ a:hover {
 
 .panel > .meta-line {
     margin: 4px 0 0;
+    color: var(--plane-muted);
 }
 
 .stat-grid {
@@ -226,22 +257,33 @@ a:hover {
 
 .stat .label {
     color: var(--text-secondary);
-    font-size: var(--fs-label);
+    font-family: var(--font-em);
+    -webkit-font-smoothing: none;
+    font-smooth: never;
+    font-synthesis: none;
+    font-size: var(--fs-em);
+    font-weight: var(--font-weight-bold);
+    line-height: 20px;
 }
 
 .stat .value {
+    font-family: var(--font-em);
+    -webkit-font-smoothing: none;
+    font-smooth: never;
+    font-synthesis: none;
     font-size: var(--fs-hero);
     font-weight: var(--font-weight-bold);
-    line-height: 1.1;
+    line-height: 48px;
     letter-spacing: var(--tracking-num);
     font-variant-numeric: tabular-nums;
 }
 
 .stat .unit {
-    margin-left: 3px;
+    margin-left: 4px;
     color: var(--text-muted);
-    font-size: var(--fs-label);
+    font-size: var(--fs-em);
     font-weight: 400;
+    line-height: 16px;
     letter-spacing: normal;
 }
 
@@ -255,7 +297,7 @@ a:hover {
     display: flex;
     flex-wrap: wrap;
     gap: 2px 8px;
-    margin-top: 4px;
+    margin-top: 2px;
     min-height: 1.2em;
     font-size: var(--fs-note);
 }
@@ -299,16 +341,16 @@ a:hover {
 
 .module h2,
 .insight-group h3 {
-    margin: 0 0 2px;
+    margin: 0 0 4px;
+    font-family: var(--font-em);
+    -webkit-font-smoothing: none;
+    font-smooth: never;
+    font-synthesis: none;
     font-size: var(--fs-section-title);
     font-weight: var(--font-weight-bold);
-    line-height: 1.4;
+    line-height: 24px;
     letter-spacing: var(--tracking-title);
     color: var(--text-primary);
-}
-
-.insight-group h3 {
-    margin-bottom: 10px;
 }
 
 .module-note {
@@ -345,13 +387,23 @@ svg {
 
 .settled-row .label {
     color: var(--text-secondary);
-    font-size: var(--fs-label);
+    font-family: var(--font-em);
+    -webkit-font-smoothing: none;
+    font-smooth: never;
+    font-synthesis: none;
+    font-size: var(--fs-em);
+    font-weight: var(--font-weight-bold);
+    line-height: 20px;
 }
 
 .settled-row .value {
+    font-family: var(--font-em);
+    -webkit-font-smoothing: none;
+    font-smooth: never;
+    font-synthesis: none;
     font-size: var(--fs-stat);
     font-weight: var(--font-weight-bold);
-    line-height: 1.3;
+    line-height: 40px;
     letter-spacing: var(--tracking-num);
     font-variant-numeric: tabular-nums;
 }
@@ -518,7 +570,7 @@ svg {
 }
 
 .hour-col .bar.usual {
-    background: var(--band);
+    background: var(--band-bar);
 }
 
 .hour-col .bar.yday {
@@ -604,7 +656,7 @@ svg {
 .footer-static #footer {
     border-top: var(--rule);
     margin-top: 20px;
-    color: var(--text-muted);
+    color: var(--plane-muted);
 }
 
 @media (max-width: 860px) {

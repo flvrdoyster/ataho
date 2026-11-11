@@ -177,6 +177,28 @@ HTML·CSS·JS·데이터가 한 파일에 들어 있다. 외부 의존은 `map/w
 - `manual.css`의 `main section>*:not(iframe)`가 section 직계 자식의 좌우 여백을 `auto`로 덮어쓴다. 그래서 section 직계에 놓는 노트는 `<p><span class="note">`로 감싸야 `.note`의 좌우 15px 여백이 산다. `li`·`.menu-section`·`.yaku-item` 안의 노트는 직계가 아니라 감싸지 않는다
 - `<p>` 안에 `<ul>`·`<ol>`을 넣지 않는다. 브라우저가 `p`를 먼저 닫아 빈 `<p>`가 생긴다
 
+## 공유 디자인 토큰 (`design-tokens.css`)
+밝은 배경 위에서 읽는 화면이 같이 쓰는 색·서체·형태 토큰이다. 읽는 페이지는 `blog/skin.html`·`blog/preview.html`
+(블로그 스킨과 미리보기), `kitan_manual/index.html`(환세희담 해설서), `viewer/map.html`(환세 지도)이다. 사이트 루트와
+미니게임은 어두운 톤(`style.css`)을 따로 쓰고, 대시보드도 자체 `dashboard/theme.css`를 쓰며 이 파일을 읽지 않는다.
+값을 바꾸면 위 네 페이지가 함께 바뀐다. 블로그 두 페이지는 `https://atah.io/design-tokens.css`로 읽어서 배포 전에는
+로컬에서 고친 값이 보이지 않는다.
+- `--text-muted`는 흰 배경에서 본문 대비 기준을 겨우 넘는 값이다. 더 밝히면 기준 아래로 떨어진다
+- `--brand`(사이트 링크색)는 흰 배경 대비가 낮아 얇은 선·작은 글자로는 못 쓰고 큰 면(히어로, 강조 박스, 배경 틴트)에만
+  쓴다. 선·글자·버튼처럼 대비가 필요한 자리는 같은 색상각의 진한 형제 `--accent`가 맡는다
+- `--font-ui`의 Noto Sans KR 폴백은 KoddiUDOnGothic에 한자와 일부 가나(장음부호 ー 등)가 없어서 둔다. 일본 원작 게임을
+  다루는 페이지에는 원어 표기와 스태프명이 섞여 나온다. 이름만 걸어 둔 것이라 폰트를 실제로 받지는 않는다 — 필요한
+  페이지가 각자 `<head>`에서 Google Fonts로 불러와야 한다(`blog/skin.html`, `kitan_manual/index.html` 등)
+- 선 두께 토큰은 상자선 하나(`--ui-border-w`), 아이콘선 둘(`--ico-stroke-w`, `--ico-stroke-w-thin`)이다. 무엇과 균형을
+  맞추느냐로 고르고 아이콘 크기는 기준이 아니다.
+  - 버튼·입력창 같은 상자의 외곽선은 `--ui-border-w`다. 인라인 SVG 아이콘 안의 사각 테두리(햄버거 버튼의 바깥 틀)도 같은
+    값을 써야 옆의 실제 버튼 테두리와 두께가 맞는다
+  - 아이콘의 글자획(화살표·돋보기·X)은 `--ico-stroke-w`다. 버튼·메뉴처럼 상자 전체와 균형을 맞추는 아이콘에 쓰고, 상자선보다
+    굵어야 작은 크기에서 형태가 읽힌다
+  - 글자 바로 옆에 붙어 그 글자와 균형을 맞추는 아이콘은 `--ico-stroke-w-thin`이다. 글자 획에 맞춰 상자선과 같은 1px로 쓴다
+  - 아이콘 SVG는 viewBox를 표시 크기와 1:1로 맞춰 쓴다는 전제다. 그래야 user unit 1이 화면 1px이 되어 아이콘마다 굵기가
+    달라지지 않는다
+
 ## 개발 도구
 
 - `world/editor.html`에는 doctype이 없다. 넣으면 호환 모드(quirks)에서 표준 모드로 바뀌어 에디터 레이아웃이 달라질 수 있어, charset·lang만 넣었다(2026-09-27). 넣으려면 에디터 화면을 직접 확인하면서 할 것
