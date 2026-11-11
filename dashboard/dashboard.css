@@ -98,12 +98,35 @@ a:hover {
 .stack {
     display: flex;
     flex-direction: column;
+    align-self: stretch;
     gap: var(--gap-grid);
     min-width: 0;
 }
 
+.stack > .module:last-child {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.stack > .module:last-child .hour-chart {
+    flex: 1 1 var(--strip-h);
+    max-height: var(--strip-h-max);
+}
+
 .module.stretch {
     align-self: stretch;
+}
+
+.module.stretch:not(.accent) {
+    display: flex;
+    flex-direction: column;
+}
+
+.module.stretch:not(.accent) .chart-box {
+    flex: 1 1 var(--chart-h);
+    height: auto;
+    min-height: var(--chart-h);
 }
 
 /* .panel 의 display: grid 가 hidden 속성을 덮어쓴다 */
@@ -191,6 +214,10 @@ a:hover {
     margin: 4px 0 var(--gap-tight);
 }
 
+.panel > .meta-line {
+    margin: 4px 0 0;
+}
+
 .stat-grid {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -240,6 +267,7 @@ a:hover {
 .standing .where.high,
 .standing .where.low {
     color: var(--text-primary);
+    font-weight: var(--font-weight-bold);
 }
 
 .standing .dim,
@@ -255,7 +283,7 @@ a:hover {
 }
 
 .insights li {
-    font-size: var(--fs-body);
+    font-size: var(--fs-lead);
     line-height: 1.65;
     color: var(--text-secondary);
 }
@@ -271,15 +299,16 @@ a:hover {
 
 .module h2,
 .insight-group h3 {
-    margin: 0 0 4px;
+    margin: 0 0 2px;
     font-size: var(--fs-section-title);
     font-weight: var(--font-weight-bold);
+    line-height: 1.4;
     letter-spacing: var(--tracking-title);
-    color: var(--text-secondary);
+    color: var(--text-primary);
 }
 
 .insight-group h3 {
-    margin-bottom: 8px;
+    margin-bottom: 10px;
 }
 
 .module-note {
@@ -299,6 +328,15 @@ svg {
     height: var(--chart-h);
 }
 
+.chart-box canvas {
+    position: absolute;
+    inset: 0;
+}
+
+.chart-box.short {
+    height: var(--chart-h-short);
+}
+
 .settled-row {
     display: flex;
     flex-wrap: wrap;
@@ -307,13 +345,14 @@ svg {
 
 .settled-row .label {
     color: var(--text-secondary);
-    font-size: var(--fs-note);
+    font-size: var(--fs-label);
 }
 
 .settled-row .value {
-    font-size: var(--fs-body);
+    font-size: var(--fs-stat);
     font-weight: var(--font-weight-bold);
-    line-height: 1.4;
+    line-height: 1.3;
+    letter-spacing: var(--tracking-num);
     font-variant-numeric: tabular-nums;
 }
 
@@ -354,8 +393,18 @@ svg {
     border-bottom: none;
 }
 
+.rank th:first-child,
+.rank td:first-child {
+    padding-left: 0;
+}
+
+.rank th:last-child,
+.rank td:last-child {
+    padding-right: 0;
+}
+
 .rank td.bar {
-    background: linear-gradient(to right, var(--rank-bar) var(--w, 0%), transparent var(--w, 0%));
+    background: linear-gradient(var(--rank-bar), var(--rank-bar)) left bottom / var(--w, 0%) 2px no-repeat;
 }
 
 .rank td.num,
@@ -396,17 +445,6 @@ svg {
 .rank .week {
     margin-left: 4px;
     color: var(--text-muted);
-}
-
-.rank tr.has-sub td {
-    padding-bottom: 2px;
-    border-bottom: none;
-}
-
-.rank tr.sub td {
-    padding-top: 0;
-    color: var(--text-secondary);
-    font-size: var(--fs-note);
 }
 
 .rank .ratio {
@@ -458,6 +496,7 @@ svg {
     height: var(--strip-h);
     padding-top: 1.1em;
     box-sizing: content-box;
+    border-bottom: 1px solid var(--axis);
 }
 
 .hour-col {
@@ -466,7 +505,6 @@ svg {
     align-items: flex-end;
     height: 100%;
     border-radius: var(--radius-xs);
-    background: var(--surface-2);
 }
 
 .hour-col .bar {
@@ -565,7 +603,7 @@ svg {
 
 .footer-static #footer {
     border-top: var(--rule);
-    margin-top: 32px;
+    margin-top: 20px;
     color: var(--text-muted);
 }
 
@@ -583,5 +621,32 @@ svg {
     .rank th,
     .rank td {
         padding: 9px 5px;
+    }
+
+    .rank.pages th.num {
+        white-space: normal;
+        line-height: 1.3;
+    }
+
+    .rank.pages th.num:nth-child(3) {
+        white-space: nowrap;
+    }
+
+    .rank.pages .page .name {
+        display: block;
+    }
+
+    .rank.pages .page .host {
+        margin-left: 0;
+    }
+
+    .rank.pages .page .path {
+        display: inline;
+        margin-left: 6px;
+    }
+
+    .rank.games .page .path {
+        display: block;
+        margin-left: 0;
     }
 }

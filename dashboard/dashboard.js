@@ -205,6 +205,8 @@
                     borderColor: line,
                     backgroundColor: fillColor(C.series[i]),
                     borderWidth: G.lineW,
+                    borderJoinStyle: 'round',
+                    borderCapStyle: 'round',
                     tension: G.tension,
                     cubicInterpolationMode: G.tension > 0 ? 'monotone' : 'default',
                     fill: !!d.fill,
@@ -261,13 +263,18 @@
             id: 'pointValues',
             afterDatasetsDraw(chart) {
                 const ctx = chart.ctx;
+                const vals = chart.data.datasets[0].data;
                 chart.getDatasetMeta(0).data.forEach((el, i) => {
+                    const cur = vals[i], prev = vals[i - 1], next = vals[i + 1];
+                    const below = (prev === undefined || cur <= prev) && (next === undefined || cur <= next)
+                        && !(prev === undefined && next === undefined);
                     ctx.save();
                     ctx.fillStyle = C.textSecondary;
                     ctx.font = `bold ${G.fontSize}px ${FONT}`;
                     ctx.textAlign = 'center';
-                    ctx.textBaseline = 'bottom';
-                    const txt = fmtValue(chart.data.datasets[0].data[i]), ty = el.y - G.pointR - 4;
+                    ctx.textBaseline = below ? 'top' : 'bottom';
+                    const txt = fmtValue(cur);
+                    const ty = below ? el.y + G.pointR + 5 : el.y - G.pointR - 5;
                     ctx.lineJoin = 'round';
                     ctx.lineWidth = 4;
                     ctx.strokeStyle = C.surface;
@@ -386,7 +393,7 @@
             `하루 평균 조회 ${dec1(wc.views)}회 (그 전 ${dec1(wc.prevViews)}회)</p>` : '';
         longMod = mod(12, '긴 흐름',
             `최근 ${months.length}개월 달별 하루 평균 방문자 · 점선과 빈 점은 아직 한 달이 안 찬 달(측정 시작 달·이번 달)`,
-            `${wcLine}<div class="chart-box"><canvas id="c-months-${key}"></canvas></div>`);
+            `${wcLine}<div class="chart-box short"><canvas id="c-months-${key}"></canvas></div>`);
     }
 
     let weekMod = '';
@@ -561,18 +568,18 @@
         const cell = (day, week) => `<td class="num">${day}<span class="week">/ ${week}</span></td>`;
         const gameRows = games.map((g) => {
             const hasLong = g.longest || g.week.longest;
-            return `<tr${hasLong ? ' class="has-sub"' : ''}>` +
+            return '<tr>' +
                 `<td class="page bar" style="${barW(g.start, gameMax)}">` +
-                `<span class="name">${esc(g.game)}</span></td>` +
+                `<span class="name">${esc(g.game)}</span>` +
+                (hasLong ? `<div class="path">최장 플레이 ${longest(g.longest)}` +
+                    `<span class="week">/ ${longest(g.week.longest)}</span></div>` : '') + '</td>' +
                 cell(fmt(g.start), fmt(g.week.start)) + cell(fmt(g.save), fmt(g.week.save)) +
-                cell(fmt(g.restore), fmt(g.week.restore)) + '</tr>' +
-                (hasLong ? `<tr class="sub"><td colspan="4">최장 플레이 ${longest(g.longest)}` +
-                    `<span class="week">/ ${longest(g.week.longest)}</span></td></tr>` : '');
+                cell(fmt(g.restore), fmt(g.week.restore)) + '</tr>';
         }).join('');
         parts.push(mod(12, `${dayLabel} 게임 플레이`,
             `시작한 방문자 많은 순 · 옅은 숫자는 ${esc(weekLabel)} ·
              방문자는 기간 안에서 중복 제외`,
-            `<div class="scroll"><table class="rank pages"><thead><tr>
+            `<div class="scroll"><table class="rank pages games"><thead><tr>
                 <th>게임</th><th class="num">시작</th><th class="num">세이브</th>
                 <th class="num">이어하기</th>
              </tr></thead><tbody>${gameRows}</tbody></table></div>`));
@@ -633,7 +640,7 @@
             { label: '방문자', data: data.daily.map((d) => d.users), fill: true,
               color: C.accent,
               pointRadius: data.daily.map((_, i) => (i === at_ ? G.pointR : 0)) },
-        ], [normalBand(data.baseline && data.baseline.users)]);
+        ], [normalBand(data.baseline && data.baseline.users)], { grace: '8%', padding: { top: 8, right: 16 } });
 
         if (at('c-months')) {
             const ms = shownMonths(data);

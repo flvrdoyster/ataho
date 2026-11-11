@@ -28,7 +28,7 @@
 
     --band: rgba(124, 166, 222, 0.22);
 
-    --rank-bar: var(--band);
+    --rank-bar: var(--brand);
 
     --attention: #d8665a;
 
@@ -39,13 +39,15 @@
     --fs-h1: 1.5rem;
     --fs-hero: 2.5rem;
     --fs-body: 0.9375rem;
+    --fs-lead: 1rem;
+    --fs-stat: 1.25rem;
     --fs-sm: 0.875rem;
     --fs-label: 0.8125rem;
     --fs-note: 0.75rem;
     --fs-micro: 0.6875rem;
 
-    --fs-section-title: 0.75rem;
-    --tracking-title: 0.06em;
+    --fs-section-title: 0.9375rem;
+    --tracking-title: 0;
     --tracking-num: -0.01em;
 
     --rule: 1px solid var(--border);
@@ -67,14 +69,16 @@
     --gap-grid: 16px;
     --gap-tight: 18px;
 
-    --chart-h: 260px;
+    --chart-h: 200px;
+    --chart-h-short: 180px;
     --chart-font-size: 12px;
     --line-w: 2px;
-    --line-tension: 0.25;
-    --line-fill-alpha: 0.1;
+    --line-tension: 0;
+    --line-fill-alpha: 0;
     --point-r: 4px;
 
-    --strip-h: 56px;
+    --strip-h: 72px;
+    --strip-h-max: 260px;
     --strip-gap: 3px;
 }
 
