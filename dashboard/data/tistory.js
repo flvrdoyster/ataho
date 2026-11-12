@@ -1,6 +1,6 @@
 window.DASHBOARD_TISTORY = {
  "firstDay": "2026-11-04",
- "lastFetch": "2026-11-10 20:48",
+ "lastFetch": "2026-11-12 12:03",
  "days": {
   "2026-11-04": {
    "until": "24:00",
@@ -136,7 +136,7 @@ window.DASHBOARD_TISTORY = {
    "keywords": []
   },
   "2026-11-10": {
-   "until": "20:48",
+   "until": "24:00",
    "views": 5,
    "inner": 36,
    "domains": [
@@ -156,6 +156,20 @@ window.DASHBOARD_TISTORY = {
      1
     ]
    ],
+   "keywords": []
+  },
+  "2026-11-11": {
+   "until": "24:00",
+   "views": 0,
+   "inner": 2,
+   "domains": [],
+   "keywords": []
+  },
+  "2026-11-12": {
+   "until": "12:03",
+   "views": 0,
+   "inner": 0,
+   "domains": [],
    "keywords": []
   }
  }
