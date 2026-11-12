@@ -289,6 +289,7 @@ PV_CSS = """
       border: 1px dashed #bbb; border-radius: 6px; color: #888; font: 13px/1.5 -apple-system, sans-serif;
       background: repeating-linear-gradient(45deg, #f4f4f4, #f4f4f4 10px, #fafafa 10px, #fafafa 20px); text-align: center; padding: 12px; }
     .pv-ph-link { min-height: 64px; }
+    #article-view figure.imageblock img { max-width: 400px; width: 100%; height: auto; }
     .area_titlenav a.pv-off { opacity: .35; pointer-events: none; }
 """
 
