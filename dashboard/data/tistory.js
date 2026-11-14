@@ -1,6 +1,6 @@
 window.DASHBOARD_TISTORY = {
  "firstDay": "2026-11-04",
- "lastFetch": "2026-11-12 12:03",
+ "lastFetch": "2026-11-14 14:23",
  "days": {
   "2026-11-04": {
    "until": "24:00",
@@ -166,10 +166,52 @@ window.DASHBOARD_TISTORY = {
    "keywords": []
   },
   "2026-11-12": {
-   "until": "12:03",
-   "views": 0,
-   "inner": 0,
-   "domains": [],
+   "until": "24:00",
+   "views": 1,
+   "inner": 22,
+   "domains": [
+    [
+     "namu.wiki",
+     "etc",
+     1
+    ]
+   ],
+   "keywords": []
+  },
+  "2026-11-13": {
+   "until": "24:00",
+   "views": 2,
+   "inner": 49,
+   "domains": [
+    [
+     "namu.wiki",
+     "etc",
+     1
+    ],
+    [
+     "www.google.com",
+     "google",
+     1
+    ]
+   ],
+   "keywords": []
+  },
+  "2026-11-14": {
+   "until": "14:23",
+   "views": 2,
+   "inner": 1,
+   "domains": [
+    [
+     "pc98.atah.io",
+     "etc",
+     1
+    ],
+    [
+     "www.google.com",
+     "google",
+     1
+    ]
+   ],
    "keywords": []
   }
  }
