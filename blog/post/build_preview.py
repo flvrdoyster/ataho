@@ -31,6 +31,7 @@ POSTS = [  # (파일, 탭 이름, 앵커)
     ("hukyou-intro.md", "환세풍광전", "hukyou"),
     ("kaitou-intro.md", "환세쾌도전", "kaitou"),
     ("torimono-intro.md", "환세포물장", "torimono"),
+    ("haiyuki-intro.md", "환세패유기", "haiyuki"),
 ]
 
 MAX_W = 1400
