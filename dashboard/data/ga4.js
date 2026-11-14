@@ -11770,7 +11770,7 @@ window.DASHBOARD_DATA['ga4'] = {
    ],
    "longest": null,
    "settled": {
-    "avgDuration": 709.491099583691,
+    "avgDuration": 709.4910995836912,
     "engagementRate": 0.5450643776824035,
     "from": "2026-11-05",
     "longest": {
@@ -11785,7 +11785,7 @@ window.DASHBOARD_DATA['ga4'] = {
     "sessions": 233,
     "to": "2026-11-11"
    },
-   "updatedAt": "2026-11-14 09:43",
+   "updatedAt": "2026-11-14 14:46",
    "ydayHours": [
     2,
     0,
@@ -12185,7 +12185,7 @@ window.DASHBOARD_DATA['ga4'] = {
     "sessions": 232,
     "to": "2026-11-12"
    },
-   "updatedAt": "2026-11-14 09:43",
+   "updatedAt": "2026-11-14 14:46",
    "ydayHours": [
     1,
     1,
@@ -12415,7 +12415,7 @@ window.DASHBOARD_DATA['ga4'] = {
   "propertyId": "516513119",
   "settledDays": 7,
   "trendDays": 28,
-  "updatedAt": "2026-11-14 09:43"
+  "updatedAt": "2026-11-14 14:46"
  },
  "months": [
   {

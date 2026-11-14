@@ -8024,7 +8024,7 @@ window.DASHBOARD_DATA['blog'] = {
     "source": "google"
    },
    "settled": {
-    "avgDuration": 190.87084594444445,
+    "avgDuration": 190.87084594444443,
     "engagementRate": 0.5740740740740741,
     "from": "2026-11-05",
     "longest": {
@@ -8039,7 +8039,7 @@ window.DASHBOARD_DATA['blog'] = {
     "sessions": 54,
     "to": "2026-11-11"
    },
-   "updatedAt": "2026-11-14 09:44",
+   "updatedAt": "2026-11-14 14:46",
    "ydayHours": [
     0,
     0,
@@ -8344,13 +8344,13 @@ window.DASHBOARD_DATA['blog'] = {
     "source": "google"
    },
    "settled": {
-    "avgDuration": 179.78714660784317,
+    "avgDuration": 179.78714660784314,
     "engagementRate": 0.5098039215686274,
     "from": "2026-11-06",
     "sessions": 51,
     "to": "2026-11-12"
    },
-   "updatedAt": "2026-11-14 09:44",
+   "updatedAt": "2026-11-14 14:46",
    "ydayHours": [
     0,
     1,
@@ -8594,7 +8594,7 @@ window.DASHBOARD_DATA['blog'] = {
   "propertyId": "549191220",
   "settledDays": 7,
   "trendDays": 28,
-  "updatedAt": "2026-11-14 09:44"
+  "updatedAt": "2026-11-14 14:46"
  },
  "months": [
   {
@@ -8627,7 +8627,7 @@ window.DASHBOARD_DATA['blog'] = {
   }
  ],
  "settled": {
-  "avgDuration": 179.78714660784317,
+  "avgDuration": 179.78714660784314,
   "engagementRate": 0.5098039215686274,
   "from": "2026-11-06",
   "sessions": 51,
