@@ -496,7 +496,15 @@ svg {
 
 .rank .week {
     margin-left: 4px;
-    color: var(--text-muted);
+    color: var(--plane-muted);
+}
+
+.rank.games td.num {
+    font-weight: var(--font-weight-bold);
+}
+
+.rank.games td.num .week {
+    font-weight: 400;
 }
 
 .rank .ratio {
