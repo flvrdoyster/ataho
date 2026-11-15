@@ -9,6 +9,7 @@ import urllib.error
 import urllib.request
 from collections import Counter
 from datetime import date, datetime, timedelta, timezone
+from functools import lru_cache
 from pathlib import Path
 
 from google.oauth2 import service_account
@@ -347,6 +348,20 @@ def rising_state(full):
     return None
 
 
+@lru_cache(maxsize=None)
+def prior_daily(key):
+    path = OUTPUT_DIR / f"{key}.js"
+    try:
+        body = json.loads(path.read_text(encoding="utf-8").split("=", 2)[2].strip().rstrip(";"))
+    except (OSError, IndexError, ValueError):
+        return {}
+    return {d["date"]: d for d in body.get("dailyLong", []) + body.get("daily", [])
+            if d.get("users") or d.get("sessions") or d.get("views")}
+
+
+_kept_logged = set()
+
+
 def daily_series(client, target, age, days, from_start=False):
     rows = report(client, target, dimensions=["date"],
                   metrics=["activeUsers", "sessions", "screenPageViews"],
@@ -358,11 +373,21 @@ def daily_series(client, target, age, days, from_start=False):
         first = datetime.now(KST).date() - timedelta(days=days + age - 1)
         day = first if from_start else date.fromisoformat(min(got))
         end = max(date.fromisoformat(max(got)), datetime.now(KST).date() - timedelta(days=age))
+        stored = prior_daily(target.key)
         while day <= end:
-            r = got.get(day.isoformat(), {})
-            out.append({"date": day.isoformat(), "users": int(r.get("activeUsers", 0)),
-                        "sessions": int(r.get("sessions", 0)),
-                        "views": int(r.get("screenPageViews", 0))})
+            k = day.isoformat()
+            r = got.get(k)
+            if r is not None:
+                row = {"date": k, "users": int(r["activeUsers"]), "sessions": int(r["sessions"]),
+                       "views": int(r["screenPageViews"])}
+            else:
+                s = stored.get(k) or {}
+                row = {"date": k, "users": int(s.get("users", 0)), "sessions": int(s.get("sessions", 0)),
+                       "views": int(s.get("views", 0))}
+                if (row["users"] or row["sessions"] or row["views"]) and (target.key, k) not in _kept_logged:
+                    _kept_logged.add((target.key, k))
+                    print(f"{target.key}: {k} 이(가) API 결과에 없어 직전 대시보드 값 유지")
+            out.append(row)
             day += timedelta(days=1)
     return out
 

@@ -71,14 +71,23 @@ def collect(client, target, start, end):
     return days
 
 
-def fill(days, start, end):
-    out, cur = {}, start
+def has_value(d):
+    return bool(d and (d["users"] or d["sessions"] or d["views"]))
+
+
+def fill(days, start, end, existing=None):
+    existing = existing or {}
+    out, kept, cur = {}, [], start
     while cur <= end:
         k = cur.isoformat()
-        out[k] = days.get(k) or {"users": 0, "newUsers": 0, "sessions": 0, "views": 0,
-                                 "pages": [], "sources": [], "devices": [], "hours": [0] * 24}
+        if not has_value(days.get(k)) and has_value(existing.get(k)):
+            out[k] = existing[k]
+            kept.append(k)
+        else:
+            out[k] = days.get(k) or {"users": 0, "newUsers": 0, "sessions": 0, "views": 0,
+                                     "pages": [], "sources": [], "devices": [], "hours": [0] * 24}
         cur += timedelta(days=1)
-    return out
+    return out, kept
 
 
 def load(path):
@@ -115,7 +124,10 @@ def main():
         else:
             start = yesterday - timedelta(days=REFRESH_DAYS - 1)
             days = collect(client, target, start, yesterday)
-        archive.update(fill(days, start, yesterday))
+        filled, kept = fill(days, start, yesterday, archive)
+        archive.update(filled)
+        if kept:
+            print(f"{target.key}: 새로 받은 값이 비어 보관 값 유지 {', '.join(kept)}")
         write(path, archive)
         print(f"{target.key}: {start} ~ {yesterday} 갱신 · 전체 {min(archive)} ~ {max(archive)} "
               f"{len(archive)}일 · {path.stat().st_size:,}B")
