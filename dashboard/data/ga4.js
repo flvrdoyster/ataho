@@ -3,10 +3,10 @@ window.DASHBOARD_DATA['ga4'] = {
  "baseline": {
   "perUser": {
    "hi": 4.357142857142857,
-   "lo": 2.062222222222222,
+   "lo": 2.2,
    "max": 6.375,
    "median": 3.0590277777777777,
-   "min": 0.0,
+   "min": 1.3529411764705883,
    "n": 28,
    "rank": 8,
    "value": 3.875,
@@ -15,10 +15,10 @@ window.DASHBOARD_DATA['ga4'] = {
   },
   "sessions": {
    "hi": 41.3,
-   "lo": 20.7,
+   "lo": 21.0,
    "max": 64,
    "median": 27.0,
-   "min": 0,
+   "min": 16,
    "n": 28,
    "rank": 22,
    "value": 23,
@@ -27,10 +27,10 @@ window.DASHBOARD_DATA['ga4'] = {
   },
   "users": {
    "hi": 27.3,
-   "lo": 11.4,
+   "lo": 13.4,
    "max": 39,
    "median": 15.5,
-   "min": 0,
+   "min": 10,
    "n": 28,
    "rank": 12,
    "value": 16,
@@ -39,10 +39,10 @@ window.DASHBOARD_DATA['ga4'] = {
   },
   "views": {
    "hi": 98.5,
-   "lo": 33.7,
+   "lo": 34.0,
    "max": 126,
    "median": 55.0,
-   "min": 0,
+   "min": 23,
    "n": 28,
    "rank": 9,
    "value": 62,
@@ -204,9 +204,9 @@ window.DASHBOARD_DATA['ga4'] = {
   },
   {
    "date": "2026-11-12",
-   "sessions": 0,
-   "users": 0,
-   "views": 0
+   "sessions": 23,
+   "users": 14,
+   "views": 36
   },
   {
    "date": "2026-11-13",
@@ -536,9 +536,9 @@ window.DASHBOARD_DATA['ga4'] = {
   },
   {
    "date": "2026-11-12",
-   "sessions": 0,
-   "users": 0,
-   "views": 0
+   "sessions": 23,
+   "users": 14,
+   "views": 36
   },
   {
    "date": "2026-11-13",
@@ -570,7 +570,7 @@ window.DASHBOARD_DATA['ga4'] = {
     },
     "restore": 10,
     "save": 23,
-    "start": 36
+    "start": 39
    }
   },
   {
@@ -589,7 +589,7 @@ window.DASHBOARD_DATA['ga4'] = {
     },
     "restore": 3,
     "save": 3,
-    "start": 13
+    "start": 14
    }
   },
   {
@@ -608,7 +608,7 @@ window.DASHBOARD_DATA['ga4'] = {
     },
     "restore": 1,
     "save": 3,
-    "start": 8
+    "start": 9
    }
   },
   {
@@ -638,7 +638,7 @@ window.DASHBOARD_DATA['ga4'] = {
    }
   },
   {
-   "game": "환세쾌도전",
+   "game": "환세희담 오프닝",
    "longest": null,
    "restore": 0,
    "save": 0,
@@ -647,11 +647,11 @@ window.DASHBOARD_DATA['ga4'] = {
     "longest": null,
     "restore": 0,
     "save": 0,
-    "start": 1
+    "start": 2
    }
   },
   {
-   "game": "환세희담 오프닝",
+   "game": "환세쾌도전",
    "longest": null,
    "restore": 0,
    "save": 0,
@@ -11581,22 +11581,22 @@ window.DASHBOARD_DATA['ga4'] = {
    "baseline": {
     "perUser": {
      "hi": 4.357142857142857,
-     "lo": 2.062222222222222,
+     "lo": 2.2,
      "max": 6.375,
      "median": 2.9466966966966965,
-     "min": 0.0,
+     "min": 1.3529411764705883,
      "n": 28,
-     "rank": 27,
+     "rank": 28,
      "value": 1.3529411764705883,
      "vsMedian": -54.08617459722742,
      "where": "low"
     },
     "sessions": {
      "hi": 41.3,
-     "lo": 20.7,
+     "lo": 21.0,
      "max": 64,
      "median": 27.0,
-     "min": 0,
+     "min": 16,
      "n": 28,
      "rank": 19,
      "value": 24,
@@ -11605,10 +11605,10 @@ window.DASHBOARD_DATA['ga4'] = {
     },
     "users": {
      "hi": 27.3,
-     "lo": 11.4,
+     "lo": 13.4,
      "max": 39,
      "median": 15.5,
-     "min": 0,
+     "min": 10,
      "n": 28,
      "rank": 12,
      "value": 17,
@@ -11617,12 +11617,12 @@ window.DASHBOARD_DATA['ga4'] = {
     },
     "views": {
      "hi": 98.5,
-     "lo": 33.7,
+     "lo": 34.0,
      "max": 126,
      "median": 52.0,
-     "min": 0,
+     "min": 23,
      "n": 28,
-     "rank": 27,
+     "rank": 28,
      "value": 23,
      "vsMedian": -55.769230769230774,
      "where": "low"
@@ -11646,7 +11646,7 @@ window.DASHBOARD_DATA['ga4'] = {
       },
       "restore": 12,
       "save": 29,
-      "start": 41
+      "start": 44
      }
     },
     {
@@ -11662,7 +11662,7 @@ window.DASHBOARD_DATA['ga4'] = {
       },
       "restore": 1,
       "save": 1,
-      "start": 9
+      "start": 10
      }
     },
     {
@@ -11688,7 +11688,7 @@ window.DASHBOARD_DATA['ga4'] = {
       "longest": null,
       "restore": 0,
       "save": 0,
-      "start": 1
+      "start": 2
      }
     },
     {
@@ -11704,7 +11704,7 @@ window.DASHBOARD_DATA['ga4'] = {
       },
       "restore": 0,
       "save": 1,
-      "start": 9
+      "start": 10
      }
     },
     {
@@ -11748,45 +11748,45 @@ window.DASHBOARD_DATA['ga4'] = {
     }
    ],
    "hourPattern": [
-    1.39,
+    1.46,
     1.14,
     0.46,
     0.61,
     0.43,
     0.21,
     0.21,
-    0.54,
-    0.71,
-    1.61,
-    1.82,
-    1.96,
-    1.54,
+    0.57,
+    0.75,
+    1.75,
+    1.86,
+    2.11,
+    1.64,
+    2.29,
     2.25,
-    2.21,
-    1.96,
+    2.04,
     2.0,
-    1.93,
-    1.5,
+    1.96,
+    1.61,
     2.07,
     1.96,
     2.0,
-    1.71,
-    1.89
+    1.79,
+    1.93
    ],
    "insights": [
     {
-     "text": "11.13 방문자당 페이지가 최근 27일 중 **가장 적습니다**(다른 날 최저 1.7장).",
+     "text": "11.13 방문자당 페이지가 최근 28일 중 **가장 적습니다**(다른 날 최저 1.7장).",
      "tone": "flat"
     },
     {
-     "text": "11.13 조회 가운데 재방문자 몫이 **9%**입니다 — 최근 28일 가운데 분류가 끝난 27일 중 가장 낮습니다(다른 날 최저 24%). 새 방문자가 대부분을 봤습니다.",
+     "text": "11.13 조회 가운데 재방문자 몫이 **9%**입니다 — 최근 28일 중 가장 낮습니다(다른 날 최저 24%). 새 방문자가 대부분을 봤습니다.",
      "tone": "flat"
     }
    ],
    "longest": null,
    "settled": {
-    "avgDuration": 735.1872843397128,
-    "engagementRate": 0.5502392344497608,
+    "avgDuration": 732.9839132112069,
+    "engagementRate": 0.5301724137931034,
     "from": "2026-11-06",
     "longest": {
      "date": "2026-11-08",
@@ -11797,10 +11797,10 @@ window.DASHBOARD_DATA['ga4'] = {
      "seconds": 3666,
      "source": "namu.wiki"
     },
-    "sessions": 209,
+    "sessions": 232,
     "to": "2026-11-12"
    },
-   "updatedAt": "2026-11-15 08:41",
+   "updatedAt": "2026-11-15 16:43",
    "ydayHours": [
     1,
     1,
@@ -11832,7 +11832,7 @@ window.DASHBOARD_DATA['ga4'] = {
      "fresh": null,
      "host": "suiko.atah.io",
      "name": "/kr.html",
-     "priorAvg": 19.48148148148148,
+     "priorAvg": 20.074074074074073,
      "ratio": 0.3,
      "rising": null,
      "section": "",
@@ -11858,7 +11858,7 @@ window.DASHBOARD_DATA['ga4'] = {
      "fresh": null,
      "host": "pc98.atah.io",
      "name": "/kitan.html",
-     "priorAvg": 3.6666666666666665,
+     "priorAvg": 3.7777777777777777,
      "ratio": 1.1,
      "rising": null,
      "section": "",
@@ -11871,7 +11871,7 @@ window.DASHBOARD_DATA['ga4'] = {
      "fresh": null,
      "host": "atah.io",
      "name": "/",
-     "priorAvg": 4.703703703703703,
+     "priorAvg": 4.888888888888889,
      "ratio": 0.6,
      "rising": null,
      "section": "메인 (아타호의 거처)",
@@ -11884,7 +11884,7 @@ window.DASHBOARD_DATA['ga4'] = {
      "fresh": null,
      "host": "haiyuki.atah.io",
      "name": "/yaku-calc.html",
-     "priorAvg": 3.7037037037037037,
+     "priorAvg": 3.888888888888889,
      "ratio": 0.8,
      "rising": null,
      "section": "",
@@ -11910,7 +11910,7 @@ window.DASHBOARD_DATA['ga4'] = {
      "fresh": null,
      "host": "pc98.atah.io",
      "name": "/",
-     "priorAvg": 6.2592592592592595,
+     "priorAvg": 6.333333333333333,
      "ratio": 0.2,
      "rising": null,
      "section": "",
@@ -11923,7 +11923,7 @@ window.DASHBOARD_DATA['ga4'] = {
      "fresh": null,
      "host": "pc98.atah.io",
      "name": "/kitan-opening.html",
-     "priorAvg": 0.5925925925925926,
+     "priorAvg": 0.6666666666666666,
      "ratio": 1.0,
      "rising": null,
      "section": "",
@@ -11990,10 +11990,10 @@ window.DASHBOARD_DATA['ga4'] = {
    "baseline": {
     "perUser": {
      "hi": 4.357142857142857,
-     "lo": 2.062222222222222,
+     "lo": 2.2,
      "max": 6.375,
      "median": 3.0590277777777777,
-     "min": 0.0,
+     "min": 1.3529411764705883,
      "n": 28,
      "rank": 8,
      "value": 3.875,
@@ -12002,10 +12002,10 @@ window.DASHBOARD_DATA['ga4'] = {
     },
     "sessions": {
      "hi": 41.3,
-     "lo": 20.7,
+     "lo": 21.0,
      "max": 64,
      "median": 27.0,
-     "min": 0,
+     "min": 16,
      "n": 28,
      "rank": 22,
      "value": 23,
@@ -12014,10 +12014,10 @@ window.DASHBOARD_DATA['ga4'] = {
     },
     "users": {
      "hi": 27.3,
-     "lo": 11.4,
+     "lo": 13.4,
      "max": 39,
      "median": 15.5,
-     "min": 0,
+     "min": 10,
      "n": 28,
      "rank": 12,
      "value": 16,
@@ -12026,10 +12026,10 @@ window.DASHBOARD_DATA['ga4'] = {
     },
     "views": {
      "hi": 98.5,
-     "lo": 33.7,
+     "lo": 34.0,
      "max": 126,
      "median": 55.0,
-     "min": 0,
+     "min": 23,
      "n": 28,
      "rank": 9,
      "value": 62,
@@ -12055,7 +12055,7 @@ window.DASHBOARD_DATA['ga4'] = {
       },
       "restore": 10,
       "save": 23,
-      "start": 36
+      "start": 39
      }
     },
     {
@@ -12074,7 +12074,7 @@ window.DASHBOARD_DATA['ga4'] = {
       },
       "restore": 3,
       "save": 3,
-      "start": 13
+      "start": 14
      }
     },
     {
@@ -12093,7 +12093,7 @@ window.DASHBOARD_DATA['ga4'] = {
       },
       "restore": 1,
       "save": 3,
-      "start": 8
+      "start": 9
      }
     },
     {
@@ -12123,7 +12123,7 @@ window.DASHBOARD_DATA['ga4'] = {
      }
     },
     {
-     "game": "환세쾌도전",
+     "game": "환세희담 오프닝",
      "longest": null,
      "restore": 0,
      "save": 0,
@@ -12132,11 +12132,11 @@ window.DASHBOARD_DATA['ga4'] = {
       "longest": null,
       "restore": 0,
       "save": 0,
-      "start": 1
+      "start": 2
      }
     },
     {
-     "game": "환세희담 오프닝",
+     "game": "환세쾌도전",
      "longest": null,
      "restore": 0,
      "save": 0,
@@ -12163,34 +12163,34 @@ window.DASHBOARD_DATA['ga4'] = {
     }
    ],
    "hourPattern": [
-    1.43,
+    1.5,
     1.18,
     0.46,
     0.61,
     0.25,
     0.11,
     0.21,
-    0.54,
-    0.71,
-    1.71,
-    1.79,
-    2.0,
-    1.57,
-    2.5,
-    2.21,
-    2.0,
+    0.57,
+    0.75,
+    1.86,
+    1.82,
+    2.14,
+    1.68,
+    2.54,
+    2.25,
+    2.07,
     1.89,
-    1.96,
-    1.5,
+    2.0,
+    1.61,
     2.11,
     1.93,
     1.82,
-    1.68,
-    1.86
+    1.75,
+    1.89
    ],
    "insights": [
     {
-     "text": "PC-98 환세 시리즈 웹 에뮬레이터가 어제 17회 — 평소 하루 6.0회 보던 페이지라 **2.9배**로 뛰었습니다.",
+     "text": "PC-98 환세 시리즈 웹 에뮬레이터가 어제 17회 — 평소 하루 6.0회 보던 페이지라 **2.8배**로 뛰었습니다.",
      "tone": "up"
     },
     {
@@ -12200,13 +12200,13 @@ window.DASHBOARD_DATA['ga4'] = {
    ],
    "longest": null,
    "settled": {
-    "avgDuration": 724.6204196091369,
-    "engagementRate": 0.5380710659898477,
+    "avgDuration": 723.4015822772726,
+    "engagementRate": 0.5181818181818182,
     "from": "2026-11-07",
-    "sessions": 197,
+    "sessions": 220,
     "to": "2026-11-13"
    },
-   "updatedAt": "2026-11-15 08:41",
+   "updatedAt": "2026-11-15 16:43",
    "ydayHours": [
     1,
     1,
@@ -12238,8 +12238,8 @@ window.DASHBOARD_DATA['ga4'] = {
      "fresh": null,
      "host": "pc98.atah.io",
      "name": "/",
-     "priorAvg": 5.962962962962963,
-     "ratio": 2.9,
+     "priorAvg": 6.037037037037037,
+     "ratio": 2.8,
      "rising": null,
      "section": "",
      "spike": true,
@@ -12251,7 +12251,7 @@ window.DASHBOARD_DATA['ga4'] = {
      "fresh": null,
      "host": "suiko.atah.io",
      "name": "/kr.html",
-     "priorAvg": 19.185185185185187,
+     "priorAvg": 19.77777777777778,
      "ratio": 0.7,
      "rising": null,
      "section": "",
@@ -12264,7 +12264,7 @@ window.DASHBOARD_DATA['ga4'] = {
      "fresh": null,
      "host": "pc98.atah.io",
      "name": "/hukyou.html",
-     "priorAvg": 2.888888888888889,
+     "priorAvg": 2.925925925925926,
      "ratio": 3.8,
      "rising": null,
      "section": "",
@@ -12277,7 +12277,7 @@ window.DASHBOARD_DATA['ga4'] = {
      "fresh": null,
      "host": "pc98.atah.io",
      "name": "/kitan.html",
-     "priorAvg": 3.6666666666666665,
+     "priorAvg": 3.7777777777777777,
      "ratio": 1.9,
      "rising": null,
      "section": "",
@@ -12290,7 +12290,7 @@ window.DASHBOARD_DATA['ga4'] = {
      "fresh": null,
      "host": "atah.io",
      "name": "/",
-     "priorAvg": 4.777777777777778,
+     "priorAvg": 4.962962962962963,
      "ratio": 0.6,
      "rising": null,
      "section": "메인 (아타호의 거처)",
@@ -12303,7 +12303,7 @@ window.DASHBOARD_DATA['ga4'] = {
      "fresh": null,
      "host": "suiko.atah.io",
      "name": "/patch.html",
-     "priorAvg": 2.962962962962963,
+     "priorAvg": 3.037037037037037,
      "ratio": 1.0,
      "rising": null,
      "section": "",
@@ -12316,7 +12316,7 @@ window.DASHBOARD_DATA['ga4'] = {
      "fresh": null,
      "host": "haiyuki.atah.io",
      "name": "/yaku-calc.html",
-     "priorAvg": 3.814814814814815,
+     "priorAvg": 4.0,
      "ratio": 0.5,
      "rising": null,
      "section": "",
@@ -12454,34 +12454,34 @@ window.DASHBOARD_DATA['ga4'] = {
   }
  },
  "hourPattern": [
-  1.43,
+  1.5,
   1.18,
   0.46,
   0.61,
   0.25,
   0.11,
   0.21,
-  0.54,
-  0.71,
-  1.71,
-  1.79,
-  2.0,
-  1.57,
-  2.5,
-  2.21,
-  2.0,
+  0.57,
+  0.75,
+  1.86,
+  1.82,
+  2.14,
+  1.68,
+  2.54,
+  2.25,
+  2.07,
   1.89,
-  1.96,
-  1.5,
+  2.0,
+  1.61,
   2.11,
   1.93,
   1.82,
-  1.68,
-  1.86
+  1.75,
+  1.89
  ],
  "insights": [
   {
-   "text": "PC-98 환세 시리즈 웹 에뮬레이터가 어제 17회 — 평소 하루 6.0회 보던 페이지라 **2.9배**로 뛰었습니다.",
+   "text": "PC-98 환세 시리즈 웹 에뮬레이터가 어제 17회 — 평소 하루 6.0회 보던 페이지라 **2.8배**로 뛰었습니다.",
    "tone": "up"
   },
   {
@@ -12496,7 +12496,7 @@ window.DASHBOARD_DATA['ga4'] = {
   "propertyId": "516513119",
   "settledDays": 7,
   "trendDays": 28,
-  "updatedAt": "2026-11-15 08:41"
+  "updatedAt": "2026-11-15 16:43"
  },
  "months": [
   {
@@ -12580,22 +12580,22 @@ window.DASHBOARD_DATA['ga4'] = {
    "days": 14,
    "month": "2026-11",
    "partial": true,
-   "users": 18.1,
-   "views": 57.3
+   "users": 19.1,
+   "views": 59.9
   }
  ],
  "settled": {
-  "avgDuration": 724.6204196091369,
-  "engagementRate": 0.5380710659898477,
+  "avgDuration": 723.4015822772726,
+  "engagementRate": 0.5181818181818182,
   "from": "2026-11-07",
-  "sessions": 197,
+  "sessions": 220,
   "to": "2026-11-13"
  },
  "weekCompare": {
   "prevUsers": 18.4,
   "prevViews": 66.6,
-  "users": 17.7,
-  "views": 48.0
+  "users": 19.7,
+  "views": 53.1
  },
  "ydayHours": [
   1,
@@ -12628,8 +12628,8 @@ window.DASHBOARD_DATA['ga4'] = {
    "fresh": null,
    "host": "pc98.atah.io",
    "name": "/",
-   "priorAvg": 5.962962962962963,
-   "ratio": 2.9,
+   "priorAvg": 6.037037037037037,
+   "ratio": 2.8,
    "rising": null,
    "section": "",
    "spike": true,
@@ -12641,7 +12641,7 @@ window.DASHBOARD_DATA['ga4'] = {
    "fresh": null,
    "host": "suiko.atah.io",
    "name": "/kr.html",
-   "priorAvg": 19.185185185185187,
+   "priorAvg": 19.77777777777778,
    "ratio": 0.7,
    "rising": null,
    "section": "",
@@ -12654,7 +12654,7 @@ window.DASHBOARD_DATA['ga4'] = {
    "fresh": null,
    "host": "pc98.atah.io",
    "name": "/hukyou.html",
-   "priorAvg": 2.888888888888889,
+   "priorAvg": 2.925925925925926,
    "ratio": 3.8,
    "rising": null,
    "section": "",
@@ -12667,7 +12667,7 @@ window.DASHBOARD_DATA['ga4'] = {
    "fresh": null,
    "host": "pc98.atah.io",
    "name": "/kitan.html",
-   "priorAvg": 3.6666666666666665,
+   "priorAvg": 3.7777777777777777,
    "ratio": 1.9,
    "rising": null,
    "section": "",
@@ -12680,7 +12680,7 @@ window.DASHBOARD_DATA['ga4'] = {
    "fresh": null,
    "host": "atah.io",
    "name": "/",
-   "priorAvg": 4.777777777777778,
+   "priorAvg": 4.962962962962963,
    "ratio": 0.6,
    "rising": null,
    "section": "메인 (아타호의 거처)",
@@ -12693,7 +12693,7 @@ window.DASHBOARD_DATA['ga4'] = {
    "fresh": null,
    "host": "suiko.atah.io",
    "name": "/patch.html",
-   "priorAvg": 2.962962962962963,
+   "priorAvg": 3.037037037037037,
    "ratio": 1.0,
    "rising": null,
    "section": "",
@@ -12706,7 +12706,7 @@ window.DASHBOARD_DATA['ga4'] = {
    "fresh": null,
    "host": "haiyuki.atah.io",
    "name": "/yaku-calc.html",
-   "priorAvg": 3.814814814814815,
+   "priorAvg": 4.0,
    "ratio": 0.5,
    "rising": null,
    "section": "",
