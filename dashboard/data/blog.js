@@ -3,26 +3,26 @@ window.DASHBOARD_DATA['blog'] = {
  "baseline": {
   "perUser": {
    "hi": 7.9,
-   "lo": 1.925,
+   "lo": 2.175,
    "max": 16.0,
    "median": 3.55,
    "min": 0.0,
    "n": 28,
-   "rank": 21,
-   "value": 2.5,
-   "vsMedian": -29.57746478873239,
+   "rank": 23,
+   "value": 2.4,
+   "vsMedian": -32.3943661971831,
    "where": "usual"
   },
   "sessions": {
    "hi": 11.3,
-   "lo": 3.7,
+   "lo": 4.0,
    "max": 16,
-   "median": 8.0,
+   "median": 8.5,
    "min": 1,
    "n": 28,
-   "rank": 14,
-   "value": 8,
-   "vsMedian": 0.0,
+   "rank": 11,
+   "value": 9,
+   "vsMedian": 5.88235294117647,
    "where": "usual"
   },
   "users": {
@@ -32,32 +32,26 @@ window.DASHBOARD_DATA['blog'] = {
    "median": 5.0,
    "min": 0,
    "n": 28,
-   "rank": 17,
-   "value": 4,
-   "vsMedian": -20.0,
+   "rank": 13,
+   "value": 5,
+   "vsMedian": 0.0,
    "where": "usual"
   },
   "views": {
    "hi": 35.6,
-   "lo": 4.4,
+   "lo": 6.4,
    "max": 67,
    "median": 23.5,
    "min": 1,
    "n": 28,
-   "rank": 22,
-   "value": 10,
-   "vsMedian": -57.446808510638306,
+   "rank": 21,
+   "value": 12,
+   "vsMedian": -48.93617021276596,
    "where": "usual"
   }
  },
  "confirmed": false,
  "daily": [
-  {
-   "date": "2026-10-20",
-   "sessions": 3,
-   "users": 2,
-   "views": 3
-  },
   {
    "date": "2026-10-21",
    "sessions": 1,
@@ -219,15 +213,15 @@ window.DASHBOARD_DATA['blog'] = {
    "sessions": 8,
    "users": 4,
    "views": 10
+  },
+  {
+   "date": "2026-11-17",
+   "sessions": 9,
+   "users": 5,
+   "views": 12
   }
  ],
  "dailyLong": [
-  {
-   "date": "2026-09-23",
-   "sessions": 5,
-   "users": 3,
-   "views": 8
-  },
   {
    "date": "2026-09-24",
    "sessions": 2,
@@ -551,200 +545,16 @@ window.DASHBOARD_DATA['blog'] = {
    "sessions": 8,
    "users": 4,
    "views": 10
+  },
+  {
+   "date": "2026-11-17",
+   "sessions": 9,
+   "users": 5,
+   "views": 12
   }
  ],
  "games": [],
  "history": {
-  "2026-10-20": {
-   "baseline": {
-    "perUser": {
-     "hi": 5.861538461538462,
-     "lo": 1.47,
-     "max": 15.333333333333334,
-     "median": 2.4761904761904763,
-     "min": 0.0,
-     "n": 28,
-     "rank": 22,
-     "value": 1.5,
-     "vsMedian": -39.42307692307693,
-     "where": "usual"
-    },
-    "sessions": {
-     "hi": 13.3,
-     "lo": 3.0,
-     "max": 21,
-     "median": 7.0,
-     "min": 0,
-     "n": 28,
-     "rank": 24,
-     "value": 3,
-     "vsMedian": -57.14285714285714,
-     "where": "usual"
-    },
-    "users": {
-     "hi": 8.6,
-     "lo": 2.0,
-     "max": 13,
-     "median": 5.5,
-     "min": 0,
-     "n": 28,
-     "rank": 24,
-     "value": 2,
-     "vsMedian": -63.63636363636363,
-     "where": "usual"
-    },
-    "views": {
-     "hi": 42.5,
-     "lo": 3.0,
-     "max": 85,
-     "median": 13.5,
-     "min": 0,
-     "n": 28,
-     "rank": 25,
-     "value": 3,
-     "vsMedian": -77.77777777777779,
-     "where": "usual"
-    }
-   },
-   "confirmed": true,
-   "games": [],
-   "hourPattern": [
-    0.5,
-    0.25,
-    0.14,
-    0.21,
-    0.18,
-    0.18,
-    0.11,
-    0.14,
-    0.07,
-    0.07,
-    0.39,
-    0.21,
-    0.36,
-    0.39,
-    0.46,
-    0.82,
-    0.64,
-    0.39,
-    0.18,
-    0.29,
-    0.57,
-    0.86,
-    0.5,
-    0.61
-   ],
-   "insights": [
-    {
-     "text": "10.20은 평소와 크게 다른 점이 없었습니다 — 방문자도 페이지별 조회도 늘 보던 범위 안입니다.",
-     "tone": "flat"
-    }
-   ],
-   "longest": {
-    "device": "데스크톱",
-    "engagementSeconds": 8,
-    "landing": "/129",
-    "pageViews": 1,
-    "seconds": 9,
-    "source": "google"
-   },
-   "settled": {
-    "avgDuration": 267.6820128965517,
-    "engagementRate": 0.6206896551724138,
-    "from": "2026-10-13",
-    "longest": {
-     "date": "2026-10-17",
-     "device": "데스크톱",
-     "engagementSeconds": 89,
-     "landing": "/100",
-     "pageViews": 3,
-     "seconds": 1345,
-     "source": "namu.wiki"
-    },
-    "sessions": 58,
-    "to": "2026-10-19"
-   },
-   "updatedAt": "2026-11-11 12:08",
-   "ydayHours": [
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    1,
-    0,
-    0,
-    1,
-    0,
-    0,
-    0,
-    1,
-    0,
-    0,
-    0
-   ],
-   "ydayPages": [
-    {
-     "fresh": null,
-     "host": "",
-     "list": false,
-     "name": "PC98 환세 시리즈 한글화",
-     "priorAvg": 3.925925925925926,
-     "ratio": 0.5,
-     "rising": null,
-     "section": "",
-     "spike": false,
-     "title": "",
-     "users": 1,
-     "views": 2
-    },
-    {
-     "fresh": null,
-     "host": "",
-     "list": false,
-     "name": "환세풍광전 공략",
-     "priorAvg": 0.5925925925925926,
-     "ratio": 1.0,
-     "rising": null,
-     "section": "",
-     "spike": false,
-     "title": "",
-     "users": 1,
-     "views": 1
-    }
-   ],
-   "ydaySites": [],
-   "ydaySources": [
-    {
-     "name": "직접 방문",
-     "sessions": 1
-    },
-    {
-     "name": "google",
-     "sessions": 1
-    },
-    {
-     "name": "namu.wiki",
-     "sessions": 1
-    }
-   ],
-   "ydayUnresolved": 0,
-   "yesterday": {
-    "date": "2026-10-20",
-    "newUsers": 2,
-    "sessions": 3,
-    "users": 2,
-    "views": 3
-   }
-  },
   "2026-10-21": {
    "baseline": {
     "perUser": {
@@ -8404,7 +8214,7 @@ window.DASHBOARD_DATA['blog'] = {
      "where": "usual"
     }
    },
-   "confirmed": false,
+   "confirmed": true,
    "games": [],
    "hourPattern": [
     0.68,
@@ -8434,7 +8244,7 @@ window.DASHBOARD_DATA['blog'] = {
    ],
    "insights": [
     {
-     "text": "어제는 평소와 크게 다른 점이 없었습니다 — 방문자도 페이지별 조회도 늘 보던 범위 안입니다.",
+     "text": "11.16은 평소와 크게 다른 점이 없었습니다 — 방문자도 페이지별 조회도 늘 보던 범위 안입니다.",
      "tone": "flat"
     }
    ],
@@ -8443,10 +8253,19 @@ window.DASHBOARD_DATA['blog'] = {
     "avgDuration": 195.75483573469387,
     "engagementRate": 0.42857142857142855,
     "from": "2026-11-09",
+    "longest": {
+     "date": "2026-11-10",
+     "device": "데스크톱",
+     "engagementSeconds": 17,
+     "landing": "/129",
+     "pageViews": 1,
+     "seconds": 1334,
+     "source": "직접 방문"
+    },
     "sessions": 49,
     "to": "2026-11-15"
    },
-   "updatedAt": "2026-11-17 11:49",
+   "updatedAt": "2026-11-18 11:11",
    "ydayHours": [
     1,
     1,
@@ -8546,13 +8365,229 @@ window.DASHBOARD_DATA['blog'] = {
      "sessions": 2
     }
    ],
-   "ydayUnresolved": 1,
+   "ydayUnresolved": 0,
    "yesterday": {
     "date": "2026-11-16",
     "newUsers": 2,
     "sessions": 8,
     "users": 4,
     "views": 10
+   }
+  },
+  "2026-11-17": {
+   "baseline": {
+    "perUser": {
+     "hi": 7.9,
+     "lo": 2.175,
+     "max": 16.0,
+     "median": 3.55,
+     "min": 0.0,
+     "n": 28,
+     "rank": 23,
+     "value": 2.4,
+     "vsMedian": -32.3943661971831,
+     "where": "usual"
+    },
+    "sessions": {
+     "hi": 11.3,
+     "lo": 4.0,
+     "max": 16,
+     "median": 8.5,
+     "min": 1,
+     "n": 28,
+     "rank": 11,
+     "value": 9,
+     "vsMedian": 5.88235294117647,
+     "where": "usual"
+    },
+    "users": {
+     "hi": 7.3,
+     "lo": 2.0,
+     "max": 11,
+     "median": 5.0,
+     "min": 0,
+     "n": 28,
+     "rank": 13,
+     "value": 5,
+     "vsMedian": 0.0,
+     "where": "usual"
+    },
+    "views": {
+     "hi": 35.6,
+     "lo": 6.4,
+     "max": 67,
+     "median": 23.5,
+     "min": 1,
+     "n": 28,
+     "rank": 21,
+     "value": 12,
+     "vsMedian": -48.93617021276596,
+     "where": "usual"
+    }
+   },
+   "confirmed": false,
+   "games": [],
+   "hourPattern": [
+    0.68,
+    0.5,
+    0.11,
+    0.14,
+    0.0,
+    0.07,
+    0.14,
+    0.04,
+    0.21,
+    0.18,
+    0.36,
+    0.29,
+    0.32,
+    0.36,
+    0.43,
+    0.36,
+    0.25,
+    0.39,
+    0.54,
+    0.82,
+    0.43,
+    0.86,
+    0.64,
+    0.46
+   ],
+   "insights": [
+    {
+     "text": "어제는 평소와 크게 다른 점이 없었습니다 — 방문자도 페이지별 조회도 늘 보던 범위 안입니다.",
+     "tone": "flat"
+    }
+   ],
+   "longest": null,
+   "settled": {
+    "avgDuration": 266.4384218269231,
+    "engagementRate": 0.4230769230769231,
+    "from": "2026-11-10",
+    "sessions": 52,
+    "to": "2026-11-16"
+   },
+   "updatedAt": "2026-11-18 11:11",
+   "ydayHours": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    2,
+    0,
+    0,
+    0,
+    2,
+    2,
+    0,
+    2,
+    0,
+    2
+   ],
+   "ydayPages": [
+    {
+     "fresh": null,
+     "host": "",
+     "list": true,
+     "name": "'기타' 카테고리의 글 목록",
+     "priorAvg": 2.740740740740741,
+     "ratio": 1.8,
+     "rising": null,
+     "section": "",
+     "spike": false,
+     "title": "",
+     "users": 1,
+     "views": 5
+    },
+    {
+     "fresh": null,
+     "host": "",
+     "list": false,
+     "name": "PC98 환세 시리즈 한글화",
+     "priorAvg": 3.5925925925925926,
+     "ratio": 0.8,
+     "rising": null,
+     "section": "",
+     "spike": false,
+     "title": "",
+     "users": 2,
+     "views": 3
+    },
+    {
+     "fresh": null,
+     "host": "",
+     "list": false,
+     "name": "환세풍광전 공략",
+     "priorAvg": 0.5555555555555556,
+     "ratio": 2.0,
+     "rising": null,
+     "section": "",
+     "spike": false,
+     "title": "",
+     "users": 2,
+     "views": 2
+    },
+    {
+     "fresh": null,
+     "host": "",
+     "list": false,
+     "name": "환세포물장 공략",
+     "priorAvg": 0.3333333333333333,
+     "ratio": 1.0,
+     "rising": null,
+     "section": "",
+     "spike": false,
+     "title": "",
+     "users": 1,
+     "views": 1
+    },
+    {
+     "fresh": null,
+     "host": "",
+     "list": false,
+     "name": "환세포물장 소개",
+     "priorAvg": 0.3333333333333333,
+     "ratio": 1.0,
+     "rising": null,
+     "section": "",
+     "spike": false,
+     "title": "",
+     "users": 1,
+     "views": 1
+    }
+   ],
+   "ydaySites": [],
+   "ydaySources": [
+    {
+     "name": "직접 방문",
+     "sessions": 6
+    },
+    {
+     "name": "google",
+     "sessions": 2
+    },
+    {
+     "name": "pc98.atah.io",
+     "sessions": 1
+    }
+   ],
+   "ydayUnresolved": 0,
+   "yesterday": {
+    "date": "2026-11-17",
+    "newUsers": 4,
+    "sessions": 9,
+    "users": 5,
+    "views": 12
    }
   }
  },
@@ -8570,17 +8605,17 @@ window.DASHBOARD_DATA['blog'] = {
   0.36,
   0.29,
   0.32,
-  0.39,
   0.36,
+  0.43,
   0.36,
-  0.29,
+  0.25,
   0.39,
-  0.46,
-  0.75,
-  0.46,
-  0.79,
+  0.54,
+  0.82,
+  0.43,
+  0.86,
   0.64,
-  0.39
+  0.46
  ],
  "insights": [
   {
@@ -8595,7 +8630,7 @@ window.DASHBOARD_DATA['blog'] = {
   "propertyId": "549191220",
   "settledDays": 7,
   "trendDays": 28,
-  "updatedAt": "2026-11-17 11:49"
+  "updatedAt": "2026-11-18 11:11"
  },
  "months": [
   {
@@ -8620,51 +8655,51 @@ window.DASHBOARD_DATA['blog'] = {
    "views": 22.5
   },
   {
-   "days": 16,
+   "days": 17,
    "month": "2026-11",
    "partial": true,
    "users": 5.0,
-   "views": 26.4
+   "views": 25.6
   }
  ],
  "settled": {
-  "avgDuration": 195.75483573469387,
-  "engagementRate": 0.42857142857142855,
-  "from": "2026-11-09",
-  "sessions": 49,
-  "to": "2026-11-15"
+  "avgDuration": 266.4384218269231,
+  "engagementRate": 0.4230769230769231,
+  "from": "2026-11-10",
+  "sessions": 52,
+  "to": "2026-11-16"
  },
  "weekCompare": {
-  "prevUsers": 6.0,
-  "prevViews": 30.0,
-  "users": 4.0,
-  "views": 24.0
+  "prevUsers": 6.1,
+  "prevViews": 31.9,
+  "users": 3.9,
+  "views": 19.4
  },
  "ydayHours": [
-  1,
-  1,
-  0,
-  0,
-  0,
-  0,
-  1,
   0,
   0,
   0,
   0,
   0,
   0,
-  1,
   0,
   0,
   0,
   0,
-  1,
-  1,
-  1,
-  1,
-  1,
-  0
+  0,
+  0,
+  0,
+  0,
+  2,
+  0,
+  0,
+  0,
+  2,
+  2,
+  0,
+  2,
+  0,
+  2
  ],
  "ydayPages": [
   {
@@ -8672,55 +8707,69 @@ window.DASHBOARD_DATA['blog'] = {
    "host": "",
    "list": true,
    "name": "'기타' 카테고리의 글 목록",
-   "priorAvg": 2.4814814814814814,
-   "ratio": 2.8,
+   "priorAvg": 2.740740740740741,
+   "ratio": 1.8,
    "rising": null,
    "section": "",
-   "spike": true,
+   "spike": false,
    "title": "",
    "users": 1,
-   "views": 7
+   "views": 5
   },
   {
    "fresh": null,
    "host": "",
    "list": false,
    "name": "PC98 환세 시리즈 한글화",
-   "priorAvg": 3.6296296296296298,
-   "ratio": 0.3,
-   "rising": null,
-   "section": "",
-   "spike": false,
-   "title": "",
-   "users": 0,
-   "views": 1
-  },
-  {
-   "fresh": null,
-   "host": "",
-   "list": false,
-   "name": "지도로 보는 환세 시리즈 세계관",
-   "priorAvg": 1.3333333333333333,
+   "priorAvg": 3.5925925925925926,
    "ratio": 0.8,
    "rising": null,
    "section": "",
    "spike": false,
    "title": "",
    "users": 2,
+   "views": 3
+  },
+  {
+   "fresh": null,
+   "host": "",
+   "list": false,
+   "name": "환세풍광전 공략",
+   "priorAvg": 0.5555555555555556,
+   "ratio": 2.0,
+   "rising": null,
+   "section": "",
+   "spike": false,
+   "title": "",
+   "users": 2,
+   "views": 2
+  },
+  {
+   "fresh": null,
+   "host": "",
+   "list": false,
+   "name": "환세포물장 공략",
+   "priorAvg": 0.3333333333333333,
+   "ratio": 1.0,
+   "rising": null,
+   "section": "",
+   "spike": false,
+   "title": "",
+   "users": 1,
    "views": 1
   },
   {
    "fresh": null,
    "host": "",
    "list": false,
-   "name": "환세풍광전 소개",
-   "priorAvg": 1.037037037037037,
+   "name": "환세포물장 소개",
+   "priorAvg": 0.3333333333333333,
    "ratio": 1.0,
    "rising": null,
    "section": "",
    "spike": false,
    "title": "",
-   "users": 2,
+   "users": 1,
    "views": 1
   }
  ],
@@ -8728,23 +8777,23 @@ window.DASHBOARD_DATA['blog'] = {
  "ydaySources": [
   {
    "name": "직접 방문",
-   "sessions": 3
-  },
-  {
-   "name": "pc98.atah.io",
-   "sessions": 3
+   "sessions": 6
   },
   {
    "name": "google",
    "sessions": 2
+  },
+  {
+   "name": "pc98.atah.io",
+   "sessions": 1
   }
  ],
- "ydayUnresolved": 1,
+ "ydayUnresolved": 0,
  "yesterday": {
-  "date": "2026-11-16",
-  "newUsers": 2,
-  "sessions": 8,
-  "users": 4,
-  "views": 10
+  "date": "2026-11-17",
+  "newUsers": 4,
+  "sessions": 9,
+  "users": 5,
+  "views": 12
  }
 };
