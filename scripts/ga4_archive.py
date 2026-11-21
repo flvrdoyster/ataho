@@ -64,6 +64,20 @@ def collect(client, target, start, end):
         if 0 <= hh < 24:
             day(r)["hours"][hh] = int(r["sessions"])
 
+    try:
+        ref_rows = report_all(client, target, dimensions=["date", "sessionSource", "pageReferrer"],
+                              metrics=["eventCount"], date_range=rng, dimension_filter=ga4.SESSION_START)
+    except Exception as err:  # noqa: BLE001
+        print(f"{target.key}: 글 주소 조회 실패, 이번엔 건너뜁니다: {type(err).__name__}", file=sys.stderr)
+    else:
+        by_date = {}
+        for r in ref_rows:
+            by_date.setdefault(ga4.date_key(r["date"]), []).append(r)
+        for k, d in days.items():
+            grouped = ga4.group_refs(by_date.get(k, []))
+            d["refs"] = sorted(([src, f["url"], f["sessions"]] for src, found in grouped.items() for f in found),
+                               key=lambda x: (-x[2], x[0], x[1]))
+
     for d in days.values():
         d["pages"].sort(key=lambda p: -p[-2])
         d["sources"].sort(key=lambda s: -s[-1])
@@ -86,6 +100,8 @@ def fill(days, start, end, existing=None):
         else:
             out[k] = days.get(k) or {"users": 0, "newUsers": 0, "sessions": 0, "views": 0,
                                      "pages": [], "sources": [], "devices": [], "hours": [0] * 24}
+            if "refs" not in out[k] and "refs" in existing.get(k, {}):
+                out[k]["refs"] = existing[k]["refs"]
         cur += timedelta(days=1)
     return out, kept
 

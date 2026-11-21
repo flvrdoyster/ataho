@@ -462,8 +462,11 @@
             `<b>${fmt(s.views)}</b> (${pct(share(s.views, siteTotal))})</span>`).join('')}</div>` : '';
 
     const srcMax = Math.max(0, ...data.ydaySources.map((s) => s.sessions));
+    const refLinks = (s) => (s.refs || []).filter((r) => /^https?:\/\//.test(r.url)).map((r) =>
+        `<div class="ref"><a href="${esc(r.url)}" target="_blank" rel="noopener noreferrer">` +
+        `${esc(r.url.replace(/^https?:\/\//, ''))}</a> · ${fmt(r.sessions)}</div>`).join('');
     const srcRows = data.ydaySources.map((s) =>
-        `<tr><td class="name bar" style="${barW(s.sessions, srcMax)}">${esc(s.name)}</td>` +
+        `<tr><td class="name bar" style="${barW(s.sessions, srcMax)}">${esc(s.name)}${refLinks(s)}</td>` +
         `<td class="num">${fmt(s.sessions)}</td></tr>`).join('');
 
     const unresolved = data.ydayUnresolved

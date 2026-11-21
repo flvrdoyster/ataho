@@ -480,6 +480,17 @@ svg {
     font-size: var(--fs-note);
 }
 
+.rank .ref {
+    margin-top: 2px;
+    font-size: var(--fs-note);
+    word-break: break-all;
+}
+
+.rank .ref a {
+    color: var(--text-primary);
+    text-decoration: underline;
+}
+
 .rank.pages .page {
     width: 100%;
 }

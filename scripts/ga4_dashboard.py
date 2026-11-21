@@ -1,11 +1,13 @@
 #!/usr/bin/env python3
 import calendar
+import ipaddress
 import json
 import os
 import re
 import statistics
 import sys
 import urllib.error
+import urllib.parse
 import urllib.request
 from collections import Counter
 from datetime import date, datetime, timedelta, timezone
@@ -62,6 +64,9 @@ def host_regex(pattern):
             match_type=Filter.StringFilter.MatchType.FULL_REGEXP, value=pattern),
     ))
 
+
+SESSION_START = FilterExpression(filter=Filter(
+    field_name="eventName", string_filter=Filter.StringFilter(value="session_start")))
 
 BOT_BROWSER = "Mozilla Compatible Agent"
 NOT_BOT = FilterExpression(not_expression=FilterExpression(filter=Filter(
@@ -257,6 +262,62 @@ def pct_delta(cur, prev):
 UNRESOLVED_SOURCES = {"(not set)", "(data not available)", ""}
 SOURCE_LABELS = {"(direct)": "직접 방문"}
 DEVICE_LABELS = {"mobile": "모바일", "desktop": "데스크톱", "tablet": "태블릿"}
+
+REFS_PER_SOURCE = 5
+REF_MAX_LEN = 200
+OWN_HOST_RE = re.compile(r"(^|\.)atah\.io$|^oysterbay\.tistory\.com$")
+LOCAL_HOST_RE = re.compile(r"^localhost$|\.(localhost|local)$")
+SEARCH_HOST_RE = re.compile(
+    r"(^|\.)google\.[a-z.]+$|(^|\.)bing\.com$|(^|\.)duckduckgo\.com$"
+    r"|(^|\.)search\.(naver\.com|daum\.net|yahoo\.com|zum\.com)$")
+
+
+def clean_ref(raw):
+    try:
+        u = urllib.parse.urlsplit((raw or "").strip())
+        host = u.hostname
+    except ValueError:
+        return None
+    if u.scheme not in ("http", "https") or not host:
+        return None
+    host = host.lower()
+    try:
+        ipaddress.ip_address(host)
+        return None
+    except ValueError:
+        pass
+    if ("." not in host or OWN_HOST_RE.search(host) or SEARCH_HOST_RE.search(host)
+            or LOCAL_HOST_RE.search(host) or not u.path.strip("/")):
+        return None
+    url = f"{u.scheme}://{host}{u.path}"
+    return url if len(url) <= REF_MAX_LEN else None
+
+
+def group_refs(rows):
+    totals = {}
+    for r in rows:
+        url, n = clean_ref(r["pageReferrer"]), int(r["eventCount"])
+        if url and n > 0:
+            key = (r["sessionSource"], url)
+            totals[key] = totals.get(key, 0) + n
+    by_source = {}
+    for (source, url), n in sorted(totals.items(), key=lambda kv: (-kv[1], kv[0])):
+        found = by_source.setdefault(source, [])
+        if len(found) < REFS_PER_SOURCE:
+            found.append({"url": url, "sessions": n})
+    return by_source
+
+
+def fetch_refs(client, target, date_range):
+    try:
+        rows = report(client, target, dimensions=["sessionSource", "pageReferrer"],
+                      metrics=["eventCount"], date_range=date_range,
+                      dimension_filter=SESSION_START, limit=10000)
+    except Exception as err:  # noqa: BLE001
+        print(f"  {target.key}: 글 주소 조회 실패, 건너뜁니다: {type(err).__name__}", file=sys.stderr)
+        return {}
+    return group_refs(rows)
+
 
 SPIKE_MIN_VIEWS = 5
 SPIKE_RATIO = 2.0
@@ -532,6 +593,7 @@ def fetch(client, target, age=1, include_long=True):
         ]
 
     sources, unresolved = [], 0
+    refs = fetch_refs(client, target, day_range(age))
     for r in report(client, target, dimensions=["sessionSource"],
                     metrics=["sessions"], date_range=day_range(age),
                     order_by=("sessions", True), limit=25):
@@ -540,7 +602,10 @@ def fetch(client, target, age=1, include_long=True):
         if name in UNRESOLVED_SOURCES:
             unresolved += n
         else:
-            sources.append({"name": SOURCE_LABELS.get(name, name), "sessions": n})
+            entry = {"name": SOURCE_LABELS.get(name, name), "sessions": n}
+            if refs.get(name):
+                entry["refs"] = refs[name]
+            sources.append(entry)
     data["ydaySources"] = sources
     data["ydayUnresolved"] = unresolved
 
