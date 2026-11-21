@@ -766,6 +766,12 @@ def build_insights(data, day_label="어제", confirmed=False):
                 "text": f"아직 {days}일치만 쌓여서 '평소'를 가릴 기준이 얇습니다 — "
                         f"견줄 만한 문장은 데이터가 더 모이면 나옵니다.",
             })
+        elif any(b and b.get("where") in ("high", "low")
+                 for b in (data.get("baseline") or {}).values()):
+            out.append({
+                "tone": "flat",
+                "text": f"{day_label} 페이지별 조회는 늘 보던 범위 안입니다.",
+            })
         else:
             out.append({
                 "tone": "flat",
