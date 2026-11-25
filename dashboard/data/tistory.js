@@ -1,6 +1,6 @@
 window.DASHBOARD_TISTORY = {
  "firstDay": "2026-11-04",
- "lastFetch": "2026-11-22 17:31",
+ "lastFetch": "2026-11-25 12:17",
  "days": {
   "2026-11-04": {
    "until": "24:00",
@@ -365,6 +365,70 @@ window.DASHBOARD_TISTORY = {
      "etc",
      1
     ],
+    [
+     "pc98.atah.io",
+     "etc",
+     1
+    ]
+   ],
+   "keywords": []
+  },
+  "2026-11-23": {
+   "until": "24:00",
+   "views": 5,
+   "inner": 1,
+   "domains": [
+    [
+     "pc98.atah.io",
+     "etc",
+     3
+    ],
+    [
+     "www.google.com",
+     "google",
+     2
+    ]
+   ],
+   "keywords": []
+  },
+  "2026-11-24": {
+   "until": "24:00",
+   "views": 7,
+   "inner": 14,
+   "domains": [
+    [
+     "search.naver.com",
+     "naver",
+     2
+    ],
+    [
+     "www.google.com",
+     "google",
+     2
+    ],
+    [
+     "haiyuki.atah.io",
+     "etc",
+     1
+    ],
+    [
+     "jfri13.tistory.com",
+     "tistory",
+     1
+    ],
+    [
+     "pc98.atah.io",
+     "etc",
+     1
+    ]
+   ],
+   "keywords": []
+  },
+  "2026-11-25": {
+   "until": "12:17",
+   "views": 1,
+   "inner": 12,
+   "domains": [
     [
      "pc98.atah.io",
      "etc",
