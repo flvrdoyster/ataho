@@ -1,6 +1,6 @@
 window.DASHBOARD_TISTORY = {
  "firstDay": "2026-11-04",
- "lastFetch": "2026-11-25 12:17",
+ "lastFetch": "2026-11-25 12:22",
  "days": {
   "2026-11-04": {
    "until": "24:00",
@@ -352,9 +352,14 @@ window.DASHBOARD_TISTORY = {
   },
   "2026-11-22": {
    "until": "17:31",
-   "views": 4,
+   "views": 5,
    "inner": 1,
    "domains": [
+    [
+     "pc98.atah.io",
+     "etc",
+     2
+    ],
     [
      "www.google.com",
      "google",
@@ -364,68 +369,73 @@ window.DASHBOARD_TISTORY = {
      "namu.wiki",
      "etc",
      1
-    ],
-    [
-     "pc98.atah.io",
-     "etc",
-     1
     ]
    ],
    "keywords": []
   },
   "2026-11-23": {
    "until": "24:00",
-   "views": 5,
-   "inner": 1,
+   "views": 13,
+   "inner": 15,
    "domains": [
     [
      "pc98.atah.io",
      "etc",
-     3
+     6
     ],
     [
      "www.google.com",
      "google",
-     2
-    ]
-   ],
-   "keywords": []
-  },
-  "2026-11-24": {
-   "until": "24:00",
-   "views": 7,
-   "inner": 14,
-   "domains": [
+     4
+    ],
     [
      "search.naver.com",
      "naver",
      2
     ],
     [
+     "jfri13.tistory.com",
+     "tistory",
+     1
+    ]
+   ],
+   "keywords": []
+  },
+  "2026-11-24": {
+   "until": "24:00",
+   "views": 11,
+   "inner": 27,
+   "domains": [
+    [
      "www.google.com",
      "google",
-     2
+     4
     ],
     [
      "haiyuki.atah.io",
      "etc",
-     1
-    ],
-    [
-     "jfri13.tistory.com",
-     "tistory",
-     1
+     2
     ],
     [
      "pc98.atah.io",
      "etc",
+     2
+    ],
+    [
+     "search.naver.com",
+     "naver",
+     2
+    ],
+    [
+     "jfri13.tistory.com",
+     "tistory",
      1
     ]
    ],
    "keywords": []
   },
   "2026-11-25": {
-   "until": "12:17",
+   "until": "12:22",
    "views": 1,
    "inner": 12,
    "domains": [

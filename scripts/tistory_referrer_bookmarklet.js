@@ -44,7 +44,20 @@
     };
 
     let root = await idb('readonly', (s) => s.get('root'));
-    if (root && await root.requestPermission({ mode: 'readwrite' }) !== 'granted') root = null;
+    if (root) {
+        let timer;
+        const state = await Promise.race([
+            root.queryPermission({ mode: 'readwrite' }),
+            new Promise((ok) => { timer = setTimeout(() => ok('stuck'), 3000); }),
+        ]);
+        clearTimeout(timer);
+        if (state === 'stuck') {
+            await idb('readwrite', (s) => s.delete('root'));
+            alert('저장해 둔 폴더 정보가 응답하지 않아 지웠습니다. 다시 누르면 폴더를 새로 고릅니다.');
+            return;
+        }
+        if (state !== 'granted' && await root.requestPermission({ mode: 'readwrite' }) !== 'granted') root = null;
+    }
     if (!root) {
         root = await showDirectoryPicker({ id: 'ataho', mode: 'readwrite' });
         await idb('readwrite', (s) => s.put(root, 'root'));
