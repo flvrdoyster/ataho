@@ -1,6 +1,6 @@
 window.DASHBOARD_TISTORY = {
  "firstDay": "2026-11-04",
- "lastFetch": "2026-11-25 12:22",
+ "lastFetch": "2026-11-26 22:58",
  "days": {
   "2026-11-04": {
    "until": "24:00",
@@ -435,13 +435,36 @@ window.DASHBOARD_TISTORY = {
    "keywords": []
   },
   "2026-11-25": {
-   "until": "12:22",
-   "views": 1,
-   "inner": 12,
+   "until": "24:00",
+   "views": 3,
+   "inner": 25,
+   "domains": [
+    [
+     "www.google.com",
+     "google",
+     2
+    ],
+    [
+     "pc98.atah.io",
+     "etc",
+     1
+    ]
+   ],
+   "keywords": []
+  },
+  "2026-11-26": {
+   "until": "22:58",
+   "views": 3,
+   "inner": 20,
    "domains": [
     [
      "pc98.atah.io",
      "etc",
+     2
+    ],
+    [
+     "www.google.com",
+     "google",
      1
     ]
    ],
